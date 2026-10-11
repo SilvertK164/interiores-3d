@@ -31,7 +31,7 @@ Diseñador de interiores **2D + 3D para viviendas y comercios**, con plantillas.
 1. ~~Guardar el diseño~~ **Hecho**: está en `design/interiores.pen`, **local y fuera de git** (`*.pen` en `.gitignore`). Para evidencia en el repo se exportan PNG a `docs/design/` (sin el archivo fuente).
 2. Aprobar el spec 1 → `writing-plans` → plan (tareas T0–T7).
 3. Crear cuentas a mano: GitHub (repo público nuevo), Supabase `dev` y `prod`, Vercel, Cloudflare Free.
-4. **Biblioteca de muebles**: investigación en curso (fuentes libres y BIM); decidir qué sumar al catálogo, incluido **comercio**.
+4. **Biblioteca de muebles** (informe BIM/arquitectura listo: [G2](analisis-clases/G2-muebles-bim.md); falta el de fuentes libres GLB). Hallazgos de G2 **[verificado en sitios oficiales, sin descargar]**: **descartar** 3D Warehouse, BIMobject/BIMsmith/RevitCity/NBS (uso "en tu proyecto", prohíben redistribuir), ShapeNet y 3D-FUTURE (solo investigación), FurniMesh y Objaverse en bloque. **Usables con crédito**: Sweet Home 3D (Scopia, BlendSwap CC0/CC-BY, KatorLegaz), Poly Haven (CC0, 85 muebles), ABO (CC BY 4.0, piloto de 30–100 piezas). **Comercio**: no hay set libre de mostradores/cajas; lo cubren los nodos nativos de Pascal (`shelf`, `cabinet`, vidriera) y módulos propios con `geometry-script` [por probar: versión instalada y dónde persisten los artefactos]. Decidir cuando llegue el informe G1.
 5. Diseño que falta: materiales, galería de renders (escritorio), exportar plano, compartir, tablet, estados (carga, error, conflicto).
 6. Probar en el spike: dock propio con `armToolMode`, ocultar la barra de Pascal, recorrido táctil, prueba de fidelidad del render.
 
