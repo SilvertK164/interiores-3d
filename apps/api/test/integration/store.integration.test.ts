@@ -59,8 +59,32 @@ describe('createSupabaseStore contra Supabase dev', () => {
     expect(await store.get(a, project.id)).toBeNull()
   })
 
+  it('recuerda la plantilla de origen al crear, listar, leer y renombrar; sin plantilla devuelve null', async () => {
+    const fromTemplate = await store.create(a, { name: 'Desde plantilla', kind: 'comercio', templateId: 'concept-store' })
+    expect(fromTemplate).toMatchObject({ templateId: 'concept-store', version: 1 })
+    const blank = await store.create(a, { name: 'En blanco' })
+    expect(blank.templateId).toBeNull()
+
+    const listed = await store.list(a)
+    expect(listed.find((p) => p.id === fromTemplate.id)?.templateId).toBe('concept-store')
+    expect(listed.find((p) => p.id === blank.id)?.templateId).toBeNull()
+    expect((await store.get(a, fromTemplate.id))?.templateId).toBe('concept-store')
+    expect((await store.update(a, fromTemplate.id, { name: 'Renombrada' }))?.templateId).toBe('concept-store')
+    expect((await store.get(a, fromTemplate.id))?.templateId).toBe('concept-store')
+  })
+
+  it('un proyecto anterior a las plantillas (fila sin template_id) devuelve templateId null', async () => {
+    const legacy = await admin.from('projects').insert({ owner_id: a.userId, name: 'Anterior a las plantillas', kind: 'vivienda' }).select('id').single()
+    expect(legacy.error).toBeNull()
+    const id = (legacy.data as { id: string }).id
+    const scene = await admin.from('project_scenes').insert({ project_id: id, scene: emptyEnvelope(), schema_version: 1 })
+    expect(scene.error).toBeNull()
+    expect((await store.list(a)).find((p) => p.id === id)?.templateId).toBeNull()
+    expect((await store.get(a, id))?.templateId).toBeNull()
+  })
+
   it('otra persona no ve ni toca el proyecto (null / false / not_found)', async () => {
-    const project = await store.create(a, { name: 'Privado' })
+    const project = await store.create(a, { name: 'Privado', templateId: 'loft' })
     expect(await store.get(b, project.id)).toBeNull()
     expect(await store.update(b, project.id, { name: 'robado' })).toBeNull()
     expect(await store.remove(b, project.id)).toBe(false)

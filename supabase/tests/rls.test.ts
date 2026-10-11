@@ -68,6 +68,65 @@ describe('RLS de projects', () => {
   })
 })
 
+describe('plantilla de origen (projects.template_id)', () => {
+  it('se guarda con el proyecto y otra cuenta no ve ese proyecto', async () => {
+    const created = await a.client
+      .from('projects')
+      .insert({ owner_id: a.id, name: 'Desde plantilla', template_id: 'concept-store' })
+      .select('id,template_id')
+      .single()
+    expect(created.error).toBeNull()
+    expect(created.data?.template_id).toBe('concept-store')
+    const id = (created.data as { id: string }).id
+
+    const mine = await a.client.from('projects').select('template_id').eq('id', id).single()
+    expect(mine.data?.template_id).toBe('concept-store')
+
+    const theirs = await b.client.from('projects').select('id,template_id').eq('id', id)
+    expect(theirs.error).toBeNull()
+    expect(theirs.data).toEqual([])
+    const byTemplate = await b.client.from('projects').select('id').eq('template_id', 'concept-store')
+    expect(byTemplate.error).toBeNull()
+    expect(byTemplate.data).toEqual([])
+  })
+
+  it('un proyecto sin plantilla (en blanco o anterior a la columna) guarda null', async () => {
+    const blank = await a.client.from('projects').select('template_id').eq('id', projectA).single()
+    expect(blank.error).toBeNull()
+    expect(blank.data?.template_id).toBeNull()
+  })
+
+  it('B no puede cambiar la plantilla de un proyecto de A (0 filas afectadas)', async () => {
+    const id = (
+      (await a.client.from('projects').insert({ owner_id: a.id, name: 'Con loft', template_id: 'loft' }).select('id').single()).data as { id: string }
+    ).id
+    const upd = await b.client.from('projects').update({ template_id: 'cafe' }).eq('id', id).select('id')
+    expect(upd.error).toBeNull()
+    expect(upd.data).toEqual([])
+    const still = await a.client.from('projects').select('template_id').eq('id', id).single()
+    expect(still.data?.template_id).toBe('loft')
+  })
+
+  it.each([
+    ['vacío', ''],
+    ['con mayúsculas', 'Concept-Store'],
+    ['con espacios', 'concept store'],
+    ['con guion bajo', 'concept_store'],
+    ['con salto de línea al final', 'loft\n'],
+    ['de más de 40 caracteres', 'a'.repeat(41)],
+  ])('rechaza un template_id %s', async (_motivo, templateId) => {
+    const { error } = await a.client.from('projects').insert({ owner_id: a.id, name: 'ok', template_id: templateId })
+    expect(error?.code).toBe('23514')
+  })
+
+  it('acepta los ids de las plantillas de muestra y uno de 40 caracteres', async () => {
+    for (const templateId of ['concept-store', 'cafe', 'supermercado', 'loft', 'a'.repeat(40)]) {
+      const { error } = await a.client.from('projects').insert({ owner_id: a.id, name: 'ok', template_id: templateId })
+      expect(error, templateId).toBeNull()
+    }
+  })
+})
+
 describe('RLS de project_scenes', () => {
   it('B no lee la escena de A', async () => {
     const { data, error } = await b.client.from('project_scenes').select('project_id')

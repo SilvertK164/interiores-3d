@@ -2,7 +2,16 @@ import { randomUUID } from 'node:crypto'
 import { type ProjectDetail, type SceneEnvelope, emptyEnvelope } from '@interiores/contract'
 import type { Ctx, ProjectStore } from '../../src/store.js'
 
-type Row = { id: string; ownerId: string; name: string; kind: 'vivienda' | 'comercio' | null; updatedAt: string; scene: SceneEnvelope; version: number }
+type Row = {
+  id: string
+  ownerId: string
+  name: string
+  kind: 'vivienda' | 'comercio' | null
+  templateId: string | null
+  updatedAt: string
+  scene: SceneEnvelope
+  version: number
+}
 
 /** Réplica en memoria de las reglas de dueño y de versión que aplican RLS y la API real. */
 export function createMemoryStore(): ProjectStore & { tick(): void } {
@@ -13,7 +22,7 @@ export function createMemoryStore(): ProjectStore & { tick(): void } {
     const row = rows.get(id)
     return row && row.ownerId === ctx.userId ? row : undefined
   }
-  const summary = (r: Row) => ({ id: r.id, name: r.name, kind: r.kind, updatedAt: r.updatedAt })
+  const summary = (r: Row) => ({ id: r.id, name: r.name, kind: r.kind, templateId: r.templateId, updatedAt: r.updatedAt })
 
   return {
     tick: () => {
@@ -27,9 +36,18 @@ export function createMemoryStore(): ProjectStore & { tick(): void } {
     },
     async create(ctx, input) {
       clock += 1000
-      const row: Row = { id: randomUUID(), ownerId: ctx.userId, name: input.name, kind: input.kind ?? null, updatedAt: now(), scene: emptyEnvelope(), version: 1 }
+      const row: Row = {
+        id: randomUUID(),
+        ownerId: ctx.userId,
+        name: input.name,
+        kind: input.kind ?? null,
+        templateId: input.templateId ?? null,
+        updatedAt: now(),
+        scene: emptyEnvelope(),
+        version: 1,
+      }
       rows.set(row.id, row)
-      return { id: row.id, name: row.name, kind: row.kind, version: 1 }
+      return { id: row.id, name: row.name, kind: row.kind, templateId: row.templateId, version: 1 }
     },
     async get(ctx, id) {
       const r = mine(ctx, id)

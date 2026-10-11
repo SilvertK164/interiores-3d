@@ -13,10 +13,11 @@ function clientWith(fetchImpl: typeof fetch, token: string | null = 'tok') {
 describe('createApiClient', () => {
   it('envía el Bearer y valida la respuesta contra el contrato', async () => {
     const fetchImpl = vi.fn(async () =>
-      json(200, [{ id: ID, name: 'Casa', kind: null, updatedAt: '2026-10-11T12:00:00.000Z' }]),
+      json(200, [{ id: ID, name: 'Casa', kind: null, templateId: 'cafe', updatedAt: '2026-10-11T12:00:00.000Z' }]),
     )
     const list = await clientWith(fetchImpl as unknown as typeof fetch).listProjects()
     expect(list[0]?.name).toBe('Casa')
+    expect(list[0]?.templateId).toBe('cafe')
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit]
     expect(url).toBe('http://api.test/v1/projects')
     expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok')

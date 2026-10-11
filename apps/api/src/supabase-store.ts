@@ -9,12 +9,13 @@ import {
 import { createClient } from '@supabase/supabase-js'
 import type { Ctx, ProjectStore } from './store.js'
 
-type ProjectRow = { id: string; name: string; kind: ProjectKind | null; updated_at: string }
+type ProjectRow = { id: string; name: string; kind: ProjectKind | null; template_id: string | null; updated_at: string }
 
 const toSummary = (r: ProjectRow): ProjectSummary => ({
   id: r.id,
   name: r.name,
   kind: r.kind,
+  templateId: r.template_id,
   updatedAt: new Date(r.updated_at).toISOString(),
 })
 
@@ -25,7 +26,7 @@ export function createSupabaseStore(url: string, anonKey: string): ProjectStore 
       global: { headers: { Authorization: `Bearer ${ctx.token}` } },
       auth: { persistSession: false, autoRefreshToken: false },
     })
-  const COLUMNS = 'id,name,kind,updated_at'
+  const COLUMNS = 'id,name,kind,template_id,updated_at'
 
   return {
     async list(ctx) {
@@ -38,7 +39,7 @@ export function createSupabaseStore(url: string, anonKey: string): ProjectStore 
       const db = forUser(ctx)
       const inserted = await db
         .from('projects')
-        .insert({ owner_id: ctx.userId, name: input.name, kind: input.kind ?? null })
+        .insert({ owner_id: ctx.userId, name: input.name, kind: input.kind ?? null, template_id: input.templateId ?? null })
         .select(COLUMNS)
         .single()
       if (inserted.error) throw inserted.error
@@ -48,7 +49,7 @@ export function createSupabaseStore(url: string, anonKey: string): ProjectStore 
         await db.from('projects').delete().eq('id', row.id)
         throw scene.error
       }
-      return { id: row.id, name: row.name, kind: row.kind, version: 1 }
+      return { id: row.id, name: row.name, kind: row.kind, templateId: row.template_id, version: 1 }
     },
 
     async get(ctx, id): Promise<ProjectDetail | null> {
