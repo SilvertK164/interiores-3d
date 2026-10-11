@@ -26,3 +26,6 @@ design/assets/items/
 apps/web/e2e/.auth/
 playwright-report/
 test-results/
+
+# Artefactos de compilación
+*.tsbuildinfo
