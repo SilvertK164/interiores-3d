@@ -63,7 +63,9 @@ Cómo se verificó: dos agentes leyeron las páginas **oficiales** de cada prove
 
 **No verificado** (hacerlo antes de apoyarse en ello): que el plan Free corra `klein-4b` en una cuenta real; el permiso mínimo del token; si una entrada de exactamente 512 × 512 es admitida; si Stability otorga los 25 créditos sin cuenta Google; los montos de bienvenida de Replicate y fal.ai.
 
-**Estado:** el proveedor **no está elegido**. La tabla de Victoria (sección 4) resultó ser de modelos de *visión* y el equipo confirmó que lo que quiere es **render realista**, así que esa tabla no entra en esta decisión.
+**Decisión del equipo (2026-10-11): soportar solo Cloudflare Workers AI (`flux-2-klein-4b`)**, porque es la única opción gratuita recurrente. Costo asumido: sin alternativa a mano si la fidelidad no alcanza. **Compuerta de entrada al slice:** una prueba de 30 minutos con una captura real del editor (cuenta Free de Cloudflare, token propio, captura reducida a < 512 × 512) para juzgar si muros, aberturas y muebles conservan su lugar. Si no alcanza, se vuelve a decidir con Stability (25 créditos de prueba) como siguiente candidato. La interfaz `RenderProvider` se mantiene para no cerrar esa puerta.
+
+**Nota sobre la tabla de Victoria:** la tabla de Victoria (sección 4) resultó ser de modelos de *visión* y el equipo confirmó que lo que quiere es **render realista**, así que esa tabla no entra en esta decisión.
 
 ### Protocolo para decidir con evidencia (30–45 min)
 Tomar 3 capturas del editor (una vivienda, un comercio y un cuarto con muebles) y correr cada candidato —incluida la API que investigó Victoria— con el mismo prompt. Puntuar de 1 a 5: fidelidad de muros y aberturas, fidelidad de muebles, realismo de luz y materiales, tiempo, costo. Guardar capturas y tabla: es la evidencia de la decisión para *Qué decidí yo*.

@@ -9,6 +9,8 @@
 
 Por qué lo defendemos: el costo y el riesgo de abuso no recaen en el equipo; se practica el manejo de secretos que enseña la clase 06 (credenciales, alcance, supply chain); y el producto no depende de una cuenta paga nuestra.
 
+**Proveedor soportado en esta versión:** solo **Cloudflare Workers AI** (modelo `flux-2-klein-4b`; pide *token* y *Account ID*). La interfaz `RenderProvider` y la columna `provider` quedan listas para sumar otros más adelante. Detalle y condiciones en la [investigación](investigacion-renders-exportaciones-diseno.md).
+
 **Costo asumido y mitigación:** quien evalúa no verá un render si no tiene una clave. Mitigación: el equipo crea su propia clave gratuita y la carga en la **cuenta de demostración por el mismo flujo** que usa cualquier persona; además, el proyecto de demo trae renders previos guardados por si el proveedor falla en vivo.
 
 ## 2. Principios
