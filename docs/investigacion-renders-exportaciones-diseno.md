@@ -15,7 +15,7 @@
 | **IFC (salida)** | **No en 1.0.3; sí en `main`** | `lib/ifc-export.ts` en `main` llama a `buildIfcExport` de `@pascal-app/ifc-converter/export`. El paquete **publicado** del conversor solo exporta `.` (dirección IFC → Pascal) **[verificado en npm y en el repo]** | Alto/incierto: vendorear ≈ 91 KB de TypeScript (9 archivos, `scene-to-ifc.ts` pesa 58 KB), con riesgo de desajuste con los tipos de `core` 1.0.3 **[inferencia]** | **Spike acotado a 2 h o descartar** y documentar la razón. |
 | **IFC (entrada)** | Sí | `@pascal-app/ifc-converter` convierte IFC → grafo de Pascal: muros, puertas, ventanas, losas, columnas y espacios como ambientes **[verificado]** | Bajo/medio | Posible "Importar plano IFC" en el futuro. |
 
-**Conclusión provisoria:** PDF con escala, cajetín y cotas es barato y entra. DXF e IFC son los candidatos a recortar.
+**Conclusión:** PDF con escala, cajetín y cotas es barato y entra. **Decisión del equipo (2026-10-11):** DXF e IFC quedan **fuera de alcance** y se documentan como trabajo futuro. Razones para el README: Pascal 1.0.3 no trae DXF; el IFC de salida solo existe en una rama sin publicar y depende de ≈ 91 KB de código con tipos que podrían no coincidir con la versión que usamos; y un plano PDF con escala y cotas cubre lo que necesita quien presenta el espacio.
 
 ## 2. Renders realistas
 
@@ -34,6 +34,8 @@
 | **Comerciales de interiorismo** (Rendair, Decor8, etc.) | Preservan geometría según su marketing | Planes propios | Afirmaciones del proveedor, no independientes |
 
 **Qué recomendamos hoy:** empezar con **Stability AI Control Structure** como candidato principal, porque su propósito documentado es conservar la estructura de la imagen de referencia, que es lo que más importa al comparar un render con el plano. Dejar **FLUX.1 Kontext [pro]** como alternativa y **Gemini** para variaciones de estilo. **Esto es una hipótesis**: ninguno de los criterios de fidelidad geométrica está comparado de forma independiente.
+
+**Estado:** el proveedor **no está elegido**. El equipo va a compartir el material que reunió Victoria; la comparativa lo incluye como candidato antes de decidir.
 
 ### Protocolo para decidir con evidencia (30–45 min)
 Tomar 3 capturas del editor (una vivienda, un comercio y un cuarto con muebles) y correr cada candidato —incluida la API que investigó Victoria— con el mismo prompt. Puntuar de 1 a 5: fidelidad de muros y aberturas, fidelidad de muebles, realismo de luz y materiales, tiempo, costo. Guardar capturas y tabla: es la evidencia de la decisión para *Qué decidí yo*.

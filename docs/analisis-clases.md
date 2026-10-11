@@ -9,6 +9,8 @@
 - **Backend visible:** opción **B** — `apps/api` en Fastify (TypeScript) dentro del workspace pnpm, con `openapi.yaml` y contrato compartido en zod.
 - **Alcance objetivo:** niveles **0 a 3** (evidencia y harness, núcleo, producto, diferencial). Congelar features al 70 % del tiempo; si algo se traba, el nivel 3 es lo primero que se recorta.
 - **Enfoque del editor:** Pascal Editor como base (spike validado), con plan B híbrido (solo `core` + `viewer`).
+- **Extras aprobados (2026-10-11):** plano en **PDF con escala gráfica y cajetín** y **render realista con IA** (captura del editor → API → galería por proyecto, con cuota por usuario). **Fuera de alcance:** exportar DXF y exportar IFC; quedan documentados como trabajo futuro con sus razones en [`investigacion-renders-exportaciones-diseno.md`](investigacion-renders-exportaciones-diseno.md). El proveedor de render se elige con una comparativa que incluye el material de Victoria.
+- **Diseño de la interfaz:** en **Pencil** (`design/interiores.pen`, estilo propio, responsivo), como primera tarea del spec de shell visual.
 
 ## 1. Reglas del juego (qué exige el curso)
 
@@ -74,7 +76,7 @@ Criterio de honestidad: no agregar una dependencia solo para que matchee el *sub
 | **0 — Evidencia** | Repo público, `CLAUDE.md`, `.claude/` con settings/rules/1–2 skills, superpowers project scope, spec(s) y plan(es) commiteados antes del código, `openapi.yaml`, README esqueleto, bitácora. | **No negociable** |
 | **1 — Núcleo** | App Next + Editor de Pascal, auth (Supabase), guardar/abrir proyectos con RLS, deploy en Vercel, endpoints de proyectos, tests RLS. | Imprescindible |
 | **2 — Producto** | Presets de vivienda y comercio, catálogo autoalojado, shell propio (selector de proyecto, chips de ambientes, dock de modos), panel de materiales/pintura. | Muy probable |
-| **3 — Diferencial** | Subida de muebles GLB a Storage, link público para compartir, modos Recorrer/Caminar/Estilos (el editor exporta `FirstPersonControls` y temas de escena). | Si el núcleo está verde |
+| **3 — Diferencial** | Plano PDF con escala y cajetín, render realista con IA, link público para compartir, modos Recorrer/Caminar/Estilos (el editor exporta `FirstPersonControls` y temas de escena), subida de muebles GLB a Storage. Orden sugerido por valor/costo; el último se recorta primero. | Si el núcleo está verde |
 | **4 — Extra** | MCP propio de presets, Pascal MCP para fabricar presets, comentarios. | Solo si sobra tiempo |
 
 Ritmo de referencia [curso/inferencia]: una tarea con subagentes toma ≈ 8 min y ≈ 250 k tokens; un plan de 5–6 tareas, 1–1,5 h. Hay que **congelar features al 70 % del tiempo** y dejar el resto para README, capturas y ensayo de defensa.
