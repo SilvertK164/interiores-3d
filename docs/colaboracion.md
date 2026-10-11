@@ -54,3 +54,7 @@ Conviene hacerlo antes de abrir un PR y cada vez que la rama base reciba cambios
 | Base de datos | `supabase/` |
 | Plantillas de ambientes | `apps/web/src/lib/templates/` |
 | Laboratorio de Victoria | `lab/` (guía en `lab/README.md`), `apps/web/src/lib/lab/`, `apps/web/app/laboratorio/` |
+
+## Cuentas de prueba locales
+
+`pnpm db:seed` crea en la base local las cuentas `silvert@interiores.test`, `victoria@interiores.test` y `demo@interiores.test`, con correo ya confirmado. La contraseña está en `scripts/lib/seed-users.mjs`. Son solo para la base local: el script se niega a crearlas en la nube.

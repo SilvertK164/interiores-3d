@@ -29,10 +29,11 @@ La guía supone que nunca viste el proyecto. Los comandos son de PowerShell y se
    ```powershell
    pnpm db:start                          # una vez: base local de Supabase
    pnpm db:env                            # una vez: escribe las variables locales
+   pnpm db:seed                           # una vez: crea las cuentas de prueba locales (se puede repetir)
    pnpm --filter @interiores/api dev      # terminal 2: API en http://localhost:3001
    pnpm --filter @interiores/web dev      # terminal 3: web en http://localhost:3000
    ```
-   Después, abrir http://localhost:3000/laboratorio. La primera vez pide una cuenta: en la pantalla de ingreso, «Crear cuenta» con cualquier correo y una contraseña de 6 caracteres o más (en local no hace falta confirmar el correo).
+   Después, abrir http://localhost:3000/laboratorio. Para ingresar sin registrarte puedes usar la cuenta de prueba `victoria@interiores.test` (la contraseña está en `scripts/lib/seed-users.mjs`; son cuentas solo para tu equipo local). Si prefieres, también puedes usar «Crear cuenta» con cualquier correo y una contraseña de 6 caracteres o más (en local no hace falta confirmar el correo).
 
 Para correr las pruebas propias de tu backend: `pnpm lab:tp3:test` (corre pytest con el entorno que armó `pnpm lab:setup`).
 
