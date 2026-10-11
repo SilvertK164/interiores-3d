@@ -66,7 +66,7 @@ apps/web/                         app/, src/editor/, src/lib/, scripts/vendor-pa
 
 ---
 
-### Tarea 0: Repo, harness y prerrequisitos
+### Task 0: Repo, harness y prerrequisitos
 
 **Responsable sugerido:** Silvert. Revisa: Victoria.
 
@@ -462,7 +462,7 @@ Abrir el PR con la plantilla; la otra persona revisa y hace *squash and merge* a
 
 ---
 
-### Tarea 1: Contrato primero (zod + OpenAPI)
+### Task 1: Contrato primero (zod + OpenAPI)
 
 **Responsable sugerido:** Silvert. Revisa: Victoria.
 
@@ -1175,7 +1175,7 @@ PR con la salida de los dos rojos y de `pnpm verify`.
 
 ---
 
-### Tarea 2: Supabase — migración 001 y pruebas de RLS
+### Task 2: Supabase — migración 001 y pruebas de RLS
 
 **Responsable sugerido:** Victoria (dueña de migraciones, decisión D7). Revisa: Silvert.
 
@@ -1521,7 +1521,7 @@ git push -u origin feature/t2-supabase
 
 ---
 
-### Tarea 3: API Fastify
+### Task 3: API Fastify
 
 **Responsable sugerido:** Silvert. Revisa: Victoria.
 
@@ -2474,7 +2474,7 @@ git push -u origin feature/t3-api
 
 ---
 
-### Tarea 4: Web — cliente de API, guardador y adaptador del editor
+### Task 4: Web — cliente de API, guardador y adaptador del editor
 
 **Responsable sugerido:** Victoria. Revisa: Silvert.
 
@@ -3525,7 +3525,7 @@ git push -u origin feature/t4-web-editor
 
 ---
 
-### Tarea 5: Web — sesión, proyectos y el editor montado
+### Task 5: Web — sesión, proyectos y el editor montado
 
 **Responsable sugerido:** Victoria. Revisa: Silvert.
 
@@ -3975,7 +3975,7 @@ git push -u origin feature/t5-sesion-y-editor
 
 ---
 
-### Tarea 6: Despliegue en Vercel
+### Task 6: Despliegue en Vercel
 
 **Responsable sugerido:** Silvert. Revisa: Victoria.
 
@@ -4039,7 +4039,7 @@ git push -u origin feature/t6-despliegue
 
 ---
 
-### Tarea 7: Verificación de extremo a extremo y README
+### Task 7: Verificación de extremo a extremo y README
 
 **Responsable sugerido:** ambas (la misma persona no revisa lo que escribió). 
 
