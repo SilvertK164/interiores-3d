@@ -11,8 +11,7 @@
     "typecheck": "node scripts/typecheck.mjs",
     "test": "vitest run",
     "assets:vendor": "node scripts/vendor-pascal-assets.mjs",
-    "e2e": "playwright test",
-    "e2e:login": "node e2e/save-auth.mjs"
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@interiores/contract": "workspace:*",

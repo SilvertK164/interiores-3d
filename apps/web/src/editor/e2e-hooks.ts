@@ -6,6 +6,7 @@ type SceneNode = { id: string; type: string }
 export function installE2eHooks(): void {
   const nodes = () => Object.values(useScene.getState().nodes) as SceneNode[]
   ;(window as unknown as { __e2e: unknown }).__e2e = {
+    ready: () => nodes().some((n) => n.type === 'level'),
     wallCount: () => nodes().filter((n) => n.type === 'wall').length,
     addWall: () => {
       const level = nodes().find((n) => n.type === 'level')
