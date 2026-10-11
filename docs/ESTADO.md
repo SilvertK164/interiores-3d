@@ -28,7 +28,7 @@ Diseñador de interiores **2D + 3D para viviendas y comercios**, con plantillas.
 - Diseño en Pencil: flujos, sistema de diseño, acceso, proyectos, nuevo proyecto (2 pasos), **Editar** (puerta, muebles, menú Estructura), **Ver** (3D y dividida), conectar cuenta de render, 4 pantallas móviles.
 
 ## Pendiente (en este orden)
-1. **Guardar el diseño**: `untitled.pen` sigue sin guardarse en disco → Ctrl+S y *Guardar como* `design/interiores.pen`.
+1. ~~Guardar el diseño~~ **Hecho**: está en `design/interiores.pen`, **local y fuera de git** (`*.pen` en `.gitignore`). Para evidencia en el repo se exportan PNG a `docs/design/` (sin el archivo fuente).
 2. Aprobar el spec 1 → `writing-plans` → plan (tareas T0–T7).
 3. Crear cuentas a mano: GitHub (repo público nuevo), Supabase `dev` y `prod`, Vercel, Cloudflare Free.
 4. **Biblioteca de muebles**: investigación en curso (fuentes libres y BIM); decidir qué sumar al catálogo, incluido **comercio**.

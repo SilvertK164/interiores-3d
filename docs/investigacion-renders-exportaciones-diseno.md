@@ -100,7 +100,7 @@ Como cada persona usa su propio nivel gratuito, **el criterio de elección pasa 
 
 ## 3. Diseño de la interfaz con Pencil
 
-- El Pencil abierto en esta sesión tiene otro archivo (`ON SITE 360`, +400 nodos). **No lo tocamos.** Nuestro diseño vive en un archivo nuevo dentro de este repo (`design/interiores.pen`).
+- El Pencil abierto en esta sesión tiene otro archivo (`ON SITE 360`, +400 nodos). **No lo tocamos.** Nuestro diseño vive en un archivo nuevo, `design/interiores.pen`, que queda local y fuera de git (`*.pen` en `.gitignore`).
 - Las skills de diseño instaladas (`onsite-app-design`, `clash-triage-ui`, `ui-ux-modern`, …) son de otros proyectos; el estilo del TP es **propio**, como pidió el equipo.
 - Pencil ofrece guías de **Web App**, **Mobile App**, **Design System**, **Tailwind** (v4, que es nuestro stack) y **Code** (generar código desde `.pen`), y estilos como *Blueprint Technical*, *Spatial Plus*, *Soft Bento* y *Product Data Grid* **[verificado]**.
 - El editor de Pascal ya trae hojas móviles (`mobile-panel-sheet.tsx`, `bottom-sheet.tsx`) y props `mobileIcon`/`mobileDefaultSnap` por pestaña **[verificado]**: lo responsivo se apoya en eso y el shell propio lo extiende.

@@ -17,3 +17,7 @@ supabase/.temp/
 .playwright-mcp/
 .worktrees/
 *.log
+
+# diseño local en Pencil (no se versiona) y miniaturas derivadas de los activos de Pascal
+*.pen
+design/assets/items/
