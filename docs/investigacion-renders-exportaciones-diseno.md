@@ -56,7 +56,27 @@ Tomar 3 capturas del editor (una vivienda, un comercio y un cuarto con muebles) 
 - El editor de Pascal ya trae hojas móviles (`mobile-panel-sheet.tsx`, `bottom-sheet.tsx`) y props `mobileIcon`/`mobileDefaultSnap` por pestaña **[verificado]**: lo responsivo se apoya en eso y el shell propio lo extiende.
 - Flujo previsto del spec de shell: (1) sistema de diseño en variables (color, tipografía, radio, elevación, movimiento); (2) pantallas en escritorio, tablet y móvil: acceso, lista de proyectos, editor con tarjeta de ambiente + chips + dock, selector de presets, catálogo, subida de mueble, compartir, galería de renders, exportar; (3) verificación visual por captura; (4) implementación con la guía *Tailwind*; (5) puente de tokens hacia el canvas 3D (el canvas no hereda CSS).
 
-## 4. Pendiente de verificar
+## 4. Material de Victoria: modelos de visión "por 1.000 análisis"
+
+Transcripción de la tabla compartida por el equipo (datos de la investigación de Victoria, **no verificados por nosotros**; los nombres y precios de los modelos hay que confirmarlos en las páginas oficiales):
+
+| Proveedor y modelo | ¿API gratuita? | Costo por 1.000 análisis | Notas de la tabla |
+|---|---|---|---|
+| Google Gemini 3.8 Flash | Sí, con límites sujetos a proyecto y modelo (se consulta en AI Studio) | US$ 0 dentro de la cuota; ≈ US$ 3,40 hasta el 31/12/2026 y ≈ US$ 6,80 desde el 1/1/2027 | Recibe imágenes, salida estructurada. En el nivel gratuito Google puede usar el contenido para mejorar sus productos. |
+| OpenRouter, modelo `:free` con imagen | Sí: 50 solicitudes por día y 20 por minuto; con US$ 10 de crédito sube a 1.000 por día | US$ 0 dentro de la cuota | El modelo gratuito cambia; hay que confirmar que acepte imágenes. Enruta a proveedores externos, así que importa la política de datos de quien atienda. |
+| OpenAI GPT-5.4 nano | No asumir cuota gratuita recurrente | ≈ US$ 1,10 | Visión; US$ 0,20/M de entrada y US$ 1,25/M de salida. Los datos de API no se usan para entrenar por defecto; los logs pueden retener contenido hasta 30 días. |
+| Mistral Ministral 3 8B | Sin cuota general permanente en la API | ≈ US$ 0,40 | Visión y salida estructurada; US$ 0,15/M de entrada y de salida. La estimación de tokens de la imagen es incierta. |
+| Anthropic Claude Haiku 4.5 | Créditos de prueba para algunos usuarios nuevos | ≈ US$ 4,80 | Visión sólida para interpretar objetos, sin promesa de precisión espacial. Una imagen de 1024 × 1024 ≈ 1.296 tokens; US$ 1/M de entrada y US$ 5/M de salida. No usa imágenes de API para entrenar; las cargas son efímeras. |
+
+**Verificación de las cuentas [verificado]:** las cifras pagas cierran con la hipótesis de ≈ 2.300 tokens de entrada (foto incluida) y 500 de salida por análisis: GPT-5.4 nano ≈ 0,46 + 0,63 = US$ 1,09; Ministral ≈ 0,35 + 0,08 = US$ 0,42; Haiku 4.5 = 2,30 + 2,50 = US$ 4,80.
+
+**Observaciones:**
+1. **Estos modelos devuelven texto o datos estructurados; no generan imágenes.** Sirven para *entender* una imagen, no para producir el render fotorrealista de la sección 2. Falta aclarar con Victoria qué "análisis" quería resolver.
+2. Usos que sí encajan en el proyecto: sugerir nombre, categoría y etiquetas de un mueble subido a partir de su miniatura (slice de subida de muebles), o describir un render guardado. Usos que **no** conviene prometer: medir o reconstruir un espacio desde una foto; la propia tabla advierte que la visión "no promete precisión espacial".
+3. **Privacidad:** los niveles gratuitos pueden usar el contenido enviado para mejorar productos o enrutarlo a terceros. Con capturas de proyectos de usuarios reales, usar el nivel pago o datos de demostración.
+4. Haiku 4.5 es de la generación anterior de Anthropic; conviene revisar la versión vigente antes de presupuestar.
+
+## 5. Pendiente de verificar
 
 - Qué API investigó Victoria y con qué prueba.
 - Precios y límites oficiales vigentes de cada proveedor de render.
