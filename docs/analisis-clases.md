@@ -10,6 +10,7 @@
 - **Alcance objetivo:** niveles **0 a 3** (evidencia y harness, núcleo, producto, diferencial). Congelar features al 70 % del tiempo; si algo se traba, el nivel 3 es lo primero que se recorta.
 - **Enfoque del editor:** Pascal Editor como base (spike validado), con plan B híbrido (solo `core` + `viewer`).
 - **Extras aprobados (2026-10-11):** plano en **PDF con escala gráfica y cajetín** y **render realista con IA** (captura del editor → API → galería por proyecto, con cuota por usuario). **Fuera de alcance:** exportar DXF y exportar IFC; quedan documentados como trabajo futuro con sus razones en [`investigacion-renders-exportaciones-diseno.md`](investigacion-renders-exportaciones-diseno.md). El proveedor de render se elige con una comparativa que incluye el material de Victoria.
+- **Clave de la API de render:** modelo **BYOK** (cada persona conecta la suya, con guía en la interfaz, almacenamiento seguro y documentación). Diseño en [`seguridad-claves-byok.md`](seguridad-claves-byok.md). Solo se comparan proveedores con **nivel gratuito**.
 - **Diseño de la interfaz:** en **Pencil** (`design/interiores.pen`, estilo propio, responsivo), como primera tarea del spec de shell visual.
 
 ## 1. Reglas del juego (qué exige el curso)

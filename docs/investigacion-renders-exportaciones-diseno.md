@@ -73,7 +73,11 @@ Tomar 3 capturas del editor (una vivienda, un comercio y un cuarto con muebles) 
 | Trabajo | Bajo. | Un slice extra: tabla de integraciones, pantalla de ajustes, cifrado, validación de la clave y pruebas. |
 | Qué demuestra para el curso | Manejo de secretos y de costo en servidor (clase 06: credenciales y alcance). | Lo mismo, pero con más riesgo y más para defender. |
 
-**Recomendación:** **A**, con una interfaz `RenderProvider` en `apps/api` para poder cambiar de proveedor sin tocar el resto. BYOK queda como mejora futura documentada; si sobrara tiempo, la versión más segura es **transitoria**: la persona pega su clave, se usa en esa petición y **no se guarda**. Nunca llamar al proveedor desde el navegador con una clave: la mayoría no permite CORS y la clave quedaría expuesta a cualquier script de la página.
+**Decisión del equipo (2026-10-11): B (BYOK).** Cada persona conecta su propia clave; la interfaz explica cómo crearla, la guarda de forma segura y todo queda documentado. Mi recomendación inicial era A (clave del equipo), por el riesgo de que quien evalúa no tenga una clave; el equipo prefirió B porque el manejo y la documentación de claves es parte de lo que quiere mostrar. El riesgo se mitiga cargando una clave gratuita del equipo en la cuenta de demostración por el mismo flujo, y con renders previos guardados en el proyecto de demo.
+
+Diseño de seguridad, modelo de amenazas, contrato y requisitos de interfaz: [`seguridad-claves-byok.md`](seguridad-claves-byok.md). Reglas que no cambian: una interfaz `RenderProvider` en `apps/api` para cambiar de proveedor sin tocar el resto, y **nunca** llamar al proveedor desde el navegador con una clave (la mayoría no permite CORS y la clave quedaría expuesta a cualquier script de la página).
+
+Como cada persona usa su propio nivel gratuito, **el criterio de elección pasa a ser** qué proveedores tienen un gratis real, una clave fácil de crear y condiciones de datos aceptables; ver la comparativa de la sección 2.
 
 **Sobre el costo de Cloudflare:** los US$ 5 por mes son el plan **Workers Paid**. Según la [página de precios](https://developers.cloudflare.com/workers-ai/platform/pricing/) (act. 9/10/2026), Workers AI está **incluido en el plan Workers Free** con 10.000 neurons por día sin cargo; lo único que ese plan no permite es superar la cuota. Aun así, si no quieren abrir cuenta ahí, los candidatos de pago cuestan centavos por imagen y alcanzan con un **prepago único** de pocos dólares (monto mínimo a confirmar en cada proveedor), no una suscripción.
 
