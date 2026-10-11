@@ -58,7 +58,12 @@ export async function createFromTemplate(
   fetchImpl: typeof fetch = (...args) => fetch(...args),
 ): Promise<CreateFromTemplateResult> {
   const envelope = input.templateId ? await loadTemplate(input.templateId, fetchImpl) : null
-  const project = await api.createProject({ name: input.name, kind: input.kind })
+  // El proyecto recuerda su plantilla (la lista muestra su imagen). En blanco no manda `templateId`: la API no admite null.
+  const project = await api.createProject({
+    name: input.name,
+    kind: input.kind,
+    ...(input.templateId ? { templateId: input.templateId } : {}),
+  })
   if (!envelope) return { project, envelope: null, saved: true }
   return retrySaveTemplate(api, { project, envelope, saved: false })
 }

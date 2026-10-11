@@ -2,7 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useState } from 'react'
+import { AppShell } from '@/components/AppShell'
+import { Logo } from '@/components/Logo'
 import { supabaseBrowser } from '@/lib/supabase/browser'
+
+const LABEL = 'mb-1.5 ml-1.5 block text-[13px] text-ink-muted'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,25 +35,78 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 p-6">
-      <h1 className="text-2xl font-semibold">Ingresa a tus proyectos</h1>
-      <form className="flex flex-col gap-3" onSubmit={(e) => submit('login', e)}>
-        <label className="flex flex-col gap-1 text-sm">
-          Correo
-          <input className="rounded-md bg-secondary px-3 py-2" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Contraseña
-          <input className="rounded-md bg-secondary px-3 py-2" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-        </label>
-        {message && <p role="status" className="text-sm text-destructive">{message}</p>}
-        <button className="rounded-md bg-primary px-3 py-2 text-primary-foreground disabled:opacity-60" disabled={busy} type="submit">
-          Ingresar
-        </button>
-        <button className="rounded-md bg-secondary px-3 py-2 disabled:opacity-60" disabled={busy} type="button" onClick={(e) => submit('register', e)}>
-          Crear cuenta
-        </button>
-      </form>
-    </main>
+    <AppShell className="relative grid place-items-center overflow-hidden">
+      {/* Fondo: una plantilla desenfocada con un velo claro. */}
+      <img alt="" aria-hidden className="absolute -inset-10 h-[calc(100%+5rem)] w-[calc(100%+5rem)] max-w-none object-cover blur-[30px] saturate-[1.1]" src="/templates/cafe.jpg" />
+      <div aria-hidden className="absolute inset-0 bg-canvas/55" />
+
+      <main className="glass relative grid w-[min(1000px,94vw)] gap-3.5 rounded-[34px] p-3.5 desk:h-[min(560px,88dvh)] desk:grid-cols-[1.05fr_1fr]">
+        <div className="relative hidden overflow-hidden rounded-3xl desk:block">
+          <img alt="" className="absolute inset-0 size-full object-cover" src="/templates/loft.jpg" />
+          <div className="glass absolute inset-x-3.5 bottom-3.5 rounded-[20px] px-[18px] py-4">
+            <p className="text-[26px] font-medium leading-[1.1] tracking-[-0.01em]">Diseña. Prueba. Habita.</p>
+            <p className="mt-1.5 text-sm text-ink-muted">Plantillas de viviendas y comercios listas para personalizar en 3D.</p>
+          </div>
+        </div>
+
+        <form className="flex flex-col justify-center gap-3.5 px-5 py-6 desk:px-[34px] desk:py-2.5" onSubmit={(e) => submit('login', e)}>
+          <Logo showName />
+          <div>
+            <h1 className="text-[32px] font-normal tracking-[-0.02em]">Te damos la bienvenida</h1>
+            <p className="mt-1.5 text-ink-muted">Ingresa a tu cuenta para abrir tus proyectos.</p>
+          </div>
+          <div>
+            <label className={LABEL} htmlFor="login-email">
+              Correo
+            </label>
+            <input
+              autoComplete="email"
+              className="field"
+              id="login-email"
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="nombre@correo.com"
+              required
+              type="email"
+              value={email}
+            />
+          </div>
+          <div>
+            <label className={LABEL} htmlFor="login-password">
+              Contraseña
+            </label>
+            <input
+              autoComplete="current-password"
+              className="field"
+              id="login-password"
+              minLength={6}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Tu contraseña"
+              required
+              type="password"
+              value={password}
+            />
+          </div>
+          {message && (
+            <p className="text-sm text-destructive" role="status">
+              {message}
+            </p>
+          )}
+          <button className="btn btn-primary h-12" disabled={busy} type="submit">
+            Ingresar
+          </button>
+          <p className="text-center text-sm text-ink-muted">
+            ¿Primera vez?{' '}
+            <button
+              className="focus-ring cursor-pointer rounded font-medium text-brand disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={busy}
+              onClick={(e) => submit('register', e)}
+              type="button"
+            >
+              Crear cuenta
+            </button>
+          </p>
+        </form>
+      </main>
+    </AppShell>
   )
 }

@@ -10,10 +10,9 @@ import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
-import { type LocalItemsManifest, localizeCatalogItem } from './catalog'
+import { localizeCatalog } from './catalog-assets'
 import { buildCommerceItems } from './commerce-catalog'
 import { installE2eHooks } from './e2e-hooks'
-import manifest from './local-items.json'
 import { SaveBanner } from './SaveBanner'
 import { type SaveOutcome, type SaverStatus, type SceneSaver, createSceneSaver } from './scene-saver'
 
@@ -43,10 +42,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     else await s.save(scene)
   }, [])
 
-  const items = useMemo(
-    () => CATALOG_ITEMS.flatMap((i) => localizeCatalogItem(i, manifest as LocalItemsManifest) ?? []),
-    [],
-  )
+  const items = useMemo(() => localizeCatalog(CATALOG_ITEMS), [])
   const commerceItems = useMemo(() => buildCommerceItems(items), [items])
 
   useEffect(() => {

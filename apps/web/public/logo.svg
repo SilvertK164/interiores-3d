@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Interiores 3D">
+  <title>Interiores 3D</title>
+  <circle cx="32" cy="32" r="29" fill="#1F5FE0"/>
+  <circle cx="32" cy="32" r="22" fill="#fff" fill-opacity=".14"/>
+  <path d="M17 23H47V43H17Z M31 23V43 M17 34H31" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M24 43A5 5 0 0 1 29 38" fill="none" stroke="#9DBBFF" stroke-width="2"/>
+  <path d="M42 12C47 12 51 16 51 21C51 27 42 35 42 35C42 35 33 27 33 21C33 16 37 12 42 12Z" fill="#FFB35C"/>
+  <circle cx="42" cy="21" r="3.5" fill="#fff"/>
+</svg>

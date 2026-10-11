@@ -6,19 +6,14 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { PASCAL_CORE_VERSION, SCHEMA_VERSION } from '@interiores/contract'
 import { CATALOG_ITEMS } from '../node_modules/@pascal-app/editor/src/components/ui/item-catalog/catalog-items'
-import manifest from '../src/editor/local-items.json' with { type: 'json' }
-import { localizeCatalogItem } from '../src/editor/catalog'
-import { type AssetLike, buildScene } from '../src/editor/templates/scene-builder'
+import { buildAssetMap } from '../src/editor/catalog-assets'
+import { buildScene } from '../src/editor/templates/scene-builder'
 import { TEMPLATE_DEFINITIONS } from '../src/lib/templates'
 
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public/templates')
 const check = process.argv.includes('--check')
 
-const assets = new Map<string, AssetLike>()
-for (const item of CATALOG_ITEMS) {
-  const local = localizeCatalogItem(item as never, manifest as Record<string, string[]>) as AssetLike | null
-  if (local) assets.set(local.id, local)
-}
+const assets = buildAssetMap(CATALOG_ITEMS)
 
 const stale: string[] = []
 mkdirSync(outDir, { recursive: true })
