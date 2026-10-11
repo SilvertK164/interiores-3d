@@ -46,7 +46,7 @@ export function ProjectCard({ project, now }: { project: ProjectSummary; now: Da
       </span>
       <span className="flex items-center justify-between gap-3 px-2 pb-1 pt-2.5">
         <span className="min-w-0">
-          <span className="block truncate text-[15px] font-medium">{project.name}</span>
+          <span className="block truncate font-display text-[15px] font-medium">{project.name}</span>
           <span className="mt-px block text-[12.5px] text-ink-muted">{whenLabel('Editado', project.updatedAt, now)}</span>
         </span>
         <span className="inline-flex shrink-0 items-center gap-1.5 text-xs text-ok">

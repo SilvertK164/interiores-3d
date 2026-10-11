@@ -75,7 +75,7 @@ export function NewProjectDialog({ open, presetTemplateId, onClose, onPartial }:
       <form className="flex flex-col gap-4 px-7 pb-[22px] pt-[26px]" noValidate onSubmit={np.submit}>
         <header className="flex items-center gap-3">
           <Logo size={36} />
-          <h2 className="text-2xl font-medium tracking-[-0.01em]">Nuevo proyecto</h2>
+          <h2 className="font-display text-2xl font-bold tracking-[-0.02em]">Nuevo proyecto</h2>
           <span className="flex-1" />
           <button
             aria-label="Cerrar"
@@ -129,7 +129,7 @@ export function NewProjectDialog({ open, presetTemplateId, onClose, onPartial }:
                 <Icon aria-hidden size={20} />
               </span>
               <span>
-                <span className="block text-base font-medium">{label}</span>
+                <span className="block font-display text-base font-medium">{label}</span>
                 <span className="block text-[13px] text-ink-muted group-has-[:checked]:text-brand-wash">{hint}</span>
               </span>
             </label>
@@ -167,7 +167,7 @@ export function NewProjectDialog({ open, presetTemplateId, onClose, onPartial }:
               </span>
               <span>
                 <SquareDashed aria-hidden className="mx-auto" size={20} />
-                <span className="block text-sm font-medium">En blanco</span>
+                <span className="block font-display text-sm font-medium">En blanco</span>
                 <span className="block text-xs text-ink-muted">Escena vacía</span>
               </span>
             </label>

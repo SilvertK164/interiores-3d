@@ -25,7 +25,7 @@ export function ProjectsSection({ projects, visible, query, error, now, onNew }:
       <div className={PANEL}>
         <div>
           <Logo className="mx-auto" size={56} />
-          <h3 className="mt-2.5 text-2xl font-medium tracking-[-0.01em]">Empieza tu primer proyecto</h3>
+          <h3 className="mt-2.5 font-display text-2xl font-bold tracking-[-0.02em]">Empieza tu primer proyecto</h3>
           <p className="mx-auto mb-4 mt-1.5 max-w-[440px] text-[15px] text-ink-muted">
             Elige una plantilla de vivienda o de comercio y personalízala con muebles, materiales y niveles.
           </p>
@@ -65,7 +65,7 @@ export function ProjectsSection({ projects, visible, query, error, now, onNew }:
         >
           <span>
             <Plus aria-hidden className="mx-auto" size={30} />
-            <span className="mt-1.5 block font-medium">Nuevo proyecto</span>
+            <span className="mt-1.5 block font-display font-medium">Nuevo proyecto</span>
             <span className="block text-[13px] text-ink-muted">Elige una plantilla</span>
           </span>
         </button>

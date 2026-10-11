@@ -40,7 +40,7 @@ export function TemplateGallery({ templates, onPick, onSeeAll }: Props) {
         >
           <span>
             <LayoutGrid aria-hidden className="mx-auto" size={20} />
-            <span className="mt-1 block text-sm font-medium">Ver galería</span>
+            <span className="mt-1 block font-display text-sm font-medium">Ver galería</span>
             <span className="block text-xs text-ink-muted">{TEMPLATES.length} plantillas y en blanco</span>
           </span>
         </button>

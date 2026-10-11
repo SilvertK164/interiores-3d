@@ -44,7 +44,7 @@ export default function LoginPage() {
         <div className="relative hidden overflow-hidden rounded-3xl desk:block">
           <img alt="" className="absolute inset-0 size-full object-cover" src="/templates/loft.jpg" />
           <div className="glass absolute inset-x-3.5 bottom-3.5 rounded-[20px] px-[18px] py-4">
-            <p className="text-[26px] font-medium leading-[1.1] tracking-[-0.01em]">Diseña. Prueba. Habita.</p>
+            <p className="font-display text-[26px] font-medium leading-[1.1] tracking-[-0.03em]">Diseña. Prueba. Habita.</p>
             <p className="mt-1.5 text-sm text-ink-muted">Plantillas de viviendas y comercios listas para personalizar en 3D.</p>
           </div>
         </div>
@@ -52,7 +52,7 @@ export default function LoginPage() {
         <form className="flex flex-col justify-center gap-3.5 px-5 py-6 desk:px-[34px] desk:py-2.5" onSubmit={(e) => submit('login', e)}>
           <Logo showName />
           <div>
-            <h1 className="text-[32px] font-normal tracking-[-0.02em]">Te damos la bienvenida</h1>
+            <h1 className="font-display text-[34px] font-medium leading-[1.05] tracking-[-0.035em]">Te damos la bienvenida</h1>
             <p className="mt-1.5 text-ink-muted">Ingresa a tu cuenta para abrir tus proyectos.</p>
           </div>
           <div>

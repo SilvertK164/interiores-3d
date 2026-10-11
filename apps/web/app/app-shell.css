@@ -19,7 +19,16 @@
   --shadow-soft: 0 10px 30px rgb(14 18 32 / 0.08);
   --shadow-lift: 0 18px 50px rgb(14 18 32 / 0.14);
   --shadow-brand: 0 8px 20px rgb(31 95 224 / 0.28);
-  --font-app: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Tipografía: DM Sans para la interfaz y Bricolage Grotesque para títulos (utilidad `font-display`).
+ * Las variables --font-dm y --font-bricolage las define next/font en el elemento `.app-shell` (ver AppShell.tsx),
+ * no en :root. Por eso van en `@theme inline`: la utilidad copia el `var()` y se resuelve en el elemento que la usa.
+ * Dentro de un `@theme` normal el `var()` se evaluaría en :root, donde no existe, y la fuente nunca se aplicaría.
+ */
+@theme inline {
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Escritorio: 900 px o más (la página de proyectos cabe en una pantalla). */
@@ -29,7 +38,7 @@
   min-height: 100dvh;
   background: var(--color-canvas);
   color: var(--color-ink);
-  font-family: var(--font-app);
+  font-family: var(--font-dm), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

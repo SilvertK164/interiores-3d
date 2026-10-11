@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  APP_NAME,
   greetingForHour,
   initialsFromEmail,
   kindLabel,
@@ -103,5 +104,12 @@ describe('textos de proyectos y plantillas', () => {
   it('templateMeta junta superficie y niveles', () => {
     expect(templateMeta({ areaM2: 108, levels: 2 })).toBe('108 m² · 2 niveles')
     expect(templateMeta({ areaM2: 140, levels: 1 })).toBe('140 m²')
+  })
+})
+
+describe('APP_NAME', () => {
+  it('es un texto no vacío y sin espacios sobrantes (se usa en el logo, el login y el título)', () => {
+    expect(APP_NAME.trim()).toBe(APP_NAME)
+    expect(APP_NAME.length).toBeGreaterThan(0)
   })
 })

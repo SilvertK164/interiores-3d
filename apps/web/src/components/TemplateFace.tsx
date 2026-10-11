@@ -36,7 +36,7 @@ export function TemplateFace({ template, size = 'small', badge, selectable = fal
         </span>
       )}
       <span className={`glass absolute flex gap-2 text-left ${INFO[size]}`}>
-        <span className={`min-w-0 truncate font-medium ${size === 'hero' ? 'text-[17px]' : 'text-[13px]'} ${size === 'picker' ? 'max-w-full' : ''}`}>
+        <span className={`min-w-0 truncate font-display font-medium ${size === 'hero' ? 'text-[17px]' : 'text-[13px]'} ${size === 'picker' ? 'max-w-full' : ''}`}>
           {template.name}
         </span>
         {size !== 'small' && <span className="chip bg-white/70">{templateMeta(template)}</span>}

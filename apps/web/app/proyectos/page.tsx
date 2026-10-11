@@ -16,7 +16,7 @@ import { supabaseBrowser } from '@/lib/supabase/browser'
 import { greetingForHour, nameFromEmail, pluralProjects, whenLabel } from '@/lib/ui-text'
 import { useSession } from '@/lib/use-session'
 
-const H2 = 'text-xl font-medium tracking-[-0.01em]'
+const H2 = 'font-display text-[19px] font-bold tracking-[-0.02em]'
 const CHIP = 'chip glass bg-white/70'
 
 export default function ProjectsPage() {
@@ -67,13 +67,14 @@ export default function ProjectsPage() {
         <div className="flex items-end gap-5 pt-1">
           <div>
             <p className="text-sm text-ink-muted">{greetingForHour(now.getHours())}</p>
-            <h1 className="mt-0.5 text-[clamp(28px,3.6vw,44px)] font-light leading-[1.1] tracking-[-0.02em]">
+            <h1 className="mt-0.5 font-display text-[clamp(28px,3.6vw,46px)] font-medium leading-[1.05] tracking-[-0.035em]">
               {name ? (
                 <>
-                  {name}, <span className="text-brand">¿qué vamos a armar hoy?</span>
+                  <span className="font-bold">{name},</span>{' '}
+                  <span className="font-light text-brand">¿qué vamos a armar hoy?</span>
                 </>
               ) : (
-                <span className="text-brand">¿Qué vamos a armar hoy?</span>
+                <span className="font-light text-brand">¿Qué vamos a armar hoy?</span>
               )}
             </h1>
           </div>
