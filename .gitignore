@@ -1,0 +1,19 @@
+# dependencias y builds
+node_modules/
+.next/
+dist/
+.turbo/
+.vercel/
+coverage/
+
+# secretos y configuración local (nunca al repo)
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+supabase/.temp/
+
+# artefactos de herramientas
+.playwright-mcp/
+.worktrees/
+*.log
