@@ -18,6 +18,10 @@ supabase/.temp/
 .worktrees/
 *.log
 
+# laboratorio: el TP3 de Victoria descargado por `pnpm lab:setup` (con su entorno de Python) y su clave de Gemini
+lab/vendor/
+lab/.env.local
+
 # diseño local en Pencil (no se versiona) y miniaturas derivadas de los activos de Pascal
 *.pen
 design/assets/items/

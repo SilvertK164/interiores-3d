@@ -5,6 +5,7 @@ TP final de IISAIA (FIUBA) de **Silvert Quispe** y **Victoria Villalba**. Diseñ
 - **Repositorio:** https://github.com/SilvertK164/interiores-3d
 - **Despliegue en Vercel + Supabase en la nube:** pendiente (Tarea 6 del plan); por ahora todo corre en local.
 - **Estado y decisiones vivas:** [`docs/ESTADO.md`](docs/ESTADO.md)
+- **Laboratorio de Victoria y colaboración:** [`lab/README.md`](lab/README.md) (modelado a partir de fotos con Pascal, paso a paso) · [`docs/colaboracion.md`](docs/colaboracion.md) (ramas, PR y revisión cruzada)
 
 ## Cómo correrlo
 
