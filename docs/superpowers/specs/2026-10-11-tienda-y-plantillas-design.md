@@ -83,5 +83,5 @@ apps/web/
 ## 8. Preguntas abiertas
 
 1. ¿Los nombres y los tamaños de las plantillas (§4) son los que quieren mostrar en el Demo Day?
-3. ¿Aceptan depender del CDN de Pascal para madera, ladrillo, azulejo y mármol (D7), o prefieren el plan B de solo materiales locales?
+3. ~~¿Aceptan depender del CDN de Pascal para madera, ladrillo, azulejo y mármol (D7), o prefieren el plan B de solo materiales locales?~~ **Resuelta (2026-10-11): sí, se acepta depender del CDN de Pascal** (decisión de Silvert y Victoria). El plan B de materiales locales queda solo como contingencia si el CDN dejara de servir.
 2. ¿Se acredita a Kenney en la interfaz (pantalla "Acerca de") además de `THIRD_PARTY_NOTICES.md`? Su licencia CC0 no lo exige.
