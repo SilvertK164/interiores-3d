@@ -12,6 +12,6 @@
     "paths": { "@/*": ["./src/*"] },
     "types": ["node", "react", "react-dom"]
   },
-  "include": ["next-env.d.ts", "src", "app", "test", "e2e"],
+  "include": ["next-env.d.ts", "src", "app", "test", "e2e", "scripts"],
   "exclude": ["node_modules"]
 }
