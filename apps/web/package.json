@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "node scripts/typecheck.mjs",
-    "test": "vitest run",
+    "test": "vitest run && tsx scripts/build-templates.ts --check",
+    "templates:build": "tsx scripts/build-templates.ts",
     "assets:vendor": "node scripts/vendor-pascal-assets.mjs",
     "e2e": "playwright test"
   },

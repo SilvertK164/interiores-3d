@@ -1,0 +1,4771 @@
+{
+ "schemaVersion": 1,
+ "pascal": {
+  "core": "1.0.3"
+ },
+ "graph": {
+  "nodes": {
+   "wall_supermercado_pb_p_n": {
+    "object": "node",
+    "id": "wall_supermercado_pb_p_n",
+    "type": "wall",
+    "name": "Muro p-n",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     0,
+     0
+    ],
+    "end": [
+     18,
+     0
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_supermercado_pb_p_e": {
+    "object": "node",
+    "id": "wall_supermercado_pb_p_e",
+    "type": "wall",
+    "name": "Muro p-e",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_supermercado_pb_porton"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     18,
+     0
+    ],
+    "end": [
+     18,
+     11
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_supermercado_pb_p_s": {
+    "object": "node",
+    "id": "wall_supermercado_pb_p_s",
+    "type": "wall",
+    "name": "Muro p-s",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_supermercado_pb_puerta_doble",
+     "window_supermercado_pb_vidriera"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     0,
+     11
+    ],
+    "end": [
+     18,
+     11
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_supermercado_pb_p_w": {
+    "object": "node",
+    "id": "wall_supermercado_pb_p_w",
+    "type": "wall",
+    "name": "Muro p-w",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_supermercado_pb_ventana_oeste"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     0,
+     0
+    ],
+    "end": [
+     0,
+     11
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_supermercado_pb_div": {
+    "object": "node",
+    "id": "wall_supermercado_pb_div",
+    "type": "wall",
+    "name": "Muro div",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_supermercado_pb_puerta_panaderia",
+     "door_supermercado_pb_puerta_deposito",
+     "door_supermercado_pb_puerta_oficina"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     13,
+     0
+    ],
+    "end": [
+     13,
+     11
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_supermercado_pb_div_pan": {
+    "object": "node",
+    "id": "wall_supermercado_pb_div_pan",
+    "type": "wall",
+    "name": "Muro div-pan",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     13,
+     4.5
+    ],
+    "end": [
+     18,
+     4.5
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_supermercado_pb_div_dep": {
+    "object": "node",
+    "id": "wall_supermercado_pb_div_dep",
+    "type": "wall",
+    "name": "Muro div-dep",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_supermercado_pb_puerta_banos"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     13,
+     8
+    ],
+    "end": [
+     18,
+     8
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_supermercado_pb_div_ofi": {
+    "object": "node",
+    "id": "wall_supermercado_pb_div_ofi",
+    "type": "wall",
+    "name": "Muro div-ofi",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     15.5,
+     8
+    ],
+    "end": [
+     15.5,
+     11
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "door_supermercado_pb_puerta_doble": {
+    "object": "node",
+    "id": "door_supermercado_pb_puerta_doble",
+    "type": "door",
+    "name": "puerta-doble",
+    "parentId": "wall_supermercado_pb_p_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3,
+     1.2,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_p_s",
+    "width": 2.4,
+    "height": 2.4,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "window_supermercado_pb_vidriera": {
+    "object": "node",
+    "id": "window_supermercado_pb_vidriera",
+    "type": "window",
+    "name": "vidriera",
+    "parentId": "wall_supermercado_pb_p_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     8.5,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_p_s",
+    "width": 5,
+    "height": 2.4,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "window_supermercado_pb_ventana_oeste": {
+    "object": "node",
+    "id": "window_supermercado_pb_ventana_oeste",
+    "type": "window",
+    "name": "ventana-oeste",
+    "parentId": "wall_supermercado_pb_p_w",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.5,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_p_w",
+    "width": 3,
+    "height": 1.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "door_supermercado_pb_porton": {
+    "object": "node",
+    "id": "door_supermercado_pb_porton",
+    "type": "door",
+    "name": "porton",
+    "parentId": "wall_supermercado_pb_p_e",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.2,
+     1.3,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_p_e",
+    "width": 2.2,
+    "height": 2.6,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_supermercado_pb_puerta_panaderia": {
+    "object": "node",
+    "id": "door_supermercado_pb_puerta_panaderia",
+    "type": "door",
+    "name": "puerta-panaderia",
+    "parentId": "wall_supermercado_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.2,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_div",
+    "width": 1.2,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_supermercado_pb_puerta_deposito": {
+    "object": "node",
+    "id": "door_supermercado_pb_puerta_deposito",
+    "type": "door",
+    "name": "puerta-deposito",
+    "parentId": "wall_supermercado_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.2,
+     1.2,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_div",
+    "width": 1.8,
+    "height": 2.4,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_supermercado_pb_puerta_oficina": {
+    "object": "node",
+    "id": "door_supermercado_pb_puerta_oficina",
+    "type": "door",
+    "name": "puerta-oficina",
+    "parentId": "wall_supermercado_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     9.5,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_div",
+    "width": 0.9,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_supermercado_pb_puerta_banos": {
+    "object": "node",
+    "id": "door_supermercado_pb_puerta_banos",
+    "type": "door",
+    "name": "puerta-banos",
+    "parentId": "wall_supermercado_pb_div_dep",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.7,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_supermercado_pb_div_dep",
+    "width": 0.8,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "zone_supermercado_pb_salon": {
+    "object": "node",
+    "id": "zone_supermercado_pb_salon",
+    "type": "zone",
+    "name": "Salón de ventas",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      0,
+      0
+     ],
+     [
+      13,
+      0
+     ],
+     [
+      13,
+      11
+     ],
+     [
+      0,
+      11
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1F5FE0"
+   },
+   "slab_supermercado_pb_salon": {
+    "object": "node",
+    "id": "slab_supermercado_pb_salon",
+    "type": "slab",
+    "name": "Salón de ventas (losa)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:concrete-polished",
+    "polygon": [
+     [
+      0,
+      0
+     ],
+     [
+      13,
+      0
+     ],
+     [
+      13,
+      11
+     ],
+     [
+      0,
+      11
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_supermercado_pb_salon": {
+    "object": "node",
+    "id": "ceiling_supermercado_pb_salon",
+    "type": "ceiling",
+    "name": "Salón de ventas (cielo)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-raw",
+    "polygon": [
+     [
+      0,
+      0
+     ],
+     [
+      13,
+      0
+     ],
+     [
+      13,
+      11
+     ],
+     [
+      0,
+      11
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_supermercado_pb_panaderia": {
+    "object": "node",
+    "id": "zone_supermercado_pb_panaderia",
+    "type": "zone",
+    "name": "Panadería",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      13,
+      0
+     ],
+     [
+      18,
+      0
+     ],
+     [
+      18,
+      4.5
+     ],
+     [
+      13,
+      4.5
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#B97A00"
+   },
+   "slab_supermercado_pb_panaderia": {
+    "object": "node",
+    "id": "slab_supermercado_pb_panaderia",
+    "type": "slab",
+    "name": "Panadería (losa)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:flooring-tile85a",
+    "polygon": [
+     [
+      13,
+      0
+     ],
+     [
+      18,
+      0
+     ],
+     [
+      18,
+      4.5
+     ],
+     [
+      13,
+      4.5
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_supermercado_pb_panaderia": {
+    "object": "node",
+    "id": "ceiling_supermercado_pb_panaderia",
+    "type": "ceiling",
+    "name": "Panadería (cielo)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-drywall",
+    "polygon": [
+     [
+      13,
+      0
+     ],
+     [
+      18,
+      0
+     ],
+     [
+      18,
+      4.5
+     ],
+     [
+      13,
+      4.5
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_supermercado_pb_deposito": {
+    "object": "node",
+    "id": "zone_supermercado_pb_deposito",
+    "type": "zone",
+    "name": "Depósito",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      13,
+      4.5
+     ],
+     [
+      18,
+      4.5
+     ],
+     [
+      18,
+      8
+     ],
+     [
+      13,
+      8
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#7A8AA8"
+   },
+   "slab_supermercado_pb_deposito": {
+    "object": "node",
+    "id": "slab_supermercado_pb_deposito",
+    "type": "slab",
+    "name": "Depósito (losa)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:concrete-polished",
+    "polygon": [
+     [
+      13,
+      4.5
+     ],
+     [
+      18,
+      4.5
+     ],
+     [
+      18,
+      8
+     ],
+     [
+      13,
+      8
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_supermercado_pb_deposito": {
+    "object": "node",
+    "id": "ceiling_supermercado_pb_deposito",
+    "type": "ceiling",
+    "name": "Depósito (cielo)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-raw",
+    "polygon": [
+     [
+      13,
+      4.5
+     ],
+     [
+      18,
+      4.5
+     ],
+     [
+      18,
+      8
+     ],
+     [
+      13,
+      8
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_supermercado_pb_oficina": {
+    "object": "node",
+    "id": "zone_supermercado_pb_oficina",
+    "type": "zone",
+    "name": "Oficina",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      13,
+      8
+     ],
+     [
+      15.5,
+      8
+     ],
+     [
+      15.5,
+      11
+     ],
+     [
+      13,
+      11
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1FA971"
+   },
+   "slab_supermercado_pb_oficina": {
+    "object": "node",
+    "id": "slab_supermercado_pb_oficina",
+    "type": "slab",
+    "name": "Oficina (losa)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:wood-woodfine22",
+    "polygon": [
+     [
+      13,
+      8
+     ],
+     [
+      15.5,
+      8
+     ],
+     [
+      15.5,
+      11
+     ],
+     [
+      13,
+      11
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_supermercado_pb_oficina": {
+    "object": "node",
+    "id": "ceiling_supermercado_pb_oficina",
+    "type": "ceiling",
+    "name": "Oficina (cielo)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-plaster",
+    "polygon": [
+     [
+      13,
+      8
+     ],
+     [
+      15.5,
+      8
+     ],
+     [
+      15.5,
+      11
+     ],
+     [
+      13,
+      11
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_supermercado_pb_banos": {
+    "object": "node",
+    "id": "zone_supermercado_pb_banos",
+    "type": "zone",
+    "name": "Baños",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      15.5,
+      8
+     ],
+     [
+      18,
+      8
+     ],
+     [
+      18,
+      11
+     ],
+     [
+      15.5,
+      11
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1FA971"
+   },
+   "slab_supermercado_pb_banos": {
+    "object": "node",
+    "id": "slab_supermercado_pb_banos",
+    "type": "slab",
+    "name": "Baños (losa)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:flooring-tile85a",
+    "polygon": [
+     [
+      15.5,
+      8
+     ],
+     [
+      18,
+      8
+     ],
+     [
+      18,
+      11
+     ],
+     [
+      15.5,
+      11
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_supermercado_pb_banos": {
+    "object": "node",
+    "id": "ceiling_supermercado_pb_banos",
+    "type": "ceiling",
+    "name": "Baños (cielo)",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-drywall",
+    "polygon": [
+     [
+      15.5,
+      8
+     ],
+     [
+      18,
+      8
+     ],
+     [
+      18,
+      11
+     ],
+     [
+      15.5,
+      11
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "item_supermercado_pb_1": {
+    "object": "node",
+    "id": "item_supermercado_pb_1",
+    "type": "item",
+    "name": "Computer",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     0.97,
+     9.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "computer",
+     "category": "appliance",
+     "name": "Computer",
+     "thumbnail": "/items/computer/thumbnail.webp",
+     "source": "library",
+     "src": "/items/computer/model.glb",
+     "dimensions": [
+      0.68,
+      0.48,
+      0.19
+     ],
+     "tags": [
+      "computer",
+      "desktop",
+      "workstation",
+      "monitor",
+      "technology",
+      "office",
+      "electronics",
+      "modern",
+      "sleek",
+      "metal",
+      "silver",
+      "minimalist",
+      "hardware",
+      "productivity"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_2": {
+    "object": "node",
+    "id": "item_supermercado_pb_2",
+    "type": "item",
+    "name": "Computer",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.2,
+     0.97,
+     9.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "computer",
+     "category": "appliance",
+     "name": "Computer",
+     "thumbnail": "/items/computer/thumbnail.webp",
+     "source": "library",
+     "src": "/items/computer/model.glb",
+     "dimensions": [
+      0.68,
+      0.48,
+      0.19
+     ],
+     "tags": [
+      "computer",
+      "desktop",
+      "workstation",
+      "monitor",
+      "technology",
+      "office",
+      "electronics",
+      "modern",
+      "sleek",
+      "metal",
+      "silver",
+      "minimalist",
+      "hardware",
+      "productivity"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_3": {
+    "object": "node",
+    "id": "item_supermercado_pb_3",
+    "type": "item",
+    "name": "Computer",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.4,
+     0.97,
+     9.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "computer",
+     "category": "appliance",
+     "name": "Computer",
+     "thumbnail": "/items/computer/thumbnail.webp",
+     "source": "library",
+     "src": "/items/computer/model.glb",
+     "dimensions": [
+      0.68,
+      0.48,
+      0.19
+     ],
+     "tags": [
+      "computer",
+      "desktop",
+      "workstation",
+      "monitor",
+      "technology",
+      "office",
+      "electronics",
+      "modern",
+      "sleek",
+      "metal",
+      "silver",
+      "minimalist",
+      "hardware",
+      "productivity"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_4": {
+    "object": "node",
+    "id": "item_supermercado_pb_4",
+    "type": "item",
+    "name": "Trash Bin",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.5,
+     0.05,
+     10.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "trash-bin",
+     "category": "furniture",
+     "name": "Trash Bin",
+     "thumbnail": "/items/trash-bin/thumbnail.webp",
+     "source": "library",
+     "src": "/items/trash-bin/model.glb",
+     "dimensions": [
+      0.35,
+      0.59,
+      0.42
+     ],
+     "tags": [
+      "floor"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_5": {
+    "object": "node",
+    "id": "item_supermercado_pb_5",
+    "type": "item",
+    "name": "Trash Bin",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     8.4,
+     0.05,
+     10.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "trash-bin",
+     "category": "furniture",
+     "name": "Trash Bin",
+     "thumbnail": "/items/trash-bin/thumbnail.webp",
+     "source": "library",
+     "src": "/items/trash-bin/model.glb",
+     "dimensions": [
+      0.35,
+      0.59,
+      0.42
+     ],
+     "tags": [
+      "floor"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_6": {
+    "object": "node",
+    "id": "item_supermercado_pb_6",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     12.3,
+     0.05,
+     10.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_7": {
+    "object": "node",
+    "id": "item_supermercado_pb_7",
+    "type": "item",
+    "name": "Coffee Machine",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     15,
+     0.97,
+     0.9
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coffee-machine",
+     "category": "appliance",
+     "name": "Coffee Machine",
+     "thumbnail": "/items/coffee-machine/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coffee-machine/model.glb",
+     "dimensions": [
+      0.16,
+      0.24,
+      0.23
+     ],
+     "tags": [
+      "coffee",
+      "machine",
+      "maker",
+      "espresso",
+      "brewer",
+      "kitchen",
+      "appliance",
+      "modern",
+      "metal",
+      "sleek",
+      "black",
+      "silver",
+      "beverage",
+      "brewing"
+     ],
+     "offset": [
+      0.0003,
+      0.0003,
+      -0.0366
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_8": {
+    "object": "node",
+    "id": "item_supermercado_pb_8",
+    "type": "item",
+    "name": "Stove",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     14.6,
+     0.05,
+     3.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stove",
+     "category": "kitchen",
+     "name": "Stove",
+     "thumbnail": "/items/stove/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stove/model.glb",
+     "dimensions": [
+      0.92,
+      0.85,
+      0.76
+     ],
+     "tags": [
+      "floor",
+      "large"
+     ],
+     "offset": [
+      0.0043,
+      0,
+      -0.0505
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_9": {
+    "object": "node",
+    "id": "item_supermercado_pb_9",
+    "type": "item",
+    "name": "Fridge",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     16.4,
+     0.05,
+     3.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "fridge",
+     "category": "kitchen",
+     "name": "Fridge",
+     "thumbnail": "/items/fridge/thumbnail.webp",
+     "source": "library",
+     "src": "/items/fridge/model.glb",
+     "dimensions": [
+      0.7,
+      1.92,
+      0.72
+     ],
+     "tags": [
+      "fridge",
+      "refrigerator",
+      "freezer",
+      "appliance",
+      "kitchen",
+      "storage",
+      "cooling",
+      "metal",
+      "steel",
+      "modern",
+      "industrial",
+      "minimalist",
+      "silver",
+      "sleek"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0507
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_10": {
+    "object": "node",
+    "id": "item_supermercado_pb_10",
+    "type": "item",
+    "name": "Office Table",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     14.2,
+     0.05,
+     10.1
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "office-table",
+     "category": "furniture",
+     "name": "Office Table",
+     "thumbnail": "/items/office-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/office-table/model.glb",
+     "dimensions": [
+      1.51,
+      0.76,
+      0.62
+     ],
+     "tags": [
+      "desk",
+      "table",
+      "workstation",
+      "furniture",
+      "office",
+      "work",
+      "study",
+      "writing",
+      "modern",
+      "minimalist",
+      "industrial",
+      "wood",
+      "metal"
+     ],
+     "offset": [
+      -0.0001,
+      0,
+      -0.0052
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.75
+     }
+    }
+   },
+   "item_supermercado_pb_11": {
+    "object": "node",
+    "id": "item_supermercado_pb_11",
+    "type": "item",
+    "name": "Office Chair",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     14.2,
+     0.05,
+     9.3
+    ],
+    "rotation": [
+     0,
+     3.141592653589793,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "office-chair",
+     "category": "furniture",
+     "name": "Office Chair",
+     "thumbnail": "/items/office-chair/thumbnail.webp",
+     "floorPlanUrl": "/items/office-chair/floor-plan.svg",
+     "source": "library",
+     "src": "/items/office-chair/model.glb",
+     "dimensions": [
+      0.66,
+      1.16,
+      0.69
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "ergonomic",
+      "swivel",
+      "office",
+      "desk",
+      "mesh",
+      "leather",
+      "modern",
+      "task",
+      "workspace",
+      "professional",
+      "computer"
+     ],
+     "offset": [
+      0.0024,
+      0.0015,
+      0.0332
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_12": {
+    "object": "node",
+    "id": "item_supermercado_pb_12",
+    "type": "item",
+    "name": "Computer",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     14.2,
+     0.78,
+     10.1
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "computer",
+     "category": "appliance",
+     "name": "Computer",
+     "thumbnail": "/items/computer/thumbnail.webp",
+     "source": "library",
+     "src": "/items/computer/model.glb",
+     "dimensions": [
+      0.68,
+      0.48,
+      0.19
+     ],
+     "tags": [
+      "computer",
+      "desktop",
+      "workstation",
+      "monitor",
+      "technology",
+      "office",
+      "electronics",
+      "modern",
+      "sleek",
+      "metal",
+      "silver",
+      "minimalist",
+      "hardware",
+      "productivity"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_13": {
+    "object": "node",
+    "id": "item_supermercado_pb_13",
+    "type": "item",
+    "name": "Toilet",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     17.3,
+     0.05,
+     9.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "toilet",
+     "category": "bathroom",
+     "name": "Toilet",
+     "thumbnail": "/items/toilet/thumbnail.webp",
+     "source": "library",
+     "src": "/items/toilet/model.glb",
+     "dimensions": [
+      0.42,
+      0.82,
+      0.72
+     ],
+     "tags": [
+      "floor",
+      "large"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.2393
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_14": {
+    "object": "node",
+    "id": "item_supermercado_pb_14",
+    "type": "item",
+    "name": "Bathroom Sink",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     16,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "bathroom-sink",
+     "category": "bathroom",
+     "name": "Bathroom Sink",
+     "thumbnail": "/items/bathroom-sink/thumbnail.webp",
+     "source": "library",
+     "src": "/items/bathroom-sink/model.glb",
+     "dimensions": [
+      1.83,
+      0.97,
+      0.63
+     ],
+     "tags": [
+      "sink",
+      "basin",
+      "lavatory",
+      "washbasin",
+      "vanity",
+      "modern",
+      "minimalist",
+      "ceramic",
+      "porcelain",
+      "white",
+      "plumbing",
+      "washing",
+      "bathroom",
+      "hygiene"
+     ],
+     "offset": [
+      0.1037,
+      0,
+      0.0221
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_15": {
+    "object": "node",
+    "id": "item_supermercado_pb_15",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.6,
+     0.05,
+     8.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_supermercado_pb_16": {
+    "object": "node",
+    "id": "item_supermercado_pb_16",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.6,
+     0.05,
+     9.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "shelf_supermercado_pb_pasillo_1_1": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_1_1",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     1.6,
+     0.05,
+     3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_1_2": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_1_2",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     3.6,
+     0.05,
+     3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_1_3": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_1_3",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     5.6,
+     0.05,
+     3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_1_4": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_1_4",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     7.6,
+     0.05,
+     3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_1_5": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_1_5",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     9.6,
+     0.05,
+     3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_2_1": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_2_1",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     1.6,
+     0.05,
+     5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_2_2": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_2_2",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     3.6,
+     0.05,
+     5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_2_3": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_2_3",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     5.6,
+     0.05,
+     5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_2_4": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_2_4",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     7.6,
+     0.05,
+     5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_2_5": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_2_5",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     9.6,
+     0.05,
+     5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_3_1": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_3_1",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     1.6,
+     0.05,
+     7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_3_2": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_3_2",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     3.6,
+     0.05,
+     7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_3_3": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_3_3",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     5.6,
+     0.05,
+     7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_3_4": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_3_4",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     7.6,
+     0.05,
+     7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_pasillo_3_5": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_pasillo_3_5",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     9.6,
+     0.05,
+     7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 5,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_frutas_1": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_frutas_1",
+    "type": "shelf",
+    "name": "Exhibidor de fruta",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     11.4,
+     0.05,
+     3
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "width": 1.2,
+    "depth": 0.8,
+    "thickness": 0.04,
+    "height": 0.6,
+    "style": "cubby",
+    "rows": 2,
+    "columns": 2,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_frutas_2": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_frutas_2",
+    "type": "shelf",
+    "name": "Exhibidor de fruta",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     11.4,
+     0.05,
+     4.5
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "width": 1.2,
+    "depth": 0.8,
+    "thickness": 0.04,
+    "height": 0.6,
+    "style": "cubby",
+    "rows": 2,
+    "columns": 2,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_frutas_3": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_frutas_3",
+    "type": "shelf",
+    "name": "Exhibidor de fruta",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     11.4,
+     0.05,
+     6
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "width": 1.2,
+    "depth": 0.8,
+    "thickness": 0.04,
+    "height": 0.6,
+    "style": "cubby",
+    "rows": 2,
+    "columns": 2,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_rack_deposito_1_1": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_rack_deposito_1_1",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     14.4,
+     0.05,
+     5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_rack_deposito_1_2": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_rack_deposito_1_2",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     16.4,
+     0.05,
+     5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_rack_deposito_2_1": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_rack_deposito_2_1",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     14.4,
+     0.05,
+     7.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_supermercado_pb_rack_deposito_2_2": {
+    "object": "node",
+    "id": "shelf_supermercado_pb_rack_deposito_2_2",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     16.4,
+     0.05,
+     7.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "cabinet-module_supermercado_pb_heladeras_1_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_1_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_1_1_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_1_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_1_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_1_2_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_1_3": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_1_3",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_1_3_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_heladeras_1": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_heladeras_1",
+    "type": "cabinet",
+    "name": "Heladeras de exhibición",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "tall",
+    "children": [
+     "cabinet-module_supermercado_pb_heladeras_1_1",
+     "cabinet-module_supermercado_pb_heladeras_1_2",
+     "cabinet-module_supermercado_pb_heladeras_1_3"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     2.4,
+     0.05,
+     0.6
+    ],
+    "rotation": 0,
+    "width": 2.7,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false
+   },
+   "cabinet-module_supermercado_pb_heladeras_2_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_2_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_2",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_2_1_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_2_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_2_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_2",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_2_2_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_2_3": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_2_3",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_2",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_2_3_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_heladeras_2": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_heladeras_2",
+    "type": "cabinet",
+    "name": "Heladeras de exhibición",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "tall",
+    "children": [
+     "cabinet-module_supermercado_pb_heladeras_2_1",
+     "cabinet-module_supermercado_pb_heladeras_2_2",
+     "cabinet-module_supermercado_pb_heladeras_2_3"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     5.4,
+     0.05,
+     0.6
+    ],
+    "rotation": 0,
+    "width": 2.7,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false
+   },
+   "cabinet-module_supermercado_pb_heladeras_3_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_3_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_3",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_3_1_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_3_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_3_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_3",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_3_2_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_3_3": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_3_3",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_3",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_3_3_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_heladeras_3": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_heladeras_3",
+    "type": "cabinet",
+    "name": "Heladeras de exhibición",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "tall",
+    "children": [
+     "cabinet-module_supermercado_pb_heladeras_3_1",
+     "cabinet-module_supermercado_pb_heladeras_3_2",
+     "cabinet-module_supermercado_pb_heladeras_3_3"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     8.4,
+     0.05,
+     0.6
+    ],
+    "rotation": 0,
+    "width": 2.7,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false
+   },
+   "cabinet-module_supermercado_pb_heladeras_4_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_4_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_4",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_4_1_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_4_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_4_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_4",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_4_2_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_heladeras_4_3": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_heladeras_4_3",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_heladeras_4",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.9,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_heladeras_4_3_1",
+      "type": "fridge-double"
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_heladeras_4": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_heladeras_4",
+    "type": "cabinet",
+    "name": "Heladeras de exhibición",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "tall",
+    "children": [
+     "cabinet-module_supermercado_pb_heladeras_4_1",
+     "cabinet-module_supermercado_pb_heladeras_4_2",
+     "cabinet-module_supermercado_pb_heladeras_4_3"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     11.4,
+     0.05,
+     0.6
+    ],
+    "rotation": 0,
+    "width": 2.7,
+    "depth": 0.7,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false
+   },
+   "cabinet-module_supermercado_pb_caja_1_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_caja_1_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_caja_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.3,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_caja_1_1_1",
+      "type": "drawer",
+      "drawerCount": 3
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_caja_1_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_caja_1_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_caja_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.3,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_caja_1_2_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_caja_1": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_caja_1",
+    "type": "cabinet",
+    "name": "Caja 1",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_supermercado_pb_caja_1_1",
+     "cabinet-module_supermercado_pb_caja_1_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     2,
+     0.05,
+     9.4
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal"
+   },
+   "cabinet-module_supermercado_pb_caja_2_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_caja_2_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_caja_2",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.3,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_caja_2_1_1",
+      "type": "drawer",
+      "drawerCount": 3
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_caja_2_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_caja_2_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_caja_2",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.3,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_caja_2_2_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_caja_2": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_caja_2",
+    "type": "cabinet",
+    "name": "Caja 2",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_supermercado_pb_caja_2_1",
+     "cabinet-module_supermercado_pb_caja_2_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     4.2,
+     0.05,
+     9.4
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal"
+   },
+   "cabinet-module_supermercado_pb_caja_3_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_caja_3_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_caja_3",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.3,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_caja_3_1_1",
+      "type": "drawer",
+      "drawerCount": 3
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_caja_3_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_caja_3_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_caja_3",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.3,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_caja_3_2_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_caja_3": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_caja_3",
+    "type": "cabinet",
+    "name": "Caja 3",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_supermercado_pb_caja_3_1",
+     "cabinet-module_supermercado_pb_caja_3_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     6.4,
+     0.05,
+     9.4
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal"
+   },
+   "cabinet-module_supermercado_pb_mostrador_pan_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_mostrador_pan_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_mostrador_pan",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-white",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_mostrador_pan_1_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 3
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_mostrador_pan_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_mostrador_pan_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_mostrador_pan",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-white",
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_mostrador_pan_2_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 3
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_mostrador_pan": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_mostrador_pan",
+    "type": "cabinet",
+    "name": "Mostrador de panadería",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_supermercado_pb_mostrador_pan_1",
+     "cabinet-module_supermercado_pb_mostrador_pan_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     15,
+     0.05,
+     0.9
+    ],
+    "rotation": 0,
+    "width": 2.4,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-white"
+   },
+   "cabinet-module_supermercado_pb_vitrina_pan_1": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_vitrina_pan_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_vitrina_pan",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_vitrina_pan_1_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 4
+     }
+    ]
+   },
+   "cabinet-module_supermercado_pb_vitrina_pan_2": {
+    "object": "node",
+    "id": "cabinet-module_supermercado_pb_vitrina_pan_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_supermercado_pb_vitrina_pan",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_supermercado_pb_vitrina_pan_2_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 4
+     }
+    ]
+   },
+   "cabinet_supermercado_pb_vitrina_pan": {
+    "object": "node",
+    "id": "cabinet_supermercado_pb_vitrina_pan",
+    "type": "cabinet",
+    "name": "Vitrina de panadería",
+    "parentId": "level_supermercado_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "tall",
+    "children": [
+     "cabinet-module_supermercado_pb_vitrina_pan_1",
+     "cabinet-module_supermercado_pb_vitrina_pan_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     17.5,
+     0.05,
+     2.5
+    ],
+    "rotation": -1.5707963267948966,
+    "width": 2.4,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false
+   },
+   "level_supermercado_pb": {
+    "object": "node",
+    "id": "level_supermercado_pb",
+    "type": "level",
+    "parentId": "building_supermercado",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "wall_supermercado_pb_p_n",
+     "wall_supermercado_pb_p_e",
+     "wall_supermercado_pb_p_s",
+     "wall_supermercado_pb_p_w",
+     "wall_supermercado_pb_div",
+     "wall_supermercado_pb_div_pan",
+     "wall_supermercado_pb_div_dep",
+     "wall_supermercado_pb_div_ofi",
+     "zone_supermercado_pb_salon",
+     "slab_supermercado_pb_salon",
+     "ceiling_supermercado_pb_salon",
+     "zone_supermercado_pb_panaderia",
+     "slab_supermercado_pb_panaderia",
+     "ceiling_supermercado_pb_panaderia",
+     "zone_supermercado_pb_deposito",
+     "slab_supermercado_pb_deposito",
+     "ceiling_supermercado_pb_deposito",
+     "zone_supermercado_pb_oficina",
+     "slab_supermercado_pb_oficina",
+     "ceiling_supermercado_pb_oficina",
+     "zone_supermercado_pb_banos",
+     "slab_supermercado_pb_banos",
+     "ceiling_supermercado_pb_banos",
+     "item_supermercado_pb_1",
+     "item_supermercado_pb_2",
+     "item_supermercado_pb_3",
+     "item_supermercado_pb_4",
+     "item_supermercado_pb_5",
+     "item_supermercado_pb_6",
+     "item_supermercado_pb_7",
+     "item_supermercado_pb_8",
+     "item_supermercado_pb_9",
+     "item_supermercado_pb_10",
+     "item_supermercado_pb_11",
+     "item_supermercado_pb_12",
+     "item_supermercado_pb_13",
+     "item_supermercado_pb_14",
+     "item_supermercado_pb_15",
+     "item_supermercado_pb_16",
+     "shelf_supermercado_pb_pasillo_1_1",
+     "shelf_supermercado_pb_pasillo_1_2",
+     "shelf_supermercado_pb_pasillo_1_3",
+     "shelf_supermercado_pb_pasillo_1_4",
+     "shelf_supermercado_pb_pasillo_1_5",
+     "shelf_supermercado_pb_pasillo_2_1",
+     "shelf_supermercado_pb_pasillo_2_2",
+     "shelf_supermercado_pb_pasillo_2_3",
+     "shelf_supermercado_pb_pasillo_2_4",
+     "shelf_supermercado_pb_pasillo_2_5",
+     "shelf_supermercado_pb_pasillo_3_1",
+     "shelf_supermercado_pb_pasillo_3_2",
+     "shelf_supermercado_pb_pasillo_3_3",
+     "shelf_supermercado_pb_pasillo_3_4",
+     "shelf_supermercado_pb_pasillo_3_5",
+     "shelf_supermercado_pb_frutas_1",
+     "shelf_supermercado_pb_frutas_2",
+     "shelf_supermercado_pb_frutas_3",
+     "shelf_supermercado_pb_rack_deposito_1_1",
+     "shelf_supermercado_pb_rack_deposito_1_2",
+     "shelf_supermercado_pb_rack_deposito_2_1",
+     "shelf_supermercado_pb_rack_deposito_2_2",
+     "cabinet_supermercado_pb_heladeras_1",
+     "cabinet_supermercado_pb_heladeras_2",
+     "cabinet_supermercado_pb_heladeras_3",
+     "cabinet_supermercado_pb_heladeras_4",
+     "cabinet_supermercado_pb_caja_1",
+     "cabinet_supermercado_pb_caja_2",
+     "cabinet_supermercado_pb_caja_3",
+     "cabinet_supermercado_pb_mostrador_pan",
+     "cabinet_supermercado_pb_vitrina_pan"
+    ],
+    "level": 0,
+    "baseElevation": 0,
+    "height": 3.6
+   },
+   "building_supermercado": {
+    "object": "node",
+    "id": "building_supermercado",
+    "type": "building",
+    "parentId": "site_supermercado",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "level_supermercado_pb"
+    ],
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ]
+   },
+   "site_supermercado": {
+    "object": "node",
+    "id": "site_supermercado",
+    "type": "site",
+    "parentId": null,
+    "visible": true,
+    "metadata": {},
+    "polygon": {
+     "type": "polygon",
+     "points": [
+      [
+       -15,
+       -15
+      ],
+      [
+       15,
+       -15
+      ],
+      [
+       15,
+       15
+      ],
+      [
+       -15,
+       15
+      ]
+     ]
+    },
+    "children": [
+     "building_supermercado"
+    ]
+   }
+  },
+  "rootNodeIds": [
+   "site_supermercado"
+  ],
+  "collections": {},
+  "materials": {},
+  "installedPlugins": []
+ }
+}

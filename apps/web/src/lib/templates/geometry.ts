@@ -2,6 +2,9 @@ import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, TemplateDefinition, Wa
 
 const round = (n: number) => Math.round(n * 1000) / 1000
 
+/** Altura (y) de la mesada de un gabinete bajo: losa 0,05 + zócalo 0,10 + cuerpo 0,80 + mesada 0,02. Para apoyar piezas encima. */
+export const COUNTER_Y = 0.97
+
 /** Cuatro muros de un rectángulo: `-n` (arriba), `-e`, `-s` (abajo) y `-w`; todos van hacia +x o +z. */
 export function perimeter(prefix: string, x0: number, z0: number, x1: number, z1: number): WallDef[] {
   return [

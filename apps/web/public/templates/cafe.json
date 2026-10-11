@@ -1,0 +1,6595 @@
+{
+ "schemaVersion": 1,
+ "pascal": {
+  "core": "1.0.3"
+ },
+ "graph": {
+  "nodes": {
+   "wall_cafe_pb_p_n": {
+    "object": "node",
+    "id": "wall_cafe_pb_p_n",
+    "type": "wall",
+    "name": "Muro p-n",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_cafe_pb_ventana_norte"
+    ],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     0,
+     0
+    ],
+    "end": [
+     12,
+     0
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_p_e": {
+    "object": "node",
+    "id": "wall_cafe_pb_p_e",
+    "type": "wall",
+    "name": "Muro p-e",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     12,
+     0
+    ],
+    "end": [
+     12,
+     9
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_p_s": {
+    "object": "node",
+    "id": "wall_cafe_pb_p_s",
+    "type": "wall",
+    "name": "Muro p-s",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_cafe_pb_puerta_salon",
+     "window_cafe_pb_vidriera"
+    ],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     0,
+     9
+    ],
+    "end": [
+     12,
+     9
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_p_w": {
+    "object": "node",
+    "id": "wall_cafe_pb_p_w",
+    "type": "wall",
+    "name": "Muro p-w",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_cafe_pb_ventana_oeste"
+    ],
+    "interiorMaterialPreset": "library:flooring-rusticbrick",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     0,
+     0
+    ],
+    "end": [
+     0,
+     9
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_div": {
+    "object": "node",
+    "id": "wall_cafe_pb_div",
+    "type": "wall",
+    "name": "Muro div",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_cafe_pb_puerta_cocina",
+     "door_cafe_pb_puerta_bano",
+     "door_cafe_pb_puerta_deposito"
+    ],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     8,
+     0
+    ],
+    "end": [
+     8,
+     9
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_div_bano": {
+    "object": "node",
+    "id": "wall_cafe_pb_div_bano",
+    "type": "wall",
+    "name": "Muro div-bano",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     8,
+     4
+    ],
+    "end": [
+     12,
+     4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_div_dep": {
+    "object": "node",
+    "id": "wall_cafe_pb_div_dep",
+    "type": "wall",
+    "name": "Muro div-dep",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:concrete-stucco",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     8,
+     6.5
+    ],
+    "end": [
+     12,
+     6.5
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_t_w": {
+    "object": "node",
+    "id": "wall_cafe_pb_t_w",
+    "type": "wall",
+    "name": "Muro t-w",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_cafe_pb_acceso"
+    ],
+    "interiorMaterialPreset": "library:preset-sage",
+    "exteriorMaterialPreset": "library:preset-sage",
+    "thickness": 0.2,
+    "height": 1.1,
+    "start": [
+     0,
+     9
+    ],
+    "end": [
+     0,
+     13
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_t_e": {
+    "object": "node",
+    "id": "wall_cafe_pb_t_e",
+    "type": "wall",
+    "name": "Muro t-e",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:preset-sage",
+    "exteriorMaterialPreset": "library:preset-sage",
+    "thickness": 0.2,
+    "height": 1.1,
+    "start": [
+     12,
+     9
+    ],
+    "end": [
+     12,
+     13
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_cafe_pb_t_s": {
+    "object": "node",
+    "id": "wall_cafe_pb_t_s",
+    "type": "wall",
+    "name": "Muro t-s",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:preset-sage",
+    "exteriorMaterialPreset": "library:preset-sage",
+    "thickness": 0.2,
+    "height": 1.1,
+    "start": [
+     0,
+     13
+    ],
+    "end": [
+     12,
+     13
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "door_cafe_pb_puerta_salon": {
+    "object": "node",
+    "id": "door_cafe_pb_puerta_salon",
+    "type": "door",
+    "name": "puerta-salon",
+    "parentId": "wall_cafe_pb_p_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3,
+     1.1,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_p_s",
+    "width": 1.6,
+    "height": 2.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "window_cafe_pb_vidriera": {
+    "object": "node",
+    "id": "window_cafe_pb_vidriera",
+    "type": "window",
+    "name": "vidriera",
+    "parentId": "wall_cafe_pb_p_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.6,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_p_s",
+    "width": 3,
+    "height": 2.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "door_cafe_pb_acceso": {
+    "object": "node",
+    "id": "door_cafe_pb_acceso",
+    "type": "door",
+    "name": "acceso",
+    "parentId": "wall_cafe_pb_t_w",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_t_w",
+    "width": 1.4,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "window_cafe_pb_ventana_oeste": {
+    "object": "node",
+    "id": "window_cafe_pb_ventana_oeste",
+    "type": "window",
+    "name": "ventana-oeste",
+    "parentId": "wall_cafe_pb_p_w",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.5,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_p_w",
+    "width": 2.2,
+    "height": 1.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "window_cafe_pb_ventana_norte": {
+    "object": "node",
+    "id": "window_cafe_pb_ventana_norte",
+    "type": "window",
+    "name": "ventana-norte",
+    "parentId": "wall_cafe_pb_p_n",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     1.6,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_p_n",
+    "width": 1.6,
+    "height": 1.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "door_cafe_pb_puerta_cocina": {
+    "object": "node",
+    "id": "door_cafe_pb_puerta_cocina",
+    "type": "door",
+    "name": "puerta-cocina",
+    "parentId": "wall_cafe_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_div",
+    "width": 1,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_cafe_pb_puerta_bano": {
+    "object": "node",
+    "id": "door_cafe_pb_puerta_bano",
+    "type": "door",
+    "name": "puerta-bano",
+    "parentId": "wall_cafe_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.2,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_div",
+    "width": 0.8,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_cafe_pb_puerta_deposito": {
+    "object": "node",
+    "id": "door_cafe_pb_puerta_deposito",
+    "type": "door",
+    "name": "puerta-deposito",
+    "parentId": "wall_cafe_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     7.7,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_cafe_pb_div",
+    "width": 0.8,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "zone_cafe_pb_salon": {
+    "object": "node",
+    "id": "zone_cafe_pb_salon",
+    "type": "zone",
+    "name": "Salón",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      0,
+      0
+     ],
+     [
+      8,
+      0
+     ],
+     [
+      8,
+      9
+     ],
+     [
+      0,
+      9
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1F5FE0"
+   },
+   "slab_cafe_pb_salon": {
+    "object": "node",
+    "id": "slab_cafe_pb_salon",
+    "type": "slab",
+    "name": "Salón (losa)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:wood-woodfine22",
+    "polygon": [
+     [
+      0,
+      0
+     ],
+     [
+      8,
+      0
+     ],
+     [
+      8,
+      9
+     ],
+     [
+      0,
+      9
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_cafe_pb_salon": {
+    "object": "node",
+    "id": "ceiling_cafe_pb_salon",
+    "type": "ceiling",
+    "name": "Salón (cielo)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-plaster",
+    "polygon": [
+     [
+      0,
+      0
+     ],
+     [
+      8,
+      0
+     ],
+     [
+      8,
+      9
+     ],
+     [
+      0,
+      9
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_cafe_pb_cocina": {
+    "object": "node",
+    "id": "zone_cafe_pb_cocina",
+    "type": "zone",
+    "name": "Cocina",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      8,
+      0
+     ],
+     [
+      12,
+      0
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      8,
+      4
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#B97A00"
+   },
+   "slab_cafe_pb_cocina": {
+    "object": "node",
+    "id": "slab_cafe_pb_cocina",
+    "type": "slab",
+    "name": "Cocina (losa)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:flooring-tile85a",
+    "polygon": [
+     [
+      8,
+      0
+     ],
+     [
+      12,
+      0
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      8,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_cafe_pb_cocina": {
+    "object": "node",
+    "id": "ceiling_cafe_pb_cocina",
+    "type": "ceiling",
+    "name": "Cocina (cielo)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-drywall",
+    "polygon": [
+     [
+      8,
+      0
+     ],
+     [
+      12,
+      0
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      8,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_cafe_pb_bano": {
+    "object": "node",
+    "id": "zone_cafe_pb_bano",
+    "type": "zone",
+    "name": "Baño",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      8,
+      4
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      12,
+      6.5
+     ],
+     [
+      8,
+      6.5
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1FA971"
+   },
+   "slab_cafe_pb_bano": {
+    "object": "node",
+    "id": "slab_cafe_pb_bano",
+    "type": "slab",
+    "name": "Baño (losa)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:flooring-tile85a",
+    "polygon": [
+     [
+      8,
+      4
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      12,
+      6.5
+     ],
+     [
+      8,
+      6.5
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_cafe_pb_bano": {
+    "object": "node",
+    "id": "ceiling_cafe_pb_bano",
+    "type": "ceiling",
+    "name": "Baño (cielo)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-drywall",
+    "polygon": [
+     [
+      8,
+      4
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      12,
+      6.5
+     ],
+     [
+      8,
+      6.5
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_cafe_pb_deposito": {
+    "object": "node",
+    "id": "zone_cafe_pb_deposito",
+    "type": "zone",
+    "name": "Depósito",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      8,
+      6.5
+     ],
+     [
+      12,
+      6.5
+     ],
+     [
+      12,
+      9
+     ],
+     [
+      8,
+      9
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#7A8AA8"
+   },
+   "slab_cafe_pb_deposito": {
+    "object": "node",
+    "id": "slab_cafe_pb_deposito",
+    "type": "slab",
+    "name": "Depósito (losa)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:concrete-polished",
+    "polygon": [
+     [
+      8,
+      6.5
+     ],
+     [
+      12,
+      6.5
+     ],
+     [
+      12,
+      9
+     ],
+     [
+      8,
+      9
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_cafe_pb_deposito": {
+    "object": "node",
+    "id": "ceiling_cafe_pb_deposito",
+    "type": "ceiling",
+    "name": "Depósito (cielo)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-drywall",
+    "polygon": [
+     [
+      8,
+      6.5
+     ],
+     [
+      12,
+      6.5
+     ],
+     [
+      12,
+      9
+     ],
+     [
+      8,
+      9
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_cafe_pb_terraza": {
+    "object": "node",
+    "id": "zone_cafe_pb_terraza",
+    "type": "zone",
+    "name": "Terraza",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      0,
+      9
+     ],
+     [
+      12,
+      9
+     ],
+     [
+      12,
+      13
+     ],
+     [
+      0,
+      13
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1FA971"
+   },
+   "slab_cafe_pb_terraza": {
+    "object": "node",
+    "id": "slab_cafe_pb_terraza",
+    "type": "slab",
+    "name": "Terraza (losa)",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:flooring-wallstone1",
+    "polygon": [
+     [
+      0,
+      9
+     ],
+     [
+      12,
+      9
+     ],
+     [
+      12,
+      13
+     ],
+     [
+      0,
+      13
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "item_cafe_pb_1": {
+    "object": "node",
+    "id": "item_cafe_pb_1",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     1.4,
+     0.05,
+     2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_2": {
+    "object": "node",
+    "id": "item_cafe_pb_2",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.4,
+     0.05,
+     2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_3": {
+    "object": "node",
+    "id": "item_cafe_pb_3",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     1.4,
+     0.05,
+     4.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_4": {
+    "object": "node",
+    "id": "item_cafe_pb_4",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.4,
+     0.05,
+     4.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_5": {
+    "object": "node",
+    "id": "item_cafe_pb_5",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     1.4,
+     0.05,
+     7.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_6": {
+    "object": "node",
+    "id": "item_cafe_pb_6",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.4,
+     0.05,
+     7.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_7": {
+    "object": "node",
+    "id": "item_cafe_pb_7",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.5999999999999999,
+     0.05,
+     2
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_8": {
+    "object": "node",
+    "id": "item_cafe_pb_8",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.2,
+     0.05,
+     2
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_9": {
+    "object": "node",
+    "id": "item_cafe_pb_9",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.5999999999999996,
+     0.05,
+     2
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_10": {
+    "object": "node",
+    "id": "item_cafe_pb_10",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.2,
+     0.05,
+     2
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_11": {
+    "object": "node",
+    "id": "item_cafe_pb_11",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.5999999999999999,
+     0.05,
+     4.6
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_12": {
+    "object": "node",
+    "id": "item_cafe_pb_12",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.2,
+     0.05,
+     4.6
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_13": {
+    "object": "node",
+    "id": "item_cafe_pb_13",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.5999999999999996,
+     0.05,
+     4.6
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_14": {
+    "object": "node",
+    "id": "item_cafe_pb_14",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.2,
+     0.05,
+     4.6
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_15": {
+    "object": "node",
+    "id": "item_cafe_pb_15",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.5999999999999999,
+     0.05,
+     7.2
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_16": {
+    "object": "node",
+    "id": "item_cafe_pb_16",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.2,
+     0.05,
+     7.2
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_17": {
+    "object": "node",
+    "id": "item_cafe_pb_17",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.5999999999999996,
+     0.05,
+     7.2
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_18": {
+    "object": "node",
+    "id": "item_cafe_pb_18",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.2,
+     0.05,
+     7.2
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_19": {
+    "object": "node",
+    "id": "item_cafe_pb_19",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.1,
+     0.05,
+     1.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_20": {
+    "object": "node",
+    "id": "item_cafe_pb_20",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.1,
+     0.05,
+     2.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_21": {
+    "object": "node",
+    "id": "item_cafe_pb_21",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.1,
+     0.05,
+     3.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_22": {
+    "object": "node",
+    "id": "item_cafe_pb_22",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.1,
+     0.05,
+     4.5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_23": {
+    "object": "node",
+    "id": "item_cafe_pb_23",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.1,
+     0.05,
+     5.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_24": {
+    "object": "node",
+    "id": "item_cafe_pb_24",
+    "type": "item",
+    "name": "Coffee Machine",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.2,
+     0.97,
+     3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coffee-machine",
+     "category": "appliance",
+     "name": "Coffee Machine",
+     "thumbnail": "/items/coffee-machine/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coffee-machine/model.glb",
+     "dimensions": [
+      0.16,
+      0.24,
+      0.23
+     ],
+     "tags": [
+      "coffee",
+      "machine",
+      "maker",
+      "espresso",
+      "brewer",
+      "kitchen",
+      "appliance",
+      "modern",
+      "metal",
+      "sleek",
+      "black",
+      "silver",
+      "beverage",
+      "brewing"
+     ],
+     "offset": [
+      0.0003,
+      0.0003,
+      -0.0366
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_25": {
+    "object": "node",
+    "id": "item_cafe_pb_25",
+    "type": "item",
+    "name": "Coffee Machine",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.2,
+     0.97,
+     4.8
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coffee-machine",
+     "category": "appliance",
+     "name": "Coffee Machine",
+     "thumbnail": "/items/coffee-machine/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coffee-machine/model.glb",
+     "dimensions": [
+      0.16,
+      0.24,
+      0.23
+     ],
+     "tags": [
+      "coffee",
+      "machine",
+      "maker",
+      "espresso",
+      "brewer",
+      "kitchen",
+      "appliance",
+      "modern",
+      "metal",
+      "sleek",
+      "black",
+      "silver",
+      "beverage",
+      "brewing"
+     ],
+     "offset": [
+      0.0003,
+      0.0003,
+      -0.0366
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_26": {
+    "object": "node",
+    "id": "item_cafe_pb_26",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.6,
+     0.05,
+     8.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_27": {
+    "object": "node",
+    "id": "item_cafe_pb_27",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     7.4,
+     0.05,
+     8.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_28": {
+    "object": "node",
+    "id": "item_cafe_pb_28",
+    "type": "item",
+    "name": "Floor Lamp",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.6,
+     0.05,
+     3.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "floor-lamp",
+     "category": "furniture",
+     "name": "Floor Lamp",
+     "thumbnail": "/items/floor-lamp/thumbnail.webp",
+     "source": "library",
+     "src": "/items/floor-lamp/model.glb",
+     "dimensions": [
+      0.7,
+      1.86,
+      0.69
+     ],
+     "tags": [
+      "lamp",
+      "luminaire",
+      "light",
+      "torchere",
+      "lighting",
+      "illumination",
+      "metal",
+      "brass",
+      "modern",
+      "minimalist",
+      "industrial",
+      "decor",
+      "ambient",
+      "reading",
+      "sleek"
+     ],
+     "offset": [
+      0.0341,
+      0.0045,
+      0.0219
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "interactive": {
+      "controls": [
+       {
+        "kind": "toggle"
+       },
+       {
+        "kind": "slider",
+        "label": "Intensity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "displayMode": "dial",
+        "default": 100
+       }
+      ],
+      "effects": [
+       {
+        "kind": "light",
+        "color": "#ffffff",
+        "intensityRange": [
+         0,
+         2
+        ],
+        "offset": [
+         0,
+         1.4,
+         0
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "item_cafe_pb_29": {
+    "object": "node",
+    "id": "item_cafe_pb_29",
+    "type": "item",
+    "name": "Stove",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     11.5,
+     0.05,
+     0.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stove",
+     "category": "kitchen",
+     "name": "Stove",
+     "thumbnail": "/items/stove/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stove/model.glb",
+     "dimensions": [
+      0.92,
+      0.85,
+      0.76
+     ],
+     "tags": [
+      "floor",
+      "large"
+     ],
+     "offset": [
+      0.0043,
+      0,
+      -0.0505
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_30": {
+    "object": "node",
+    "id": "item_cafe_pb_30",
+    "type": "item",
+    "name": "Hood",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     11.5,
+     1.9,
+     0.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "hood",
+     "category": "kitchen",
+     "name": "Hood",
+     "thumbnail": "/items/hood/thumbnail.webp",
+     "source": "library",
+     "src": "/items/hood/model.glb",
+     "dimensions": [
+      1.21,
+      0.52,
+      0.51
+     ],
+     "attachTo": "wall-side",
+     "tags": [
+      "hood",
+      "vent",
+      "extractor",
+      "ventilation",
+      "kitchen",
+      "cooking",
+      "appliance",
+      "metal",
+      "steel",
+      "stainless",
+      "modern",
+      "sleek",
+      "industrial",
+      "minimalist"
+     ],
+     "offset": [
+      0,
+      0.2718,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_31": {
+    "object": "node",
+    "id": "item_cafe_pb_31",
+    "type": "item",
+    "name": "Fridge",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     11.5,
+     0.05,
+     2.2
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "fridge",
+     "category": "kitchen",
+     "name": "Fridge",
+     "thumbnail": "/items/fridge/thumbnail.webp",
+     "source": "library",
+     "src": "/items/fridge/model.glb",
+     "dimensions": [
+      0.7,
+      1.92,
+      0.72
+     ],
+     "tags": [
+      "fridge",
+      "refrigerator",
+      "freezer",
+      "appliance",
+      "kitchen",
+      "storage",
+      "cooling",
+      "metal",
+      "steel",
+      "modern",
+      "industrial",
+      "minimalist",
+      "silver",
+      "sleek"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0507
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_32": {
+    "object": "node",
+    "id": "item_cafe_pb_32",
+    "type": "item",
+    "name": "Toilet",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     11.5,
+     0.05,
+     5.7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "toilet",
+     "category": "bathroom",
+     "name": "Toilet",
+     "thumbnail": "/items/toilet/thumbnail.webp",
+     "source": "library",
+     "src": "/items/toilet/model.glb",
+     "dimensions": [
+      0.42,
+      0.82,
+      0.72
+     ],
+     "tags": [
+      "floor",
+      "large"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.2393
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_33": {
+    "object": "node",
+    "id": "item_cafe_pb_33",
+    "type": "item",
+    "name": "Bathroom Sink",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     9,
+     0.05,
+     5.7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "bathroom-sink",
+     "category": "bathroom",
+     "name": "Bathroom Sink",
+     "thumbnail": "/items/bathroom-sink/thumbnail.webp",
+     "source": "library",
+     "src": "/items/bathroom-sink/model.glb",
+     "dimensions": [
+      1.83,
+      0.97,
+      0.63
+     ],
+     "tags": [
+      "sink",
+      "basin",
+      "lavatory",
+      "washbasin",
+      "vanity",
+      "modern",
+      "minimalist",
+      "ceramic",
+      "porcelain",
+      "white",
+      "plumbing",
+      "washing",
+      "bathroom",
+      "hygiene"
+     ],
+     "offset": [
+      0.1037,
+      0,
+      0.0221
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_34": {
+    "object": "node",
+    "id": "item_cafe_pb_34",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_35": {
+    "object": "node",
+    "id": "item_cafe_pb_35",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.6,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_36": {
+    "object": "node",
+    "id": "item_cafe_pb_36",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     9.2,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_37": {
+    "object": "node",
+    "id": "item_cafe_pb_37",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_38": {
+    "object": "node",
+    "id": "item_cafe_pb_38",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.6,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_39": {
+    "object": "node",
+    "id": "item_cafe_pb_39",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     9.2,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_cafe_pb_40": {
+    "object": "node",
+    "id": "item_cafe_pb_40",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     1.2,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_41": {
+    "object": "node",
+    "id": "item_cafe_pb_41",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.8,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_42": {
+    "object": "node",
+    "id": "item_cafe_pb_42",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.8,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_43": {
+    "object": "node",
+    "id": "item_cafe_pb_43",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.3999999999999995,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_44": {
+    "object": "node",
+    "id": "item_cafe_pb_44",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     8.399999999999999,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_45": {
+    "object": "node",
+    "id": "item_cafe_pb_45",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     10,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_46": {
+    "object": "node",
+    "id": "item_cafe_pb_46",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     1.2,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_47": {
+    "object": "node",
+    "id": "item_cafe_pb_47",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.8,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_48": {
+    "object": "node",
+    "id": "item_cafe_pb_48",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.8,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_49": {
+    "object": "node",
+    "id": "item_cafe_pb_49",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.3999999999999995,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_50": {
+    "object": "node",
+    "id": "item_cafe_pb_50",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     8.399999999999999,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_51": {
+    "object": "node",
+    "id": "item_cafe_pb_51",
+    "type": "item",
+    "name": "Dining Chair",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     10,
+     0.05,
+     12.3
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-chair",
+     "category": "furniture",
+     "name": "Dining Chair",
+     "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-chair/model.glb",
+     "dimensions": [
+      0.47,
+      0.87,
+      0.5
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "dining",
+      "furniture",
+      "modern",
+      "wood",
+      "upholstered",
+      "kitchen",
+      "seat",
+      "minimalist",
+      "timber",
+      "bistro"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0016
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_52": {
+    "object": "node",
+    "id": "item_cafe_pb_52",
+    "type": "item",
+    "name": "Patio Umbrella",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "patio-umbrella",
+     "category": "outdoor",
+     "name": "Patio Umbrella",
+     "thumbnail": "/items/patio-umbrella/thumbnail.webp",
+     "source": "library",
+     "src": "/items/patio-umbrella/model.glb",
+     "dimensions": [
+      0.139,
+      3.603,
+      0.15
+     ],
+     "tags": [
+      "umbrella",
+      "parasol",
+      "shade",
+      "canopy",
+      "sunshade",
+      "outdoor",
+      "patio",
+      "garden",
+      "modern",
+      "polyester",
+      "fabric",
+      "aluminum",
+      "poolside",
+      "protection",
+      "summer"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_53": {
+    "object": "node",
+    "id": "item_cafe_pb_53",
+    "type": "item",
+    "name": "Patio Umbrella",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     9.2,
+     0.05,
+     10.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "patio-umbrella",
+     "category": "outdoor",
+     "name": "Patio Umbrella",
+     "thumbnail": "/items/patio-umbrella/thumbnail.webp",
+     "source": "library",
+     "src": "/items/patio-umbrella/model.glb",
+     "dimensions": [
+      0.139,
+      3.603,
+      0.15
+     ],
+     "tags": [
+      "umbrella",
+      "parasol",
+      "shade",
+      "canopy",
+      "sunshade",
+      "outdoor",
+      "patio",
+      "garden",
+      "modern",
+      "polyester",
+      "fabric",
+      "aluminum",
+      "poolside",
+      "protection",
+      "summer"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_54": {
+    "object": "node",
+    "id": "item_cafe_pb_54",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.6,
+     0.05,
+     12.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_55": {
+    "object": "node",
+    "id": "item_cafe_pb_55",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.76,
+     0.05,
+     12.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_56": {
+    "object": "node",
+    "id": "item_cafe_pb_56",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.92,
+     0.05,
+     12.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_57": {
+    "object": "node",
+    "id": "item_cafe_pb_57",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     7.08,
+     0.05,
+     12.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_58": {
+    "object": "node",
+    "id": "item_cafe_pb_58",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     9.24,
+     0.05,
+     12.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_59": {
+    "object": "node",
+    "id": "item_cafe_pb_59",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     11.4,
+     0.05,
+     12.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_cafe_pb_60": {
+    "object": "node",
+    "id": "item_cafe_pb_60",
+    "type": "item",
+    "name": "Palm",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0.8,
+     0.05,
+     9.8
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "palm",
+     "category": "outdoor",
+     "name": "Palm",
+     "thumbnail": "/items/palm/thumbnail.webp",
+     "source": "library",
+     "src": "/items/palm/model.glb",
+     "dimensions": [
+      0.525,
+      4.5,
+      0.496
+     ],
+     "tags": [
+      "palm",
+      "tree",
+      "plant",
+      "tropical",
+      "exotic",
+      "foliage",
+      "greenery",
+      "botanical",
+      "garden",
+      "patio",
+      "outdoor",
+      "lush",
+      "organic",
+      "nature"
+     ],
+     "offset": [
+      0,
+      0.08,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      0.37,
+      0.37,
+      0.37
+     ]
+    }
+   },
+   "item_cafe_pb_61": {
+    "object": "node",
+    "id": "item_cafe_pb_61",
+    "type": "item",
+    "name": "Palm",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     11.2,
+     0.05,
+     9.8
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "palm",
+     "category": "outdoor",
+     "name": "Palm",
+     "thumbnail": "/items/palm/thumbnail.webp",
+     "source": "library",
+     "src": "/items/palm/model.glb",
+     "dimensions": [
+      0.525,
+      4.5,
+      0.496
+     ],
+     "tags": [
+      "palm",
+      "tree",
+      "plant",
+      "tropical",
+      "exotic",
+      "foliage",
+      "greenery",
+      "botanical",
+      "garden",
+      "patio",
+      "outdoor",
+      "lush",
+      "organic",
+      "nature"
+     ],
+     "offset": [
+      0,
+      0.08,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      0.37,
+      0.37,
+      0.37
+     ]
+    }
+   },
+   "shelf_cafe_pb_repisa_1": {
+    "object": "node",
+    "id": "shelf_cafe_pb_repisa_1",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     3.6,
+     1.5,
+     0.23
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 2,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_cafe_pb_repisa_2": {
+    "object": "node",
+    "id": "shelf_cafe_pb_repisa_2",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     5.3,
+     1.5,
+     0.23
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 2,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_cafe_pb_repisa_3": {
+    "object": "node",
+    "id": "shelf_cafe_pb_repisa_3",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     7,
+     1.5,
+     0.23
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 2,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_cafe_pb_biblioteca": {
+    "object": "node",
+    "id": "shelf_cafe_pb_biblioteca",
+    "type": "shelf",
+    "name": "Biblioteca",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     0.35,
+     0.05,
+     5.5
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "width": 1.8,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 2,
+    "style": "bookshelf",
+    "rows": 5,
+    "columns": 2,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_cafe_pb_rack_1": {
+    "object": "node",
+    "id": "shelf_cafe_pb_rack_1",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     9,
+     0.05,
+     7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_cafe_pb_rack_2": {
+    "object": "node",
+    "id": "shelf_cafe_pb_rack_2",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     11,
+     0.05,
+     7
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_cafe_pb_cubby_cocina": {
+    "object": "node",
+    "id": "shelf_cafe_pb_cubby_cocina",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     11.6,
+     0.05,
+     3.2
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "width": 1.2,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "cabinet-module_cafe_pb_barra_1_1": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_barra_1_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_barra_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.7,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_barra_1_1_1",
+      "type": "sink",
+      "sinkLayout": "single"
+     }
+    ]
+   },
+   "cabinet-module_cafe_pb_barra_1_2": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_barra_1_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_barra_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.2,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.8,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_barra_1_2_1",
+      "type": "drawer",
+      "drawerCount": 3
+     }
+    ]
+   },
+   "cabinet-module_cafe_pb_barra_1_3": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_barra_1_3",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_barra_1",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_barra_1_3_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet_cafe_pb_barra_1": {
+    "object": "node",
+    "id": "cabinet_cafe_pb_barra_1",
+    "type": "cabinet",
+    "name": "Barra con bacha",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_cafe_pb_barra_1_1",
+     "cabinet-module_cafe_pb_barra_1_2",
+     "cabinet-module_cafe_pb_barra_1_3"
+    ],
+    "barLedge": {
+     "edge": "back",
+     "height": 1.06,
+     "depth": 0.35
+    },
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     6.2,
+     0.05,
+     2
+    ],
+    "rotation": 1.5707963267948966,
+    "width": 2.4,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true
+   },
+   "cabinet-module_cafe_pb_barra_2_1": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_barra_2_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_barra_2",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_barra_2_1_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet-module_cafe_pb_barra_2_2": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_barra_2_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_barra_2",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_barra_2_2_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet_cafe_pb_barra_2": {
+    "object": "node",
+    "id": "cabinet_cafe_pb_barra_2",
+    "type": "cabinet",
+    "name": "Barra",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_cafe_pb_barra_2_1",
+     "cabinet-module_cafe_pb_barra_2_2"
+    ],
+    "barLedge": {
+     "edge": "back",
+     "height": 1.06,
+     "depth": 0.35
+    },
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     6.2,
+     0.05,
+     4.8
+    ],
+    "rotation": 1.5707963267948966,
+    "width": 2.4,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true
+   },
+   "cabinet-module_cafe_pb_vitrina_pasteleria_1": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_vitrina_pasteleria_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_vitrina_pasteleria",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.5,
+    "carcassHeight": 1.2,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-white",
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_vitrina_pasteleria_1_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 3
+     }
+    ]
+   },
+   "cabinet-module_cafe_pb_vitrina_pasteleria_2": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_vitrina_pasteleria_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_vitrina_pasteleria",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.5,
+    "carcassHeight": 1.2,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-white",
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_vitrina_pasteleria_2_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 3
+     }
+    ]
+   },
+   "cabinet_cafe_pb_vitrina_pasteleria": {
+    "object": "node",
+    "id": "cabinet_cafe_pb_vitrina_pasteleria",
+    "type": "cabinet",
+    "name": "Vitrina de pastelería",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_cafe_pb_vitrina_pasteleria_1",
+     "cabinet-module_cafe_pb_vitrina_pasteleria_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     3.8,
+     0.05,
+     0.45
+    ],
+    "rotation": 0,
+    "width": 2.4,
+    "depth": 0.5,
+    "carcassHeight": 1.2,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-white"
+   },
+   "cabinet-module_cafe_pb_cocina_mesada_1": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_cocina_mesada_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_cocina_mesada",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.7,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1,
+    "depth": 0.6,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_cocina_mesada_1_1",
+      "type": "sink",
+      "sinkLayout": "double"
+     }
+    ]
+   },
+   "cabinet-module_cafe_pb_cocina_mesada_2": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_cocina_mesada_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_cocina_mesada",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.1,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.6,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_cocina_mesada_2_1",
+      "type": "dishwasher"
+     }
+    ]
+   },
+   "cabinet-module_cafe_pb_cocina_mesada_3": {
+    "object": "node",
+    "id": "cabinet-module_cafe_pb_cocina_mesada_3",
+    "type": "cabinet-module",
+    "parentId": "cabinet_cafe_pb_cocina_mesada",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.8,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.8,
+    "depth": 0.6,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_cafe_pb_cocina_mesada_3_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet_cafe_pb_cocina_mesada": {
+    "object": "node",
+    "id": "cabinet_cafe_pb_cocina_mesada",
+    "type": "cabinet",
+    "name": "Mesada de cocina",
+    "parentId": "level_cafe_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_cafe_pb_cocina_mesada_1",
+     "cabinet-module_cafe_pb_cocina_mesada_2",
+     "cabinet-module_cafe_pb_cocina_mesada_3"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     9.9,
+     0.05,
+     0.45
+    ],
+    "rotation": 0,
+    "width": 2.4,
+    "depth": 0.6,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true
+   },
+   "level_cafe_pb": {
+    "object": "node",
+    "id": "level_cafe_pb",
+    "type": "level",
+    "parentId": "building_cafe",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "wall_cafe_pb_p_n",
+     "wall_cafe_pb_p_e",
+     "wall_cafe_pb_p_s",
+     "wall_cafe_pb_p_w",
+     "wall_cafe_pb_div",
+     "wall_cafe_pb_div_bano",
+     "wall_cafe_pb_div_dep",
+     "wall_cafe_pb_t_w",
+     "wall_cafe_pb_t_e",
+     "wall_cafe_pb_t_s",
+     "zone_cafe_pb_salon",
+     "slab_cafe_pb_salon",
+     "ceiling_cafe_pb_salon",
+     "zone_cafe_pb_cocina",
+     "slab_cafe_pb_cocina",
+     "ceiling_cafe_pb_cocina",
+     "zone_cafe_pb_bano",
+     "slab_cafe_pb_bano",
+     "ceiling_cafe_pb_bano",
+     "zone_cafe_pb_deposito",
+     "slab_cafe_pb_deposito",
+     "ceiling_cafe_pb_deposito",
+     "zone_cafe_pb_terraza",
+     "slab_cafe_pb_terraza",
+     "item_cafe_pb_1",
+     "item_cafe_pb_2",
+     "item_cafe_pb_3",
+     "item_cafe_pb_4",
+     "item_cafe_pb_5",
+     "item_cafe_pb_6",
+     "item_cafe_pb_7",
+     "item_cafe_pb_8",
+     "item_cafe_pb_9",
+     "item_cafe_pb_10",
+     "item_cafe_pb_11",
+     "item_cafe_pb_12",
+     "item_cafe_pb_13",
+     "item_cafe_pb_14",
+     "item_cafe_pb_15",
+     "item_cafe_pb_16",
+     "item_cafe_pb_17",
+     "item_cafe_pb_18",
+     "item_cafe_pb_19",
+     "item_cafe_pb_20",
+     "item_cafe_pb_21",
+     "item_cafe_pb_22",
+     "item_cafe_pb_23",
+     "item_cafe_pb_24",
+     "item_cafe_pb_25",
+     "item_cafe_pb_26",
+     "item_cafe_pb_27",
+     "item_cafe_pb_28",
+     "item_cafe_pb_29",
+     "item_cafe_pb_30",
+     "item_cafe_pb_31",
+     "item_cafe_pb_32",
+     "item_cafe_pb_33",
+     "item_cafe_pb_34",
+     "item_cafe_pb_35",
+     "item_cafe_pb_36",
+     "item_cafe_pb_37",
+     "item_cafe_pb_38",
+     "item_cafe_pb_39",
+     "item_cafe_pb_40",
+     "item_cafe_pb_41",
+     "item_cafe_pb_42",
+     "item_cafe_pb_43",
+     "item_cafe_pb_44",
+     "item_cafe_pb_45",
+     "item_cafe_pb_46",
+     "item_cafe_pb_47",
+     "item_cafe_pb_48",
+     "item_cafe_pb_49",
+     "item_cafe_pb_50",
+     "item_cafe_pb_51",
+     "item_cafe_pb_52",
+     "item_cafe_pb_53",
+     "item_cafe_pb_54",
+     "item_cafe_pb_55",
+     "item_cafe_pb_56",
+     "item_cafe_pb_57",
+     "item_cafe_pb_58",
+     "item_cafe_pb_59",
+     "item_cafe_pb_60",
+     "item_cafe_pb_61",
+     "shelf_cafe_pb_repisa_1",
+     "shelf_cafe_pb_repisa_2",
+     "shelf_cafe_pb_repisa_3",
+     "shelf_cafe_pb_biblioteca",
+     "shelf_cafe_pb_rack_1",
+     "shelf_cafe_pb_rack_2",
+     "shelf_cafe_pb_cubby_cocina",
+     "cabinet_cafe_pb_barra_1",
+     "cabinet_cafe_pb_barra_2",
+     "cabinet_cafe_pb_vitrina_pasteleria",
+     "cabinet_cafe_pb_cocina_mesada"
+    ],
+    "level": 0,
+    "baseElevation": 0,
+    "height": 3.2
+   },
+   "building_cafe": {
+    "object": "node",
+    "id": "building_cafe",
+    "type": "building",
+    "parentId": "site_cafe",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "level_cafe_pb"
+    ],
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ]
+   },
+   "site_cafe": {
+    "object": "node",
+    "id": "site_cafe",
+    "type": "site",
+    "parentId": null,
+    "visible": true,
+    "metadata": {},
+    "polygon": {
+     "type": "polygon",
+     "points": [
+      [
+       -15,
+       -15
+      ],
+      [
+       15,
+       -15
+      ],
+      [
+       15,
+       15
+      ],
+      [
+       -15,
+       15
+      ]
+     ]
+    },
+    "children": [
+     "building_cafe"
+    ]
+   }
+  },
+  "rootNodeIds": [
+   "site_cafe"
+  ],
+  "collections": {},
+  "materials": {},
+  "installedPlugins": []
+ }
+}
