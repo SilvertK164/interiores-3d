@@ -125,3 +125,30 @@ Todo es estado de `useViewer` (`setWallMode`, `setCameraMode`, `setShading`, `se
 2. **La escena demo oficial no sirve para interiores** (es una casa con jardín, con puertas y ventanas como ítems). Usamos una escena de prueba del repo y le sumamos muebles del catálogo.
 3. **Dependencia externa del catálogo:** los GLB del catálogo salen del bucket de Pascal (ver la investigación); los renders de muestra usan fotos de stock de Pencil y están marcados como ilustrativos.
 4. **Resolución:** las capturas del panel son de ~700 px de ancho; en el diseño se ven algo suaves al ampliarlas. Para el Demo Day conviene generar capturas del editor real en pantalla completa.
+
+## 9. Modos de trabajo: Ver y Editar (verificado)
+
+Decisión del equipo (2026-10-11): separar el uso en dos modos para que la interfaz sea simple.
+
+| Modo | Para qué | Qué se ve | En Pascal |
+|---|---|---|---|
+| **Ver** (navegación) | Recorrer, mostrar, renderizar y compartir | Sin herramientas de edición. Selector de vista (2D/3D/Ambas), niveles, ambientes, opciones de vista 3D, dock de navegación (girar, vista superior, recorrer) y acciones *Compartir* y *Renderizar* | Visor de solo lectura (`ViewerStage` + `useViewer`) |
+| **Editar** | Dibujar y amoblar | Dock de 7 grupos (Seleccionar, Estructura, Aberturas, Muebles, Materiales, Medir, Más), panel de propiedades del elemento seleccionado, deshacer/rehacer | `workspaceMode: 'edit'` de `useEditor`: "la superficie completa de edición" |
+
+Además existe `workspaceMode: 'studio'`: "la superficie de render y captura: lienzo limpio, sin herramientas ni selección. Entrar a *studio* fuerza una vista solo 3D y restaura la anterior al salir". **Lo usamos al renderizar**: el botón *Renderizar* entra a *studio*, toma la captura limpia y vuelve. También hay `captureMode` (encuadres de caminata y dron para fotos) **[por probar]**.
+
+## 10. Qué parámetros tienen puertas, ventanas, muros y muebles (verificado en los esquemas de `@pascal-app/core`)
+
+**Puertas y ventanas son paramétricas, no modelos de catálogo.**
+
+| Elemento | Parámetros reales | Qué mostramos al editar |
+|---|---|---|
+| **Puerta** | Tipo: batiente, doble, francesa, plegable, embutida, de granero, corrediza, y de garaje (seccional, enrollable, basculante); ancho (0,90 m por defecto), alto (2,10 m); hojas (1 a 4); forma del hueco (rectangular, redondeada, arco); "hueco sin puerta"; marco (espesor y profundidad); construcción en seco o mampostería; tipo de medida (nominal, hueco bruto, hueco de mampostería, hueco terminado); paneles y vidrio; material | Tipo, ancho, alto, hojas, forma del hueco, material. El resto en "Más". Las puertas de garaje sirven para **comercio** (cortina enrollable). |
+| **Ventana** | Tipo: fija, corrediza, batiente, proyectante, de abatir hacia dentro (hopper), guillotina simple y doble, bay, bow y de persiana; ancho y alto (1,5 × 1,5 m por defecto); divisiones en columnas y filas; forma del hueco; marco; sentido de apertura y bisagras; material | Tipo, ancho, alto, divisiones, forma del hueco, marco |
+| **Muro** | Espesor, altura, curvatura, muro cortina (vidrio), material **distinto por cara** (interior y exterior), zócalo, moldura de corona, guardasilla y revestimientos | Altura, espesor, material de cada cara, zócalo |
+| **Piso, cielorraso y escalera** | Piso: nivel, espesor, rebaje (piscina), huecos; escalera: tramos, altura total y materiales por parte (peldaño, lateral, baranda); columna: redonda o rectangular, altura, radio, estilo | Material y altura |
+| **Mueble (ítem)** | Posición, rotación y **escala en x, y, z** (por eso se puede redimensionar), material por partes (si el modelo trae "slots"), se pega al piso, al muro o al cielorraso, algunos tienen controles propios (luz con color e intensidad, aire con temperatura, animación) | Ancho, alto, profundidad, rotación, material |
+
+**Formato de un mueble del catálogo** (lo que hay que producir para sumar una biblioteca externa): `id`, `category`, `name`, `tags` (con la ubicación: `floor`, `wall`, `ceiling`, `countertop`), `thumbnail` (miniatura), `src` (archivo **GLB**), `floorPlanUrl` (ícono para el plano 2D), `dimensions` [ancho, alto, profundidad] en metros, `offset`, `rotation`, `scale`, y opcionalmente `surface` (altura de apoyo), `attachTo` (`wall`, `wall-side` o `ceiling`) y controles interactivos. El catálogo trae 111 modelos; solo 17 definen `surface` y 19 `attachTo`.
+
+**Medidas de los muebles:** el campo `dimensions` es el tamaño real del modelo; el usuario lo cambia con `scale`. El panel de muebles muestra esas medidas en la tarjeta, y un fichero GLB ajeno **debe escalarse a metros** antes de entrar al catálogo.
