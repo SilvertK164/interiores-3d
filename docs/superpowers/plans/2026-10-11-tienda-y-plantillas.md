@@ -4,11 +4,11 @@
 
 **Objetivo:** que quien arma un comercio encuentre piezas de tienda en el editor y pueda partir de una **plantilla de muestra** que enseñe el potencial del editor (concept store de 2 niveles, café de especialidad con terraza, supermercado de barrio o loft de doble altura: niveles, escalera, materiales de la biblioteca de Pascal, zócalos y cornisas, mobiliario denso) en vez de una escena vacía.
 
-**Arquitectura:** las piezas nuevas son 12 modelos de Kenney Mini Market (CC0) vendoreados en `public/items/` más piezas de Pascal ya locales, mostradas en una pestaña **Comercio**. Cada plantilla es una definición de datos **multinivel** (`src/lib/templates/definitions/`: muros, ambientes con piso y cielo, aberturas, piezas, escaleras, materiales por id de la biblioteca de Pascal) que un constructor transforma en una escena de Pascal usando los esquemas reales de `@pascal-app/core` en Node; el resultado se commitea como JSON en `public/templates/`. Las texturas que el repo MIT de Pascal no trae se piden a su CDN con un `rewrites().fallback` de Next. La pantalla de proyectos crea el proyecto y guarda esa escena con la API que ya existe, sin cambiar el contrato.
+**Arquitectura:** el comercio se arma con **nodos paramétricos de Pascal** (estantes `ShelfNode` y corridas de gabinetes `CabinetNode` con módulos: góndolas, exhibidores, vitrinas de vidrio, mostradores, cajas, barras y heladeras de exhibición) y con ~100 muebles realistas del catálogo local, mostrados en una pestaña **Comercio**. Cada plantilla es una definición de datos **multinivel** (`src/lib/templates/definitions/`: muros, ambientes con piso y cielo, aberturas, piezas, estantes, gabinetes, escaleras, materiales por id de la biblioteca de Pascal) que un constructor transforma en una escena de Pascal usando los esquemas reales de `@pascal-app/core` en Node; el resultado se commitea como JSON en `public/templates/`. Las texturas que el repo MIT de Pascal no trae se piden a su CDN con un `rewrites().fallback` de Next. La pantalla de proyectos crea el proyecto y guarda esa escena con la API que ya existe, sin cambiar el contrato.
 
-**Tecnologías:** las del spec 1 más `fflate 0.8.3` (descomprimir el ZIP de Kenney) y `tsx 4.23.15` (scripts en TypeScript).
+**Tecnologías:** las del spec 1 más `tsx 4.23.15` (scripts en TypeScript) y `lucide-react` (ya instalado) para los íconos.
 
-**Spec:** [`docs/superpowers/specs/2026-10-11-tienda-y-plantillas-design.md`](../specs/2026-10-11-tienda-y-plantillas-design.md) (aprobado el 2026-10-11; ampliado el mismo día a plantillas de muestra con niveles y materiales, D7–D8). Leer ambos.
+**Spec:** [`docs/superpowers/specs/2026-10-11-tienda-y-plantillas-design.md`](../specs/2026-10-11-tienda-y-plantillas-design.md) (aprobado el 2026-10-11; ampliado el mismo día a plantillas de muestra con niveles y materiales, D7–D8, y **corregido el mismo día: sin piezas de Kenney**, ver "Historial"). Leer ambos.
 
 ## Global Constraints
 
@@ -17,7 +17,8 @@
 - Solo `apps/web/src/editor/` importa `@pascal-app/*`, `three` o `@react-three/*` desde `.ts`/`.tsx` (D8 del spec 1; lo verifica `tests/boundaries.test.ts`). Los datos de plantillas (`src/lib/templates/`) **no** importan Pascal.
 - La API y `openapi.yaml` **no cambian**. El límite de escena es **5 MB** (`SCENE_MAX_BYTES`).
 - Archivos de código de menos de 300 líneas (las definiciones de plantilla son datos y pueden pasar de esa cifra solo si se parten).
-- Los assets de terceros solo de fuentes ya aprobadas: repo MIT de Pascal, su CDN de texturas (`https://editor.pascal.app/material/`, solo vía el `rewrite` de Next) y Kenney (CC0). Nada de claves en el repo.
+- Los assets de terceros solo de fuentes ya aprobadas: repo MIT de Pascal y su CDN de texturas (`https://editor.pascal.app/material/`, solo vía el `rewrite` de Next). Los modelos deben verse **realistas**, no de videojuego. Nada de claves en el repo.
+- Íconos solo de `lucide-react`, nunca emojis (`.claude/rules/iconos-sin-emojis.md`).
 - Los materiales de una definición se escriben por **id de la biblioteca de Pascal** (`wood-hungarianparquet10`); el constructor agrega el prefijo `library:`. Un id inexistente rompe la validación.
 - Ejes de las definiciones: **x** a la derecha, **z** hacia abajo; el frente del local es el muro `-s`. Cada plantilla muestra potencial: 3 o más ambientes, 20 o más piezas, 5 o más materiales distintos (prueba en la Tarea 4).
 - TDD: el primer test de cada unidad se ve **en rojo** antes de implementar. Un único comando de verdad: `pnpm verify`.
@@ -44,20 +45,25 @@ Entradas y condiciones que ninguna tarea probaría por sí sola; cada línea tie
 | D7: materiales de la biblioteca | De los 114 materiales de `MATERIAL_CATALOG`, solo 66 tienen textura en el repo (hormigón, metal, tela, cuero, colores lisos); madera, ladrillo, azulejo y piedra no. | `next.config.mjs` agrega `rewrites().fallback` de `/material/:path*` al CDN de Pascal; un archivo local siempre gana. Plan B si el CDN deja de servir: reemplazar en las definiciones los materiales sin textura local por equivalentes locales (el E2E de la Tarea 5 falla si alguna textura da 4xx). |
 | D8: escalera | La orientación de `StairNode` con `rotation 0` no está calibrada y el prototipo solo comprobó que renderiza. | `rotY` y `at` de cada escalera se afinan en la revisión visual (Tarea 5, Paso 6); el validador solo exige que arranque dentro de un ambiente y suba a un nivel posterior. |
 
+## Historial (cambio de rumbo del 2026-10-11)
+
+1. El plan nació con 12 piezas de **Kenney Mini Market** (CC0) para caja, freezers, góndolas y exhibidores (Tarea 1, ejecutada).
+2. Al verlas en el editor, Silvert las descartó: "parecen de un juego, tienen que ser realistas". Se pidió usar los **estantes y gabinetes paramétricos de Pascal**, con vitrinas y lo demás que se pueda.
+3. Un prototipo en el editor real mostró que `ShelfNode` y `CabinetNode` (con módulos hijos) se ven limpios y realistas y cubren góndolas, exhibidores, vitrinas de vidrio, mostradores con cajones, barras con bacha y heladeras de exhibición.
+4. Se retiraron de git los archivos de Kenney y su script (commit `feat(tienda): estantes y gabinetes paramétricos de Pascal en el constructor y retiro de las piezas de Kenney`); el constructor (Tarea 3), las definiciones (Tarea 4) y el catálogo (Tarea 2) pasaron a describir lo que quedó. **El código de este plan es el que está en el repositorio**: los bloques de las Tareas 2 a 5 se tomaron de los archivos que pasaron `pnpm verify`.
+
 ## Estructura de archivos
 
 ```
 apps/web/
-  scripts/lib/glb-bounds.ts                    caja envolvente de un GLB
-  scripts/vendor-kenney-mini-market.ts         descarga + SHA-256 + extracción + manifest
   scripts/build-templates.ts                   definiciones → public/templates/*.json|svg   (--check compara)
   next.config.mjs                              rewrite de /material/* al CDN de Pascal (texturas que el repo no trae)
-  src/lib/templates/types.ts, geometry.ts (perimeter/row/grid), validate.ts, thumbnail.ts, index.ts, create-from-template.ts
+  src/lib/templates/types.ts, geometry.ts (perimeter/row/grid/shelfRow/footprint), validate.ts, thumbnail.ts, index.ts, create-from-template.ts
   src/lib/templates/definitions/{concept-store,cafe,supermercado,loft}.ts   datos puros, multinivel, con materiales
   src/editor/templates/scene-builder.ts        definición → grafo de Pascal (única pieza que importa @pascal-app/core)
-  src/editor/commerce-catalog.ts, kenney-pieces.json   catálogo de la pestaña Comercio
+  src/editor/commerce-catalog.ts               ids de Pascal de la pestaña Comercio
   src/components/TemplatePicker.tsx            tarjetas de plantilla (mínimas, sin diseño final)
-  public/items/kenney-*/  ·  public/templates/*.json|svg
+  public/templates/*.json|svg
   test/support/asset-ids.ts                    ids de piezas disponibles (para validar definiciones)
   e2e/templates.spec.ts, e2e/catalog.spec.ts
 THIRD_PARTY_NOTICES.md
@@ -65,316 +71,14 @@ THIRD_PARTY_NOTICES.md
 
 ---
 
-### Task 1: Piezas de Kenney Mini Market
+### Task 1: Piezas de Kenney Mini Market — EJECUTADA Y REVERTIDA
 
-**Responsable sugerido:** Victoria. Revisa: Silvert.
+**Estado:** ejecutada el 2026-10-11 (commit `feat(tienda): 12 piezas de Kenney Mini Market (CC0) vendoreadas con sus medidas reales`) y **retirada el mismo día** por pedido de Silvert: el estilo de las piezas es de videojuego y el producto necesita modelos realistas. Lo que se hizo y se conserva:
 
-**Files:**
-- Create: `apps/web/scripts/lib/glb-bounds.ts`, `apps/web/scripts/vendor-kenney-mini-market.ts`
-- Create: `apps/web/test/glb-bounds.test.ts`
-- Create (generados por el script): `apps/web/public/items/kenney-*/`, `apps/web/public/items/kenney-LICENSE.txt`, `apps/web/src/editor/kenney-pieces.json`
-- Modify: `apps/web/package.json`, `apps/web/tsconfig.json`
+- `tsx 4.23.15` como dependencia de desarrollo (lo usa `scripts/build-templates.ts`) y `"scripts"` en el `include` de `apps/web/tsconfig.json`.
+- La lección: **mirar el estilo de un pack antes de integrarlo** (queda en `docs/bitacora.md`).
 
-**Interfaces:**
-- Produces: `glbBounds(input: Uint8Array | Buffer): { size: [number, number, number]; min: [number, number, number] }`; `src/editor/kenney-pieces.json`: `Array<{ id: string; folder: string; name: string; category: 'furniture' | 'appliance'; tags: string[]; dimensions: [number, number, number] }>` con los 12 ids `kenney-<pieza>`.
-
-- [ ] **Paso 1: Rama y dependencias**
-
-```bash
-git switch feature/tienda-plantillas
-pnpm --filter @interiores/web add -D fflate@0.8.3 tsx@4.23.15
-```
-Expected: `package.json` de `apps/web` suma las dos dependencias con versión exacta (si pnpm escribe `^`, quitarlo a mano).
-
-Modify `apps/web/tsconfig.json`: en `include` agregar `"scripts"`:
-
-```json
-  "include": ["next-env.d.ts", "src", "app", "test", "e2e", "scripts"],
-```
-
-- [ ] **Paso 2: Escribir la prueba de `glbBounds` en rojo**
-
-Create `apps/web/test/glb-bounds.test.ts`:
-
-```ts
-import { describe, expect, it } from 'vitest'
-import { glbBounds } from '../scripts/lib/glb-bounds'
-
-/** Arma un GLB mínimo (solo el trozo JSON): glbBounds lee los mínimos y máximos de los accesores. */
-function makeGlb(json: object): Buffer {
-  let text = JSON.stringify(json)
-  while (Buffer.byteLength(text) % 4 !== 0) text += ' '
-  const body = Buffer.from(text)
-  const header = Buffer.alloc(20)
-  header.writeUInt32LE(0x46546c67, 0)
-  header.writeUInt32LE(2, 4)
-  header.writeUInt32LE(20 + body.length, 8)
-  header.writeUInt32LE(body.length, 12)
-  header.writeUInt32LE(0x4e4f534a, 16)
-  return Buffer.concat([header, body])
-}
-
-const box = (min: number[], max: number[]) => ({
-  meshes: [{ primitives: [{ attributes: { POSITION: 0 } }] }],
-  accessors: [{ type: 'VEC3', min, max }],
-})
-
-describe('glbBounds', () => {
-  it('mide una caja sin transformaciones', () => {
-    const glb = makeGlb({ scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }], ...box([-0.5, 0, -0.5], [0.5, 1, 0.5]) })
-    expect(glbBounds(glb)).toEqual({ size: [1, 1, 1], min: [-0.5, 0, -0.5] })
-  })
-
-  it('aplica la escala del nodo', () => {
-    const glb = makeGlb({ scenes: [{ nodes: [0] }], nodes: [{ mesh: 0, scale: [2, 2, 2] }], ...box([0, 0, 0], [1, 1, 1]) })
-    expect(glbBounds(glb).size).toEqual([2, 2, 2])
-  })
-
-  it('acumula la traslación de un nodo padre', () => {
-    const glb = makeGlb({
-      scenes: [{ nodes: [0] }],
-      nodes: [{ children: [1], translation: [10, 0, 0] }, { mesh: 0 }],
-      ...box([0, 0, 0], [1, 1, 1]),
-    })
-    expect(glbBounds(glb).min).toEqual([10, 0, 0])
-  })
-
-  it('una rotación de 90° sobre Y intercambia ancho y fondo', () => {
-    const s = Math.SQRT1_2
-    const glb = makeGlb({
-      scenes: [{ nodes: [0] }],
-      nodes: [{ mesh: 0, rotation: [0, s, 0, s] }],
-      ...box([0, 0, 0], [2, 1, 1]),
-    })
-    expect(glbBounds(glb).size).toEqual([1, 1, 2])
-  })
-
-  it('rechaza un archivo que no es GLB', () => {
-    expect(() => glbBounds(Buffer.from('no soy un glb, de verdad que no'))).toThrow('no es un GLB')
-  })
-})
-```
-
-- [ ] **Paso 3: Ver la prueba fallar**
-
-Run: `pnpm --filter @interiores/web exec vitest run glb-bounds`
-Expected: FAIL — `Failed to resolve import "../scripts/lib/glb-bounds"`. Pegar en el PR.
-
-- [ ] **Paso 4: Implementar `glbBounds`**
-
-Create `apps/web/scripts/lib/glb-bounds.ts`:
-
-```ts
-type Vec3 = [number, number, number]
-type Gltf = {
-  scene?: number
-  scenes: { nodes: number[] }[]
-  nodes: { mesh?: number; children?: number[]; matrix?: number[]; translation?: number[]; rotation?: number[]; scale?: number[] }[]
-  meshes: { primitives: { attributes: { POSITION: number } }[] }[]
-  accessors: { min: number[]; max: number[] }[]
-}
-
-const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-
-// Matrices de 16 números en orden de columnas, como glTF.
-function multiply(a: number[], b: number[]): number[] {
-  const out = new Array<number>(16).fill(0)
-  for (let c = 0; c < 4; c++) {
-    for (let r = 0; r < 4; r++) {
-      let sum = 0
-      for (let k = 0; k < 4; k++) sum += (a[k * 4 + r] as number) * (b[c * 4 + k] as number)
-      out[c * 4 + r] = sum
-    }
-  }
-  return out
-}
-
-function localMatrix(node: Gltf['nodes'][number]): number[] {
-  if (node.matrix) return node.matrix
-  const [tx, ty, tz] = node.translation ?? [0, 0, 0]
-  const [sx, sy, sz] = node.scale ?? [1, 1, 1]
-  const [x, y, z, w] = node.rotation ?? [0, 0, 0, 1]
-  const r00 = 1 - 2 * (y! * y! + z! * z!)
-  const r01 = 2 * (x! * y! - z! * w!)
-  const r02 = 2 * (x! * z! + y! * w!)
-  const r10 = 2 * (x! * y! + z! * w!)
-  const r11 = 1 - 2 * (x! * x! + z! * z!)
-  const r12 = 2 * (y! * z! - x! * w!)
-  const r20 = 2 * (x! * z! - y! * w!)
-  const r21 = 2 * (y! * z! + x! * w!)
-  const r22 = 1 - 2 * (x! * x! + y! * y!)
-  return [
-    r00 * sx!, r10 * sx!, r20 * sx!, 0,
-    r01 * sy!, r11 * sy!, r21 * sy!, 0,
-    r02 * sz!, r12 * sz!, r22 * sz!, 0,
-    tx!, ty!, tz!, 1,
-  ]
-}
-
-const round3 = (n: number) => Math.round(n * 1000) / 1000 + 0 // `+ 0` evita -0
-
-/** Caja envolvente (en metros) de un GLB: recorre los nodos aplicando traslación, rotación y escala. */
-export function glbBounds(input: Uint8Array): { size: Vec3; min: Vec3 } {
-  const buf = Buffer.from(input)
-  if (buf.length < 20 || buf.readUInt32LE(0) !== 0x46546c67) throw new Error('El archivo no es un GLB')
-  const jsonLength = buf.readUInt32LE(12)
-  const gltf = JSON.parse(buf.subarray(20, 20 + jsonLength).toString('utf8')) as Gltf
-  const min: Vec3 = [Infinity, Infinity, Infinity]
-  const max: Vec3 = [-Infinity, -Infinity, -Infinity]
-
-  const walk = (index: number, parent: number[]) => {
-    const node = gltf.nodes[index]!
-    const m = multiply(parent, localMatrix(node))
-    if (node.mesh !== undefined) {
-      for (const primitive of gltf.meshes[node.mesh]!.primitives) {
-        const acc = gltf.accessors[primitive.attributes.POSITION]!
-        for (const cx of [acc.min[0]!, acc.max[0]!]) {
-          for (const cy of [acc.min[1]!, acc.max[1]!]) {
-            for (const cz of [acc.min[2]!, acc.max[2]!]) {
-              const p: Vec3 = [
-                m[0]! * cx + m[4]! * cy + m[8]! * cz + m[12]!,
-                m[1]! * cx + m[5]! * cy + m[9]! * cz + m[13]!,
-                m[2]! * cx + m[6]! * cy + m[10]! * cz + m[14]!,
-              ]
-              for (let i = 0; i < 3; i++) {
-                min[i] = Math.min(min[i]!, p[i]!)
-                max[i] = Math.max(max[i]!, p[i]!)
-              }
-            }
-          }
-        }
-      }
-    }
-    for (const child of node.children ?? []) walk(child, m)
-  }
-
-  for (const root of gltf.scenes[gltf.scene ?? 0]!.nodes) walk(root, IDENTITY)
-  return {
-    size: [round3(max[0]! - min[0]!), round3(max[1]! - min[1]!), round3(max[2]! - min[2]!)],
-    min: [round3(min[0]!), round3(min[1]!), round3(min[2]!)],
-  }
-}
-```
-
-- [ ] **Paso 5: Ver la prueba pasar**
-
-Run: `pnpm --filter @interiores/web exec vitest run glb-bounds`
-Expected: PASS (5 pruebas).
-
-- [ ] **Paso 6: Script que vendorea las 12 piezas**
-
-Create `apps/web/scripts/vendor-kenney-mini-market.ts`:
-
-```ts
-// Descarga Kenney Mini Market (CC0), verifica su SHA-256, copia 12 piezas a public/items/ y escribe el manifest.
-//   tsx scripts/vendor-kenney-mini-market.ts            descarga y copia
-//   tsx scripts/vendor-kenney-mini-market.ts --check    solo verifica que estén todos los archivos
-import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { unzipSync } from 'fflate'
-import { glbBounds } from './lib/glb-bounds'
-
-const ZIP_URL = 'https://kenney.nl/media/pages/assets/mini-market/463f38da51-1729865423/kenney_mini-market.zip'
-const ZIP_SHA256 = '6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203'
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-
-type Piece = { file: string; name: string; category: 'furniture' | 'appliance'; tags: string[] }
-const PIECES: Piece[] = [
-  { file: 'cash-register', name: 'Caja registradora', category: 'appliance', tags: ['comercio', 'caja', 'mostrador'] },
-  { file: 'freezer', name: 'Freezer horizontal', category: 'appliance', tags: ['comercio', 'freezer', 'heladera'] },
-  { file: 'freezers-standing', name: 'Freezers verticales', category: 'appliance', tags: ['comercio', 'freezer', 'heladera'] },
-  { file: 'shelf-bags', name: 'Góndola de bolsas', category: 'furniture', tags: ['comercio', 'góndola', 'estante'] },
-  { file: 'shelf-boxes', name: 'Góndola de cajas', category: 'furniture', tags: ['comercio', 'góndola', 'estante'] },
-  { file: 'shelf-end', name: 'Cabecera de góndola', category: 'furniture', tags: ['comercio', 'góndola', 'estante'] },
-  { file: 'display-bread', name: 'Exhibidor de pan', category: 'furniture', tags: ['comercio', 'exhibidor', 'panadería'] },
-  { file: 'display-fruit', name: 'Exhibidor de fruta', category: 'furniture', tags: ['comercio', 'exhibidor', 'verdulería'] },
-  { file: 'shopping-cart', name: 'Carrito de compras', category: 'furniture', tags: ['comercio', 'carrito'] },
-  { file: 'shopping-basket', name: 'Canasto', category: 'furniture', tags: ['comercio', 'canasto'] },
-  { file: 'bottle-return', name: 'Retorno de botellas', category: 'appliance', tags: ['comercio', 'reciclaje'] },
-  { file: 'character-employee', name: 'Vendedor', category: 'furniture', tags: ['comercio', 'persona', 'vendedor'] },
-]
-
-const folderOf = (piece: Piece) => `kenney-${piece.file}`
-const itemsDir = join(root, 'public/items')
-const manifestPath = join(root, 'src/editor/kenney-pieces.json')
-
-if (process.argv.includes('--check')) {
-  const missing = PIECES.flatMap((p) =>
-    ['model.glb', 'thumbnail.png', 'Textures/colormap.png']
-      .map((f) => `${folderOf(p)}/${f}`)
-      .filter((f) => !existsSync(join(itemsDir, f))),
-  )
-  if (!existsSync(manifestPath)) missing.push('src/editor/kenney-pieces.json')
-  if (missing.length > 0) {
-    console.error(`Faltan archivos de Kenney: ${missing.join(', ')}. Ejecuta: pnpm --filter @interiores/web assets:kenney`)
-    process.exit(1)
-  }
-  process.exit(0)
-}
-
-const response = await fetch(ZIP_URL)
-if (!response.ok) throw new Error(`No se pudo descargar Kenney Mini Market: HTTP ${response.status}`)
-const zipBytes = new Uint8Array(await response.arrayBuffer())
-const sha = createHash('sha256').update(zipBytes).digest('hex')
-if (sha !== ZIP_SHA256) throw new Error(`El ZIP de Kenney cambió (SHA-256 ${sha}); revisa la licencia y el contenido antes de actualizar el hash.`)
-
-const files = unzipSync(zipBytes)
-const need = (path: string): Uint8Array => {
-  const data = files[path]
-  if (!data) throw new Error(`El ZIP no trae ${path}`)
-  return data
-}
-
-const manifest = PIECES.map((piece) => {
-  const glb = need(`Models/GLB format/${piece.file}.glb`)
-  const dir = join(itemsDir, folderOf(piece))
-  mkdirSync(join(dir, 'Textures'), { recursive: true })
-  writeFileSync(join(dir, 'model.glb'), glb)
-  writeFileSync(join(dir, 'Textures/colormap.png'), need('Models/GLB format/Textures/colormap.png'))
-  writeFileSync(join(dir, 'thumbnail.png'), need(`Previews/${piece.file}.png`))
-  return {
-    id: folderOf(piece),
-    folder: folderOf(piece),
-    name: piece.name,
-    category: piece.category,
-    tags: piece.tags,
-    dimensions: glbBounds(glb).size,
-  }
-})
-
-writeFileSync(join(itemsDir, 'kenney-LICENSE.txt'), Buffer.from(need('License.txt')))
-mkdirSync(dirname(manifestPath), { recursive: true })
-writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
-console.log(`Listo: ${manifest.length} piezas de Kenney Mini Market (CC0) en public/items/`)
-```
-
-Modify `apps/web/package.json`: en `scripts` agregar
-`"assets:kenney": "tsx scripts/vendor-kenney-mini-market.ts"` y cambiar `prebuild` a:
-
-```json
-    "prebuild": "pnpm --filter @interiores/contract build && node scripts/vendor-pascal-assets.mjs --check && tsx scripts/vendor-kenney-mini-market.ts --check",
-```
-
-- [ ] **Paso 7: Ejecutar el script y revisar el resultado**
-
-Run: `pnpm --filter @interiores/web assets:kenney`
-Expected: `Listo: 12 piezas de Kenney Mini Market (CC0) en public/items/`. Se crean `public/items/kenney-*/{model.glb,thumbnail.png,Textures/colormap.png}`, `public/items/kenney-LICENSE.txt` y `src/editor/kenney-pieces.json` con `dimensions` reales (la caja registradora mide 0,85 × 0,595 × 0,85 m).
-
-Run: `pnpm --filter @interiores/web exec tsx scripts/vendor-kenney-mini-market.ts --check; echo $?`
-Expected: `0`.
-
-- [ ] **Paso 8: Verificar y commit**
-
-Run: `pnpm verify`
-Expected: PASS.
-
-```bash
-git add -A
-git commit -m "feat(tienda): 12 piezas de Kenney Mini Market (CC0) vendoreadas con sus medidas reales"
-git push -q
-```
+Lo que se retiró: `fflate`, `scripts/vendor-kenney-mini-market.ts`, `scripts/lib/glb-bounds.ts` y su prueba, `src/editor/kenney-pieces.json`, `public/items/kenney-*` y el chequeo en `prebuild`. El historial de git conserva todo por si hiciera falta.
 
 ---
 
@@ -387,8 +91,8 @@ git push -q
 - Create: `apps/web/src/editor/commerce-catalog.ts`, `apps/web/test/commerce-catalog.test.ts`, `apps/web/e2e/catalog.spec.ts`
 
 **Interfaces:**
-- Consumes: `kenney-pieces.json` (Tarea 1), `local-items.json` (spec 1).
-- Produces: `localizeCatalogItem` (ahora por carpeta del `src`, conserva `tool`); `COMMERCE_PASCAL_IDS: readonly string[]`; `kenneyAssets(): CommerceAsset[]`; `buildCommerceItems<T extends { id: string }>(localized: T[]): Array<T | CommerceAsset>`.
+- Consumes: `local-items.json` (spec 1).
+- Produces: `localizeCatalogItem` (ahora por carpeta del `src`, conserva `tool`); `COMMERCE_PASCAL_IDS: readonly string[]` (33 ids); `buildCommerceItems<T extends { id: string }>(localized: readonly T[]): T[]`.
 
 - [ ] **Paso 1: Cambiar las pruebas del catálogo (rojo)**
 
@@ -480,11 +184,10 @@ Create `apps/web/test/commerce-catalog.test.ts`:
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { COMMERCE_PASCAL_IDS, buildCommerceItems, kenneyAssets } from '../src/editor/commerce-catalog'
+import { COMMERCE_PASCAL_IDS, buildCommerceItems } from '../src/editor/commerce-catalog'
 import { localizeCatalogItem } from '../src/editor/catalog'
 import manifest from '../src/editor/local-items.json' with { type: 'json' }
 
-const publicPath = (p: string) => fileURLToPath(new URL(`../public${p}`, import.meta.url))
 const source = readFileSync(
   fileURLToPath(new URL('../node_modules/@pascal-app/editor/src/components/ui/item-catalog/catalog-items.tsx', import.meta.url)),
   'utf8',
@@ -512,23 +215,19 @@ describe('catálogo de comercio', () => {
     }
   })
 
-  it('cada pieza de Kenney trae su modelo, su textura y su miniatura', () => {
-    const assets = kenneyAssets()
-    expect(assets).toHaveLength(12)
-    for (const a of assets) {
-      expect(existsSync(publicPath(a.src)), a.src).toBe(true)
-      expect(existsSync(publicPath(a.src.replace('model.glb', 'Textures/colormap.png'))), a.id).toBe(true)
-      expect(existsSync(publicPath(a.thumbnail)), a.thumbnail).toBe(true)
-      expect(a.dimensions.every((d) => d > 0)).toBe(true)
-    }
-  })
-
-  it('la pestaña Comercio tiene al menos 20 piezas, sin ids repetidos, y arranca con el gabinete paramétrico', () => {
+  it('la pestaña Comercio tiene al menos 20 piezas de Pascal, sin ids repetidos, y arranca con el gabinete paramétrico', () => {
     const items = buildCommerceItems(localized)
     const ids = items.map((i) => i.id)
     expect(items.length).toBeGreaterThanOrEqual(20)
     expect(new Set(ids).size).toBe(ids.length)
     expect(ids[0]).toBe('cabinet')
+    expect(ids.some((id) => id.startsWith('kenney-'))).toBe(false)
+  })
+
+  it('cada pieza de la pestaña trae un modelo local que existe', () => {
+    for (const item of buildCommerceItems(localized)) {
+      expect(existsSync(fileURLToPath(new URL(`../public${item.src}`, import.meta.url))), item.src).toBe(true)
+    }
   })
 })
 ```
@@ -541,21 +240,6 @@ Expected: FAIL — `Failed to resolve import "../src/editor/commerce-catalog"`. 
 Create `apps/web/src/editor/commerce-catalog.ts`:
 
 ```ts
-import kenney from './kenney-pieces.json'
-
-export type CommerceAsset = {
-  id: string
-  category: 'furniture' | 'appliance'
-  name: string
-  tags: string[]
-  src: string
-  thumbnail: string
-  dimensions: [number, number, number]
-  offset: [number, number, number]
-  rotation: [number, number, number]
-  scale: [number, number, number]
-}
-
 /** Piezas del catálogo de Pascal (ya locales) útiles para comercio; el gabinete paramétrico va primero. */
 export const COMMERCE_PASCAL_IDS: readonly string[] = [
   'cabinet',
@@ -593,38 +277,20 @@ export const COMMERCE_PASCAL_IDS: readonly string[] = [
   'air-conditioning',
 ]
 
-type KenneyPiece = (typeof kenney)[number]
-
-export function kenneyAssets(pieces: readonly KenneyPiece[] = kenney): CommerceAsset[] {
-  return pieces.map((p) => ({
-    id: p.id,
-    category: p.category as CommerceAsset['category'],
-    name: p.name,
-    tags: p.tags,
-    src: `/items/${p.folder}/model.glb`,
-    thumbnail: `/items/${p.folder}/thumbnail.png`,
-    dimensions: p.dimensions as [number, number, number],
-    offset: [0, 0, 0],
-    rotation: [0, 0, 0],
-    scale: [1, 1, 1],
-  }))
-}
-
-/** Pestaña Comercio: las piezas de Pascal elegidas (en ese orden) y después las de Kenney. */
-export function buildCommerceItems<T extends { id: string }>(localized: readonly T[]): Array<T | CommerceAsset> {
+/** Pestaña Comercio: las piezas de Pascal elegidas, en ese orden (las que no existan localmente se omiten). */
+export function buildCommerceItems<T extends { id: string }>(localized: readonly T[]): T[] {
   const byId = new Map(localized.map((i) => [i.id, i]))
-  const fromPascal = COMMERCE_PASCAL_IDS.flatMap((id) => byId.get(id) ?? [])
-  return [...fromPascal, ...kenneyAssets()]
+  return COMMERCE_PASCAL_IDS.flatMap((id) => byId.get(id) ?? [])
 }
 ```
 
 Run: `pnpm --filter @interiores/web exec vitest run commerce-catalog`
-Expected: PASS (3 pruebas).
+Expected: PASS (3 pruebas: ids oficiales con modelo local, 20 o más piezas sin repetir con el gabinete primero, y todos los modelos existen en `public/`).
 
 - [ ] **Paso 6: Montar la pestaña Comercio**
 
 Modify `apps/web/src/editor/ProjectEditor.tsx`:
-1. Agregar el import `import { buildCommerceItems } from './commerce-catalog'`.
+1. Agregar los imports `import { Sofa, Store } from 'lucide-react'` y `import { buildCommerceItems } from './commerce-catalog'`. El ícono de la pestaña Muebles pasa de emoji a `<Sofa aria-hidden size={20} />` (regla: sin emojis).
 2. Debajo de `const items = useMemo(…)` agregar:
 
 ```tsx
@@ -637,7 +303,7 @@ Modify `apps/web/src/editor/ProjectEditor.tsx`:
       {
         id: 'commerce',
         label: 'Comercio',
-        icon: <span style={{ fontSize: 20 }}>🏪</span>,
+        icon: <Store aria-hidden size={20} />,
         component: () => <ItemsPanel items={commerceItems} showSourceFilter={false} showTagFilters={false} />,
       },
 ```
@@ -651,7 +317,7 @@ Create `apps/web/e2e/catalog.spec.ts`:
 ```ts
 import { expect, test } from '@playwright/test'
 
-test('la pestaña Comercio lista las piezas de tienda y todas cargan sin 404', async ({ page }) => {
+test('la pestaña Comercio lista el gabinete y el estante paramétricos y todo carga sin 404', async ({ page }) => {
   const failed: string[] = []
   page.on('response', (r) => {
     if (r.status() === 404 && /\/items\//.test(r.url())) failed.push(r.url())
@@ -661,15 +327,16 @@ test('la pestaña Comercio lista las piezas de tienda y todas cargan sin 404', a
   await page.getByRole('button', { name: 'Crear proyecto' }).click()
   await page.waitForURL(/\/proyectos\/[0-9a-f-]{36}$/)
   await page.getByRole('button', { name: 'Comercio' }).click()
-  await expect(page.getByText('Caja registradora')).toBeVisible({ timeout: 60_000 })
-  await expect(page.getByText('Modular Cabinet')).toBeVisible()
+  // El gabinete y el estante paramétricos van primero en Furniture; todos los modelos salen de /items/ locales.
+  await expect(page.getByText('Modular Cabinet')).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByText('Shelf', { exact: true })).toBeVisible()
   await page.waitForTimeout(3000)
   expect(failed).toEqual([])
 })
 ```
 
 Run (con Supabase local arriba: `pnpm db:start && pnpm db:env`): `pnpm --filter @interiores/web e2e -g "pestaña Comercio"`
-Expected: PASS. Si falla por un 404 de `/items/…`, se corrige la ruta o el archivo faltante (no se relaja la prueba). Antes del Paso 6 esta misma prueba **falla**: `getByRole('button', { name: 'Comercio' })` no existe; pegar esa salida en el PR.
+Expected: PASS. El panel de Pascal filtra por categoría y arranca en "Furniture": la prueba mira el gabinete y el estante, que están ahí. Si falla por un 404 de `/items/…`, se corrige la ruta o el archivo faltante (no se relaja la prueba). Antes del Paso 6 esta misma prueba **falla**: `getByRole('button', { name: 'Comercio' })` no existe; pegar esa salida en el PR.
 
 - [ ] **Paso 8: Verificar y commit**
 
@@ -678,13 +345,13 @@ Expected: PASS.
 
 ```bash
 git add -A
-git commit -m "feat(tienda): pestaña Comercio con 45 piezas y gabinete paramétrico recuperado"
+git commit -m "feat(tienda): pestaña Comercio con 33 piezas de Pascal y gabinete paramétrico recuperado"
 git push -q
 ```
 
 ---
 
-### Task 3: Definiciones multinivel con materiales, validador y constructor de escenas
+### Task 3: Definiciones multinivel con materiales, estantes y gabinetes paramétricos, validador y constructor de escenas
 
 **Responsable sugerido:** Silvert. Revisa: Victoria.
 
@@ -700,6 +367,8 @@ git push -q
   - `perimeter(prefix, x0, z0, x1, z1): WallDef[]`; `row(asset, from, to, count, opts?)`, `grid(asset, origin, columns, rows, step, opts?)`: `ItemDef[]`; `roomArea`, `definitionArea(def)`
   - `validateDefinition(def, assetIds: ReadonlySet<string>, materialIds: ReadonlySet<string>): string[]`
   - `buildScene(def, assets: ReadonlyMap<string, AssetLike>): SceneGraph`, `MATERIAL_IDS: ReadonlySet<string>` (ids de la biblioteca de Pascal)
+
+**Ampliación del 2026-10-11:** `LevelDef` suma `shelves` (`ShelfDef`) y `cabinets` (`CabinetDef` con `modules`); el validador comprueba que la base girada de cada uno caiga dentro de los ambientes (`footprint`), que las medidas entren en lo que Pascal admite (corrida de hasta 3 m) y que existan los materiales; el constructor crea `ShelfNode` y `CabinetNode` con sus `CabinetModuleNode` hijos centrados sobre el eje local x. Los bloques de código de esta tarea ya incluyen todo eso.
 
 Los materiales se escriben por **id de la biblioteca** (`wood-hungarianparquet10`); el constructor les agrega el prefijo `library:` que Pascal espera en `materialPreset`.
 
@@ -763,6 +432,60 @@ export type StairDef = {
   rail?: 'none' | 'left' | 'right' | 'both'
 }
 
+/** Estante paramétrico de Pascal. `at` es el centro de su base; el frente mira a +z cuando `rotY` es 0. */
+export type ShelfDef = {
+  id: string
+  /** `open-rack` = góndola industrial; `bookshelf` = biblioteca; `cubby` = exhibidor de casilleros; `wall-shelf` = repisa. */
+  style: 'wall-shelf' | 'bookshelf' | 'open-rack' | 'cubby'
+  at: Pt
+  rotY?: number
+  /** Altura de la base sobre el piso (por ejemplo, una repisa de pared); por defecto, sobre la losa. */
+  y?: number
+  width: number
+  depth: number
+  height: number
+  rows?: number
+  columns?: number
+  withBack?: boolean
+  withBottom?: boolean
+  /** Material de la biblioteca de Pascal. */
+  material?: string
+  name?: string
+}
+
+/** Un compartimento del módulo de un gabinete (los mismos nombres y campos que `CabinetNode` de Pascal). */
+export type CompartmentDef =
+  | { type: 'door'; doorType?: 'single-left' | 'single-right' | 'double' | 'glass'; shelfCount?: number }
+  | { type: 'drawer'; drawerCount?: number }
+  | { type: 'shelf'; shelfCount?: number }
+  | { type: 'sink'; sinkLayout?: 'single' | 'double' | 'double-offset' }
+  | { type: 'fridge-single' | 'fridge-double' | 'fridge-top-freezer' | 'fridge-bottom-freezer' | 'oven' | 'microwave' | 'dishwasher' }
+
+export type CabinetModuleDef = { width: number; stack: CompartmentDef[] }
+
+/**
+ * Corrida de gabinetes paramétricos: módulos en fila sobre el eje local x. `at` es el centro de la base de toda la corrida;
+ * el frente mira a +z cuando `rotY` es 0. Sirve para mostradores, cajas, barras, vitrinas y heladeras de exhibición.
+ */
+export type CabinetDef = {
+  id: string
+  at: Pt
+  rotY?: number
+  y?: number
+  depth: number
+  /** Alto del cuerpo (sin zócalo ni mesada); Pascal usa 0,8 m en gabinetes bajos. */
+  height: number
+  tier?: 'base' | 'tall'
+  /** Mesada; por defecto, sí en `base` y no en `tall`. */
+  countertop?: boolean
+  frontStyle?: 'slab' | 'shaker' | 'raised-arch'
+  /** Barra elevada por el lado de atrás (para sentarse en banquetas). */
+  bar?: boolean
+  material?: string
+  name?: string
+  modules: CabinetModuleDef[]
+}
+
 export type LevelDef = {
   id: string
   height?: number
@@ -776,6 +499,8 @@ export type LevelDef = {
   rooms: RoomDef[]
   openings: OpeningDef[]
   items: ItemDef[]
+  shelves?: ShelfDef[]
+  cabinets?: CabinetDef[]
   stairs?: StairDef[]
 }
 
@@ -792,9 +517,12 @@ export type TemplateDefinition = {
 Create `apps/web/src/lib/templates/geometry.ts`:
 
 ```ts
-import type { ItemDef, Pt, RoomDef, TemplateDefinition, WallDef } from './types'
+import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, TemplateDefinition, WallDef } from './types'
 
 const round = (n: number) => Math.round(n * 1000) / 1000
+
+/** Altura (y) de la mesada de un gabinete bajo: losa 0,05 + zócalo 0,10 + cuerpo 0,80 + mesada 0,02. Para apoyar piezas encima. */
+export const COUNTER_Y = 0.97
 
 /** Cuatro muros de un rectángulo: `-n` (arriba), `-e`, `-s` (abajo) y `-w`; todos van hacia +x o +z. */
 export function perimeter(prefix: string, x0: number, z0: number, x1: number, z1: number): WallDef[] {
@@ -827,6 +555,37 @@ export function grid(asset: string, origin: Pt, columns: number, rows: number, s
   return out
 }
 
+/** `count` estantes iguales repartidos en línea recta de `from` a `to` (ids `<prefijo>-1`, `<prefijo>-2`…). */
+export function shelfRow(
+  prefix: string,
+  base: Omit<ShelfDef, 'id' | 'at'>,
+  from: Pt,
+  to: Pt,
+  count: number,
+  extra: { rotY?: number; y?: number } = {},
+): ShelfDef[] {
+  return row('', from, to, count).map((p, i) => ({ ...base, ...extra, id: `${prefix}-${i + 1}`, at: p.at }))
+}
+
+/** Ancho total de una corrida de gabinetes: la suma de sus módulos. */
+export function cabinetWidth(cabinet: Pick<CabinetDef, 'modules'>): number {
+  return Math.round(cabinet.modules.reduce((sum, m) => sum + m.width, 0) * 1000) / 1000
+}
+
+/**
+ * Esquinas (x, z) de la base `width × depth` centrada en `at` y girada `rotY`. Sigue la convención de three.js:
+ * el eje local x va a (cos, -sin) y el eje local z (el frente) a (sin, cos).
+ */
+export function footprint(at: Pt, width: number, depth: number, rotY = 0): Pt[] {
+  const c = Math.cos(rotY)
+  const s = Math.sin(rotY)
+  const corner = (kx: number, kz: number): Pt => [
+    round(at[0] + (c * kx * width) / 2 + (s * kz * depth) / 2),
+    round(at[1] + (-s * kx * width) / 2 + (c * kz * depth) / 2),
+  ]
+  return [corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)]
+}
+
 export function roomArea(room: RoomDef): number {
   const [x0, z0, x1, z1] = room.rect
   return Math.abs(x1 - x0) * Math.abs(z1 - z0)
@@ -845,7 +604,7 @@ Create `apps/web/test/template-geometry.test.ts`:
 
 ```ts
 import { describe, expect, it } from 'vitest'
-import { grid, perimeter, row } from '../src/lib/templates/geometry'
+import { cabinetWidth, footprint, grid, perimeter, row, shelfRow } from '../src/lib/templates/geometry'
 
 describe('perimeter', () => {
   it('devuelve los cuatro muros de un rectángulo, todos hacia +x o +z', () => {
@@ -869,6 +628,29 @@ describe('row y grid', () => {
     const items = grid('m', [1, 1], 3, 2, [2, 3])
     expect(items).toHaveLength(6)
     expect(items.map((i) => i.at)).toEqual([[1, 1], [3, 1], [5, 1], [1, 4], [3, 4], [5, 4]])
+  })
+})
+
+describe('footprint', () => {
+  it('sin giro es un rectángulo centrado en el punto', () => {
+    expect(footprint([5, 5], 2, 1)).toEqual([[4, 4.5], [6, 4.5], [6, 5.5], [4, 5.5]])
+  })
+
+  it('girado 90° intercambia ancho y fondo (el eje local x va a (cos, -sin), como en three.js)', () => {
+    expect(footprint([5, 5], 2, 1, Math.PI / 2)).toEqual([[4.5, 6], [4.5, 4], [5.5, 4], [5.5, 6]])
+  })
+})
+
+describe('shelfRow y cabinetWidth', () => {
+  it('shelfRow reparte estantes iguales con ids numerados', () => {
+    const shelves = shelfRow('gondola', { style: 'open-rack', width: 1.5, depth: 0.5, height: 1.8, rows: 5 }, [1, 2], [5, 2], 3, { rotY: 1.5 })
+    expect(shelves.map((s) => s.id)).toEqual(['gondola-1', 'gondola-2', 'gondola-3'])
+    expect(shelves.map((s) => s.at)).toEqual([[1, 2], [3, 2], [5, 2]])
+    expect(shelves.every((s) => s.rotY === 1.5 && s.rows === 5)).toBe(true)
+  })
+
+  it('cabinetWidth suma el ancho de los módulos', () => {
+    expect(cabinetWidth({ modules: [{ width: 1.2, stack: [] }, { width: 0.6, stack: [] }] })).toBeCloseTo(1.8)
   })
 })
 ```
@@ -900,6 +682,10 @@ function ground(): LevelDef {
       { id: 'interior', type: 'door', wall: 'int', at: 2, width: 0.9 },
     ],
     items: [{ asset: 'cash-register', at: [1, 1] }],
+    shelves: [{ id: 'gondola', style: 'open-rack', at: [2.5, 3.5], width: 1.5, depth: 0.5, height: 1.8, rows: 5 }],
+    cabinets: [
+      { id: 'caja', at: [1.5, 0.45], depth: 0.7, height: 0.8, modules: [{ width: 1.2, stack: [{ type: 'door', doorType: 'double' }] }, { width: 0.6, stack: [{ type: 'drawer', drawerCount: 3 }] }] },
+    ],
     stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1, steps: 12, to: 'alta' }],
   }
 }
@@ -1004,6 +790,41 @@ describe('validateDefinition', () => {
     expect(check(def).some((e) => e.includes('nivel') && e.includes('repetido'))).toBe(true)
   })
 })
+
+describe('validateDefinition: estantes y gabinetes paramétricos', () => {
+  it('rechaza un estante o un gabinete cuya base cae (aunque sea en parte) fuera de los ambientes', () => {
+    const def = valid()
+    lv(def).shelves = [{ id: 'afuera', style: 'bookshelf', at: [4.9, 3.9], width: 1.8, depth: 0.4, height: 2 }]
+    lv(def).cabinets = [{ id: 'girado', at: [0.2, 2], rotY: Math.PI / 2, depth: 0.7, height: 0.8, modules: [{ width: 1.2, stack: [{ type: 'door' }] }] }]
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('afuera') && e.includes('fuera de los ambientes'))).toBe(true)
+    expect(errors.some((e) => e.includes('girado') && e.includes('fuera de los ambientes'))).toBe(true)
+  })
+
+  it('rechaza medidas que Pascal no admite: estante muy ancho, gabinete sin módulos o de más de 3 m', () => {
+    const def = valid()
+    lv(def).shelves = [{ id: 'enorme', style: 'open-rack', at: [2.5, 2], width: 3.5, depth: 0.5, height: 1.8 }]
+    lv(def).cabinets = [
+      { id: 'vacio', at: [2.5, 2], depth: 0.7, height: 0.8, modules: [] },
+      { id: 'largo', at: [2.5, 2], depth: 0.7, height: 0.8, modules: [{ width: 2, stack: [{ type: 'door' }] }, { width: 1.5, stack: [{ type: 'door' }] }] },
+    ]
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('enorme') && e.includes('medidas'))).toBe(true)
+    expect(errors.some((e) => e.includes('vacio') && e.includes('módulo'))).toBe(true)
+    expect(errors.some((e) => e.includes('largo') && e.includes('3 m'))).toBe(true)
+  })
+
+  it('rechaza ids repetidos entre estantes o entre gabinetes, y materiales que no existen', () => {
+    const def = valid()
+    lv(def).shelves = [
+      { id: 'dup', style: 'cubby', at: [1, 2], width: 1, depth: 0.4, height: 1.2, material: 'laca-inventada' },
+      { id: 'dup', style: 'cubby', at: [3, 2], width: 1, depth: 0.4, height: 1.2 },
+    ]
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('repetido'))).toBe(true)
+    expect(errors.some((e) => e.includes('laca-inventada'))).toBe(true)
+  })
+})
 ```
 
 Run: `pnpm --filter @interiores/web exec vitest run template-geometry template-validate`
@@ -1014,6 +835,7 @@ Expected: FAIL — `Failed to resolve import "../src/lib/templates/validate"` (y
 Create `apps/web/src/lib/templates/validate.ts`:
 
 ```ts
+import { cabinetWidth, footprint } from './geometry'
 import type { LevelDef, OpeningDef, RoomDef, TemplateDefinition, WallDef } from './types'
 
 const EPS = 0.011
@@ -1091,7 +913,7 @@ function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[
 }
 
 function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds: ReadonlySet<string>, materialIds: ReadonlySet<string>, errors: string[]) {
-  for (const id of new Set([...duplicates(level.walls.map((w) => w.id)), ...duplicates(level.rooms.map((r) => r.id)), ...duplicates(level.openings.map((o) => o.id)), ...duplicates((level.stairs ?? []).map((s) => s.id))])) {
+  for (const id of new Set([...duplicates(level.walls.map((w) => w.id)), ...duplicates(level.rooms.map((r) => r.id)), ...duplicates(level.openings.map((o) => o.id)), ...duplicates((level.stairs ?? []).map((s) => s.id)), ...duplicates((level.shelves ?? []).map((s) => s.id)), ...duplicates((level.cabinets ?? []).map((c) => c.id))])) {
     errors.push(`El id ${id} está repetido en el nivel ${level.id}.`)
   }
   for (const w of level.walls) {
@@ -1115,6 +937,24 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
       errors.push(`La pieza ${item.asset} en (${item.at[0]}, ${item.at[1]}) cae fuera de los ambientes del nivel ${level.id}.`)
     }
   }
+  const inRooms = (corners: [number, number][]) => corners.every(([x, z]) => level.rooms.some((r) => inside(r, x, z)))
+  const between = (n: number | undefined, min: number, max: number) => n === undefined || (Number.isInteger(n) && n >= min && n <= max)
+  for (const sh of level.shelves ?? []) {
+    const ok = sh.width >= 0.3 && sh.width <= 3 && sh.depth >= 0.1 && sh.depth <= 1 && sh.height >= 0.05 && sh.height <= 2.5 && between(sh.rows, 1, 8) && between(sh.columns, 1, 6)
+    if (!ok) errors.push(`El estante ${sh.id} tiene medidas que Pascal no admite (ancho 0,3 a 3 m, fondo 0,1 a 1 m, alto 0,05 a 2,5 m, 1 a 8 filas, 1 a 6 columnas).`)
+    if (!inRooms(footprint(sh.at, sh.width, sh.depth, sh.rotY))) errors.push(`El estante ${sh.id} cae fuera de los ambientes del nivel ${level.id}.`)
+  }
+  for (const c of level.cabinets ?? []) {
+    const width = cabinetWidth(c)
+    if (c.modules.length === 0) {
+      errors.push(`El gabinete ${c.id} no tiene ningún módulo.`)
+      continue
+    }
+    if (width > 3) errors.push(`El gabinete ${c.id} mide ${width} m: Pascal admite hasta 3 m por corrida; divídelo en dos.`)
+    const bad = c.modules.some((m) => m.width < 0.05 || m.width > 3 || m.stack.length === 0) || c.depth < 0.3 || c.depth > 1.2 || c.height < 0.4 || c.height > 2.4
+    if (bad) errors.push(`El gabinete ${c.id} tiene medidas o módulos que Pascal no admite (fondo 0,3 a 1,2 m, alto 0,4 a 2,4 m, cada módulo con al menos un compartimento).`)
+    if (!inRooms(footprint(c.at, width, c.depth, c.rotY))) errors.push(`El gabinete ${c.id} cae fuera de los ambientes del nivel ${level.id}.`)
+  }
   for (const s of level.stairs ?? []) {
     const target = levelIds.indexOf(s.to)
     if (target <= index) errors.push(`La escalera ${s.id} debe subir a un nivel posterior que exista (${s.to}).`)
@@ -1126,6 +966,8 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
     level.wallOutside,
     ...level.walls.flatMap((w) => [w.inside, w.outside]),
     ...level.rooms.flatMap((r) => [r.floor, r.ceiling]),
+    ...(level.shelves ?? []).map((sh) => sh.material),
+    ...(level.cabinets ?? []).map((c) => c.material),
   ]
   for (const m of new Set(materials)) {
     if (m && !materialIds.has(m)) errors.push(`El material ${m} no existe en la biblioteca de Pascal.`)
@@ -1144,7 +986,7 @@ export function validateDefinition(def: TemplateDefinition, assetIds: ReadonlySe
 ```
 
 Run: `pnpm --filter @interiores/web exec vitest run template-geometry template-validate`
-Expected: PASS (4 + 11 pruebas).
+Expected: PASS (8 + 14 pruebas).
 
 - [ ] **Paso 4: Texturas que el repo no trae**
 
@@ -1218,6 +1060,29 @@ const def: TemplateDefinition = {
       items: [
         { asset: 'cash-register', at: [1, 1], rotY: Math.PI },
         { asset: 'cash-register', at: [2, 1], y: 0.78 },
+      ],
+      shelves: [{ id: 'gondola', style: 'open-rack', at: [2.5, 3.5], width: 1.5, depth: 0.5, height: 1.8, rows: 5, withBack: true, material: 'preset-charcoal' }],
+      cabinets: [
+        {
+          id: 'mostrador',
+          at: [3, 0.5],
+          depth: 0.7,
+          height: 0.8,
+          bar: true,
+          modules: [
+            { width: 1.2, stack: [{ type: 'door', doorType: 'double' }] },
+            { width: 0.6, stack: [{ type: 'drawer', drawerCount: 3 }] },
+          ],
+        },
+        {
+          id: 'vitrina',
+          at: [0.5, 1.5],
+          rotY: Math.PI / 2,
+          depth: 0.5,
+          height: 1.9,
+          tier: 'tall',
+          modules: [{ width: 1, stack: [{ type: 'door', doorType: 'glass', shelfCount: 4 }] }],
+        },
       ],
       stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
@@ -1311,6 +1176,44 @@ describe('buildScene', () => {
     expect(stair.railingMode).toBe('both')
   })
 
+  it('crea los estantes y los gabinetes paramétricos de Pascal', () => {
+    expect(byType('shelf')).toHaveLength(1)
+    expect(byType('cabinet')).toHaveLength(2)
+    expect(byType('cabinet-module')).toHaveLength(3)
+  })
+
+  it('el estante lleva su estilo, sus medidas, su material y su posición sobre la losa', () => {
+    const shelf = nodes['shelf_local_de_prueba_pb_gondola'] as N
+    expect(shelf).toMatchObject({
+      style: 'open-rack',
+      rows: 5,
+      width: 1.5,
+      depth: 0.5,
+      height: 1.8,
+      withBack: true,
+      materialPreset: 'library:preset-charcoal',
+      position: [2.5, 0.05, 3.5],
+    })
+  })
+
+  it('la corrida suma el ancho de sus módulos y los ubica centrados en fila sobre su eje x', () => {
+    const run = nodes['cabinet_local_de_prueba_pb_mostrador'] as N
+    expect(run).toMatchObject({ width: 1.8, runTier: 'base', withCountertop: true, position: [3, 0.05, 0.5] })
+    expect((run.barLedge as { edge: string }).edge).toBe('back')
+    const modules = (run.children as string[]).map((id) => nodes[id] as N)
+    expect(modules.map((m) => m.position)).toEqual([[-0.3, 0, 0], [0.6, 0, 0]])
+    expect(modules.map((m) => m.width)).toEqual([1.2, 0.6])
+    expect(modules.every((m) => m.parentId === run.id)).toBe(true)
+  })
+
+  it('una vitrina alta no lleva mesada, queda girada y tiene la puerta de vidrio con sus estantes', () => {
+    const run = nodes['cabinet_local_de_prueba_pb_vitrina'] as N
+    expect(run).toMatchObject({ runTier: 'tall', withCountertop: false, rotation: Math.PI / 2 })
+    const module = nodes[(run.children as string[])[0] as string] as N
+    expect(module).toMatchObject({ cabinetType: 'tall', withCountertop: false })
+    expect(module.stack).toEqual([expect.objectContaining({ type: 'door', doorType: 'glass', shelfCount: 4 })])
+  })
+
   it('las piezas llevan su descriptor, su altura sobre la losa y su giro', () => {
     const [a, b] = byType('item').filter((i) => (i.asset as { id: string }).id === 'cash-register') as [N, N]
     expect((a.asset as { src: string }).src).toBe('/items/cash-register/model.glb')
@@ -1354,11 +1257,14 @@ Create `apps/web/src/editor/templates/scene-builder.ts`:
 import type { SceneGraph } from '@interiores/contract'
 import {
   BuildingNode,
+  CabinetModuleNode,
+  CabinetNode,
   CeilingNode,
   DoorNode,
   ItemNode,
   LevelNode,
   MATERIAL_CATALOG,
+  ShelfNode,
   SiteNode,
   SlabNode,
   StairNode,
@@ -1368,6 +1274,7 @@ import {
   WindowNode,
   ZoneNode,
 } from '@pascal-app/core'
+import { cabinetWidth } from '../../lib/templates/geometry'
 import type { LevelDef, OpeningDef, TemplateDefinition } from '../../lib/templates/types'
 import { validateDefinition } from '../../lib/templates/validate'
 
@@ -1394,6 +1301,10 @@ const FALLBACK_THUMBNAIL = '/icons/couch.webp'
 const DOOR_HEIGHT = 2.1
 const WINDOW_HEIGHT = 1.2
 const WINDOW_SILL = 0.9
+
+const SHELF_NAMES = { 'wall-shelf': 'Repisa', bookshelf: 'Biblioteca', 'open-rack': 'Góndola', cubby: 'Exhibidor' } as const
+const BAR_LEDGE = { edge: 'back', height: 1.06, depth: 0.35 } as const
+const round3 = (n: number) => Math.round(n * 1000) / 1000
 
 const clean = (s: string) => s.replace(/[^a-z0-9]/g, '_')
 const lib = (id: string) => `library:${id}`
@@ -1491,6 +1402,70 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
       children.push(id)
     })
 
+    for (const sh of level.shelves ?? []) {
+      const id = sub('shelf', level, sh.id)
+      nodes[id] = ShelfNode.parse({
+        id,
+        parentId: lid,
+        name: sh.name ?? SHELF_NAMES[sh.style],
+        position: [sh.at[0], sh.y ?? FLOOR_Y, sh.at[1]],
+        rotation: [0, sh.rotY ?? 0, 0],
+        width: sh.width,
+        depth: sh.depth,
+        height: sh.height,
+        style: sh.style,
+        rows: sh.rows ?? 1,
+        columns: sh.columns ?? 1,
+        withBack: sh.withBack ?? false,
+        withBottom: sh.withBottom ?? false,
+        ...(sh.material ? { materialPreset: lib(sh.material) } : {}),
+      })
+      children.push(id)
+    }
+
+    for (const c of level.cabinets ?? []) {
+      // Pascal solo dibuja una corrida si tiene módulos hijos; cada módulo se ubica por el centro de su ancho en el eje local x.
+      const runId = sub('cabinet', level, c.id)
+      const tier = c.tier ?? 'base'
+      const countertop = c.countertop ?? tier !== 'tall'
+      const total = cabinetWidth(c)
+      const common = {
+        depth: c.depth,
+        carcassHeight: c.height,
+        withCountertop: countertop,
+        ...(c.frontStyle ? { frontStyle: c.frontStyle } : {}),
+        ...(c.material ? { materialPreset: lib(c.material) } : {}),
+      }
+      let cursor = -total / 2
+      const moduleIds = c.modules.map((m, i) => {
+        const mid = `cabinet-module_${tag}_${clean(level.id)}_${clean(c.id)}_${i + 1}`
+        nodes[mid] = CabinetModuleNode.parse({
+          id: mid,
+          parentId: runId,
+          position: [round3(cursor + m.width / 2), 0, 0],
+          width: m.width,
+          cabinetType: tier,
+          stack: m.stack.map((compartment, k) => ({ id: `${mid}_${k + 1}`, ...compartment })),
+          ...common,
+        })
+        cursor += m.width
+        return mid
+      })
+      nodes[runId] = CabinetNode.parse({
+        id: runId,
+        parentId: lid,
+        name: c.name ?? 'Mostrador',
+        position: [c.at[0], c.y ?? FLOOR_Y, c.at[1]],
+        rotation: c.rotY ?? 0,
+        runTier: tier,
+        width: total,
+        children: moduleIds,
+        ...(c.bar ? { barLedge: BAR_LEDGE } : {}),
+        ...common,
+      })
+      children.push(runId)
+    }
+
     for (const s of level.stairs ?? []) {
       const id = sub('stair', level, s.id)
       const target = def.levels.find((l) => l.id === s.to) as LevelDef
@@ -1525,7 +1500,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
 ```
 
 Run: `pnpm --filter @interiores/web exec vitest run scene-builder template-validate template-geometry`
-Expected: PASS (11 + 11 + 4). Si Pascal rechaza algún campo (por ejemplo, el tipo de `rotation` de la escalera), leer el mensaje de Zod, abrir `node_modules/@pascal-app/core/dist/schema/nodes/<nodo>.d.ts`, corregir el constructor y anotarlo en `docs/pascal-notes.md`.
+Expected: PASS (15 + 14 + 8). Si Pascal rechaza algún campo (por ejemplo, el tipo de `rotation` de la escalera), leer el mensaje de Zod, abrir `node_modules/@pascal-app/core/dist/schema/nodes/<nodo>.d.ts`, corregir el constructor y anotarlo en `docs/pascal-notes.md`.
 
 - [ ] **Paso 7: Verificar y commit**
 
@@ -1553,7 +1528,7 @@ git push -q
 - Modify: `apps/web/package.json`
 
 **Interfaces:**
-- Consumes: `perimeter`, `row`, `grid`, `validateDefinition`, `buildScene`, `MATERIAL_IDS`, `localizeCatalogItem`, `kenneyAssets`.
+- Consumes: `perimeter`, `row`, `grid`, `shelfRow`, `COUNTER_Y`, `validateDefinition`, `buildScene`, `MATERIAL_IDS`, `localizeCatalogItem`.
 - Produces: `TEMPLATE_DEFINITIONS: readonly TemplateDefinition[]` (ids `concept-store`, `cafe`, `supermercado`, `loft`); `TEMPLATES: TemplateInfo[]` con `{ id, kind, name, summary, areaM2, thumbnail: '/templates/<id>.svg', file: '/templates/<id>.json' }`; `templatesForKind(kind)`, `templateById(id)`; `renderTemplateThumbnail(def): string` (SVG).
 
 - [ ] **Paso 1: Ayuda de pruebas: ids de piezas disponibles**
@@ -1563,7 +1538,6 @@ Create `apps/web/test/support/asset-ids.ts`:
 ```ts
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import kenney from '../../src/editor/kenney-pieces.json' with { type: 'json' }
 import manifest from '../../src/editor/local-items.json' with { type: 'json' }
 
 const source = readFileSync(
@@ -1571,9 +1545,9 @@ const source = readFileSync(
   'utf8',
 )
 
-/** Ids de piezas que una plantilla puede usar: el catálogo oficial con modelo local más las de Kenney. */
+/** Ids de piezas que una plantilla puede usar: el catálogo oficial de Pascal con modelo local. */
 export function availableAssetIds(): Set<string> {
-  const ids = new Set<string>(kenney.map((k) => k.id))
+  const ids = new Set<string>()
   for (const block of source.split('\n  {\n')) {
     const id = /\bid: '([^']+)'/.exec(block)?.[1]
     const folder = /items\/system\/([^/']+)\/model\.glb/.exec(block)?.[1]
@@ -1596,6 +1570,7 @@ import { validateDefinition } from '../src/lib/templates/validate'
 import { availableAssetIds } from './support/asset-ids'
 
 const assets = availableAssetIds()
+const pieces = (d: TemplateDefinition) => d.levels.reduce((n, l) => n + l.items.length + (l.shelves ?? []).length + (l.cabinets ?? []).length, 0)
 const materialsOf = (d: TemplateDefinition) =>
   new Set(
     d.levels.flatMap((l) => [
@@ -1603,6 +1578,8 @@ const materialsOf = (d: TemplateDefinition) =>
       l.wallOutside,
       ...l.walls.flatMap((w) => [w.inside, w.outside]),
       ...l.rooms.flatMap((r) => [r.floor, r.ceiling]),
+      ...(l.shelves ?? []).map((sh) => sh.material),
+      ...(l.cabinets ?? []).map((c) => c.material),
     ]).filter(Boolean),
   )
 
@@ -1615,10 +1592,17 @@ describe('definiciones de plantilla', () => {
     expect(validateDefinition(def, assets, MATERIAL_IDS)).toEqual([])
   })
 
-  it.each(TEMPLATE_DEFINITIONS.map((d) => [d.id, d] as const))('%s muestra potencial: 3+ ambientes, 20+ piezas y 5+ materiales distintos', (_id, def) => {
+  it.each(TEMPLATE_DEFINITIONS.map((d) => [d.id, d] as const))('%s muestra potencial: 3+ ambientes, 20+ piezas (muebles, estantes y gabinetes) y 5+ materiales distintos', (_id, def) => {
     expect(def.levels.flatMap((l) => l.rooms).length).toBeGreaterThanOrEqual(3)
-    expect(def.levels.flatMap((l) => l.items).length).toBeGreaterThanOrEqual(20)
+    expect(pieces(def)).toBeGreaterThanOrEqual(20)
     expect(materialsOf(def).size).toBeGreaterThanOrEqual(5)
+  })
+
+  it('las plantillas de comercio usan estantes y gabinetes paramétricos, y todas llevan al menos un gabinete o estante', () => {
+    for (const def of TEMPLATE_DEFINITIONS.filter((d) => d.kind === 'comercio')) {
+      expect(def.levels.flatMap((l) => l.shelves ?? []).length, `${def.id}: estantes`).toBeGreaterThanOrEqual(3)
+      expect(def.levels.flatMap((l) => l.cabinets ?? []).length, `${def.id}: gabinetes`).toBeGreaterThanOrEqual(2)
+    }
   })
 
   it('al menos dos plantillas tienen 2 niveles con escalera', () => {
@@ -1661,6 +1645,12 @@ describe('renderTemplateThumbnail', () => {
     expect(svg).toContain('stroke-dasharray')
   })
 
+  it('dibuja la base de cada estante y gabinete de la planta baja como un rectángulo girado', () => {
+    const furniture = (ground.shelves ?? []).length + (ground.cabinets ?? []).length
+    expect(furniture).toBeGreaterThan(0)
+    expect(svg.match(/<rect [^>]*data-kind="(shelf|cabinet)"/g)?.length).toBe(furniture)
+  })
+
   it('es determinista', () => {
     expect(renderTemplateThumbnail(def)).toBe(svg)
   })
@@ -1677,17 +1667,20 @@ Las cuatro definiciones son datos. Orientación: el eje **x** crece a la derecha
 Create `apps/web/src/lib/templates/definitions/concept-store.ts`:
 
 ```ts
-import { grid, perimeter, row } from '../geometry'
+import { COUNTER_Y, grid, perimeter, row, shelfRow } from '../geometry'
 import type { TemplateDefinition } from '../types'
 
 const Q = Math.PI / 2
+const DOOR = { type: 'door', doorType: 'double' } as const
+const DRAWERS = { type: 'drawer', drawerCount: 3 } as const
+const GLASS = { type: 'door', doorType: 'glass', shelfCount: 4 } as const
 
-/** Concept store de 14 × 8 m con entrepiso: parquet, ladrillo, terrazo y concreto pulido. */
+/** Concept store de 14 × 8 m con entrepiso: parquet, ladrillo, terrazo y concreto pulido; cubbies, vitrinas y mostradores paramétricos. */
 export const conceptStore: TemplateDefinition = {
   id: 'concept-store',
   kind: 'comercio',
   name: 'Concept store de 2 niveles',
-  summary: 'Salón de ventas con doble vidriera y barra de café; entrepiso de showroom y oficina con escalera.',
+  summary: 'Salón de ventas con doble vidriera, vitrinas, caja y barra de café; entrepiso de showroom y oficina con escalera.',
   levels: [
     {
       id: 'pb',
@@ -1711,31 +1704,35 @@ export const conceptStore: TemplateDefinition = {
         { id: 'puerta-entrada', type: 'door', wall: 'p-s', at: 2.2, width: 1.6, height: 2.4 },
         { id: 'vidriera-1', type: 'window', wall: 'p-s', at: 5.1, width: 2.4, height: 2.4, sill: 0.3 },
         { id: 'vidriera-2', type: 'window', wall: 'p-s', at: 8.0, width: 2.0, height: 2.4, sill: 0.3 },
-        { id: 'ventana-oeste', type: 'window', wall: 'p-w', at: 4, width: 2.4, height: 2, sill: 0.6 },
+        { id: 'ventana-oeste', type: 'window', wall: 'p-w', at: 6.4, width: 2.0, height: 2, sill: 0.6 },
         { id: 'ventana-barra', type: 'window', wall: 'p-n', at: 11.7, width: 1.6 },
         { id: 'paso-barra', type: 'door', wall: 'div', at: 2, width: 1.2 },
         { id: 'puerta-deposito', type: 'door', wall: 'div', at: 5, width: 0.9 },
         { id: 'puerta-bano', type: 'door', wall: 'div', at: 7, width: 0.8 },
       ],
+      shelves: [
+        ...shelfRow('expositor', { style: 'cubby', width: 1.5, depth: 0.4, height: 1.2, rows: 3, columns: 3, withBack: true, withBottom: true, name: 'Exhibidor' }, [1.4, 0.35], [7.8, 0.35], 5),
+        ...shelfRow('repisa', { style: 'wall-shelf', width: 1.5, depth: 0.25, height: 0.9, rows: 3, name: 'Repisa' }, [1.4, 0.23], [7.8, 0.23], 5, { y: 1.5 }),
+        ...shelfRow('rack-deposito', { style: 'open-rack', width: 1.5, depth: 0.5, height: 1.8, rows: 4, withBack: true }, [11.0, 4.45], [13.0, 4.45], 2),
+        { id: 'rack-este', style: 'open-rack', at: [13.65, 5.2], rotY: -Q, width: 1.4, depth: 0.5, height: 1.8, rows: 4, withBack: true },
+      ],
+      cabinets: [
+        { id: 'caja', name: 'Caja', at: [7.3, 6.7], depth: 0.7, height: 0.8, material: 'preset-charcoal', modules: [{ width: 0.6, stack: [DRAWERS] }, { width: 1.2, stack: [DOOR] }, { width: 0.6, stack: [DRAWERS] }] },
+        { id: 'vitrina-oeste', name: 'Vitrina', at: [0.4, 4.2], rotY: Q, depth: 0.5, height: 1.9, tier: 'tall', modules: [{ width: 1, stack: [GLASS] }, { width: 1, stack: [GLASS] }] },
+        { id: 'barra', name: 'Barra de café', at: [12.0, 1.9], rotY: Math.PI, depth: 0.7, height: 0.8, bar: true, modules: [{ width: 1.2, stack: [DOOR] }, { width: 1.2, stack: [DOOR] }] },
+      ],
       items: [
-        ...row('kenney-shelf-boxes', [1.4, 0.55], [7.8, 0.55], 5),
-        ...grid('coat-rack', [2.4, 2.6], 3, 2, [2.0, 1.4]),
-        { asset: 'rectangular-carpet', at: [4.4, 3.3] },
-        ...row('kitchen-counter', [8.7, 1.6], [8.7, 3.6], 2, { rotY: Q }),
-        { asset: 'kenney-cash-register', at: [8.7, 1.6], y: 0.78, rotY: -Q },
-        { asset: 'coffee-machine', at: [8.7, 3.6], y: 0.78 },
-        ...row('stool', [7.9, 1.4], [7.9, 3.8], 3),
+        ...grid('dining-table', [2.6, 2.6], 3, 2, [2.2, 1.6]),
+        { asset: 'rectangular-carpet', at: [4.8, 3.4] },
         { asset: 'sofa', at: [2.2, 7.0], rotY: Math.PI },
         { asset: 'coffee-table', at: [2.2, 5.9] },
-        { asset: 'indoor-plant', at: [0.5, 7.4] },
+        { asset: 'indoor-plant', at: [0.6, 7.4] },
         { asset: 'indoor-plant', at: [9.0, 7.4] },
-        { asset: 'floor-lamp', at: [0.5, 5.0] },
-        ...row('kitchen-counter', [11.0, 0.7], [13.0, 0.7], 2),
-        { asset: 'coffee-machine', at: [11.0, 0.7], y: 0.78 },
-        { asset: 'fridge', at: [13.4, 2.4], rotY: -Q },
-        ...row('stool', [11.0, 2.2], [12.0, 2.2], 2),
-        ...row('kenney-shelf-boxes', [10.6, 4.8], [13.2, 4.8], 3),
-        { asset: 'kenney-shelf-bags', at: [13.2, 5.5] },
+        { asset: 'floor-lamp', at: [0.6, 5.9] },
+        { asset: 'computer', at: [7.0, 6.7], y: COUNTER_Y },
+        { asset: 'coffee-machine', at: [11.3, 1.9], y: COUNTER_Y },
+        { asset: 'fridge', at: [13.4, 0.65] },
+        ...row('stool', [11.2, 2.95], [12.8, 2.95], 3),
         { asset: 'toilet', at: [13.4, 7.4] },
         { asset: 'bathroom-sink', at: [10.6, 7.4] },
       ],
@@ -1761,17 +1758,24 @@ export const conceptStore: TemplateDefinition = {
         { id: 'ventana-este', type: 'window', wall: 'a-e', at: 3.5, width: 2.6 },
         { id: 'ventana-sur', type: 'window', wall: 'a-s', at: 2.2, width: 1.4 },
       ],
+      shelves: [
+        ...shelfRow('exhibidor-alto', { style: 'cubby', width: 1.5, depth: 0.4, height: 1.2, rows: 3, columns: 3, withBack: true, withBottom: true }, [10.8, 0.35], [13.0, 0.35], 2),
+        { id: 'biblioteca', style: 'bookshelf', at: [13.65, 3.0], rotY: -Q, width: 1.8, depth: 0.4, height: 2, rows: 5, columns: 2, withBack: true },
+      ],
+      cabinets: [
+        { id: 'vitrina-alta', name: 'Vitrina', at: [10.2, 5.2], rotY: Q, depth: 0.5, height: 1.9, tier: 'tall', modules: [{ width: 1, stack: [GLASS] }, { width: 1, stack: [GLASS] }] },
+      ],
       items: [
-        { asset: 'sofa', at: [11.6, 1.2] },
-        { asset: 'coffee-table', at: [11.6, 2.4] },
-        { asset: 'rectangular-carpet', at: [11.6, 2.2] },
-        ...row('coat-rack', [10.4, 3.8], [13.4, 3.8], 4),
+        { asset: 'sofa', at: [11.6, 1.8] },
+        { asset: 'coffee-table', at: [11.6, 3.0] },
+        { asset: 'rectangular-carpet', at: [11.6, 2.8] },
+        ...row('coat-rack', [11.2, 4.4], [13.4, 4.4], 3),
         { asset: 'office-table', at: [12.9, 6.9] },
         { asset: 'office-chair', at: [12.9, 6.1], rotY: Math.PI },
         { asset: 'computer', at: [12.9, 6.9], y: 0.78 },
-        { asset: 'dresser', at: [13.6, 5.0], rotY: -Q },
+        { asset: 'dresser', at: [13.6, 5.5], rotY: -Q },
         { asset: 'indoor-plant', at: [10.2, 7.4] },
-        { asset: 'floor-lamp', at: [10.2, 0.6] },
+        { asset: 'floor-lamp', at: [10.3, 0.7] },
       ],
     },
   ],
@@ -1781,12 +1785,15 @@ export const conceptStore: TemplateDefinition = {
 Create `apps/web/src/lib/templates/definitions/cafe.ts`:
 
 ```ts
-import { grid, perimeter, row } from '../geometry'
+import { COUNTER_Y, grid, perimeter, row, shelfRow } from '../geometry'
 import type { ItemDef, TemplateDefinition } from '../types'
 
 const Q = Math.PI / 2
+const DOOR = { type: 'door', doorType: 'double' } as const
+const DRAWERS = { type: 'drawer', drawerCount: 3 } as const
+const GLASS_LOW = { type: 'door', doorType: 'glass', shelfCount: 3 } as const
 
-const interiorTables = grid('dining-table', [1.6, 2.0], 2, 3, [2.4, 2.6])
+const interiorTables = grid('dining-table', [1.4, 2.0], 2, 3, [2.0, 2.6])
 const terraceTables = grid('dining-table', [2.0, 10.4], 3, 2, [3.6, 1.9])
 const chairsAround = (tables: ItemDef[], dx: number): ItemDef[] =>
   tables.flatMap((t) => [
@@ -1794,12 +1801,12 @@ const chairsAround = (tables: ItemDef[], dx: number): ItemDef[] =>
     { asset: 'dining-chair', at: [t.at[0] + dx, t.at[1]] as [number, number], rotY: -Q },
   ])
 
-/** Café de especialidad de 12 × 9 m con terraza de 12 × 4 m: madera, ladrillo, azulejo y piedra. */
+/** Café de especialidad de 12 × 9 m con terraza de 12 × 4 m: madera, ladrillo, azulejo y piedra; barra con banquetas y vitrina de pastelería. */
 export const cafe: TemplateDefinition = {
   id: 'cafe',
   kind: 'comercio',
   name: 'Café de especialidad con terraza',
-  summary: 'Salón de madera con barra y mesas, cocina y baño con azulejo, depósito y terraza con sombrillas.',
+  summary: 'Salón de madera con barra, vitrina de pastelería y mesas; cocina y baño con azulejo, depósito y terraza con sombrillas.',
   levels: [
     {
       id: 'pb',
@@ -1827,33 +1834,38 @@ export const cafe: TemplateDefinition = {
         { id: 'puerta-salon', type: 'door', wall: 'p-s', at: 3, width: 1.6, height: 2.2 },
         { id: 'vidriera', type: 'window', wall: 'p-s', at: 5.6, width: 3, height: 2.2, sill: 0.4 },
         { id: 'acceso', type: 'door', wall: 't-w', at: 2, width: 1.4 },
-        { id: 'ventana-oeste', type: 'window', wall: 'p-w', at: 4.5, width: 2.2 },
-        { id: 'ventana-norte', type: 'window', wall: 'p-n', at: 3.5, width: 2.6 },
+        { id: 'ventana-oeste', type: 'window', wall: 'p-w', at: 6.5, width: 2.2 },
+        { id: 'ventana-norte', type: 'window', wall: 'p-n', at: 1.6, width: 1.6 },
         { id: 'puerta-cocina', type: 'door', wall: 'div', at: 2, width: 1 },
         { id: 'puerta-bano', type: 'door', wall: 'div', at: 5.2, width: 0.8 },
         { id: 'puerta-deposito', type: 'door', wall: 'div', at: 7.7, width: 0.8 },
       ],
+      shelves: [
+        ...shelfRow('repisa', { style: 'wall-shelf', width: 1.5, depth: 0.25, height: 0.9, rows: 2, name: 'Repisa' }, [3.6, 0.23], [7.0, 0.23], 3, { y: 1.5 }),
+        { id: 'biblioteca', style: 'bookshelf', at: [0.35, 5.5], rotY: Q, width: 1.8, depth: 0.4, height: 2, rows: 5, columns: 2, withBack: true },
+        ...shelfRow('rack', { style: 'open-rack', width: 1.5, depth: 0.5, height: 1.8, rows: 4, withBack: true }, [9.0, 7.0], [11.0, 7.0], 2),
+        { id: 'cubby-cocina', style: 'cubby', at: [11.6, 3.2], rotY: -Q, width: 1.2, depth: 0.4, height: 1.2, rows: 3, columns: 3, withBack: true, withBottom: true },
+      ],
+      cabinets: [
+        { id: 'barra-1', name: 'Barra con bacha', at: [6.2, 2.0], rotY: Q, depth: 0.7, height: 0.8, bar: true, modules: [{ width: 1, stack: [{ type: 'sink', sinkLayout: 'single' }] }, { width: 0.8, stack: [DRAWERS] }, { width: 0.6, stack: [DOOR] }] },
+        { id: 'barra-2', name: 'Barra', at: [6.2, 4.8], rotY: Q, depth: 0.7, height: 0.8, bar: true, modules: [{ width: 1.2, stack: [DOOR] }, { width: 1.2, stack: [DOOR] }] },
+        { id: 'vitrina-pasteleria', name: 'Vitrina de pastelería', at: [3.8, 0.45], depth: 0.5, height: 1.2, material: 'preset-white', modules: [{ width: 1.2, stack: [GLASS_LOW] }, { width: 1.2, stack: [GLASS_LOW] }] },
+        { id: 'cocina-mesada', name: 'Mesada de cocina', at: [9.9, 0.45], depth: 0.6, height: 0.8, modules: [{ width: 1, stack: [{ type: 'sink', sinkLayout: 'double' }] }, { width: 0.6, stack: [{ type: 'dishwasher' }] }, { width: 0.8, stack: [DOOR] }] },
+      ],
       items: [
-        ...row('kitchen-counter', [6.9, 1.3], [6.9, 5.3], 3, { rotY: Q }),
-        { asset: 'coffee-machine', at: [6.9, 1.3], y: 0.78 },
-        { asset: 'coffee-machine', at: [6.9, 3.3], y: 0.78 },
-        { asset: 'kenney-cash-register', at: [6.9, 5.3], y: 0.78, rotY: -Q },
-        { asset: 'kenney-display-bread', at: [6.9, 4.3], y: 0.78 },
-        ...row('stool', [5.9, 1.3], [5.9, 5.3], 5),
         ...interiorTables,
         ...chairsAround(interiorTables, 0.8),
-        ...row('kenney-shelf-boxes', [1.2, 0.55], [2.4, 0.55], 2),
-        { asset: 'indoor-plant', at: [0.5, 8.4] },
+        ...row('stool', [5.1, 1.2], [5.1, 5.6], 5),
+        { asset: 'coffee-machine', at: [6.2, 3.0], y: COUNTER_Y },
+        { asset: 'coffee-machine', at: [6.2, 4.8], y: COUNTER_Y },
+        { asset: 'indoor-plant', at: [0.6, 8.4] },
         { asset: 'indoor-plant', at: [7.4, 8.4] },
-        { asset: 'floor-lamp', at: [0.5, 6.4] },
-        { asset: 'kitchen', at: [10.0, 0.8] },
-        { asset: 'stove', at: [11.4, 0.7] },
-        { asset: 'fridge', at: [11.5, 3.4], rotY: -Q },
-        { asset: 'kitchen-counter', at: [9.2, 2.6], rotY: Q },
+        { asset: 'floor-lamp', at: [0.6, 3.3] },
+        { asset: 'stove', at: [11.5, 0.6] },
+        { asset: 'hood', at: [11.5, 0.6], y: 1.9 },
+        { asset: 'fridge', at: [11.5, 2.2], rotY: -Q },
         { asset: 'toilet', at: [11.5, 5.7] },
         { asset: 'bathroom-sink', at: [9.0, 5.7] },
-        ...row('kenney-shelf-boxes', [9.0, 7.2], [11.4, 7.2], 3),
-        { asset: 'kenney-shelf-bags', at: [11.4, 8.4] },
         ...terraceTables,
         ...chairsAround(terraceTables, 0.8),
         { asset: 'patio-umbrella', at: [2.0, 10.4] },
@@ -1870,21 +1882,41 @@ export const cafe: TemplateDefinition = {
 Create `apps/web/src/lib/templates/definitions/supermercado.ts`:
 
 ```ts
-import { perimeter, row } from '../geometry'
-import type { TemplateDefinition } from '../types'
+import { COUNTER_Y, perimeter, row, shelfRow } from '../geometry'
+import type { CabinetDef, TemplateDefinition } from '../types'
 
 const Q = Math.PI / 2
-const aisle = (z: number) => [
-  ...row('kenney-shelf-boxes', [1.6, z], [9.6, z], 5),
-  ...row('kenney-shelf-bags', [1.6, z + 0.45], [9.6, z + 0.45], 5, { rotY: Math.PI }),
-]
+const DOOR = { type: 'door', doorType: 'double' } as const
+const DRAWERS = { type: 'drawer', drawerCount: 3 } as const
+const GLASS_LOW = { type: 'door', doorType: 'glass', shelfCount: 3 } as const
+const COOLER = { type: 'fridge-double' } as const
 
-/** Supermercado de barrio de 18 × 11 m: concreto pulido, góndolas en pasillos, cajas, panadería y depósito. */
+const rack = { style: 'open-rack', width: 1.5, depth: 0.5, height: 1.8, rows: 5, withBack: true, name: 'Góndola' } as const
+const coolerWall = (id: string, x: number): CabinetDef => ({
+  id,
+  name: 'Heladeras de exhibición',
+  at: [x, 0.6],
+  depth: 0.7,
+  height: 1.9,
+  tier: 'tall',
+  modules: [{ width: 0.9, stack: [COOLER] }, { width: 0.9, stack: [COOLER] }, { width: 0.9, stack: [COOLER] }],
+})
+const checkout = (n: number, x: number): CabinetDef => ({
+  id: `caja-${n}`,
+  name: `Caja ${n}`,
+  at: [x, 9.4],
+  depth: 0.7,
+  height: 0.8,
+  material: 'preset-charcoal',
+  modules: [{ width: 0.6, stack: [DRAWERS] }, { width: 0.6, stack: [DOOR] }],
+})
+
+/** Supermercado de barrio de 18 × 11 m: concreto pulido, pared de heladeras, góndolas en pasillos, tres cajas, panadería y depósito. */
 export const supermercado: TemplateDefinition = {
   id: 'supermercado',
   kind: 'comercio',
   name: 'Supermercado de barrio',
-  summary: 'Salón con freezers, góndolas en pasillos y tres cajas; panadería, depósito con portón, oficina y baños.',
+  summary: 'Salón con pared de heladeras, góndolas en pasillos y tres cajas; panadería con vitrina, depósito con portón, oficina y baños.',
   levels: [
     {
       id: 'pb',
@@ -1916,33 +1948,39 @@ export const supermercado: TemplateDefinition = {
         { id: 'puerta-oficina', type: 'door', wall: 'div', at: 9.5, width: 0.9 },
         { id: 'puerta-banos', type: 'door', wall: 'div-dep', at: 3.7, width: 0.8 },
       ],
+      shelves: [
+        ...shelfRow('pasillo-1', rack, [1.6, 3.0], [9.6, 3.0], 5),
+        ...shelfRow('pasillo-2', rack, [1.6, 5.0], [9.6, 5.0], 5),
+        ...shelfRow('pasillo-3', rack, [1.6, 7.0], [9.6, 7.0], 5),
+        ...shelfRow('frutas', { style: 'cubby', width: 1.2, depth: 0.8, height: 0.6, rows: 2, columns: 2, withBottom: true, name: 'Exhibidor de fruta' }, [11.4, 3.0], [11.4, 6.0], 3, { rotY: Q }),
+        ...shelfRow('rack-deposito-1', { style: 'open-rack', width: 1.5, depth: 0.5, height: 1.8, rows: 4, withBack: true }, [14.4, 5.0], [16.4, 5.0], 2),
+        ...shelfRow('rack-deposito-2', { style: 'open-rack', width: 1.5, depth: 0.5, height: 1.8, rows: 4, withBack: true }, [14.4, 7.3], [16.4, 7.3], 2),
+      ],
+      cabinets: [
+        coolerWall('heladeras-1', 2.4),
+        coolerWall('heladeras-2', 5.4),
+        coolerWall('heladeras-3', 8.4),
+        coolerWall('heladeras-4', 11.4),
+        checkout(1, 2.0),
+        checkout(2, 4.2),
+        checkout(3, 6.4),
+        { id: 'mostrador-pan', name: 'Mostrador de panadería', at: [15.0, 0.9], depth: 0.7, height: 0.8, material: 'preset-white', modules: [{ width: 1.2, stack: [GLASS_LOW] }, { width: 1.2, stack: [GLASS_LOW] }] },
+        { id: 'vitrina-pan', name: 'Vitrina de panadería', at: [17.5, 2.5], rotY: -Q, depth: 0.5, height: 1.9, tier: 'tall', modules: [{ width: 1.2, stack: [{ type: 'door', doorType: 'glass', shelfCount: 4 }] }, { width: 1.2, stack: [{ type: 'door', doorType: 'glass', shelfCount: 4 }] }] },
+      ],
       items: [
-        ...row('kenney-freezers-standing', [1.0, 0.6], [7.0, 0.6], 6),
-        ...row('kenney-freezer', [8.4, 0.7], [11.6, 0.7], 3),
-        ...aisle(3.0),
-        ...aisle(5.0),
-        ...aisle(7.0),
-        ...row('kenney-display-fruit', [10.6, 3.0], [10.6, 6.0], 3),
-        { asset: 'kenney-display-bread', at: [12.2, 3.0] },
-        ...[2.0, 4.2, 6.4].flatMap((x) => [
-          { asset: 'kitchen-counter', at: [x, 9.4] as [number, number] },
-          { asset: 'kenney-cash-register', at: [x, 9.4] as [number, number], y: 0.78 },
-          { asset: 'kenney-shopping-basket', at: [x + 0.95, 9.6] as [number, number] },
-        ]),
-        ...row('kenney-shopping-cart', [9.0, 10.2], [11.4, 10.2], 3),
-        { asset: 'kenney-bottle-return', at: [0.6, 10.2] },
-        ...row('kitchen-counter', [14.2, 0.8], [16.2, 0.8], 2),
-        { asset: 'kenney-display-bread', at: [14.2, 0.8], y: 0.78 },
-        { asset: 'kenney-display-bread', at: [16.2, 0.8], y: 0.78 },
-        { asset: 'stove', at: [17.4, 3.0], rotY: -Q },
-        { asset: 'fridge', at: [14.0, 3.8] },
-        ...row('kenney-shelf-boxes', [14.0, 5.0], [17.0, 5.0], 4),
-        ...row('kenney-shelf-bags', [14.0, 7.2], [17.0, 7.2], 4),
+        ...[2.0, 4.2, 6.4].map((x) => ({ asset: 'computer', at: [x, 9.4] as [number, number], y: COUNTER_Y })),
+        { asset: 'trash-bin', at: [0.5, 10.3] },
+        { asset: 'trash-bin', at: [8.4, 10.3] },
+        { asset: 'indoor-plant', at: [12.3, 10.3] },
+        { asset: 'coffee-machine', at: [15.0, 0.9], y: COUNTER_Y },
+        { asset: 'stove', at: [14.6, 3.6] },
+        { asset: 'fridge', at: [16.4, 3.6] },
         { asset: 'office-table', at: [14.2, 10.1] },
         { asset: 'office-chair', at: [14.2, 9.3], rotY: Math.PI },
         { asset: 'computer', at: [14.2, 10.1], y: 0.78 },
         { asset: 'toilet', at: [17.3, 9.2] },
         { asset: 'bathroom-sink', at: [16.0, 10.4] },
+        ...row('indoor-plant', [0.6, 8.6], [0.6, 9.4], 2),
       ],
     },
   ],
@@ -1956,8 +1994,10 @@ import { perimeter, row } from '../geometry'
 import type { TemplateDefinition } from '../types'
 
 const Q = Math.PI / 2
+const DOOR = { type: 'door', doorType: 'double' } as const
+const DRAWERS = { type: 'drawer', drawerCount: 3 } as const
 
-/** Loft de doble altura de 12 × 7 m: concreto pulido, ladrillo expuesto y dormitorio en el entrepiso. */
+/** Loft de doble altura de 12 × 7 m: concreto pulido, ladrillo expuesto, cocina con isla paramétrica y dormitorio en el entrepiso. */
 export const loft: TemplateDefinition = {
   id: 'loft',
   kind: 'vivienda',
@@ -1984,40 +2024,46 @@ export const loft: TemplateDefinition = {
         { id: 'puerta-entrada', type: 'door', wall: 'p-s', at: 1.5, width: 1 },
         { id: 'ventanal', type: 'window', wall: 'p-s', at: 5, width: 3.6, height: 2.4, sill: 0.3 },
         { id: 'ventana-oeste', type: 'window', wall: 'p-w', at: 3.5, width: 2 },
-        { id: 'ventana-norte', type: 'window', wall: 'p-n', at: 3, width: 2.2 },
+        { id: 'ventana-norte', type: 'window', wall: 'p-n', at: 6.5, width: 2.2 },
         { id: 'ventana-estudio', type: 'window', wall: 'p-e', at: 5, width: 1.6 },
         { id: 'ventana-bano', type: 'window', wall: 'p-e', at: 1.5, width: 0.7, height: 0.6, sill: 1.5 },
         { id: 'puerta-bano', type: 'door', wall: 'div', at: 1.5, width: 0.8 },
         { id: 'puerta-estudio', type: 'door', wall: 'div', at: 5, width: 0.9 },
       ],
+      shelves: [
+        { id: 'biblioteca-estar', style: 'bookshelf', at: [7.6, 0.35], width: 1.8, depth: 0.4, height: 2.2, rows: 5, columns: 2, withBack: true },
+        { id: 'biblioteca-oeste', style: 'bookshelf', at: [0.35, 5.2], rotY: Q, width: 1.8, depth: 0.4, height: 2.2, rows: 5, columns: 2, withBack: true },
+        { id: 'biblioteca-estudio', style: 'bookshelf', at: [11.65, 5.0], rotY: -Q, width: 2, depth: 0.4, height: 2.1, rows: 5, columns: 2, withBack: true },
+        { id: 'repisa-cocina', style: 'wall-shelf', at: [2.6, 0.23], y: 1.5, width: 1.8, depth: 0.25, height: 0.5, rows: 2 },
+      ],
+      cabinets: [
+        { id: 'cocina', name: 'Cocina', at: [2.6, 0.45], depth: 0.6, height: 0.8, modules: [{ width: 1, stack: [{ type: 'sink', sinkLayout: 'double' }] }, { width: 0.6, stack: [{ type: 'dishwasher' }] }, { width: 0.8, stack: [DOOR] }] },
+        { id: 'isla', name: 'Isla', at: [4.4, 2.8], rotY: Math.PI, depth: 0.9, height: 0.8, bar: true, modules: [{ width: 1.2, stack: [DRAWERS] }, { width: 1.2, stack: [DOOR] }] },
+      ],
       items: [
         { asset: 'fridge', at: [0.7, 0.7] },
-        { asset: 'kitchen', at: [2.2, 0.7] },
-        { asset: 'stove', at: [3.7, 0.7] },
-        { asset: 'hood', at: [3.7, 0.7], y: 1.9 },
-        ...row('kitchen-counter', [3.6, 2.6], [5.6, 2.6], 2),
-        ...row('stool', [3.4, 3.5], [5.8, 3.5], 3),
-        { asset: 'dining-table', at: [2.4, 5.0] },
-        { asset: 'dining-chair', at: [1.5, 5.0], rotY: Q },
-        { asset: 'dining-chair', at: [3.3, 5.0], rotY: -Q },
-        { asset: 'dining-chair', at: [2.4, 4.2] },
-        { asset: 'dining-chair', at: [2.4, 5.8], rotY: Math.PI },
-        { asset: 'sofa', at: [7.6, 2.4], rotY: -Q },
-        { asset: 'coffee-table', at: [6.3, 2.4] },
-        { asset: 'rectangular-carpet', at: [6.5, 2.4] },
-        { asset: 'tv-stand', at: [4.7, 2.4], rotY: Q },
-        { asset: 'bookshelf', at: [8.0, 0.6] },
-        { asset: 'floor-lamp', at: [8.0, 4.4] },
-        { asset: 'indoor-plant', at: [0.5, 6.4] },
+        { asset: 'stove', at: [4.4, 0.6] },
+        { asset: 'hood', at: [4.4, 0.6], y: 1.9 },
+        ...row('stool', [3.7, 3.75], [5.1, 3.75], 3),
+        { asset: 'dining-table', at: [2.4, 5.2] },
+        { asset: 'dining-chair', at: [1.5, 5.2], rotY: Q },
+        { asset: 'dining-chair', at: [3.3, 5.2], rotY: -Q },
+        { asset: 'dining-chair', at: [2.4, 4.4] },
+        { asset: 'dining-chair', at: [2.4, 6.0], rotY: Math.PI },
+        { asset: 'sofa', at: [7.4, 3.6], rotY: -Q },
+        { asset: 'coffee-table', at: [6.1, 3.6] },
+        { asset: 'rectangular-carpet', at: [6.3, 3.6] },
+        { asset: 'tv-stand', at: [4.9, 5.3], rotY: Math.PI },
+        { asset: 'floor-lamp', at: [7.9, 5.6] },
+        { asset: 'indoor-plant', at: [0.6, 6.4] },
         { asset: 'bathtub', at: [11.0, 0.9] },
         { asset: 'toilet', at: [9.1, 1.0] },
-        { asset: 'bathroom-sink', at: [9.6, 2.6] },
-        { asset: 'office-table', at: [10.6, 6.2] },
-        { asset: 'office-chair', at: [10.6, 5.5], rotY: Math.PI },
-        { asset: 'computer', at: [10.6, 6.2], y: 0.78 },
-        { asset: 'bookshelf', at: [11.6, 3.6], rotY: -Q },
+        { asset: 'bathroom-sink', at: [9.6, 2.5] },
+        { asset: 'office-table', at: [10.4, 6.2] },
+        { asset: 'office-chair', at: [10.4, 5.5], rotY: Math.PI },
+        { asset: 'computer', at: [10.4, 6.2], y: 0.78 },
         { asset: 'indoor-plant', at: [9.0, 6.5] },
-        { asset: 'rectangular-carpet', at: [10.3, 4.6] },
+        { asset: 'rectangular-carpet', at: [10.3, 4.4] },
       ],
       stairs: [{ id: 'escalera', at: [4.6, 6.2], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
@@ -2040,11 +2086,13 @@ export const loft: TemplateDefinition = {
         { id: 'ventana-norte', type: 'window', wall: 'a-n', at: 1.7, width: 1.4 },
         { id: 'ventana-este', type: 'window', wall: 'a-e', at: 3.5, width: 2.2 },
       ],
+      cabinets: [
+        { id: 'placard', name: 'Placard', at: [11.6, 5.4], rotY: -Q, depth: 0.6, height: 2.2, tier: 'tall', modules: [{ width: 0.9, stack: [DOOR] }, { width: 0.9, stack: [DOOR] }] },
+      ],
       items: [
         { asset: 'double-bed', at: [10.6, 2.8] },
         { asset: 'bedside-table', at: [9.2, 0.8] },
         { asset: 'bedside-table', at: [11.9, 0.8] },
-        { asset: 'closet', at: [11.7, 5.4], rotY: -Q },
         { asset: 'dresser', at: [9.4, 6.4], rotY: Math.PI },
         { asset: 'rectangular-carpet', at: [10.4, 3.0] },
         { asset: 'floor-lamp', at: [9.0, 4.8] },
@@ -2098,6 +2146,7 @@ export const templateById = (id: string): TemplateInfo | undefined => TEMPLATES.
 Create `apps/web/src/lib/templates/thumbnail.ts`:
 
 ```ts
+import { cabinetWidth } from './geometry'
 import type { TemplateDefinition } from './types'
 
 const W = 240
@@ -2143,9 +2192,15 @@ export function renderTemplateThumbnail(def: TemplateDefinition): string {
       return `<line x1="${sx(w.from[0] + ux * a)}" y1="${sz(w.from[1] + uz * a)}" x2="${sx(w.from[0] + ux * b)}" y2="${sz(w.from[1] + uz * b)}" stroke="${o.type === 'door' ? '#FFFFFF' : '#7FB2FF'}" stroke-width="3.2"/>`
     })
     .join('')
+  const base = (kind: 'shelf' | 'cabinet', at: [number, number], width: number, depth: number, rotY = 0) =>
+    `<rect data-kind="${kind}" x="${(Number(sx(at[0])) - (width * scale) / 2).toFixed(1)}" y="${(Number(sz(at[1])) - (depth * scale) / 2).toFixed(1)}" width="${dim(width)}" height="${dim(depth)}" rx="1" fill="#2B3340" fill-opacity="0.55" transform="rotate(${((-rotY * 180) / Math.PI).toFixed(1)} ${sx(at[0])} ${sz(at[1])})"/>`
+  const furniture = [
+    ...(ground.shelves ?? []).map((sh) => base('shelf', sh.at, sh.width, sh.depth, sh.rotY)),
+    ...(ground.cabinets ?? []).map((c) => base('cabinet', c.at, cabinetWidth(c), c.depth, c.rotY)),
+  ].join('')
   const items = ground.items.map((i) => `<circle cx="${sx(i.at[0])}" cy="${sz(i.at[1])}" r="1.6" fill="#1F5FE0"/>`).join('')
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#EEF2F8"/>${rooms}${upper}${walls}${gaps}${items}</svg>\n`
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#EEF2F8"/>${rooms}${upper}${furniture}${walls}${gaps}${items}</svg>\n`
 }
 ```
 
@@ -2194,6 +2249,10 @@ describe.each(TEMPLATE_DEFINITIONS.map((d) => [d.id, d] as const))('plantilla %s
     expect(count('window')).toBe(openings.filter((o) => o.type === 'window').length)
     expect(count('item')).toBe(def.levels.flatMap((l) => l.items).length)
     expect(count('stair')).toBe(def.levels.flatMap((l) => l.stairs ?? []).length)
+    expect(count('shelf')).toBe(def.levels.flatMap((l) => l.shelves ?? []).length)
+    const cabinets = def.levels.flatMap((l) => l.cabinets ?? [])
+    expect(count('cabinet')).toBe(cabinets.length)
+    expect(count('cabinet-module')).toBe(cabinets.reduce((n, c) => n + c.modules.length, 0))
   })
 
   it('todas las piezas apuntan a archivos locales que existen', () => {
@@ -2220,7 +2279,6 @@ import { fileURLToPath } from 'node:url'
 import { PASCAL_CORE_VERSION, SCHEMA_VERSION } from '@interiores/contract'
 import { CATALOG_ITEMS } from '../node_modules/@pascal-app/editor/src/components/ui/item-catalog/catalog-items'
 import manifest from '../src/editor/local-items.json' with { type: 'json' }
-import { kenneyAssets } from '../src/editor/commerce-catalog'
 import { localizeCatalogItem } from '../src/editor/catalog'
 import { type AssetLike, buildScene } from '../src/editor/templates/scene-builder'
 import { TEMPLATE_DEFINITIONS } from '../src/lib/templates'
@@ -2234,7 +2292,6 @@ for (const item of CATALOG_ITEMS) {
   const local = localizeCatalogItem(item as never, manifest as Record<string, string[]>) as AssetLike | null
   if (local) assets.set(local.id, local)
 }
-for (const k of kenneyAssets()) assets.set(k.id, k)
 
 const stale: string[] = []
 mkdirSync(outDir, { recursive: true })
@@ -2315,7 +2372,8 @@ Create `apps/web/test/create-from-template.test.ts`:
 
 ```ts
 import { emptyEnvelope } from '@interiores/contract'
-import { describe, expect, it, vi } from 'vitest'
+import { type Mock, describe, expect, it, vi } from 'vitest'
+import type { ApiClient } from '../src/lib/api/client'
 import {
   TemplateError,
   createFromTemplate,
@@ -2329,11 +2387,13 @@ const envelope = { ...emptyEnvelope(), graph: { nodes: { a: { type: 'wall' } }, 
 
 const okFetch = () => vi.fn(async () => new Response(JSON.stringify(envelope), { status: 200 })) as unknown as typeof fetch
 
-function fakeApi(overrides: { saveScene?: ReturnType<typeof vi.fn> } = {}) {
+type FakeApi = Pick<ApiClient, 'createProject' | 'saveScene'> & { createProject: Mock; saveScene: Mock }
+
+function fakeApi(overrides: { saveScene?: Mock } = {}): FakeApi {
   return {
     createProject: vi.fn(async () => created),
     saveScene: overrides.saveScene ?? vi.fn(async () => ({ version: 2 })),
-  }
+  } as unknown as FakeApi
 }
 
 describe('createFromTemplate', () => {
@@ -2393,7 +2453,7 @@ describe('createFromTemplate', () => {
   })
 
   it('si falla el guardado devuelve el proyecto y la escena para reintentar, sin crear otro', async () => {
-    const saveScene = vi.fn().mockRejectedValueOnce(new Error('caída')).mockResolvedValueOnce({ version: 2 })
+    const saveScene: Mock = vi.fn().mockRejectedValueOnce(new Error('caída')).mockResolvedValueOnce({ version: 2 })
     const api = fakeApi({ saveScene })
     const first = await createFromTemplate(api, { name: 'Mi tienda', kind: 'comercio', templateId: 'cafe' }, okFetch())
     expect(first).toMatchObject({ project: created, saved: false })
@@ -2734,7 +2794,7 @@ Expected: PASS (4 pruebas). Si los conteos de Pascal difieren de la plantilla (p
 
 - [ ] **Paso 6: Revisión visual (la parte que no se puede automatizar)**
 
-Abrir las 4 capturas en `apps/web/test-results/plantillas/*.png` y, para el concept store y el loft, abrir también el proyecto en el navegador y recorrer los dos niveles. Revisar a ojo y corregir **la definición** (no el constructor): muros cerrados y con el material correcto de cada lado, zócalo y cornisa visibles, parquet/ladrillo/terrazo con textura (sin cuadros grises ni rosas), aberturas en su sitio, piezas dentro de cada ambiente y no encimadas, escala razonable de las piezas de Kenney, **orientación y posición de la escalera** (que arranque en la planta baja y llegue al entrepiso por el borde abierto; ajustar `at` y `rotY`), barandas del entrepiso a 1,05 m. Registrar en `docs/bitacora.md` lo que se ajustó y en `docs/pascal-notes.md` la orientación real de la escalera con `rotY = 0`. Volver a correr `pnpm --filter @interiores/web templates:build` y la suite después de cada cambio de definición.
+Abrir las 4 capturas en `apps/web/test-results/plantillas/*.png` y, para el concept store y el loft, abrir también el proyecto en el navegador y recorrer los dos niveles. Revisar a ojo y corregir **la definición** (no el constructor): muros cerrados y con el material correcto de cada lado, zócalo y cornisa visibles, parquet/ladrillo/terrazo con textura (sin cuadros grises ni rosas), aberturas en su sitio, piezas dentro de cada ambiente y no encimadas, escala razonable de las piezas del catálogo, **orientación y posición de la escalera** (que arranque en la planta baja y llegue al entrepiso por el borde abierto; ajustar `at` y `rotY`), barandas del entrepiso a 1,05 m. Registrar en `docs/bitacora.md` lo que se ajustó y en `docs/pascal-notes.md` la orientación real de la escalera con `rotY = 0`. Volver a correr `pnpm --filter @interiores/web templates:build` y la suite después de cada cambio de definición.
 
 - [ ] **Paso 7: Verificar y commit**
 
@@ -2755,56 +2815,11 @@ git push -q
 
 **Files:**
 - Create: `THIRD_PARTY_NOTICES.md`
-- Modify: `README.md`, `docs/ESTADO.md`, `docs/pascal-notes.md`, `docs/bitacora.md`, `apps/web/CLAUDE.md`
+- Modify: `README.md`, `docs/ESTADO.md`, `docs/pascal-notes.md`, `docs/bitacora.md`, `apps/web/CLAUDE.md`, el spec y este plan
 
-- [ ] **Paso 1: Avisos de terceros**
-
-Create `THIRD_PARTY_NOTICES.md`:
-
-```markdown
-# Avisos de terceros
-
-## Pascal Editor — MIT
-Código (`@pascal-app/*`, vía npm) y assets copiados de su repositorio (`apps/web/public/{material,icons,hdri,fonts,audios,items}`, muebles de `public/items/<nombre>/` salvo los `kenney-*`).
-© Pascal Group Inc. Licencia MIT; copia en `apps/web/public/pascal-LICENSE.txt`. Fuente: https://github.com/pascalorg/editor (commit `86f8e833904f7b6b3358bb1505feb82d801ad9ad`).
-
-### Texturas de materiales servidas por el CDN de Pascal — MIT
-La biblioteca de materiales de Pascal (`MATERIAL_CATALOG`) es parte de `@pascal-app/core` (MIT). Las texturas de madera, ladrillo, azulejo y piedra que su repositorio no incluye se piden en tiempo de ejecución a `https://editor.pascal.app/material/` mediante un `rewrite` de Next (`apps/web/next.config.mjs`); **no se copian al repositorio**. Si ese servicio dejara de responder, esos materiales se reemplazan por equivalentes locales (ver el plan de la tienda, desviaciones).
-
-## Kenney — Mini Market 1.0 — CC0 1.0
-Doce modelos y sus miniaturas en `apps/web/public/items/kenney-*/`. Creado y distribuido por Kenney (www.kenney.nl); créditos adicionales: Fleur Keijsers y Guus Vermeulen. Licencia CC0 (dominio público); no exige atribución, pero se agradece. Copia del texto original en `apps/web/public/items/kenney-LICENSE.txt`. Fuente: https://kenney.nl/assets/mini-market.
-```
-
-- [ ] **Paso 2: Documentación**
-
-Modify `docs/pascal-notes.md` agregando estas filas a la tabla:
-
-```markdown
-| `SiteNode`, `BuildingNode`, `LevelNode`, `WallNode`, `ZoneNode`, `SlabNode`, `CeilingNode`, `DoorNode`, `WindowNode`, `ItemNode` se pueden `parse` en Node puro (sin navegador) | `import('@pascal-app/core')` desde un script, 2026-10-11 | Base del constructor de plantillas (`src/editor/templates/scene-builder.ts`). |
-| Una puerta o ventana cuelga de su muro (`parentId` y `wallId` = id del muro; `position: [distancia al inicio, altura del centro, 0]`) y el muro la lista en `children` | `scene_19.json` de Pascal y escena real guardada por el editor | `side: 'front'` por defecto. |
-| `AssetInput` exige `thumbnail` (texto); el resto de campos del descriptor es opcional | error de Zod al construir un `ItemNode` | Las piezas de Kenney usan su `Previews/<pieza>.png`. |
-| Los GLB de Kenney referencian `Textures/colormap.png` por ruta relativa | inspección del GLB | Cada carpeta `public/items/kenney-*/` lleva su `Textures/colormap.png`. |
-| Las zonas, losas y cielos son nodos explícitos (no se derivan al cargar) | `scene_19.json` | El constructor crea uno de cada por ambiente (sin cielo en terrazas y entrepisos abiertos). |
-| Un material de la biblioteca se aplica con `materialPreset` (losa y cielo) o `interiorMaterialPreset`/`exteriorMaterialPreset` (muro), valor `library:<id>`; `MATERIAL_CATALOG` trae 114 y solo 66 tienen textura en el repo | `MATERIAL_CATALOG` y `apps/web/public/material`, 2026-10-11 | Las demás se piden a `https://editor.pascal.app/material/` con un `rewrites().fallback` de Next (CORS `*`, HTTP 200). |
-| Zócalo, cornisa y friso son `skirting`/`crown`/`chairRail` del muro (`{ ...WALL_SKIRTING_DEFAULT, enabled: true, sides: 'interior' }`) | `WallNode` y sus constantes por defecto | Se activan por nivel con `trim: true`. |
-| `LevelNode.level` es el índice (0 = planta baja) y `BuildingNode.children` los lista en orden | prototipo de 2 niveles en el editor | La escalera (`StairNode`) cuelga del nivel de abajo con `fromLevelId`/`toLevelId` y `slabOpeningMode: 'destination'`. |
-| Orientación de `StairNode` con `rotation = 0` | revisión visual de las plantillas (Tarea 5, Paso 6) | Completar con lo observado. |
-```
-
-Modify `apps/web/CLAUDE.md` agregando al final:
-
-```markdown
-- **Plantillas** (`src/lib/templates/`): son datos puros, multinivel y con materiales por id de la biblioteca de Pascal. `pnpm --filter @interiores/web templates:build` regenera `public/templates/`; `pnpm verify` falla si los archivos commiteados no coinciden con las definiciones.
-- **Piezas de Kenney:** `pnpm --filter @interiores/web assets:kenney`. No editar `public/items/kenney-*` a mano.
-```
-
-Modify `README.md`: en la sección "Cómo correrlo" agregar una línea `pnpm --filter @interiores/web templates:build   # regenera las plantillas` y, en "Qué decidí yo", un punto 7: "**Plantillas como código:** cada plantilla es una definición de datos (niveles, escalera, materiales de la biblioteca de Pascal) validada (muros cerrados, aberturas dentro de su muro, piezas dentro de un ambiente, materiales existentes) que un constructor convierte en escena con los esquemas reales de Pascal; el JSON generado se commitea y una prueba falla si se desactualiza. Las texturas que el repo no trae se piden al CDN de Pascal."
-
-Modify `docs/bitacora.md` agregando (con la fecha de hoy): lo que se ajustó en la revisión visual (Tarea 5, Paso 6) y esta línea: "`cabinet` se perdió al autoalojar el catálogo porque se buscaba por id; el modelo vive en la carpeta `kitchen-cabinet`. Se detectó al listar ítems con `tool`."
-
-Modify `docs/ESTADO.md`: en "Hecho" agregar "Spec 2 (tienda) implementado: pestaña Comercio con 45 piezas, gabinete paramétrico recuperado y 4 plantillas de muestra (concept store y loft de 2 niveles con escalera, café con terraza, supermercado) con materiales de la biblioteca de Pascal"; en "Pendiente" reemplazar el punto de la tienda por "Siguiente: spec de interfaz (shell visual con el diseño de Pencil)".
-
-- [ ] **Paso 3: Verificación final y PR**
+- [ ] **Paso 1: Avisos de terceros.** `THIRD_PARTY_NOTICES.md` acredita a Pascal (MIT, © Pascal Group Inc.), aclara que las texturas de madera, ladrillo, azulejo y piedra se piden a `https://editor.pascal.app/material/` mediante un `rewrite` (aceptado por el equipo el 2026-10-11, con el plan B de materiales locales) y que los estantes y gabinetes son nodos paramétricos sin modelos de terceros.
+- [ ] **Paso 2: Documentación.** `docs/pascal-notes.md` suma las filas verificadas (nodos que se pueden `parse` en Node, puertas y ventanas colgadas del muro, `AssetInput` con miniatura, zonas/losas/cielos explícitos, materiales `library:<id>` y texturas del CDN, zócalo y cornisa, niveles y escalera, **una corrida de gabinetes solo se dibuja con módulos hijos**, estilos de `ShelfNode`, heladeras y vitrinas, filtro por categoría del panel). `README.md` suma `templates:build`, el punto 7 (plantillas como código) y el 8 (piezas realistas). `docs/bitacora.md` registra los errores del día. `apps/web/CLAUDE.md` explica las plantillas y la regla de íconos. `docs/ESTADO.md` describe lo implementado.
+- [ ] **Paso 3: Verificación final y PR.**
 
 Run: `pnpm verify`
 Expected: PASS. Pegar las últimas líneas en el PR.
@@ -2812,12 +2827,12 @@ Expected: PASS. Pegar las últimas líneas en el PR.
 Run: `pnpm --filter @interiores/web e2e`
 Expected: PASS (las pruebas del spec 1 más las de catálogo y plantillas).
 
-Revisar los 7 criterios de éxito del spec y pegar la evidencia:
+Evidencia de los 7 criterios de éxito del spec:
 
 | # | Criterio | Evidencia |
 |---|---|---|
 | 1 | `pnpm verify` verde | salida del Paso 3 |
-| 2 | Pestaña Comercio con ≥ 20 piezas sin 404 (modelos y texturas) | `commerce-catalog.test.ts` y `e2e/catalog.spec.ts` |
+| 2 | Pestaña Comercio con ≥ 20 piezas sin 404 | `commerce-catalog.test.ts` y `e2e/catalog.spec.ts` |
 | 3 | `cabinet` aparece y arma su herramienta | `catalog.test.ts` (conserva `tool`) y `e2e/catalog.spec.ts` ("Modular Cabinet") |
 | 4 | 4 plantillas válidas con miniatura, 2 de ellas con 2 niveles y escalera, ≥ 5 materiales cada una | `template-definitions.test.ts`, `template-files.test.ts` |
 | 5 | Crear desde "Concept store", recargar y ninguna textura 4xx | `e2e/templates.spec.ts` (1.ª y 2.ª pruebas) |
@@ -2828,7 +2843,7 @@ Revisar los 7 criterios de éxito del spec y pegar la evidencia:
 git add -A
 git commit -m "docs(tienda): avisos de terceros, notas de Pascal y estado del spec 2"
 git push -q
-gh pr create --base feature/fundacion-persistencia --head feature/tienda-plantillas --title "feat: tienda — catálogo de comercio y plantillas (spec 2)" --body-file <archivo con la plantilla de PR completa>
+gh pr create --base feature/fundacion-persistencia --head feature/tienda-plantillas --title "feat: tienda — catálogo de comercio y plantillas de muestra (spec 2)" --body-file <archivo con la plantilla de PR completa>
 ```
 
 El PR apunta a `feature/fundacion-persistencia` mientras el PR #1 no esté fusionado; cuando lo esté, cambiar la base a `main` (`gh pr edit --base main`).
@@ -2837,12 +2852,10 @@ El PR apunta a `feature/fundacion-persistencia` mientras el PR #1 no esté fusio
 
 ## Autorrevisión del plan
 
-**Cobertura del spec.** Criterio 1 (verify) → Tareas 1–6; 2 (pestaña Comercio ≥ 20, sin 404) → Tarea 2; 3 (`cabinet`) → Tarea 2; 4 (4 plantillas válidas, 2 con niveles y escalera, ≥ 5 materiales) → Tareas 3 y 4; 5 (crear, recargar, sin texturas rotas) → Tarea 5; 6 (reintento) → Tarea 5; 7 (avisos, incluido el CDN) → Tarea 6. D1 → Tarea 4; D2 → Tarea 1; D3 → Tareas 3–4 (con la desviación de la miniatura SVG); D4 → Tarea 5; D5 → Tarea 2; D6 → fuera de alcance, sin tarea; D7 (materiales y CDN) → Tareas 3 (rewrite, `MATERIAL_IDS`) y 5 (E2E sin 4xx); D8 (niveles y escalera) → Tareas 3–4.
+**Cobertura del spec.** Criterio 1 (verify) → Tareas 1–6; 2 (pestaña Comercio ≥ 20, sin 404) → Tarea 2; 3 (`cabinet`) → Tarea 2; 4 (4 plantillas válidas, 2 con niveles y escalera, ≥ 5 materiales) → Tareas 3 y 4; 5 (crear, recargar, sin texturas rotas) → Tarea 5; 6 (reintento) → Tarea 5; 7 (avisos, incluido el CDN) → Tarea 6. D1 → Tarea 4; D2 (estantes y gabinetes paramétricos) → Tareas 3–4; D3 → Tareas 3–4 (con la desviación de la miniatura SVG); D4 → Tarea 5; D5 → Tarea 2; D6 → fuera de alcance, sin tarea; D7 (materiales y CDN) → Tareas 3 (rewrite, `MATERIAL_IDS`) y 5 (E2E sin 4xx); D8 (niveles y escalera) → Tareas 3–4.
 
-**Código validado antes de ejecutar.** El código de las Tareas 3 y 4 se extrajo del plan y se corrió el 2026-10-11 (con un `kenney-pieces.json` provisorio): 40 de 40 pruebas verdes y las 4 plantillas construyen un `SceneEnvelope` válido de 61 a 95 KB (concept store: 2 niveles, 11 muros, 49 piezas, 1 escalera; café: 73 piezas; supermercado: 75; loft: 2 niveles, 38 piezas, 1 escalera). Esa corrida corrigió tres errores del borrador (conteo de muros, id con guiones bajos y sillas de la terraza fuera del ambiente). Queda sin validar lo que solo se ve en el editor: posiciones finas, orientación de la escalera y texturas (Tarea 5, Paso 6).
+**Lo que se ejecutó tal cual y lo que no.** Se ejecutó el plan completo con un cambio de rumbo (ver "Historial"): Kenney se descartó, se agregaron estantes y gabinetes paramétricos y los bloques de código se tomaron del repositorio. Cada tarea se verificó con `pnpm verify` y, las que tocan el navegador, con Playwright. **Sin verificar a ojo:** la llegada de la escalera al entrepiso (la cámara por defecto deja el piso 1 fuera de cuadro); las capturas de las cuatro plantillas muestran muros, materiales, zócalos, estantes, vitrinas, heladeras y cocinas en su sitio.
 
-**Marcadores de relleno.** Sin "TBD". Lo único que se decide al ejecutar son las coordenadas finas de piezas y escaleras, que el Paso 6 de la Tarea 5 ajusta con revisión visual y que las pruebas de definición mantienen válidas.
+**Consistencia de tipos.** `Pt`, `WallDef`, `RoomDef`, `OpeningDef`, `ItemDef`, `ShelfDef`, `CabinetDef`, `StairDef`, `LevelDef` y `TemplateDefinition` (Tarea 3, `types.ts`) los usan `validateDefinition`, `buildScene`, las cuatro definiciones, `renderTemplateThumbnail` y `build-templates.ts`; `AssetLike` (constructor) coincide con los ítems localizados de la Tarea 2; `TemplateInfo` (Tarea 4) agrega `levels`, que usa `TemplatePicker` (Tarea 5); `CreateFromTemplateResult` es el mismo en la función, el reintento y la pantalla.
 
-**Consistencia de tipos.** `Pt`, `WallDef`, `RoomDef`, `OpeningDef`, `ItemDef`, `StairDef`, `LevelDef` y `TemplateDefinition` (Tarea 3, `types.ts`) los usan `validateDefinition`, `buildScene`, las cuatro definiciones, `renderTemplateThumbnail` y `build-templates.ts`; `AssetLike` (constructor) coincide con los ítems localizados de la Tarea 2 y con `kenneyAssets()`; `TemplateInfo` (Tarea 4) agrega `levels`, que usa `TemplatePicker` (Tarea 5); `CreateFromTemplateResult` es el mismo en la función, el reintento y la pantalla.
-
-**Review Focus.** (1) plantilla que no carga → `create-from-template.test.ts` (3 casos); (2) doble clic → `e2e/templates.spec.ts`; (3) ambiente que no cierra → `template-validate.test.ts`; (4) 4xx de modelos y texturas → `commerce-catalog.test.ts`, `template-files.test.ts` y `e2e/templates.spec.ts`; (5) nombre de solo espacios → `normalizeProjectName` y `e2e/templates.spec.ts`; (6) escalera, material o abertura inválidos → `template-validate.test.ts`.
+**Review Focus.** (1) plantilla que no carga → `create-from-template.test.ts` (3 casos); (2) doble clic → `e2e/templates.spec.ts`; (3) ambiente que no cierra → `template-validate.test.ts`; (4) 4xx de modelos y texturas → `commerce-catalog.test.ts`, `template-files.test.ts` y `e2e/templates.spec.ts`; (5) nombre de solo espacios → `normalizeProjectName` y `e2e/templates.spec.ts`; (6) escalera, material, abertura, estante o gabinete inválidos → `template-validate.test.ts`.
