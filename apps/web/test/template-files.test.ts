@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { SCENE_MAX_BYTES, SceneEnvelopeSchema } from '@interiores/contract'
 import { describe, expect, it } from 'vitest'
@@ -10,9 +10,10 @@ const publicPath = (p: string) => fileURLToPath(new URL(`../public${p}`, import.
 describe.each(TEMPLATE_DEFINITIONS.map((d) => [d.id, d] as const))('plantilla %s (archivo generado)', (id, def) => {
   const text = existsSync(file(`${id}.json`)) ? readFileSync(file(`${id}.json`), 'utf8') : ''
 
-  it('existen el JSON y la miniatura', () => {
+  it('existen el JSON y la captura en 3D que se muestra en la tarjeta', () => {
     expect(text.length, `falta public/templates/${id}.json: corre pnpm --filter @interiores/web templates:build`).toBeGreaterThan(0)
-    expect(existsSync(file(`${id}.svg`))).toBe(true)
+    expect(existsSync(file(`${id}.jpg`)), `falta la captura public/templates/${id}.jpg: corre pnpm --filter @interiores/web templates:thumbs`).toBe(true)
+    expect(statSync(file(`${id}.jpg`)).size, 'la captura parece vacía').toBeGreaterThan(20_000)
   })
 
   it('es un SceneEnvelope válido que cabe en 5 MB', () => {

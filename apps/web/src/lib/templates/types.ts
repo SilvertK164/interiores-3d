@@ -43,9 +43,13 @@ export type ItemDef = { asset: string; at: Pt; rotY?: number; y?: number }
 
 export type StairDef = {
   id: string
-  /** Punto de arranque de la escalera en el nivel donde está definida. */
+  /** Pie de la escalera (donde pisas el primer escalón) en el nivel donde está definida. */
   at: Pt
+  /** Con 0 la escalera sube caminando hacia +z; con π/2, hacia +x; con π, hacia -z; con -π/2, hacia -x. */
   rotY: number
+  /** Recorrido horizontal en metros (por defecto 3, como en Pascal): el último escalón queda a esta distancia de `at`. */
+  run?: number
+  /** Ancho, centrado sobre el eje de subida. */
   width: number
   steps: number
   /** Id del nivel al que sube. */

@@ -41,6 +41,7 @@ export default function ProjectsPage() {
     if (creating) return
     setCreating(true)
     setError(null)
+    setPending(null)
     try {
       const result = await createFromTemplate(api, { name: clean, kind, templateId })
       if (result.saved) return router.push(`/proyectos/${result.project.id}`)
@@ -56,11 +57,14 @@ export default function ProjectsPage() {
   async function retry() {
     if (!pending) return
     setCreating(true)
-    const result = await retrySaveTemplate(api, pending)
-    setCreating(false)
-    if (result.saved) return router.push(`/proyectos/${result.project.id}`)
-    setPending(result)
-    setError(friendlyMessage(result.error))
+    try {
+      const result = await retrySaveTemplate(api, pending)
+      if (result.saved) return router.push(`/proyectos/${result.project.id}`)
+      setPending(result)
+      setError(friendlyMessage(result.error))
+    } finally {
+      setCreating(false)
+    }
   }
 
   return (

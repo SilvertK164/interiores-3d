@@ -1,4 +1,4 @@
-// Genera public/templates/<id>.json (escena de Pascal) y <id>.svg (plano) desde las definiciones.
+// Genera public/templates/<id>.json (escena de Pascal) desde las definiciones. Las capturas .jpg salen de `templates:thumbs`.
 //   tsx scripts/build-templates.ts           escribe los archivos
 //   tsx scripts/build-templates.ts --check   falla si los archivos commiteados no coinciden con las definiciones
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -10,7 +10,6 @@ import manifest from '../src/editor/local-items.json' with { type: 'json' }
 import { localizeCatalogItem } from '../src/editor/catalog'
 import { type AssetLike, buildScene } from '../src/editor/templates/scene-builder'
 import { TEMPLATE_DEFINITIONS } from '../src/lib/templates'
-import { renderTemplateThumbnail } from '../src/lib/templates/thumbnail'
 
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public/templates')
 const check = process.argv.includes('--check')
@@ -27,7 +26,6 @@ for (const def of TEMPLATE_DEFINITIONS) {
   const envelope = { schemaVersion: SCHEMA_VERSION, pascal: { core: PASCAL_CORE_VERSION }, graph: buildScene(def, assets) }
   const files: [string, string][] = [
     [`${def.id}.json`, `${JSON.stringify(envelope, null, 1)}\n`],
-    [`${def.id}.svg`, renderTemplateThumbnail(def)],
   ]
   for (const [name, content] of files) {
     const path = join(outDir, name)

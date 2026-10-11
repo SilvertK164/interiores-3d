@@ -26,7 +26,7 @@ function ground(): LevelDef {
     cabinets: [
       { id: 'caja', at: [1.5, 0.45], depth: 0.7, height: 0.8, modules: [{ width: 1.2, stack: [{ type: 'door', doorType: 'double' }] }, { width: 0.6, stack: [{ type: 'drawer', drawerCount: 3 }] }] },
     ],
-    stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1, steps: 12, to: 'alta' }],
+    stairs: [{ id: 'escalera', at: [1, 3.2], rotY: Math.PI / 2, run: 3, width: 1, steps: 12, to: 'alta' }],
   }
 }
 
@@ -79,6 +79,16 @@ describe('validateDefinition', () => {
     expect(errors.some((e) => e.includes('se pisan'))).toBe(true)
   })
 
+  it('rechaza una puerta o ventana más alta que su muro (por ejemplo, una puerta de 2,1 m en un parapeto de 1,1 m)', () => {
+    const def = valid()
+    lv(def).walls.push({ id: 'parapeto', from: [0, 4], to: [3, 4], height: 1.1 })
+    lv(def).openings.push({ id: 'puerta-alta', type: 'door', wall: 'parapeto', at: 1.5, width: 0.9 })
+    lv(def).openings.push({ id: 'puerta-baja', type: 'door', wall: 'parapeto', at: 0.5, width: 0.6, height: 1 })
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('puerta-alta') && e.includes('más alta'))).toBe(true)
+    expect(errors.some((e) => e.includes('puerta-baja'))).toBe(false)
+  })
+
   it('rechaza una abertura en un muro que no existe', () => {
     const def = valid()
     lv(def).openings.push({ id: 'huerfana', type: 'door', wall: 'no-existe', at: 1, width: 1 })
@@ -112,6 +122,18 @@ describe('validateDefinition', () => {
     ]
     const errors = check(def)
     expect(errors.filter((e) => e.includes('escalera'))).toHaveLength(3)
+  })
+
+  it('rechaza una escalera que sale de los ambientes del nivel o que termina lejos del piso de arriba', () => {
+    const sale = valid()
+    // rotY 0 camina hacia +z: desde (1, 3) llega a z = 6 y atraviesa el muro sur del salón (z = 4)
+    lv(sale).stairs = [{ id: 'sale', at: [1, 3], rotY: 0, width: 1, steps: 12, to: 'alta' }]
+    expect(check(sale).some((e) => e.includes('sale') && e.includes('fuera de los ambientes'))).toBe(true)
+
+    const corta = valid()
+    // camina hacia +x pero solo 1 m: termina en x = 2, dentro del salón y lejos del entrepiso (que empieza en x = 4)
+    lv(corta).stairs = [{ id: 'corta', at: [1, 3.2], rotY: Math.PI / 2, run: 1, width: 1, steps: 12, to: 'alta' }]
+    expect(check(corta).some((e) => e.includes('corta') && e.includes('no llega'))).toBe(true)
   })
 
   it('rechaza ids repetidos, ambientes solapados y muros diagonales', () => {

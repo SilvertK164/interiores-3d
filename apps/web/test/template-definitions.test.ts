@@ -50,7 +50,7 @@ describe('definiciones de plantilla', () => {
     expect(templatesForKind('comercio').map((t) => t.id)).toEqual(['concept-store', 'cafe', 'supermercado'])
     expect(templatesForKind('vivienda').map((t) => t.id)).toEqual(['loft'])
     expect(templateById('cafe')?.file).toBe('/templates/cafe.json')
-    expect(templateById('cafe')?.thumbnail).toBe('/templates/cafe.svg')
+    expect(templateById('cafe')?.thumbnail).toBe('/templates/cafe.jpg')
     expect(templateById('no-existe')).toBeUndefined()
     expect(TEMPLATES.every((t) => t.areaM2 >= 80)).toBe(true)
   })

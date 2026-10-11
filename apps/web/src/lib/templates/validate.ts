@@ -1,4 +1,4 @@
-import { cabinetWidth, footprint } from './geometry'
+import { DEFAULT_LEVEL_HEIGHT, DOOR_HEIGHT, WINDOW_HEIGHT, WINDOW_SILL, cabinetWidth, footprint, stairEnd, stairFootprint } from './geometry'
 import type { LevelDef, OpeningDef, RoomDef, TemplateDefinition, WallDef } from './types'
 
 const EPS = 0.011
@@ -50,7 +50,7 @@ function checkRoom(room: RoomDef, walls: readonly WallDef[], errors: string[]) {
   }
 }
 
-function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[], errors: string[]) {
+function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[], levelHeight: number, errors: string[]) {
   const byWall = new Map<string, OpeningDef[]>()
   for (const o of openings) {
     const wall = walls.find((w) => w.id === o.wall)
@@ -60,6 +60,10 @@ function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[
     }
     if (o.at - o.width / 2 < MARGIN - EPS || o.at + o.width / 2 > length(wall) - MARGIN + EPS) {
       errors.push(`La abertura ${o.id} se sale del muro ${o.wall} (largo ${length(wall).toFixed(2)} m) o queda pegada a la esquina.`)
+    }
+    const top = (o.type === 'window' ? (o.sill ?? WINDOW_SILL) : 0) + (o.height ?? (o.type === 'door' ? DOOR_HEIGHT : WINDOW_HEIGHT))
+    if (top > (wall.height ?? levelHeight) + 0.001) {
+      errors.push(`La abertura ${o.id} es más alta que el muro ${o.wall} (llega a ${top.toFixed(2)} m y el muro mide ${(wall.height ?? levelHeight).toFixed(2)} m).`)
     }
     byWall.set(o.wall, [...(byWall.get(o.wall) ?? []), o])
   }
@@ -75,7 +79,7 @@ function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[
   }
 }
 
-function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds: ReadonlySet<string>, materialIds: ReadonlySet<string>, errors: string[]) {
+function checkLevel(level: LevelDef, levels: readonly LevelDef[], levelIds: string[], index: number, assetIds: ReadonlySet<string>, materialIds: ReadonlySet<string>, errors: string[]) {
   for (const id of new Set([...duplicates(level.walls.map((w) => w.id)), ...duplicates(level.rooms.map((r) => r.id)), ...duplicates(level.openings.map((o) => o.id)), ...duplicates((level.stairs ?? []).map((s) => s.id)), ...duplicates((level.shelves ?? []).map((s) => s.id)), ...duplicates((level.cabinets ?? []).map((c) => c.id))])) {
     errors.push(`El id ${id} está repetido en el nivel ${level.id}.`)
   }
@@ -93,7 +97,7 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
       if (overlapX > EPS && overlapZ > EPS) errors.push(`Los ambientes ${a.id} y ${b.id} se solapan.`)
     }
   }
-  checkOpenings(level.openings, level.walls, errors)
+  checkOpenings(level.openings, level.walls, level.height ?? DEFAULT_LEVEL_HEIGHT, errors)
   for (const item of level.items) {
     if (!assetIds.has(item.asset)) errors.push(`La pieza ${item.asset} no está en el catálogo.`)
     if (!level.rooms.some((r) => inside(r, item.at[0], item.at[1]))) {
@@ -120,9 +124,19 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
   }
   for (const s of level.stairs ?? []) {
     const target = levelIds.indexOf(s.to)
-    if (target <= index) errors.push(`La escalera ${s.id} debe subir a un nivel posterior que exista (${s.to}).`)
-    else if (!level.rooms.some((r) => inside(r, s.at[0], s.at[1], 0))) errors.push(`La escalera ${s.id} arranca fuera de los ambientes del nivel ${level.id}.`)
     if (s.steps < 4 || s.width < 0.7) errors.push(`La escalera ${s.id} tiene muy pocos escalones o es muy angosta.`)
+    if (target <= index) {
+      errors.push(`La escalera ${s.id} debe subir a un nivel posterior que exista (${s.to}).`)
+    } else if (!level.rooms.some((r) => inside(r, s.at[0], s.at[1], 0))) {
+      errors.push(`La escalera ${s.id} arranca fuera de los ambientes del nivel ${level.id}.`)
+    } else if (!inRooms(stairFootprint(s))) {
+      errors.push(`La escalera ${s.id} queda en parte fuera de los ambientes del nivel ${level.id}: revisa hacia dónde sube (rotY) y su recorrido.`)
+    } else {
+      const [x, z] = stairEnd(s)
+      if (!(levels[target] as LevelDef).rooms.some((r) => inside(r, x, z, 0.25))) {
+        errors.push(`La escalera ${s.id} no llega al nivel ${s.to}: termina en (${x}, ${z}), fuera de sus ambientes.`)
+      }
+    }
   }
   const materials: (string | undefined | null)[] = [
     level.wallInside,
@@ -143,6 +157,6 @@ export function validateDefinition(def: TemplateDefinition, assetIds: ReadonlySe
   const levelIds = def.levels.map((l) => l.id)
   for (const id of new Set(duplicates(levelIds))) errors.push(`El id de nivel ${id} está repetido.`)
   if (def.levels.length === 0 || def.levels.every((l) => l.rooms.length === 0)) errors.push('La plantilla no tiene ambientes.')
-  for (const [index, level] of def.levels.entries()) checkLevel(level, levelIds, index, assetIds, materialIds, errors)
+  for (const [index, level] of def.levels.entries()) checkLevel(level, def.levels, levelIds, index, assetIds, materialIds, errors)
   return errors
 }

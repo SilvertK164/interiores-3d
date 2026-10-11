@@ -66,6 +66,14 @@ describe('createFromTemplate', () => {
     expect(api.createProject).not.toHaveBeenCalled()
   })
 
+  it('mide el límite de 5 MB en bytes y no en caracteres', async () => {
+    const api = fakeApi()
+    const big = 'é'.repeat(3_000_000) // 3 millones de caracteres, 6 MB en UTF-8
+    const fetchImpl = vi.fn(async () => new Response(big, { status: 200 })) as unknown as typeof fetch
+    await expect(createFromTemplate(api, { name: 'x', kind: 'comercio', templateId: 'cafe' }, fetchImpl)).rejects.toThrow('5 MB')
+    expect(api.createProject).not.toHaveBeenCalled()
+  })
+
   it('rechaza una plantilla con formato inválido antes de crear nada', async () => {
     const api = fakeApi()
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ schemaVersion: 9 }), { status: 200 })) as unknown as typeof fetch

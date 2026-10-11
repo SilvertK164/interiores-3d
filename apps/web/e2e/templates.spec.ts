@@ -14,6 +14,12 @@ function expected(id: string): Counts {
   return total
 }
 
+/** Espera a que la red se calme (modelos y texturas) y da una pausa corta: el editor sigue pidiendo cosas un instante después. */
+async function settle(page: Page) {
+  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => undefined)
+  await page.waitForTimeout(1500)
+}
+
 /** Respuestas 4xx/5xx de modelos, texturas y plantillas (lo que rompería el criterio 5 del spec). */
 function watchAssetFailures(page: Page): string[] {
   const failed: string[] = []
@@ -40,15 +46,15 @@ test('crear desde "Concept store" y recargar deja los mismos niveles, ambientes 
   expect(want.level).toBe(2)
   await expect.poll(async () => (await counts(page)).zone).toBe(want.zone)
   const before = await counts(page)
-  for (const type of ['level', 'wall', 'item', 'door', 'window', 'stair'] as const) expect(before[type], type).toBe(want[type])
+  for (const type of Object.keys(want)) expect(before[type], type).toBe(want[type])
 
-  await page.waitForTimeout(6000) // deja que carguen las texturas y los modelos
+  await settle(page)
   await page.reload()
   await ready(page)
   await expect.poll(async () => (await counts(page)).zone).toBe(want.zone)
   const after = await counts(page)
-  for (const type of ['level', 'zone', 'item', 'stair'] as const) expect(after[type], type).toBe(want[type])
-  await page.waitForTimeout(6000)
+  for (const type of Object.keys(want)) expect(after[type], type).toBe(want[type])
+  await settle(page)
   expect(failed).toEqual([])
 })
 
@@ -64,7 +70,7 @@ test('las cuatro plantillas se abren sin errores ni texturas rotas y dejan una c
     ['vivienda', 'Loft', 'loft'],
   ] as const) {
     await createFrom(page, kind, name)
-    await page.waitForTimeout(6000)
+    await settle(page)
     await page.screenshot({ path: `test-results/plantillas/${file}.png` })
   }
   expect(errors).toEqual([])

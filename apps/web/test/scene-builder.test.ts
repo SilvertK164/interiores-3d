@@ -74,7 +74,7 @@ const def: TemplateDefinition = {
           modules: [{ width: 1, stack: [{ type: 'door', doorType: 'glass', shelfCount: 4 }] }],
         },
       ],
-      stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
+      stairs: [{ id: 'escalera', at: [2, 3.4], rotY: Math.PI / 2, run: 3, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
     {
       id: 'alta',
@@ -164,6 +164,30 @@ describe('buildScene', () => {
     expect(stair.toLevelId).toBe(top?.id)
     expect(stair.stepCount).toBe(14)
     expect(stair.railingMode).toBe('both')
+    expect(stair.rotation).toBeCloseTo(Math.PI / 2)
+  })
+
+  it('la escalera lleva un tramo hijo con su recorrido, su ancho y su cantidad de escalones', () => {
+    const stair = byType('stair')[0] as N
+    expect(stair.children).toHaveLength(1)
+    const segment = nodes[(stair.children as string[])[0] as string] as N
+    expect(segment).toMatchObject({ type: 'stair-segment', parentId: stair.id, segmentType: 'stair', length: 3, width: 1.1, stepCount: 14, height: 3.4 })
+  })
+
+  it('centra la planta baja en el origen (el editor encuadra desde ahí) y mueve todo lo demás con ella', () => {
+    // la definición va de (0, 0) a (8, 4): el centro es (4, 2)
+    const wall = nodes['wall_local_de_prueba_pb_p_n'] as N
+    expect(wall.start).toEqual([-4, -2])
+    expect(wall.end).toEqual([4, -2])
+    const slab = byType('slab').find((s) => s.name === 'Salón (losa)')
+    expect(slab?.polygon).toEqual([[-4, -2], [1, -2], [1, 2], [-4, 2]])
+    const [a] = byType('item').filter((i) => (i.asset as { id: string }).id === 'cash-register') as [N, N]
+    expect(a.position).toEqual([-3, 0, -1])
+    expect((nodes['shelf_local_de_prueba_pb_gondola'] as N).position).toEqual([-1.5, 0, 1.5])
+    expect((nodes['cabinet_local_de_prueba_pb_mostrador'] as N).position).toEqual([-1, 0, -1.5])
+    expect((byType('stair')[0] as N).position).toEqual([-2, 0, 1.4])
+    // las puertas y ventanas se miden sobre su muro: no se mueven
+    expect((byType('door')[0] as N).position).toEqual([2, 1.05, 0])
   })
 
   it('crea los estantes y los gabinetes paramétricos de Pascal', () => {
@@ -182,13 +206,13 @@ describe('buildScene', () => {
       height: 1.8,
       withBack: true,
       materialPreset: 'library:preset-charcoal',
-      position: [2.5, 0.05, 3.5],
+      position: [-1.5, 0, 1.5],
     })
   })
 
   it('la corrida suma el ancho de sus módulos y los ubica centrados en fila sobre su eje x', () => {
     const run = nodes['cabinet_local_de_prueba_pb_mostrador'] as N
-    expect(run).toMatchObject({ width: 1.8, runTier: 'base', withCountertop: true, position: [3, 0.05, 0.5] })
+    expect(run).toMatchObject({ width: 1.8, runTier: 'base', withCountertop: true, position: [-1, 0, -1.5] })
     expect((run.barLedge as { edge: string }).edge).toBe('back')
     const modules = (run.children as string[]).map((id) => nodes[id] as N)
     expect(modules.map((m) => m.position)).toEqual([[-0.3, 0, 0], [0.6, 0, 0]])
@@ -204,12 +228,12 @@ describe('buildScene', () => {
     expect(module.stack).toEqual([expect.objectContaining({ type: 'door', doorType: 'glass', shelfCount: 4 })])
   })
 
-  it('las piezas llevan su descriptor, su altura sobre la losa y su giro', () => {
+  it('las piezas llevan su descriptor, la altura que se les pide sobre el piso y su giro', () => {
     const [a, b] = byType('item').filter((i) => (i.asset as { id: string }).id === 'cash-register') as [N, N]
     expect((a.asset as { src: string }).src).toBe('/items/cash-register/model.glb')
-    expect(a.position).toEqual([1, 0.05, 1])
+    expect(a.position).toEqual([-3, 0, -1])
     expect((a.rotation as number[])[1]).toBeCloseTo(Math.PI)
-    expect(b.position).toEqual([2, 0.78, 1])
+    expect(b.position).toEqual([-2, 0.78, -1])
   })
 
   it('es determinista y cabe en un SceneEnvelope válido de mucho menos de 5 MB', () => {

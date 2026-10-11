@@ -25,7 +25,7 @@ export const TEMPLATES: TemplateInfo[] = TEMPLATE_DEFINITIONS.map((d) => ({
   summary: d.summary,
   areaM2: definitionArea(d),
   levels: d.levels.length,
-  thumbnail: `/templates/${d.id}.svg`,
+  thumbnail: `/templates/${d.id}.jpg`,
   file: `/templates/${d.id}.json`,
 }))
 

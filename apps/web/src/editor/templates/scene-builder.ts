@@ -12,14 +12,15 @@ import {
   SiteNode,
   SlabNode,
   StairNode,
+  StairSegmentNode,
   WALL_CROWN_DEFAULT,
   WALL_SKIRTING_DEFAULT,
   WallNode,
   WindowNode,
   ZoneNode,
 } from '@pascal-app/core'
-import { cabinetWidth } from '../../lib/templates/geometry'
-import type { LevelDef, OpeningDef, TemplateDefinition } from '../../lib/templates/types'
+import { DEFAULT_LEVEL_HEIGHT, DEFAULT_STAIR_RUN, DOOR_HEIGHT, WINDOW_HEIGHT, WINDOW_SILL, cabinetWidth } from '../../lib/templates/geometry'
+import type { LevelDef, OpeningDef, Pt, TemplateDefinition } from '../../lib/templates/types'
 import { validateDefinition } from '../../lib/templates/validate'
 
 export type AssetLike = {
@@ -40,11 +41,9 @@ export type AssetLike = {
 export const MATERIAL_IDS: ReadonlySet<string> = new Set(MATERIAL_CATALOG.map((m) => m.id))
 
 const WALL_THICKNESS = 0.2
-const FLOOR_Y = 0.05 // la losa de Pascal tiene 5 cm de espesor
+// Pascal sube cada pieza apoyada en el piso el espesor de la losa (5 cm) al dibujarla: la posición guardada es 0.
+const FLOOR_Y = 0
 const FALLBACK_THUMBNAIL = '/icons/couch.webp'
-const DOOR_HEIGHT = 2.1
-const WINDOW_HEIGHT = 1.2
-const WINDOW_SILL = 0.9
 
 const SHELF_NAMES = { 'wall-shelf': 'Repisa', bookshelf: 'Biblioteca', 'open-rack': 'Góndola', cubby: 'Exhibidor' } as const
 const BAR_LEDGE = { edge: 'back', height: 1.06, depth: 0.35 } as const
@@ -60,6 +59,15 @@ const lib = (id: string) => `library:${id}`
 export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, AssetLike>): SceneGraph {
   const errors = validateDefinition(def, new Set(assets.keys()), MATERIAL_IDS)
   if (errors.length > 0) throw new Error(`La plantilla ${def.id} no es válida:\n- ${errors.join('\n- ')}`)
+
+  // Las definiciones usan coordenadas positivas desde la esquina (0, 0); la escena se centra en el origen,
+  // que es desde donde el editor encuadra la cámara. Las aberturas se miden sobre su muro y no se mueven.
+  const wallPoints = (def.levels[0] as LevelDef).walls.flatMap((w) => [w.from, w.to])
+  const xs = wallPoints.map((p) => p[0])
+  const zs = wallPoints.map((p) => p[1])
+  const centerX = (Math.min(...xs) + Math.max(...xs)) / 2
+  const centerZ = (Math.min(...zs) + Math.max(...zs)) / 2
+  const at = (p: Pt): Pt => [round3(p[0] - centerX), round3(p[1] - centerZ)]
 
   const tag = clean(def.id)
   const siteId = `site_${tag}`
@@ -84,8 +92,8 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id: wallId(w.id),
         parentId: lid,
         name: w.name ?? `Muro ${w.id}`,
-        start: w.from,
-        end: w.to,
+        start: at(w.from),
+        end: at(w.to),
         thickness: WALL_THICKNESS,
         children: openingsByWall.get(w.id) ?? [],
         ...(w.height ? { height: w.height } : {}),
@@ -111,7 +119,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
 
     for (const r of level.rooms) {
       const [x0, z0, x1, z1] = r.rect
-      const polygon = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]]
+      const polygon = [at([x0, z0]), at([x1, z0]), at([x1, z1]), at([x0, z1])]
       const zoneId = sub('zone', level, r.id)
       const slabId = sub('slab', level, r.id)
       nodes[zoneId] = ZoneNode.parse({ id: zoneId, parentId: lid, name: r.name, polygon, color: r.color })
@@ -131,7 +139,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id,
         parentId: lid,
         name: asset.name,
-        position: [it.at[0], it.y ?? FLOOR_Y, it.at[1]],
+        position: [at(it.at)[0], it.y ?? FLOOR_Y, at(it.at)[1]],
         rotation: [0, it.rotY ?? 0, 0],
         asset: {
           ...asset,
@@ -152,7 +160,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id,
         parentId: lid,
         name: sh.name ?? SHELF_NAMES[sh.style],
-        position: [sh.at[0], sh.y ?? FLOOR_Y, sh.at[1]],
+        position: [at(sh.at)[0], sh.y ?? FLOOR_Y, at(sh.at)[1]],
         rotation: [0, sh.rotY ?? 0, 0],
         width: sh.width,
         depth: sh.depth,
@@ -199,7 +207,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id: runId,
         parentId: lid,
         name: c.name ?? 'Mostrador',
-        position: [c.at[0], c.y ?? FLOOR_Y, c.at[1]],
+        position: [at(c.at)[0], c.y ?? FLOOR_Y, at(c.at)[1]],
         rotation: c.rotY ?? 0,
         runTier: tier,
         width: total,
@@ -213,10 +221,22 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
     for (const s of level.stairs ?? []) {
       const id = sub('stair', level, s.id)
       const target = def.levels.find((l) => l.id === s.to) as LevelDef
+      // El tramo hijo fija el recorrido; Pascal reajusta su altura a la del nivel (`syncStairRises`).
+      const segmentId = `sseg_${tag}_${clean(level.id)}_${clean(s.id)}`
+      nodes[segmentId] = StairSegmentNode.parse({
+        id: segmentId,
+        parentId: id,
+        segmentType: 'stair',
+        width: s.width,
+        length: s.run ?? DEFAULT_STAIR_RUN,
+        height: level.height ?? DEFAULT_LEVEL_HEIGHT,
+        stepCount: s.steps,
+      })
       nodes[id] = StairNode.parse({
         id,
+        children: [segmentId],
         parentId: lid,
-        position: [s.at[0], 0, s.at[1]],
+        position: [at(s.at)[0], 0, at(s.at)[1]],
         rotation: s.rotY,
         fromLevelId: lid,
         toLevelId: levelNodeId(target),

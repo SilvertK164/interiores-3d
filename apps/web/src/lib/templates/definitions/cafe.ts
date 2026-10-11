@@ -7,7 +7,7 @@ const DRAWERS = { type: 'drawer', drawerCount: 3 } as const
 const GLASS_LOW = { type: 'door', doorType: 'glass', shelfCount: 3 } as const
 
 const interiorTables = grid('dining-table', [1.4, 2.0], 2, 3, [2.0, 2.6])
-const terraceTables = grid('dining-table', [2.0, 10.4], 3, 2, [3.6, 1.9])
+const terraceTables = grid('dining-table', [2.0, 10.2], 3, 2, [3.6, 1.7])
 const chairsAround = (tables: ItemDef[], dx: number): ItemDef[] =>
   tables.flatMap((t) => [
     { asset: 'dining-chair', at: [t.at[0] - dx, t.at[1]] as [number, number], rotY: Q },
@@ -46,7 +46,7 @@ export const cafe: TemplateDefinition = {
       openings: [
         { id: 'puerta-salon', type: 'door', wall: 'p-s', at: 3, width: 1.6, height: 2.2 },
         { id: 'vidriera', type: 'window', wall: 'p-s', at: 5.6, width: 3, height: 2.2, sill: 0.4 },
-        { id: 'acceso', type: 'door', wall: 't-w', at: 2, width: 1.4 },
+        { id: 'acceso', type: 'door', wall: 't-w', at: 2, width: 1.4, height: 1 },
         { id: 'ventana-oeste', type: 'window', wall: 'p-w', at: 6.5, width: 2.2 },
         { id: 'ventana-norte', type: 'window', wall: 'p-n', at: 1.6, width: 1.6 },
         { id: 'puerta-cocina', type: 'door', wall: 'div', at: 2, width: 1 },
@@ -77,13 +77,13 @@ export const cafe: TemplateDefinition = {
         { asset: 'stove', at: [11.5, 0.6] },
         { asset: 'hood', at: [11.5, 0.6], y: 1.9 },
         { asset: 'fridge', at: [11.5, 2.2], rotY: -Q },
-        { asset: 'toilet', at: [11.5, 5.7] },
-        { asset: 'bathroom-sink', at: [9.0, 5.7] },
+        { asset: 'toilet', at: [11.6, 5.2], rotY: -Q },
+        { asset: 'bathroom-sink', at: [9.6, 6.05], rotY: Math.PI },
         ...terraceTables,
         ...chairsAround(terraceTables, 0.8),
-        { asset: 'patio-umbrella', at: [2.0, 10.4] },
-        { asset: 'patio-umbrella', at: [9.2, 10.4] },
-        ...row('indoor-plant', [0.6, 12.4], [11.4, 12.4], 6),
+        { asset: 'patio-umbrella', at: [2.0, 10.2] },
+        { asset: 'patio-umbrella', at: [9.2, 10.2] },
+        ...row('indoor-plant', [0.6, 12.7], [11.4, 12.7], 6),
         { asset: 'palm', at: [0.8, 9.8] },
         { asset: 'palm', at: [11.2, 9.8] },
       ],

@@ -50,7 +50,8 @@ Entradas y condiciones que ninguna tarea probaría por sí sola; cada línea tie
 1. El plan nació con 12 piezas de **Kenney Mini Market** (CC0) para caja, freezers, góndolas y exhibidores (Tarea 1, ejecutada).
 2. Al verlas en el editor, Silvert las descartó: "parecen de un juego, tienen que ser realistas". Se pidió usar los **estantes y gabinetes paramétricos de Pascal**, con vitrinas y lo demás que se pueda.
 3. Un prototipo en el editor real mostró que `ShelfNode` y `CabinetNode` (con módulos hijos) se ven limpios y realistas y cubren góndolas, exhibidores, vitrinas de vidrio, mostradores con cajones, barras con bacha y heladeras de exhibición.
-4. Se retiraron de git los archivos de Kenney y su script (commit `feat(tienda): estantes y gabinetes paramétricos de Pascal en el constructor y retiro de las piezas de Kenney`); el constructor (Tarea 3), las definiciones (Tarea 4) y el catálogo (Tarea 2) pasaron a describir lo que quedó. **El código de este plan es el que está en el repositorio**: los bloques de las Tareas 2 a 5 se tomaron de los archivos que pasaron `pnpm verify`.
+4. Se retiraron de git los archivos de Kenney y su script (commit `feat(tienda): estantes y gabinetes paramétricos de Pascal en el constructor y retiro de las piezas de Kenney`); el constructor (Tarea 3), las definiciones (Tarea 4) y el catálogo (Tarea 2) pasaron a describir lo que quedó. 5. Tras probarlo Silvert en el editor y tras la revisión final: la escalera salía del edificio (con `rotY: 0` sube hacia +z; ahora `rotY: π/2`, tramo hijo con `run` y validación de que llegue al nivel de arriba), las piezas flotaban 5 cm (Pascal suma la losa al dibujar: `FLOOR_Y = 0`), los baños tenían las piezas mirando a la pared, el mensaje de error de plantilla no se mostraba, y la tarjeta de plantilla pasó del plano SVG a una **captura 3D** (`pnpm --filter @interiores/web templates:thumbs`, muros en modo `down`). La escena se centra en el origen para que el editor la encuadre.
+6. **El código de este plan es el que está en el repositorio**: los bloques de las Tareas 2 a 5 se tomaron de los archivos que pasaron `pnpm verify`.
 
 ## Estructura de archivos
 
@@ -422,9 +423,13 @@ export type ItemDef = { asset: string; at: Pt; rotY?: number; y?: number }
 
 export type StairDef = {
   id: string
-  /** Punto de arranque de la escalera en el nivel donde está definida. */
+  /** Pie de la escalera (donde pisas el primer escalón) en el nivel donde está definida. */
   at: Pt
+  /** Con 0 la escalera sube caminando hacia +z; con π/2, hacia +x; con π, hacia -z; con -π/2, hacia -x. */
   rotY: number
+  /** Recorrido horizontal en metros (por defecto 3, como en Pascal): el último escalón queda a esta distancia de `at`. */
+  run?: number
+  /** Ancho, centrado sobre el eje de subida. */
   width: number
   steps: number
   /** Id del nivel al que sube. */
@@ -517,12 +522,12 @@ export type TemplateDefinition = {
 Create `apps/web/src/lib/templates/geometry.ts`:
 
 ```ts
-import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, TemplateDefinition, WallDef } from './types'
+import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, StairDef, TemplateDefinition, WallDef } from './types'
 
 const round = (n: number) => Math.round(n * 1000) / 1000
 
-/** Altura (y) de la mesada de un gabinete bajo: losa 0,05 + zócalo 0,10 + cuerpo 0,80 + mesada 0,02. Para apoyar piezas encima. */
-export const COUNTER_Y = 0.97
+/** Altura (y) de la mesada de un gabinete bajo medida desde su base: zócalo 0,10 + cuerpo 0,80 + mesada 0,02. Para apoyar piezas encima. */
+export const COUNTER_Y = 0.92
 
 /** Cuatro muros de un rectángulo: `-n` (arriba), `-e`, `-s` (abajo) y `-w`; todos van hacia +x o +z. */
 export function perimeter(prefix: string, x0: number, z0: number, x1: number, z1: number): WallDef[] {
@@ -584,6 +589,27 @@ export function footprint(at: Pt, width: number, depth: number, rotY = 0): Pt[] 
     round(at[1] + (-s * kx * width) / 2 + (c * kz * depth) / 2),
   ]
   return [corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)]
+}
+
+export const DEFAULT_STAIR_RUN = 3
+
+/** Medidas por defecto de las aberturas (las usan el constructor y el validador). */
+export const DOOR_HEIGHT = 2.1
+export const WINDOW_HEIGHT = 1.2
+export const WINDOW_SILL = 0.9
+export const DEFAULT_LEVEL_HEIGHT = 2.5
+
+/** Punto donde la escalera llega al piso de arriba (el pie más `run` metros hacia donde mira `rotY`). */
+export function stairEnd(stair: Pick<StairDef, 'at' | 'rotY' | 'run'>): Pt {
+  const run = stair.run ?? DEFAULT_STAIR_RUN
+  return [round(stair.at[0] + Math.sin(stair.rotY) * run), round(stair.at[1] + Math.cos(stair.rotY) * run)]
+}
+
+/** Base de la escalera en planta: un rectángulo `width × run` entre el pie y la llegada. */
+export function stairFootprint(stair: Pick<StairDef, 'at' | 'rotY' | 'run' | 'width'>): Pt[] {
+  const run = stair.run ?? DEFAULT_STAIR_RUN
+  const center: Pt = [stair.at[0] + (Math.sin(stair.rotY) * run) / 2, stair.at[1] + (Math.cos(stair.rotY) * run) / 2]
+  return footprint(center, stair.width, run, stair.rotY)
 }
 
 export function roomArea(room: RoomDef): number {
@@ -686,7 +712,7 @@ function ground(): LevelDef {
     cabinets: [
       { id: 'caja', at: [1.5, 0.45], depth: 0.7, height: 0.8, modules: [{ width: 1.2, stack: [{ type: 'door', doorType: 'double' }] }, { width: 0.6, stack: [{ type: 'drawer', drawerCount: 3 }] }] },
     ],
-    stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1, steps: 12, to: 'alta' }],
+    stairs: [{ id: 'escalera', at: [1, 3.2], rotY: Math.PI / 2, run: 3, width: 1, steps: 12, to: 'alta' }],
   }
 }
 
@@ -739,6 +765,16 @@ describe('validateDefinition', () => {
     expect(errors.some((e) => e.includes('se pisan'))).toBe(true)
   })
 
+  it('rechaza una puerta o ventana más alta que su muro (por ejemplo, una puerta de 2,1 m en un parapeto de 1,1 m)', () => {
+    const def = valid()
+    lv(def).walls.push({ id: 'parapeto', from: [0, 4], to: [3, 4], height: 1.1 })
+    lv(def).openings.push({ id: 'puerta-alta', type: 'door', wall: 'parapeto', at: 1.5, width: 0.9 })
+    lv(def).openings.push({ id: 'puerta-baja', type: 'door', wall: 'parapeto', at: 0.5, width: 0.6, height: 1 })
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('puerta-alta') && e.includes('más alta'))).toBe(true)
+    expect(errors.some((e) => e.includes('puerta-baja'))).toBe(false)
+  })
+
   it('rechaza una abertura en un muro que no existe', () => {
     const def = valid()
     lv(def).openings.push({ id: 'huerfana', type: 'door', wall: 'no-existe', at: 1, width: 1 })
@@ -772,6 +808,18 @@ describe('validateDefinition', () => {
     ]
     const errors = check(def)
     expect(errors.filter((e) => e.includes('escalera'))).toHaveLength(3)
+  })
+
+  it('rechaza una escalera que sale de los ambientes del nivel o que termina lejos del piso de arriba', () => {
+    const sale = valid()
+    // rotY 0 camina hacia +z: desde (1, 3) llega a z = 6 y atraviesa el muro sur del salón (z = 4)
+    lv(sale).stairs = [{ id: 'sale', at: [1, 3], rotY: 0, width: 1, steps: 12, to: 'alta' }]
+    expect(check(sale).some((e) => e.includes('sale') && e.includes('fuera de los ambientes'))).toBe(true)
+
+    const corta = valid()
+    // camina hacia +x pero solo 1 m: termina en x = 2, dentro del salón y lejos del entrepiso (que empieza en x = 4)
+    lv(corta).stairs = [{ id: 'corta', at: [1, 3.2], rotY: Math.PI / 2, run: 1, width: 1, steps: 12, to: 'alta' }]
+    expect(check(corta).some((e) => e.includes('corta') && e.includes('no llega'))).toBe(true)
   })
 
   it('rechaza ids repetidos, ambientes solapados y muros diagonales', () => {
@@ -835,7 +883,7 @@ Expected: FAIL — `Failed to resolve import "../src/lib/templates/validate"` (y
 Create `apps/web/src/lib/templates/validate.ts`:
 
 ```ts
-import { cabinetWidth, footprint } from './geometry'
+import { DEFAULT_LEVEL_HEIGHT, DOOR_HEIGHT, WINDOW_HEIGHT, WINDOW_SILL, cabinetWidth, footprint, stairEnd, stairFootprint } from './geometry'
 import type { LevelDef, OpeningDef, RoomDef, TemplateDefinition, WallDef } from './types'
 
 const EPS = 0.011
@@ -887,7 +935,7 @@ function checkRoom(room: RoomDef, walls: readonly WallDef[], errors: string[]) {
   }
 }
 
-function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[], errors: string[]) {
+function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[], levelHeight: number, errors: string[]) {
   const byWall = new Map<string, OpeningDef[]>()
   for (const o of openings) {
     const wall = walls.find((w) => w.id === o.wall)
@@ -897,6 +945,10 @@ function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[
     }
     if (o.at - o.width / 2 < MARGIN - EPS || o.at + o.width / 2 > length(wall) - MARGIN + EPS) {
       errors.push(`La abertura ${o.id} se sale del muro ${o.wall} (largo ${length(wall).toFixed(2)} m) o queda pegada a la esquina.`)
+    }
+    const top = (o.type === 'window' ? (o.sill ?? WINDOW_SILL) : 0) + (o.height ?? (o.type === 'door' ? DOOR_HEIGHT : WINDOW_HEIGHT))
+    if (top > (wall.height ?? levelHeight) + 0.001) {
+      errors.push(`La abertura ${o.id} es más alta que el muro ${o.wall} (llega a ${top.toFixed(2)} m y el muro mide ${(wall.height ?? levelHeight).toFixed(2)} m).`)
     }
     byWall.set(o.wall, [...(byWall.get(o.wall) ?? []), o])
   }
@@ -912,7 +964,7 @@ function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[
   }
 }
 
-function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds: ReadonlySet<string>, materialIds: ReadonlySet<string>, errors: string[]) {
+function checkLevel(level: LevelDef, levels: readonly LevelDef[], levelIds: string[], index: number, assetIds: ReadonlySet<string>, materialIds: ReadonlySet<string>, errors: string[]) {
   for (const id of new Set([...duplicates(level.walls.map((w) => w.id)), ...duplicates(level.rooms.map((r) => r.id)), ...duplicates(level.openings.map((o) => o.id)), ...duplicates((level.stairs ?? []).map((s) => s.id)), ...duplicates((level.shelves ?? []).map((s) => s.id)), ...duplicates((level.cabinets ?? []).map((c) => c.id))])) {
     errors.push(`El id ${id} está repetido en el nivel ${level.id}.`)
   }
@@ -930,7 +982,7 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
       if (overlapX > EPS && overlapZ > EPS) errors.push(`Los ambientes ${a.id} y ${b.id} se solapan.`)
     }
   }
-  checkOpenings(level.openings, level.walls, errors)
+  checkOpenings(level.openings, level.walls, level.height ?? DEFAULT_LEVEL_HEIGHT, errors)
   for (const item of level.items) {
     if (!assetIds.has(item.asset)) errors.push(`La pieza ${item.asset} no está en el catálogo.`)
     if (!level.rooms.some((r) => inside(r, item.at[0], item.at[1]))) {
@@ -957,9 +1009,19 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
   }
   for (const s of level.stairs ?? []) {
     const target = levelIds.indexOf(s.to)
-    if (target <= index) errors.push(`La escalera ${s.id} debe subir a un nivel posterior que exista (${s.to}).`)
-    else if (!level.rooms.some((r) => inside(r, s.at[0], s.at[1], 0))) errors.push(`La escalera ${s.id} arranca fuera de los ambientes del nivel ${level.id}.`)
     if (s.steps < 4 || s.width < 0.7) errors.push(`La escalera ${s.id} tiene muy pocos escalones o es muy angosta.`)
+    if (target <= index) {
+      errors.push(`La escalera ${s.id} debe subir a un nivel posterior que exista (${s.to}).`)
+    } else if (!level.rooms.some((r) => inside(r, s.at[0], s.at[1], 0))) {
+      errors.push(`La escalera ${s.id} arranca fuera de los ambientes del nivel ${level.id}.`)
+    } else if (!inRooms(stairFootprint(s))) {
+      errors.push(`La escalera ${s.id} queda en parte fuera de los ambientes del nivel ${level.id}: revisa hacia dónde sube (rotY) y su recorrido.`)
+    } else {
+      const [x, z] = stairEnd(s)
+      if (!(levels[target] as LevelDef).rooms.some((r) => inside(r, x, z, 0.25))) {
+        errors.push(`La escalera ${s.id} no llega al nivel ${s.to}: termina en (${x}, ${z}), fuera de sus ambientes.`)
+      }
+    }
   }
   const materials: (string | undefined | null)[] = [
     level.wallInside,
@@ -980,7 +1042,7 @@ export function validateDefinition(def: TemplateDefinition, assetIds: ReadonlySe
   const levelIds = def.levels.map((l) => l.id)
   for (const id of new Set(duplicates(levelIds))) errors.push(`El id de nivel ${id} está repetido.`)
   if (def.levels.length === 0 || def.levels.every((l) => l.rooms.length === 0)) errors.push('La plantilla no tiene ambientes.')
-  for (const [index, level] of def.levels.entries()) checkLevel(level, levelIds, index, assetIds, materialIds, errors)
+  for (const [index, level] of def.levels.entries()) checkLevel(level, def.levels, levelIds, index, assetIds, materialIds, errors)
   return errors
 }
 ```
@@ -1084,7 +1146,7 @@ const def: TemplateDefinition = {
           modules: [{ width: 1, stack: [{ type: 'door', doorType: 'glass', shelfCount: 4 }] }],
         },
       ],
-      stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
+      stairs: [{ id: 'escalera', at: [2, 3.4], rotY: Math.PI / 2, run: 3, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
     {
       id: 'alta',
@@ -1174,6 +1236,30 @@ describe('buildScene', () => {
     expect(stair.toLevelId).toBe(top?.id)
     expect(stair.stepCount).toBe(14)
     expect(stair.railingMode).toBe('both')
+    expect(stair.rotation).toBeCloseTo(Math.PI / 2)
+  })
+
+  it('la escalera lleva un tramo hijo con su recorrido, su ancho y su cantidad de escalones', () => {
+    const stair = byType('stair')[0] as N
+    expect(stair.children).toHaveLength(1)
+    const segment = nodes[(stair.children as string[])[0] as string] as N
+    expect(segment).toMatchObject({ type: 'stair-segment', parentId: stair.id, segmentType: 'stair', length: 3, width: 1.1, stepCount: 14, height: 3.4 })
+  })
+
+  it('centra la planta baja en el origen (el editor encuadra desde ahí) y mueve todo lo demás con ella', () => {
+    // la definición va de (0, 0) a (8, 4): el centro es (4, 2)
+    const wall = nodes['wall_local_de_prueba_pb_p_n'] as N
+    expect(wall.start).toEqual([-4, -2])
+    expect(wall.end).toEqual([4, -2])
+    const slab = byType('slab').find((s) => s.name === 'Salón (losa)')
+    expect(slab?.polygon).toEqual([[-4, -2], [1, -2], [1, 2], [-4, 2]])
+    const [a] = byType('item').filter((i) => (i.asset as { id: string }).id === 'cash-register') as [N, N]
+    expect(a.position).toEqual([-3, 0, -1])
+    expect((nodes['shelf_local_de_prueba_pb_gondola'] as N).position).toEqual([-1.5, 0, 1.5])
+    expect((nodes['cabinet_local_de_prueba_pb_mostrador'] as N).position).toEqual([-1, 0, -1.5])
+    expect((byType('stair')[0] as N).position).toEqual([-2, 0, 1.4])
+    // las puertas y ventanas se miden sobre su muro: no se mueven
+    expect((byType('door')[0] as N).position).toEqual([2, 1.05, 0])
   })
 
   it('crea los estantes y los gabinetes paramétricos de Pascal', () => {
@@ -1192,13 +1278,13 @@ describe('buildScene', () => {
       height: 1.8,
       withBack: true,
       materialPreset: 'library:preset-charcoal',
-      position: [2.5, 0.05, 3.5],
+      position: [-1.5, 0, 1.5],
     })
   })
 
   it('la corrida suma el ancho de sus módulos y los ubica centrados en fila sobre su eje x', () => {
     const run = nodes['cabinet_local_de_prueba_pb_mostrador'] as N
-    expect(run).toMatchObject({ width: 1.8, runTier: 'base', withCountertop: true, position: [3, 0.05, 0.5] })
+    expect(run).toMatchObject({ width: 1.8, runTier: 'base', withCountertop: true, position: [-1, 0, -1.5] })
     expect((run.barLedge as { edge: string }).edge).toBe('back')
     const modules = (run.children as string[]).map((id) => nodes[id] as N)
     expect(modules.map((m) => m.position)).toEqual([[-0.3, 0, 0], [0.6, 0, 0]])
@@ -1214,12 +1300,12 @@ describe('buildScene', () => {
     expect(module.stack).toEqual([expect.objectContaining({ type: 'door', doorType: 'glass', shelfCount: 4 })])
   })
 
-  it('las piezas llevan su descriptor, su altura sobre la losa y su giro', () => {
+  it('las piezas llevan su descriptor, la altura que se les pide sobre el piso y su giro', () => {
     const [a, b] = byType('item').filter((i) => (i.asset as { id: string }).id === 'cash-register') as [N, N]
     expect((a.asset as { src: string }).src).toBe('/items/cash-register/model.glb')
-    expect(a.position).toEqual([1, 0.05, 1])
+    expect(a.position).toEqual([-3, 0, -1])
     expect((a.rotation as number[])[1]).toBeCloseTo(Math.PI)
-    expect(b.position).toEqual([2, 0.78, 1])
+    expect(b.position).toEqual([-2, 0.78, -1])
   })
 
   it('es determinista y cabe en un SceneEnvelope válido de mucho menos de 5 MB', () => {
@@ -1268,14 +1354,15 @@ import {
   SiteNode,
   SlabNode,
   StairNode,
+  StairSegmentNode,
   WALL_CROWN_DEFAULT,
   WALL_SKIRTING_DEFAULT,
   WallNode,
   WindowNode,
   ZoneNode,
 } from '@pascal-app/core'
-import { cabinetWidth } from '../../lib/templates/geometry'
-import type { LevelDef, OpeningDef, TemplateDefinition } from '../../lib/templates/types'
+import { DEFAULT_LEVEL_HEIGHT, DEFAULT_STAIR_RUN, DOOR_HEIGHT, WINDOW_HEIGHT, WINDOW_SILL, cabinetWidth } from '../../lib/templates/geometry'
+import type { LevelDef, OpeningDef, Pt, TemplateDefinition } from '../../lib/templates/types'
 import { validateDefinition } from '../../lib/templates/validate'
 
 export type AssetLike = {
@@ -1296,11 +1383,9 @@ export type AssetLike = {
 export const MATERIAL_IDS: ReadonlySet<string> = new Set(MATERIAL_CATALOG.map((m) => m.id))
 
 const WALL_THICKNESS = 0.2
-const FLOOR_Y = 0.05 // la losa de Pascal tiene 5 cm de espesor
+// Pascal sube cada pieza apoyada en el piso el espesor de la losa (5 cm) al dibujarla: la posición guardada es 0.
+const FLOOR_Y = 0
 const FALLBACK_THUMBNAIL = '/icons/couch.webp'
-const DOOR_HEIGHT = 2.1
-const WINDOW_HEIGHT = 1.2
-const WINDOW_SILL = 0.9
 
 const SHELF_NAMES = { 'wall-shelf': 'Repisa', bookshelf: 'Biblioteca', 'open-rack': 'Góndola', cubby: 'Exhibidor' } as const
 const BAR_LEDGE = { edge: 'back', height: 1.06, depth: 0.35 } as const
@@ -1316,6 +1401,15 @@ const lib = (id: string) => `library:${id}`
 export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, AssetLike>): SceneGraph {
   const errors = validateDefinition(def, new Set(assets.keys()), MATERIAL_IDS)
   if (errors.length > 0) throw new Error(`La plantilla ${def.id} no es válida:\n- ${errors.join('\n- ')}`)
+
+  // Las definiciones usan coordenadas positivas desde la esquina (0, 0); la escena se centra en el origen,
+  // que es desde donde el editor encuadra la cámara. Las aberturas se miden sobre su muro y no se mueven.
+  const wallPoints = (def.levels[0] as LevelDef).walls.flatMap((w) => [w.from, w.to])
+  const xs = wallPoints.map((p) => p[0])
+  const zs = wallPoints.map((p) => p[1])
+  const centerX = (Math.min(...xs) + Math.max(...xs)) / 2
+  const centerZ = (Math.min(...zs) + Math.max(...zs)) / 2
+  const at = (p: Pt): Pt => [round3(p[0] - centerX), round3(p[1] - centerZ)]
 
   const tag = clean(def.id)
   const siteId = `site_${tag}`
@@ -1340,8 +1434,8 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id: wallId(w.id),
         parentId: lid,
         name: w.name ?? `Muro ${w.id}`,
-        start: w.from,
-        end: w.to,
+        start: at(w.from),
+        end: at(w.to),
         thickness: WALL_THICKNESS,
         children: openingsByWall.get(w.id) ?? [],
         ...(w.height ? { height: w.height } : {}),
@@ -1367,7 +1461,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
 
     for (const r of level.rooms) {
       const [x0, z0, x1, z1] = r.rect
-      const polygon = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]]
+      const polygon = [at([x0, z0]), at([x1, z0]), at([x1, z1]), at([x0, z1])]
       const zoneId = sub('zone', level, r.id)
       const slabId = sub('slab', level, r.id)
       nodes[zoneId] = ZoneNode.parse({ id: zoneId, parentId: lid, name: r.name, polygon, color: r.color })
@@ -1387,7 +1481,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id,
         parentId: lid,
         name: asset.name,
-        position: [it.at[0], it.y ?? FLOOR_Y, it.at[1]],
+        position: [at(it.at)[0], it.y ?? FLOOR_Y, at(it.at)[1]],
         rotation: [0, it.rotY ?? 0, 0],
         asset: {
           ...asset,
@@ -1408,7 +1502,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id,
         parentId: lid,
         name: sh.name ?? SHELF_NAMES[sh.style],
-        position: [sh.at[0], sh.y ?? FLOOR_Y, sh.at[1]],
+        position: [at(sh.at)[0], sh.y ?? FLOOR_Y, at(sh.at)[1]],
         rotation: [0, sh.rotY ?? 0, 0],
         width: sh.width,
         depth: sh.depth,
@@ -1455,7 +1549,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
         id: runId,
         parentId: lid,
         name: c.name ?? 'Mostrador',
-        position: [c.at[0], c.y ?? FLOOR_Y, c.at[1]],
+        position: [at(c.at)[0], c.y ?? FLOOR_Y, at(c.at)[1]],
         rotation: c.rotY ?? 0,
         runTier: tier,
         width: total,
@@ -1469,10 +1563,22 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
     for (const s of level.stairs ?? []) {
       const id = sub('stair', level, s.id)
       const target = def.levels.find((l) => l.id === s.to) as LevelDef
+      // El tramo hijo fija el recorrido; Pascal reajusta su altura a la del nivel (`syncStairRises`).
+      const segmentId = `sseg_${tag}_${clean(level.id)}_${clean(s.id)}`
+      nodes[segmentId] = StairSegmentNode.parse({
+        id: segmentId,
+        parentId: id,
+        segmentType: 'stair',
+        width: s.width,
+        length: s.run ?? DEFAULT_STAIR_RUN,
+        height: level.height ?? DEFAULT_LEVEL_HEIGHT,
+        stepCount: s.steps,
+      })
       nodes[id] = StairNode.parse({
         id,
+        children: [segmentId],
         parentId: lid,
-        position: [s.at[0], 0, s.at[1]],
+        position: [at(s.at)[0], 0, at(s.at)[1]],
         rotation: s.rotY,
         fromLevelId: lid,
         toLevelId: levelNodeId(target),
@@ -1614,7 +1720,7 @@ describe('definiciones de plantilla', () => {
     expect(templatesForKind('comercio').map((t) => t.id)).toEqual(['concept-store', 'cafe', 'supermercado'])
     expect(templatesForKind('vivienda').map((t) => t.id)).toEqual(['loft'])
     expect(templateById('cafe')?.file).toBe('/templates/cafe.json')
-    expect(templateById('cafe')?.thumbnail).toBe('/templates/cafe.svg')
+    expect(templateById('cafe')?.thumbnail).toBe('/templates/cafe.jpg')
     expect(templateById('no-existe')).toBeUndefined()
     expect(TEMPLATES.every((t) => t.areaM2 >= 80)).toBe(true)
   })
@@ -1717,26 +1823,28 @@ export const conceptStore: TemplateDefinition = {
         { id: 'rack-este', style: 'open-rack', at: [13.65, 5.2], rotY: -Q, width: 1.4, depth: 0.5, height: 1.8, rows: 4, withBack: true },
       ],
       cabinets: [
-        { id: 'caja', name: 'Caja', at: [7.3, 6.7], depth: 0.7, height: 0.8, material: 'preset-charcoal', modules: [{ width: 0.6, stack: [DRAWERS] }, { width: 1.2, stack: [DOOR] }, { width: 0.6, stack: [DRAWERS] }] },
-        { id: 'vitrina-oeste', name: 'Vitrina', at: [0.4, 4.2], rotY: Q, depth: 0.5, height: 1.9, tier: 'tall', modules: [{ width: 1, stack: [GLASS] }, { width: 1, stack: [GLASS] }] },
+        { id: 'caja', name: 'Caja', at: [4.2, 6.4], depth: 0.7, height: 0.8, material: 'preset-charcoal', modules: [{ width: 0.6, stack: [DRAWERS] }, { width: 1.2, stack: [DOOR] }, { width: 0.6, stack: [DRAWERS] }] },
+        { id: 'vitrina-oeste', name: 'Vitrina', at: [0.4, 2.4], rotY: Q, depth: 0.5, height: 1.9, tier: 'tall', modules: [{ width: 1, stack: [GLASS] }, { width: 1, stack: [GLASS] }] },
         { id: 'barra', name: 'Barra de café', at: [12.0, 1.9], rotY: Math.PI, depth: 0.7, height: 0.8, bar: true, modules: [{ width: 1.2, stack: [DOOR] }, { width: 1.2, stack: [DOOR] }] },
       ],
       items: [
         ...grid('dining-table', [2.6, 2.6], 3, 2, [2.2, 1.6]),
         { asset: 'rectangular-carpet', at: [4.8, 3.4] },
-        { asset: 'sofa', at: [2.2, 7.0], rotY: Math.PI },
-        { asset: 'coffee-table', at: [2.2, 5.9] },
+        { asset: 'rectangular-carpet', at: [1.9, 6.0] },
+        { asset: 'sofa', at: [0.7, 6.0], rotY: Q },
+        { asset: 'coffee-table', at: [1.9, 6.0] },
         { asset: 'indoor-plant', at: [0.6, 7.4] },
-        { asset: 'indoor-plant', at: [9.0, 7.4] },
-        { asset: 'floor-lamp', at: [0.6, 5.9] },
-        { asset: 'computer', at: [7.0, 6.7], y: COUNTER_Y },
+        { asset: 'indoor-plant', at: [9.0, 5.4] },
+        { asset: 'floor-lamp', at: [0.6, 4.4] },
+        { asset: 'computer', at: [4.0, 6.4], y: COUNTER_Y },
         { asset: 'coffee-machine', at: [11.3, 1.9], y: COUNTER_Y },
         { asset: 'fridge', at: [13.4, 0.65] },
         ...row('stool', [11.2, 2.95], [12.8, 2.95], 3),
-        { asset: 'toilet', at: [13.4, 7.4] },
-        { asset: 'bathroom-sink', at: [10.6, 7.4] },
+        { asset: 'toilet', at: [13.6, 7.0], rotY: -Q },
+        { asset: 'bathroom-sink', at: [11.6, 7.55], rotY: Math.PI },
+        { asset: 'trash-bin', at: [10.3, 6.5] },
       ],
-      stairs: [{ id: 'escalera', at: [5.5, 6.9], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
+      stairs: [{ id: 'escalera', at: [5.7, 7.05], rotY: Q, run: 3.8, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
     {
       id: 'alta',
@@ -1772,7 +1880,7 @@ export const conceptStore: TemplateDefinition = {
         ...row('coat-rack', [11.2, 4.4], [13.4, 4.4], 3),
         { asset: 'office-table', at: [12.9, 6.9] },
         { asset: 'office-chair', at: [12.9, 6.1], rotY: Math.PI },
-        { asset: 'computer', at: [12.9, 6.9], y: 0.78 },
+        { asset: 'computer', at: [12.9, 6.9], y: 0.76 },
         { asset: 'dresser', at: [13.6, 5.5], rotY: -Q },
         { asset: 'indoor-plant', at: [10.2, 7.4] },
         { asset: 'floor-lamp', at: [10.3, 0.7] },
@@ -1794,7 +1902,7 @@ const DRAWERS = { type: 'drawer', drawerCount: 3 } as const
 const GLASS_LOW = { type: 'door', doorType: 'glass', shelfCount: 3 } as const
 
 const interiorTables = grid('dining-table', [1.4, 2.0], 2, 3, [2.0, 2.6])
-const terraceTables = grid('dining-table', [2.0, 10.4], 3, 2, [3.6, 1.9])
+const terraceTables = grid('dining-table', [2.0, 10.2], 3, 2, [3.6, 1.7])
 const chairsAround = (tables: ItemDef[], dx: number): ItemDef[] =>
   tables.flatMap((t) => [
     { asset: 'dining-chair', at: [t.at[0] - dx, t.at[1]] as [number, number], rotY: Q },
@@ -1833,7 +1941,7 @@ export const cafe: TemplateDefinition = {
       openings: [
         { id: 'puerta-salon', type: 'door', wall: 'p-s', at: 3, width: 1.6, height: 2.2 },
         { id: 'vidriera', type: 'window', wall: 'p-s', at: 5.6, width: 3, height: 2.2, sill: 0.4 },
-        { id: 'acceso', type: 'door', wall: 't-w', at: 2, width: 1.4 },
+        { id: 'acceso', type: 'door', wall: 't-w', at: 2, width: 1.4, height: 1 },
         { id: 'ventana-oeste', type: 'window', wall: 'p-w', at: 6.5, width: 2.2 },
         { id: 'ventana-norte', type: 'window', wall: 'p-n', at: 1.6, width: 1.6 },
         { id: 'puerta-cocina', type: 'door', wall: 'div', at: 2, width: 1 },
@@ -1864,13 +1972,13 @@ export const cafe: TemplateDefinition = {
         { asset: 'stove', at: [11.5, 0.6] },
         { asset: 'hood', at: [11.5, 0.6], y: 1.9 },
         { asset: 'fridge', at: [11.5, 2.2], rotY: -Q },
-        { asset: 'toilet', at: [11.5, 5.7] },
-        { asset: 'bathroom-sink', at: [9.0, 5.7] },
+        { asset: 'toilet', at: [11.6, 5.2], rotY: -Q },
+        { asset: 'bathroom-sink', at: [9.6, 6.05], rotY: Math.PI },
         ...terraceTables,
         ...chairsAround(terraceTables, 0.8),
-        { asset: 'patio-umbrella', at: [2.0, 10.4] },
-        { asset: 'patio-umbrella', at: [9.2, 10.4] },
-        ...row('indoor-plant', [0.6, 12.4], [11.4, 12.4], 6),
+        { asset: 'patio-umbrella', at: [2.0, 10.2] },
+        { asset: 'patio-umbrella', at: [9.2, 10.2] },
+        ...row('indoor-plant', [0.6, 12.7], [11.4, 12.7], 6),
         { asset: 'palm', at: [0.8, 9.8] },
         { asset: 'palm', at: [11.2, 9.8] },
       ],
@@ -1977,9 +2085,9 @@ export const supermercado: TemplateDefinition = {
         { asset: 'fridge', at: [16.4, 3.6] },
         { asset: 'office-table', at: [14.2, 10.1] },
         { asset: 'office-chair', at: [14.2, 9.3], rotY: Math.PI },
-        { asset: 'computer', at: [14.2, 10.1], y: 0.78 },
-        { asset: 'toilet', at: [17.3, 9.2] },
-        { asset: 'bathroom-sink', at: [16.0, 10.4] },
+        { asset: 'computer', at: [14.2, 10.1], y: 0.76 },
+        { asset: 'toilet', at: [17.5, 9.3], rotY: -Q },
+        { asset: 'bathroom-sink', at: [16.6, 10.6], rotY: Math.PI },
         ...row('indoor-plant', [0.6, 8.6], [0.6, 9.4], 2),
       ],
     },
@@ -2031,7 +2139,7 @@ export const loft: TemplateDefinition = {
         { id: 'puerta-estudio', type: 'door', wall: 'div', at: 5, width: 0.9 },
       ],
       shelves: [
-        { id: 'biblioteca-estar', style: 'bookshelf', at: [7.6, 0.35], width: 1.8, depth: 0.4, height: 2.2, rows: 5, columns: 2, withBack: true },
+        { id: 'biblioteca-estar', style: 'bookshelf', at: [7.4, 0.35], width: 1.8, depth: 0.4, height: 2.2, rows: 5, columns: 2, withBack: true },
         { id: 'biblioteca-oeste', style: 'bookshelf', at: [0.35, 5.2], rotY: Q, width: 1.8, depth: 0.4, height: 2.2, rows: 5, columns: 2, withBack: true },
         { id: 'biblioteca-estudio', style: 'bookshelf', at: [11.65, 5.0], rotY: -Q, width: 2, depth: 0.4, height: 2.1, rows: 5, columns: 2, withBack: true },
         { id: 'repisa-cocina', style: 'wall-shelf', at: [2.6, 0.23], y: 1.5, width: 1.8, depth: 0.25, height: 0.5, rows: 2 },
@@ -2054,18 +2162,18 @@ export const loft: TemplateDefinition = {
         { asset: 'coffee-table', at: [6.1, 3.6] },
         { asset: 'rectangular-carpet', at: [6.3, 3.6] },
         { asset: 'tv-stand', at: [4.9, 5.3], rotY: Math.PI },
-        { asset: 'floor-lamp', at: [7.9, 5.6] },
+        { asset: 'floor-lamp', at: [7.9, 4.7] },
         { asset: 'indoor-plant', at: [0.6, 6.4] },
-        { asset: 'bathtub', at: [11.0, 0.9] },
-        { asset: 'toilet', at: [9.1, 1.0] },
-        { asset: 'bathroom-sink', at: [9.6, 2.5] },
+        { asset: 'bathtub', at: [10.8, 0.9] },
+        { asset: 'toilet', at: [11.6, 1.9], rotY: -Q },
+        { asset: 'bathroom-sink', at: [10.0, 2.55], rotY: Math.PI },
         { asset: 'office-table', at: [10.4, 6.2] },
         { asset: 'office-chair', at: [10.4, 5.5], rotY: Math.PI },
-        { asset: 'computer', at: [10.4, 6.2], y: 0.78 },
+        { asset: 'computer', at: [10.4, 6.2], y: 0.76 },
         { asset: 'indoor-plant', at: [9.0, 6.5] },
         { asset: 'rectangular-carpet', at: [10.3, 4.4] },
       ],
-      stairs: [{ id: 'escalera', at: [4.6, 6.2], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
+      stairs: [{ id: 'escalera', at: [4.7, 6.2], rotY: Q, run: 3.8, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
     {
       id: 'alta',
@@ -2135,7 +2243,7 @@ export const TEMPLATES: TemplateInfo[] = TEMPLATE_DEFINITIONS.map((d) => ({
   summary: d.summary,
   areaM2: definitionArea(d),
   levels: d.levels.length,
-  thumbnail: `/templates/${d.id}.svg`,
+  thumbnail: `/templates/${d.id}.jpg`,
   file: `/templates/${d.id}.json`,
 }))
 
@@ -2212,7 +2320,7 @@ Expected: PASS. Si una definición falla (pieza fuera de un ambiente, abertura p
 Create `apps/web/test/template-files.test.ts`:
 
 ```ts
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { SCENE_MAX_BYTES, SceneEnvelopeSchema } from '@interiores/contract'
 import { describe, expect, it } from 'vitest'
@@ -2224,9 +2332,10 @@ const publicPath = (p: string) => fileURLToPath(new URL(`../public${p}`, import.
 describe.each(TEMPLATE_DEFINITIONS.map((d) => [d.id, d] as const))('plantilla %s (archivo generado)', (id, def) => {
   const text = existsSync(file(`${id}.json`)) ? readFileSync(file(`${id}.json`), 'utf8') : ''
 
-  it('existen el JSON y la miniatura', () => {
+  it('existen el JSON y la captura en 3D que se muestra en la tarjeta', () => {
     expect(text.length, `falta public/templates/${id}.json: corre pnpm --filter @interiores/web templates:build`).toBeGreaterThan(0)
-    expect(existsSync(file(`${id}.svg`))).toBe(true)
+    expect(existsSync(file(`${id}.jpg`)), `falta la captura public/templates/${id}.jpg: corre pnpm --filter @interiores/web templates:thumbs`).toBe(true)
+    expect(statSync(file(`${id}.jpg`)).size, 'la captura parece vacía').toBeGreaterThan(20_000)
   })
 
   it('es un SceneEnvelope válido que cabe en 5 MB', () => {
@@ -2270,7 +2379,7 @@ Expected: FAIL — `falta public/templates/concept-store.json`. Pegar en el PR.
 Create `apps/web/scripts/build-templates.ts`:
 
 ```ts
-// Genera public/templates/<id>.json (escena de Pascal) y <id>.svg (plano) desde las definiciones.
+// Genera public/templates/<id>.json (escena de Pascal) desde las definiciones. Las capturas .jpg salen de `templates:thumbs`.
 //   tsx scripts/build-templates.ts           escribe los archivos
 //   tsx scripts/build-templates.ts --check   falla si los archivos commiteados no coinciden con las definiciones
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -2282,7 +2391,6 @@ import manifest from '../src/editor/local-items.json' with { type: 'json' }
 import { localizeCatalogItem } from '../src/editor/catalog'
 import { type AssetLike, buildScene } from '../src/editor/templates/scene-builder'
 import { TEMPLATE_DEFINITIONS } from '../src/lib/templates'
-import { renderTemplateThumbnail } from '../src/lib/templates/thumbnail'
 
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public/templates')
 const check = process.argv.includes('--check')
@@ -2299,7 +2407,6 @@ for (const def of TEMPLATE_DEFINITIONS) {
   const envelope = { schemaVersion: SCHEMA_VERSION, pascal: { core: PASCAL_CORE_VERSION }, graph: buildScene(def, assets) }
   const files: [string, string][] = [
     [`${def.id}.json`, `${JSON.stringify(envelope, null, 1)}\n`],
-    [`${def.id}.svg`, renderTemplateThumbnail(def)],
   ]
   for (const [name, content] of files) {
     const path = join(outDir, name)
@@ -2439,6 +2546,14 @@ describe('createFromTemplate', () => {
     expect(api.createProject).not.toHaveBeenCalled()
   })
 
+  it('mide el límite de 5 MB en bytes y no en caracteres', async () => {
+    const api = fakeApi()
+    const big = 'é'.repeat(3_000_000) // 3 millones de caracteres, 6 MB en UTF-8
+    const fetchImpl = vi.fn(async () => new Response(big, { status: 200 })) as unknown as typeof fetch
+    await expect(createFromTemplate(api, { name: 'x', kind: 'comercio', templateId: 'cafe' }, fetchImpl)).rejects.toThrow('5 MB')
+    expect(api.createProject).not.toHaveBeenCalled()
+  })
+
   it('rechaza una plantilla con formato inválido antes de crear nada', async () => {
     const api = fakeApi()
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ schemaVersion: 9 }), { status: 200 })) as unknown as typeof fetch
@@ -2491,8 +2606,9 @@ import {
 } from '@interiores/contract'
 import type { ApiClient } from '../api/client'
 import { templateById } from './index'
+import { TemplateError } from './template-error'
 
-export class TemplateError extends Error {}
+export { TemplateError }
 
 export type CreateFromTemplateResult = {
   project: ProjectCreated
@@ -2518,7 +2634,7 @@ async function loadTemplate(templateId: string, fetchImpl: typeof fetch): Promis
   }
   if (!response.ok) throw new TemplateError('No pudimos cargar la plantilla. Inténtalo de nuevo en unos segundos.')
   const text = await response.text()
-  if (text.length > SCENE_MAX_BYTES) throw new TemplateError('La plantilla supera el límite de 5 MB.')
+  if (new TextEncoder().encode(text).length > SCENE_MAX_BYTES) throw new TemplateError('La plantilla supera el límite de 5 MB.')
   let json: unknown
   try {
     json = JSON.parse(text)
@@ -2571,9 +2687,12 @@ Create `apps/web/src/components/TemplatePicker.tsx`:
 'use client'
 
 import type { ProjectKind } from '@interiores/contract'
+import { Check } from 'lucide-react'
 import { templatesForKind } from '@/lib/templates'
 
 type Props = { kind: ProjectKind; value: string | null; onChange: (id: string | null) => void }
+
+const CARD = 'flex cursor-pointer rounded-xl p-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary'
 
 /** Tarjetas de plantilla (mínimas; el diseño final llega con el spec de interfaz). */
 export function TemplatePicker({ kind, value, onChange }: Props) {
@@ -2583,20 +2702,26 @@ export function TemplatePicker({ kind, value, onChange }: Props) {
       <legend className="mb-1 text-sm font-medium">Plantilla</legend>
       <div className="grid gap-3 sm:grid-cols-2">
         {templates.map((t) => (
-          <label key={t.id} className={`flex cursor-pointer flex-col gap-2 rounded-xl p-3 ${value === t.id ? 'bg-primary/10' : 'bg-secondary'}`}>
+          <label key={t.id} className={`${CARD} flex-col gap-2 ${value === t.id ? 'bg-primary/10' : 'bg-secondary'}`}>
             <input checked={value === t.id} className="sr-only" name="plantilla" onChange={() => onChange(t.id)} type="radio" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img alt="" className="w-full rounded-lg" height={160} src={t.thumbnail} width={240} />
-            <span className="font-medium">{t.name}</span>
+            <img alt="" className="aspect-[3/2] w-full rounded-lg object-cover" height={400} src={t.thumbnail} width={600} />
+            <span className="flex items-center gap-1 font-medium">
+              {value === t.id && <Check aria-hidden size={16} />}
+              {t.name}
+            </span>
             <span className="text-xs text-muted-foreground">
               {t.areaM2} m² · {t.levels > 1 ? `${t.levels} niveles · ` : ''}
               {t.summary}
             </span>
           </label>
         ))}
-        <label className={`flex cursor-pointer flex-col justify-center gap-1 rounded-xl p-3 ${value === null ? 'bg-primary/10' : 'bg-secondary'}`}>
+        <label className={`${CARD} flex-col justify-center gap-1 ${value === null ? 'bg-primary/10' : 'bg-secondary'}`}>
           <input checked={value === null} className="sr-only" name="plantilla" onChange={() => onChange(null)} type="radio" />
-          <span className="font-medium">En blanco</span>
+          <span className="flex items-center gap-1 font-medium">
+            {value === null && <Check aria-hidden size={16} />}
+            En blanco
+          </span>
           <span className="text-xs text-muted-foreground">Empieza desde cero con una escena vacía.</span>
         </label>
       </div>
@@ -2711,6 +2836,12 @@ function expected(id: string): Counts {
   return total
 }
 
+/** Espera a que la red se calme (modelos y texturas) y da una pausa corta: el editor sigue pidiendo cosas un instante después. */
+async function settle(page: Page) {
+  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => undefined)
+  await page.waitForTimeout(1500)
+}
+
 /** Respuestas 4xx/5xx de modelos, texturas y plantillas (lo que rompería el criterio 5 del spec). */
 function watchAssetFailures(page: Page): string[] {
   const failed: string[] = []
@@ -2737,15 +2868,15 @@ test('crear desde "Concept store" y recargar deja los mismos niveles, ambientes 
   expect(want.level).toBe(2)
   await expect.poll(async () => (await counts(page)).zone).toBe(want.zone)
   const before = await counts(page)
-  for (const type of ['level', 'wall', 'item', 'door', 'window', 'stair'] as const) expect(before[type], type).toBe(want[type])
+  for (const type of Object.keys(want)) expect(before[type], type).toBe(want[type])
 
-  await page.waitForTimeout(6000) // deja que carguen las texturas y los modelos
+  await settle(page)
   await page.reload()
   await ready(page)
   await expect.poll(async () => (await counts(page)).zone).toBe(want.zone)
   const after = await counts(page)
-  for (const type of ['level', 'zone', 'item', 'stair'] as const) expect(after[type], type).toBe(want[type])
-  await page.waitForTimeout(6000)
+  for (const type of Object.keys(want)) expect(after[type], type).toBe(want[type])
+  await settle(page)
   expect(failed).toEqual([])
 })
 
@@ -2761,7 +2892,7 @@ test('las cuatro plantillas se abren sin errores ni texturas rotas y dejan una c
     ['vivienda', 'Loft', 'loft'],
   ] as const) {
     await createFrom(page, kind, name)
-    await page.waitForTimeout(6000)
+    await settle(page)
     await page.screenshot({ path: `test-results/plantillas/${file}.png` })
   }
   expect(errors).toEqual([])

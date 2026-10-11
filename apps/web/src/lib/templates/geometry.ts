@@ -1,9 +1,9 @@
-import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, TemplateDefinition, WallDef } from './types'
+import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, StairDef, TemplateDefinition, WallDef } from './types'
 
 const round = (n: number) => Math.round(n * 1000) / 1000
 
-/** Altura (y) de la mesada de un gabinete bajo: losa 0,05 + zócalo 0,10 + cuerpo 0,80 + mesada 0,02. Para apoyar piezas encima. */
-export const COUNTER_Y = 0.97
+/** Altura (y) de la mesada de un gabinete bajo medida desde su base: zócalo 0,10 + cuerpo 0,80 + mesada 0,02. Para apoyar piezas encima. */
+export const COUNTER_Y = 0.92
 
 /** Cuatro muros de un rectángulo: `-n` (arriba), `-e`, `-s` (abajo) y `-w`; todos van hacia +x o +z. */
 export function perimeter(prefix: string, x0: number, z0: number, x1: number, z1: number): WallDef[] {
@@ -65,6 +65,27 @@ export function footprint(at: Pt, width: number, depth: number, rotY = 0): Pt[] 
     round(at[1] + (-s * kx * width) / 2 + (c * kz * depth) / 2),
   ]
   return [corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)]
+}
+
+export const DEFAULT_STAIR_RUN = 3
+
+/** Medidas por defecto de las aberturas (las usan el constructor y el validador). */
+export const DOOR_HEIGHT = 2.1
+export const WINDOW_HEIGHT = 1.2
+export const WINDOW_SILL = 0.9
+export const DEFAULT_LEVEL_HEIGHT = 2.5
+
+/** Punto donde la escalera llega al piso de arriba (el pie más `run` metros hacia donde mira `rotY`). */
+export function stairEnd(stair: Pick<StairDef, 'at' | 'rotY' | 'run'>): Pt {
+  const run = stair.run ?? DEFAULT_STAIR_RUN
+  return [round(stair.at[0] + Math.sin(stair.rotY) * run), round(stair.at[1] + Math.cos(stair.rotY) * run)]
+}
+
+/** Base de la escalera en planta: un rectángulo `width × run` entre el pie y la llegada. */
+export function stairFootprint(stair: Pick<StairDef, 'at' | 'rotY' | 'run' | 'width'>): Pt[] {
+  const run = stair.run ?? DEFAULT_STAIR_RUN
+  const center: Pt = [stair.at[0] + (Math.sin(stair.rotY) * run) / 2, stair.at[1] + (Math.cos(stair.rotY) * run) / 2]
+  return footprint(center, stair.width, run, stair.rotY)
 }
 
 export function roomArea(room: RoomDef): number {

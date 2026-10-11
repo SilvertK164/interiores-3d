@@ -1,7 +1,9 @@
+import { TemplateError } from '../templates/template-error'
 import { ApiError } from './client'
 
 /** Única capa que traduce errores técnicos a mensajes para personas. */
 export function friendlyMessage(err: unknown): string {
+  if (err instanceof TemplateError) return err.message
   if (!(err instanceof ApiError)) return 'Algo salió mal. Inténtalo de nuevo.'
   switch (err.status) {
     case 0:
