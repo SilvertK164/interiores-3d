@@ -12,7 +12,7 @@ Empezar por [`ESTADO.md`](ESTADO.md). Los demás documentos se abren solo cuando
 | [`investigacion-renders-exportaciones-diseno.md`](investigacion-renders-exportaciones-diseno.md) | Render con IA, comparativa gratuita, PDF/DXF/IFC | Al construir render y exportar |
 | [`seguridad-claves-byok.md`](seguridad-claves-byok.md) | Diseño seguro de claves de usuario | Al construir integraciones |
 | [`inventario-pascal-herramientas.md`](inventario-pascal-herramientas.md) | Qué hace Pascal, vistas, modos, parámetros, 3D, móvil | Al diseñar o integrar el editor |
-| `design/` | Capturas reales de Pascal en `assets/`. El archivo `interiores.pen` es **local y no se versiona** | Al diseñar o implementar la interfaz |
+| `design/` y [`docs/design/`](design/README.md) | 23 capturas de las pantallas (PNG) y capturas reales de Pascal en `design/assets/`. El archivo `interiores.pen` es **local y no se versiona** | Al diseñar o implementar la interfaz |
 
 ## Convenciones
 - Idioma: castellano; commits `tipo(área): descripción`.
