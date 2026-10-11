@@ -112,8 +112,8 @@ Create `package.json`:
   "packageManager": "pnpm@11.2.2",
   "engines": { "node": ">=22.13" },
   "scripts": {
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test && vitest run",
     "build": "pnpm -r --if-present build",
@@ -164,13 +164,15 @@ Create `biome.json`:
 {
   "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "files": {
-    "includes": ["**", "!**/dist", "!**/.next", "!**/node_modules", "!apps/web/public", "!**/*.css", "!docs", "!design", "!supabase/.temp", "!pnpm-lock.yaml"]
+    "includes": ["**", "!!**/node_modules", "!!**/dist", "!!**/.next", "!!apps/web/public", "!**/*.css", "!docs", "!design", "!supabase/.temp", "!pnpm-lock.yaml"]
   },
   "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
   "javascript": { "formatter": { "quoteStyle": "single", "semicolons": "asNeeded" } },
-  "linter": { "enabled": true, "rules": { "recommended": true } }
+  "linter": { "enabled": true }
 }
 ```
+
+Nota: `!!` (doble signo) saca las carpetas pesadas también del indexado de Biome; con un solo `!` `biome` recorre `node_modules` y `public/` y tarda minutos. `pnpm lint` revisa reglas; el formato se aplica con `pnpm format` (no bloquea `verify`).
 
 Create `.nvmrc`:
 
@@ -3002,7 +3004,7 @@ export type ApiClient = ReturnType<typeof createApiClient>
 Create `apps/web/src/lib/api/errors.ts`:
 
 ```ts
-import { ApiError } from './client.js'
+import { ApiError } from './client'
 
 /** Única capa que traduce errores técnicos a mensajes para personas. */
 export function friendlyMessage(err: unknown): string {
