@@ -60,4 +60,21 @@ describe('createApiClient', () => {
     expect(err).toBeInstanceOf(ApiError)
     expect(err.status).toBe(0)
   })
+
+  it('saveScene con keepalive lo pasa a fetch cuando la escena es chica', async () => {
+    const fetchImpl = vi.fn(async () => json(200, { version: 3 }))
+    await clientWith(fetchImpl as unknown as typeof fetch).saveScene(ID, emptyEnvelope(), 2, { keepalive: true })
+    const [, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit]
+    expect(init.keepalive).toBe(true)
+  })
+
+  it('no usa keepalive si no se pide o si la escena pasa de 60 KB (fetch la rechazaría)', async () => {
+    const fetchImpl = vi.fn(async () => json(200, { version: 3 }))
+    const client = clientWith(fetchImpl as unknown as typeof fetch)
+    await client.saveScene(ID, emptyEnvelope(), 2)
+    const big = { ...emptyEnvelope(), graph: { nodes: { x: 'a'.repeat(70_000) }, rootNodeIds: [] } }
+    await client.saveScene(ID, big, 3, { keepalive: true })
+    const flags = fetchImpl.mock.calls.map((c) => (c as unknown as [string, RequestInit])[1].keepalive)
+    expect(flags).toEqual([undefined, undefined])
+  })
 })

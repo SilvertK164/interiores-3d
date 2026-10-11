@@ -71,10 +71,10 @@ describe('createSceneSaver', () => {
 
   it('un 409 detiene el autoguardado y conserva lo local', async () => {
     const { saver, calls, statuses } = setup([{ kind: 'conflict' }])
-    saver.save({ n: 1 })
+    saver.save({ n: 1 }).catch(() => {})
     await vi.advanceTimersByTimeAsync(2000)
     expect(statuses.at(-1)).toBe('conflict')
-    saver.save({ n: 2 })
+    saver.save({ n: 2 }).catch(() => {})
     await vi.advanceTimersByTimeAsync(10_000)
     expect(calls).toHaveLength(1)
     expect(saver.status).toBe('conflict')
@@ -82,7 +82,7 @@ describe('createSceneSaver', () => {
 
   it('un 401 (sesión vencida) detiene el autoguardado sin reintentar en bucle', async () => {
     const { saver, calls, statuses } = setup([{ kind: 'unauthorized' }])
-    saver.save({ n: 1 })
+    saver.save({ n: 1 }).catch(() => {})
     await vi.advanceTimersByTimeAsync(2000)
     await vi.advanceTimersByTimeAsync(60_000)
     expect(calls).toHaveLength(1)
@@ -111,5 +111,97 @@ describe('createSceneSaver', () => {
     const { saver, calls } = setup([{ kind: 'ok', version: 2 }])
     await saver.flushNow({ n: 7 })
     expect(calls).toEqual([{ payload: { n: 7 }, version: 1 }])
+  })
+})
+
+describe('createSceneSaver — cierre de la página, sesión y rechazos', () => {
+  it('flushNow con un guardado en vuelo envía lo último apenas termina ese vuelo, sin esperar los 2 s', async () => {
+    let release: (o: SaveOutcome) => void = () => {}
+    const calls: Payload[] = []
+    const saver = createSceneSaver<Payload>({
+      initialVersion: 1,
+      put: (payload) => {
+        calls.push(payload)
+        if (calls.length === 1) {
+          return new Promise<SaveOutcome>((r) => {
+            release = r
+          })
+        }
+        return Promise.resolve<SaveOutcome>({ kind: 'ok', version: 3 })
+      },
+    })
+    void saver.save({ n: 1 })
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(calls).toEqual([{ n: 1 }])
+    void saver.flushNow({ n: 2 })
+    release({ kind: 'ok', version: 2 })
+    await vi.advanceTimersByTimeAsync(10)
+    expect(calls).toEqual([{ n: 1 }, { n: 2 }])
+  })
+
+  it('solo el guardado de cierre de página usa keepalive', async () => {
+    const flags: boolean[] = []
+    const saver = createSceneSaver<Payload>({
+      initialVersion: 1,
+      put: async (_payload, _version, opts) => {
+        flags.push(opts.keepalive)
+        return { kind: 'ok', version: flags.length + 1 }
+      },
+    })
+    void saver.save({ n: 1 })
+    await vi.advanceTimersByTimeAsync(2000)
+    await saver.flushNow({ n: 2 })
+    expect(flags).toEqual([false, true])
+  })
+
+  it('guardar con el guardador en pausa rechaza la promesa: Pascal no debe marcar la escena como guardada', async () => {
+    const { saver } = setup([{ kind: 'conflict' }])
+    saver.save({ n: 1 }).catch(() => {})
+    await vi.advanceTimersByTimeAsync(2000)
+    await expect(saver.save({ n: 2 })).rejects.toThrow('versión más nueva')
+  })
+
+  it('resume() tras un 401 reenvía lo pendiente', async () => {
+    const { saver, calls, statuses } = setup([{ kind: 'unauthorized' }, { kind: 'ok', version: 2 }])
+    saver.save({ n: 1 }).catch(() => {})
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(calls).toHaveLength(1)
+    saver.resume()
+    await vi.advanceTimersByTimeAsync(10)
+    expect(calls).toEqual([
+      { payload: { n: 1 }, version: 1 },
+      { payload: { n: 1 }, version: 1 },
+    ])
+    expect(statuses.at(-1)).toBe('saved')
+  })
+
+  it('resume() no levanta la pausa de un conflicto (hay que recargar)', async () => {
+    const { saver, calls } = setup([{ kind: 'conflict' }, { kind: 'ok', version: 2 }])
+    saver.save({ n: 1 }).catch(() => {})
+    await vi.advanceTimersByTimeAsync(2000)
+    saver.resume()
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(calls).toHaveLength(1)
+    expect(saver.status).toBe('conflict')
+  })
+
+  it('un rechazo definitivo (413, 422, 404) no se reintenta y conserva el mensaje', async () => {
+    const seen: [SaverStatus, string | undefined][] = []
+    const message = 'La escena supera el límite de 5 MB y no se puede guardar.'
+    let calls = 0
+    const saver = createSceneSaver<Payload>({
+      initialVersion: 1,
+      onStatus: (s, detail) => seen.push([s, detail]),
+      put: async () => {
+        calls += 1
+        return { kind: 'rejected', message }
+      },
+    })
+    saver.save({ n: 1 }).catch(() => {})
+    await vi.advanceTimersByTimeAsync(2000)
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(calls).toBe(1)
+    expect(seen.at(-1)).toEqual(['rejected', message])
+    await expect(saver.save({ n: 2 })).rejects.toThrow('5 MB')
   })
 })

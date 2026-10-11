@@ -24,6 +24,16 @@ test('un muro dibujado sobrevive a recargar (criterio 3)', async ({ page }) => {
   expect(await wallCount(page)).toBe(before + 1)
 })
 
+test('recargar la página antes de que termine el autoguardado no pierde el muro (guardado de cierre con keepalive)', async ({ page }) => {
+  const url = await openNewProject(page, `E2E cierre ${Date.now()}`)
+  const before = await wallCount(page)
+  await addWall(page)
+  await page.reload() // dentro de los 2 s de debounce: solo el guardado de cierre puede salvar el muro
+  await page.waitForFunction(() => (window as unknown as { __e2e?: { ready(): boolean } }).__e2e?.ready())
+  expect(page.url()).toBe(url)
+  expect(await wallCount(page)).toBe(before + 1)
+})
+
 test('dos pestañas: la segunda en guardar recibe 409 y no pierde su trabajo (criterio 5)', async ({ browser, page }) => {
   const url = await openNewProject(page, `E2E conflicto ${Date.now()}`)
   const second = await (await browser.newContext({ storageState: 'e2e/.auth/state.json' })).newPage()

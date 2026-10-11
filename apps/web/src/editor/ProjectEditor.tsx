@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
+import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { type LocalItemsManifest, localizeCatalogItem } from './catalog'
 import { installE2eHooks } from './e2e-hooks'
@@ -25,6 +26,7 @@ type Phase = { kind: 'loading' } | { kind: 'ready'; name: string } | { kind: 'er
 export default function ProjectEditor({ projectId }: { projectId: string }) {
   const [phase, setPhase] = useState<Phase>({ kind: 'loading' })
   const [status, setStatus] = useState<SaverStatus>('idle')
+  const [detail, setDetail] = useState<string | undefined>()
   const [dismissed, setDismissed] = useState(false)
   const saver = useRef<SceneSaver<SceneGraph> | null>(null)
   const graphRef = useRef<SceneGraph | null>(null)
@@ -53,14 +55,21 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         if (cancelled) return
         saver.current = createSceneSaver<SceneGraph>({
           initialVersion: project.version,
-          onStatus: setStatus,
-          put: async (graph, version): Promise<SaveOutcome> => {
+          onStatus: (s, detail) => {
+            setStatus(s)
+            setDetail(detail)
+          },
+          put: async (graph, version, { keepalive }): Promise<SaveOutcome> => {
             try {
-              const res = await api.saveScene(projectId, toEnvelope(graph), version)
+              const res = await api.saveScene(projectId, toEnvelope(graph), version, { keepalive })
               return { kind: 'ok', version: res.version }
             } catch (err) {
               if (err instanceof ApiError && err.status === 409) return { kind: 'conflict' }
               if (err instanceof ApiError && err.status === 401) return { kind: 'unauthorized' }
+              // 404, 413 y 422 no se arreglan reintentando: se avisa con el mensaje accionable.
+              if (err instanceof ApiError && [404, 413, 422].includes(err.status)) {
+                return { kind: 'rejected', message: friendlyMessage(err) }
+              }
               return { kind: 'error', message: friendlyMessage(err) }
             }
           },
@@ -76,6 +85,14 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
       cancelled = true
     }
   }, [projectId])
+
+  // Al volver a ingresar (otra pestaña) o renovarse el token, el guardado pausado por sesión vencida se reanuda.
+  useEffect(() => {
+    const { data } = supabaseBrowser().auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') saver.current?.resume()
+    })
+    return () => data.subscription.unsubscribe()
+  }, [])
 
   const sidebarTabs = useMemo(
     () => [
@@ -94,7 +111,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
 
   return (
     <div className="relative h-screen w-screen">
-      <SaveBanner dismissed={dismissed} onKeepEditing={() => setDismissed(true)} status={status} />
+      <SaveBanner detail={detail} dismissed={dismissed} onKeepEditing={() => setDismissed(true)} status={status} />
       <Editor
         guardAgainstSceneWipe
         layoutVersion="v2"
