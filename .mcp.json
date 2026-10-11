@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "playwright": { "command": "npx", "args": ["@playwright/mcp@0.0.83"] },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=${SUPABASE_DEV_PROJECT_REF}&read_only=true"
+    }
+  }
+}

@@ -5,7 +5,7 @@ Diseñador de interiores 2D+3D (viviendas y comercios) — TP final IISAIA de Si
 ## Empezar por acá
 - **Leer `docs/ESTADO.md`** (decisiones, hecho, pendiente). Índice en `docs/README.md`.
 - No releer `docs/analisis-clases/*` completos: son consulta puntual (`grep` de títulos).
-- Todavía **no hay código de producto**: no hacer scaffolding hasta que el spec 1 esté aprobado y el plan escrito.
+- Plan vigente: `docs/superpowers/plans/2026-10-11-fundacion-y-persistencia.md`. Comando único: `pnpm verify`. Reglas por zona en `.claude/rules/` y en cada `apps/*/CLAUDE.md`.
 
 ## Flujo obligatorio (clase 05)
 brainstorming → spec en `docs/superpowers/specs/` → aprobación de ambas personas → `writing-plans` → rama `feature/*` → implementación con TDD (el test se ve en rojo primero) → code review → verificación con salida real → PR.
