@@ -1,0 +1,579 @@
+{
+  "ac-block": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "air-conditioner": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "air-conditioner-block": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "air-conditioning": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "alarm-keypad": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "ball": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "barbell": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "barbell-stand": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "basket-hoop": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "bathroom-sink": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "bathtub": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "bean-bag": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "bedside-table": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "books": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "bookshelf": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "bunkbed": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "bush": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "cactus": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "car-toy": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "ceiling-fan": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "ceiling-lamp": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "ceiling-light": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "circular-ceiling-light": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "closet": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "coat-rack": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "coffee-machine": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "coffee-table": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "column": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "computer": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "couch-medium": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "couch-small": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "cutting-board": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "desk": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "dining-chair": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "dining-table": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "door": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "door-bar": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "door-with-bar": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "doorway-front": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "double-bed": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "dresser": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "drying-rack": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "easel": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "electric-panel": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "ev-wall-charger": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "exercise-bike": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "exit-sign": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "fence": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "fir-tree": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "fire-alarm": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "fire-detector": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "fire-extinguisher": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "flat-screen-tv": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "floor-lamp": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "freezer": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "fridge": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "fruits": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "frying-pan": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "glass-door": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "guitar": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "hedge": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "high-fence": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "hood": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "hydrant": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "indoor-plant": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "iron": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "ironing-board": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "kettle": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "kitchen": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "kitchen-cabinet": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "kitchen-counter": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "kitchen-fridge": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "kitchen-shelf": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "kitchen-utensils": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "laundry-bag": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "livingroom-chair": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "lounge-chair": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "low-fence": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "medium-fence": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "microwave": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "office-chair": [
+    "floor-plan.svg",
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "office-table": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "outdoor-playhouse": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "palm": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "parking-spot": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "patio-umbrella": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "piano": [
+    "Fireplace_13.glb",
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "picture": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "pillar": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "pool-table": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "recessed-light": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "rectangular-carpet": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "rectangular-ceiling-light": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "rectangular-mirror": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "round-carpet": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "round-mirror": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "scooter": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "sewing-machine": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "shelf": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "shower": [
+    "model.glb"
+  ],
+  "shower-angle": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "shower-rug": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "shower-square": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "single-bed": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "sink-cabinet": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "skate": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "small-indoor-plant": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "smoke-detector": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "sofa": [
+    "floor-plan.svg",
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "sprinkler": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "stairs": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "stereo-speaker": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "stool": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "stove": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "sunbed": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "suspended-fireplace": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "table": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "table-lamp": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "television": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "tesla": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "thermostat": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "threadmill": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "toaster": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "toilet": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "toilet-brush": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "toilet-paper": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "toy": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "trash-bin": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "tree": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "tub": [
+    "model.glb"
+  ],
+  "tv-stand": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "wall-art-06": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "wall-sink": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "washing-machine": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-double": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-large": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-rectangle": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-round": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-simple": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-small": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-small-2": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window-square": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "window1-black-open-1731": [
+    "model.glb",
+    "thumbnail.webp"
+  ],
+  "wine-bottle": [
+    "model.glb",
+    "thumbnail.webp"
+  ]
+}

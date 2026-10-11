@@ -2570,7 +2570,7 @@ Create `apps/web/tsconfig.json`:
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": { "@/*": ["./src/*"] },
-    "types": ["node"]
+    "types": ["node", "react", "react-dom"]
   },
   "include": ["next-env.d.ts", "src", "app", "test", "e2e"],
   "exclude": ["node_modules"]
@@ -2700,15 +2700,12 @@ Create `apps/web/scripts/typecheck.mjs`:
 import { spawnSync } from 'node:child_process'
 
 const run = spawnSync('pnpm', ['exec', 'tsc', '--noEmit', '--pretty', 'false'], { encoding: 'utf8', shell: true })
-const errors = `${run.stdout}${run.stderr}`.split('
-').filter((l) => /\(\d+,\d+\): error TS\d+/.test(l))
+const errors = `${run.stdout}${run.stderr}`.split('\n').filter((l) => /\(\d+,\d+\): error TS\d+/.test(l))
 const own = errors.filter((l) => !l.includes('node_modules'))
 
 if (own.length > 0) {
-  console.error(own.join('
-'))
-  console.error(`
-${own.length} error(es) de tipos en archivos propios.`)
+  console.error(own.join('\n'))
+  console.error(`\n${own.length} error(es) de tipos en archivos propios.`)
   process.exit(1)
 }
 console.log(`Tipos OK (se ignoraron ${errors.length} error(es) internos de Pascal en node_modules).`)
@@ -3473,7 +3470,7 @@ describe('fronteras del editor (decisión D8)', () => {
     try {
       out = execFileSync(
         'git',
-        ['grep', '-l', '-E', "@pascal-app/|from 'three'|@react-three/", '--', '*.ts', '*.tsx', ':!tests/boundaries.test.ts'],
+        ['grep', '-l', '-E', "(from|import\\() *'(@pascal-app/|three'|@react-three/)", '--', '*.ts', '*.tsx', ':!tests/boundaries.test.ts'],
         { encoding: 'utf8' },
       )
     } catch (e) {
