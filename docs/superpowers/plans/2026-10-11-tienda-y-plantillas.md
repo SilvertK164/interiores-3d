@@ -881,7 +881,7 @@ import { definitionArea, perimeter } from '../src/lib/templates/geometry'
 import type { LevelDef, TemplateDefinition } from '../src/lib/templates/types'
 import { validateDefinition } from '../src/lib/templates/validate'
 
-const ASSETS = new Set(['kenney-cash-register', 'sofa'])
+const ASSETS = new Set(['cash-register', 'sofa'])
 const MATERIALS = new Set(['wood-hungarianparquet10', 'concrete-plaster', 'flooring-agedbrick'])
 
 function ground(): LevelDef {
@@ -899,7 +899,7 @@ function ground(): LevelDef {
       { id: 'vidriera', type: 'window', wall: 'p-s', at: 3.8, width: 1.4, sill: 0.5 },
       { id: 'interior', type: 'door', wall: 'int', at: 2, width: 0.9 },
     ],
-    items: [{ asset: 'kenney-cash-register', at: [1, 1] }],
+    items: [{ asset: 'cash-register', at: [1, 1] }],
     stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1, steps: 12, to: 'alta' }],
   }
 }
@@ -1138,7 +1138,7 @@ export function validateDefinition(def: TemplateDefinition, assetIds: ReadonlySe
   const levelIds = def.levels.map((l) => l.id)
   for (const id of new Set(duplicates(levelIds))) errors.push(`El id de nivel ${id} está repetido.`)
   if (def.levels.length === 0 || def.levels.every((l) => l.rooms.length === 0)) errors.push('La plantilla no tiene ambientes.')
-  def.levels.forEach((level, index) => checkLevel(level, levelIds, index, assetIds, materialIds, errors))
+  for (const [index, level] of def.levels.entries()) checkLevel(level, levelIds, index, assetIds, materialIds, errors)
   return errors
 }
 ```
@@ -1186,7 +1186,7 @@ const asset = (id: string, name: string, extra: object = {}) => ({
   ...extra,
 })
 const ASSETS = new Map([
-  ['kenney-cash-register', asset('kenney-cash-register', 'Caja registradora')],
+  ['cash-register', asset('cash-register', 'Caja registradora')],
   ['sofa', asset('sofa', 'Sofá')],
 ])
 
@@ -1216,8 +1216,8 @@ const def: TemplateDefinition = {
         { id: 'interior', type: 'door', wall: 'int', at: 2, width: 0.9 },
       ],
       items: [
-        { asset: 'kenney-cash-register', at: [1, 1], rotY: Math.PI },
-        { asset: 'kenney-cash-register', at: [2, 1], y: 0.78 },
+        { asset: 'cash-register', at: [1, 1], rotY: Math.PI },
+        { asset: 'cash-register', at: [2, 1], y: 0.78 },
       ],
       stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
@@ -1312,11 +1312,11 @@ describe('buildScene', () => {
   })
 
   it('las piezas llevan su descriptor, su altura sobre la losa y su giro', () => {
-    const [a, b] = byType('item').filter((i) => (i.asset as { id: string }).id === 'kenney-cash-register')
-    expect((a?.asset as { src: string }).src).toBe('/items/kenney-cash-register/model.glb')
-    expect(a?.position).toEqual([1, 0.05, 1])
-    expect((a?.rotation as number[])[1]).toBeCloseTo(Math.PI)
-    expect(b?.position).toEqual([2, 0.78, 1])
+    const [a, b] = byType('item').filter((i) => (i.asset as { id: string }).id === 'cash-register') as [N, N]
+    expect((a.asset as { src: string }).src).toBe('/items/cash-register/model.glb')
+    expect(a.position).toEqual([1, 0.05, 1])
+    expect((a.rotation as number[])[1]).toBeCloseTo(Math.PI)
+    expect(b.position).toEqual([2, 0.78, 1])
   })
 
   it('es determinista y cabe en un SceneEnvelope válido de mucho menos de 5 MB', () => {
