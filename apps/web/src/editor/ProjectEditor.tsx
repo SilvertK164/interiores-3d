@@ -10,6 +10,7 @@ import { friendlyMessage } from '@/lib/api/errors'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { type LocalItemsManifest, localizeCatalogItem } from './catalog'
+import { buildCommerceItems } from './commerce-catalog'
 import { installE2eHooks } from './e2e-hooks'
 import manifest from './local-items.json'
 import { SaveBanner } from './SaveBanner'
@@ -45,6 +46,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     () => CATALOG_ITEMS.flatMap((i) => localizeCatalogItem(i, manifest as LocalItemsManifest) ?? []),
     [],
   )
+  const commerceItems = useMemo(() => buildCommerceItems(items), [items])
 
   useEffect(() => {
     let cancelled = false
@@ -102,8 +104,14 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         icon: <span style={{ fontSize: 20 }}>🛋️</span>,
         component: () => <ItemsPanel items={items} showSourceFilter={false} showTagFilters={false} />,
       },
+      {
+        id: 'commerce',
+        label: 'Comercio',
+        icon: <span style={{ fontSize: 20 }}>🏪</span>,
+        component: () => <ItemsPanel items={commerceItems} showSourceFilter={false} showTagFilters={false} />,
+      },
     ],
-    [items],
+    [items, commerceItems],
   )
 
   if (phase.kind === 'loading') return <p className="p-6 text-muted-foreground">Abriendo tu proyecto…</p>
