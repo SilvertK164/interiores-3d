@@ -3,6 +3,7 @@
 import { loadPlugin } from '@pascal-app/core'
 import { CATALOG_ITEMS, Editor, ItemsPanel, type SceneGraph } from '@pascal-app/editor'
 import { builtinPlugin } from '@pascal-app/nodes'
+import { Sofa, Store } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
@@ -101,13 +102,13 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
       {
         id: 'items',
         label: 'Muebles',
-        icon: <span style={{ fontSize: 20 }}>🛋️</span>,
+        icon: <Sofa aria-hidden size={20} />,
         component: () => <ItemsPanel items={items} showSourceFilter={false} showTagFilters={false} />,
       },
       {
         id: 'commerce',
         label: 'Comercio',
-        icon: <span style={{ fontSize: 20 }}>🏪</span>,
+        icon: <Store aria-hidden size={20} />,
         component: () => <ItemsPanel items={commerceItems} showSourceFilter={false} showTagFilters={false} />,
       },
     ],
