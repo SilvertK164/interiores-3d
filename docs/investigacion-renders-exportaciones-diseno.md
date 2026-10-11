@@ -31,11 +31,24 @@
 | **FLUX.1 Kontext [pro]** (Black Forest Labs) | Edición por instrucción de una imagen (conserva composición) | US$ 0,04 (pro) / 0,08 (max), 1 crédito = US$ 0,01 | Precio oficial según la [página de precios de BFL](https://docs.eu.bfl.ai/quick_start/pricing); Replicate y fal difieren según la fuente |
 | **Gemini 3 Pro Image / 2.5 Flash Image** (Google) | Edición por instrucciones | Entre US$ 0,039 y 0,134 según el blog consultado | **[fuente externa]**, cifras inconsistentes ([comparativa](https://invideo.io/blog/ai-image-model-pricing/)); confirmar en la página de Google. Imagen 4 no sirve (no edita y se discontinúa el 17/08/2026) |
 | **Modelos de interiorismo en Replicate** (p. ej. [`rocketdigitalai/interior-design-sdxl`](https://replicate.com/rocketdigitalai/interior-design-sdxl)) | SDXL con ControlNet de profundidad + estructura, pensado para interiores | Se factura por segundos de GPU; sin cifra confiable | Probar: no encontramos documentación oficial de precio ni de latencia |
+| **Cloudflare Workers AI — FLUX.2 klein 4B / 9B y FLUX.2 dev** | Generación **y edición** en un solo modelo, hasta 4 imágenes de referencia (de 512 × 512 cada una); distribución por referencia, no ControlNet | **Oficial:** 10.000 neurons/día gratis (se reinicia 00:00 UTC); luego US$ 0,011 por 1.000 neurons. Con nuestras cuentas: klein 4B ≈ **US$ 0,0012** por imagen ≈ **91 gratis/día**; klein 9B ≈ US$ 0,017 ≈ 6 gratis/día; dev (25 pasos) ≈ US$ 0,046 ≈ 2 gratis/día | **[verificado]** en la [documentación de Cloudflare](https://developers.cloudflare.com/workers-ai/platform/pricing/) (act. 9/10/2026) y su [catálogo de modelos](https://developers.cloudflare.com/workers-ai/models/). Falta probar la fidelidad geométrica; la entrada de 512 × 512 es baja resolución. |
 | **Comerciales de interiorismo** (Rendair, Decor8, etc.) | Preservan geometría según su marketing | Planes propios | Afirmaciones del proveedor, no independientes |
 
-**Qué recomendamos hoy:** empezar con **Stability AI Control Structure** como candidato principal, porque su propósito documentado es conservar la estructura de la imagen de referencia, que es lo que más importa al comparar un render con el plano. Dejar **FLUX.1 Kontext [pro]** como alternativa y **Gemini** para variaciones de estilo. **Esto es una hipótesis**: ninguno de los criterios de fidelidad geométrica está comparado de forma independiente.
+**Niveles gratuitos reales [fuente externa, salvo Cloudflare]:**
+- **Cloudflare Workers AI:** cuota oficial y documentada (arriba). Es la única opción gratuita con documentación oficial verificada.
+- **Gemini (imagen):** los foros reportan que los modelos de imagen suelen mostrar límite 0 en el nivel gratuito y funcionan al activar facturación; un blog afirma 500 pedidos por día, pero advierte que las cuotas se recortaron en diciembre de 2025. **No confiar en el gratis**: mirar la cuota en AI Studio ([foro](https://discuss.google.dev/t/image-generation-at-free-tier-possible-or-not/322034)).
+- **Stability AI:** 25 créditos únicos al registrarse, luego US$ 0,01 por crédito. No encontramos la página oficial del endpoint *Control Structure* con la búsqueda; recordamos que existe (`/v2beta/stable-image/control/structure`), pero **hay que confirmarlo** en la referencia de API oficial.
+- **FLUX.1 Kontext (BFL):** sin nivel gratuito publicado; el playground puede dar un saldo inicial pequeño.
 
-**Estado:** el proveedor **no está elegido**. El equipo va a compartir el material que reunió Victoria; la comparativa lo incluye como candidato antes de decidir.
+**Qué recomendamos hoy (hipótesis a validar con la comparativa):**
+1. **Primera prueba: Cloudflare FLUX.2 klein 4B**, porque es gratis dentro de la cuota, tiene documentación oficial, una sola credencial en el servidor y cuesta ≈ US$ 0,001 después. Se prueba también la 9B si la 4B no alcanza.
+2. **Referencia de fidelidad geométrica: Stability Control Structure** (usa estructura/profundidad como señal de control).
+3. **Referencia de calidad de edición: FLUX.1 Kontext [pro]** (US$ 0,04).
+4. Gemini solo si la cuota de AI Studio muestra que la imagen está habilitada.
+
+Con una cuota de 5 renders por usuario por día, 100 renders de prueba y demo cuestan del orden de US$ 0,1 con klein 4B o US$ 3–4 con las opciones de pago. **El costo no es el riesgo: lo son la fidelidad geométrica y la privacidad** de las capturas.
+
+**Estado:** el proveedor **no está elegido**. La tabla de Victoria (sección 4) resultó ser de modelos de *visión* (analizan imágenes) y el equipo confirmó que lo que quiere es **render realista**, así que esa tabla no entra en esta decisión. La comparativa se hace con modelos de generación/edición de imagen.
 
 ### Protocolo para decidir con evidencia (30–45 min)
 Tomar 3 capturas del editor (una vivienda, un comercio y un cuarto con muebles) y correr cada candidato —incluida la API que investigó Victoria— con el mismo prompt. Puntuar de 1 a 5: fidelidad de muros y aberturas, fidelidad de muebles, realismo de luz y materiales, tiempo, costo. Guardar capturas y tabla: es la evidencia de la decisión para *Qué decidí yo*.
@@ -47,6 +60,22 @@ Tomar 3 capturas del editor (una vivienda, un comercio y un cuarto con muebles) 
 - Subida de la captura y resultado en Supabase Storage con URL firmada y vencimiento.
 - Prompt y capturas son datos del usuario: no incluir información personal en el prompt.
 - Estimación de trabajo del slice: **3–5 h** si la API colabora **[inferencia]**.
+
+### ¿Quién aporta la clave de la API de render? (servidor vs. cliente "trae su propia clave")
+
+| | **A. Clave del equipo en el servidor + cuota por usuario** | **B. Cada persona conecta su propia clave (BYOK)** |
+|---|---|---|
+| Experiencia | Un clic en "Renderizar". | La persona debe tener cuenta y clave en el proveedor y pegarla en Ajustes. |
+| Demo Day / corrector | **Funciona sin que nadie traiga nada.** | Quien evalúa no ve un render si no tiene una clave propia. |
+| Costo y abuso | Lo asume el equipo; se acota con cuota (p. ej. 5 por día) y límite de tamaño. | Lo asume cada persona; no hay abuso sobre la cuenta del equipo. |
+| Seguridad | Una clave, solo en `apps/api`. Superficie chica. | Hay que **guardar secretos de terceros**: cifrado en reposo (p. ej. Supabase Vault), RLS, no devolver nunca la clave al navegador, rotación y borrado. Más superficie de ataque. |
+| Proveedores | Uno (el elegido). | Varios, si se abstrae el proveedor. |
+| Trabajo | Bajo. | Un slice extra: tabla de integraciones, pantalla de ajustes, cifrado, validación de la clave y pruebas. |
+| Qué demuestra para el curso | Manejo de secretos y de costo en servidor (clase 06: credenciales y alcance). | Lo mismo, pero con más riesgo y más para defender. |
+
+**Recomendación:** **A**, con una interfaz `RenderProvider` en `apps/api` para poder cambiar de proveedor sin tocar el resto. BYOK queda como mejora futura documentada; si sobrara tiempo, la versión más segura es **transitoria**: la persona pega su clave, se usa en esa petición y **no se guarda**. Nunca llamar al proveedor desde el navegador con una clave: la mayoría no permite CORS y la clave quedaría expuesta a cualquier script de la página.
+
+**Sobre el costo de Cloudflare:** los US$ 5 por mes son el plan **Workers Paid**. Según la [página de precios](https://developers.cloudflare.com/workers-ai/platform/pricing/) (act. 9/10/2026), Workers AI está **incluido en el plan Workers Free** con 10.000 neurons por día sin cargo; lo único que ese plan no permite es superar la cuota. Aun así, si no quieren abrir cuenta ahí, los candidatos de pago cuestan centavos por imagen y alcanzan con un **prepago único** de pocos dólares (monto mínimo a confirmar en cada proveedor), no una suscripción.
 
 ## 3. Diseño de la interfaz con Pencil
 
