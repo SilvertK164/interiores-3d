@@ -48,7 +48,8 @@ export function buildApp(deps: Deps, options: BuildOptions = {}) {
       return reply.status(e.status).send(errorBody(e.code, e.message))
     }
     req.log.error({ err }, 'error no controlado')
-    return reply.status(500).send(errorBody(ERROR_CODES.internal, 'Ocurrió un error inesperado. Inténtalo de nuevo.'))
+    const e = errors.internal()
+    return reply.status(e.status).send(errorBody(e.code, e.message))
   })
 
   app.setNotFoundHandler((_req, reply) =>

@@ -23,6 +23,7 @@ export const errors = {
   tooLarge: () => new AppError(413, ERROR_CODES.tooLarge, 'La escena supera el límite de 5 MB.'),
   preconditionRequired: () =>
     new AppError(428, ERROR_CODES.preconditionRequired, 'Falta el encabezado If-Match con la versión que tienes abierta.'),
+  internal: () => new AppError(500, ERROR_CODES.internal, 'Ocurrió un error inesperado. Inténtalo de nuevo.'),
 }
 
 export function errorBody(code: string, message: string): ErrorBody {

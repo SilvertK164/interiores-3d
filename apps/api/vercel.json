@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "pnpm install --frozen-lockfile --filter @interiores/api...",
+  "buildCommand": "pnpm --filter @interiores/contract build",
+  "outputDirectory": "public",
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+}

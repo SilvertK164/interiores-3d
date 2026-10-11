@@ -10,6 +10,7 @@ coverage/
 .env
 .env.*
 !.env.example
+!.env.cloud.example
 .claude/settings.local.json
 supabase/.temp/
 

@@ -25,7 +25,7 @@ La guía supone que nunca viste el proyecto. Los comandos son de PowerShell y se
    pnpm lab:tp3
    ```
    Si todavía no hay clave de Gemini arranca igual: el análisis responde 503 y el botón de ejemplo del laboratorio sigue funcionando (ver «La clave de Gemini»). Tu pantalla original de TP3 queda disponible en http://localhost:8000, útil **para comparar** con lo que muestra el laboratorio.
-5. **Levantar nuestra web y abrir el laboratorio.** Hacen falta otras dos terminales (la API y la web) y la base local, que corre en Docker (ver «Docker Desktop»).
+5. **Levantar nuestra web y abrir el laboratorio.** Hacen falta otras dos terminales (la API y la web) y la base local, que corre en Docker (ver «Docker Desktop»; sin Docker, ver «Trabajar sin Docker»).
    ```powershell
    pnpm db:start                          # una vez: base local de Supabase
    pnpm db:env                            # una vez: escribe las variables locales
@@ -67,7 +67,18 @@ pnpm db:stop
 pnpm db:start
 ```
 
-**Más adelante.** Cuando exista la base de desarrollo en la nube, se podrá trabajar sin Docker pidiéndole las variables a Silvert.
+**Sin Docker.** Si no puedes correr Docker, mira «Trabajar sin Docker» más abajo.
+
+## Trabajar sin Docker
+
+Tu web y tu API pueden usar la base de **desarrollo en la nube** de Supabase en lugar de la local. Silvert te pasa por un canal privado dos valores (la URL del proyecto y su clave pública; nunca van en el repositorio ni en un chat de GitHub) y después:
+
+```powershell
+Copy-Item .env.cloud.example .env.cloud    # reemplaza los dos valores en .env.cloud (git lo ignora)
+pnpm db:env:cloud                          # escribe apps/api/.env y apps/web/.env.local
+```
+
+El resto del paso 5 sigue igual, sin `pnpm db:start`, `pnpm db:env` ni `pnpm db:seed` (las cuentas de prueba son solo para la base local: en la nube usa «Crear cuenta»). Qué no corre sin Docker, cómo volver a la base local y el detalle de cada paso están en [`docs/nube.md`](../docs/nube.md) (sección 4). Todavía **no se probó** contra una base en la nube: hasta que Silvert cree las cuentas, la base local sigue siendo el camino probado.
 
 ## La clave de Gemini (opcional)
 
