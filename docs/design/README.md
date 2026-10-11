@@ -22,8 +22,9 @@ Exportadas desde Pencil a escala 0,5. El archivo fuente `design/interiores.pen` 
 | [16-editar-menu-estructura-escritorio.png](16-editar-menu-estructura-escritorio.png) | Editar · Menú Estructura · Escritorio |
 | [17-editar-materiales-escritorio.png](17-editar-materiales-escritorio.png) | Editar · Materiales · Escritorio |
 | [18-renders-galeria-escritorio.png](18-renders-galeria-escritorio.png) | Renders · Galería · Escritorio |
-| [19-exportar-plano-escritorio.png](19-exportar-plano-escritorio.png) | Exportar plano · Escritorio |
+| [19-exportar-plano-a3-escritorio.png](19-exportar-plano-a3-escritorio.png) | Exportar plano · A3 (1:25 cabe) |
 | [20-compartir-escritorio.png](20-compartir-escritorio.png) | Compartir · Escritorio |
 | [21-estados-del-sistema-escritorio.png](21-estados-del-sistema-escritorio.png) | Estados del sistema · Escritorio |
 | [22-proyecto-3d-tablet.png](22-proyecto-3d-tablet.png) | Proyecto 3D · Tablet |
 | [23-subir-mueble-escritorio.png](23-subir-mueble-escritorio.png) | Subir mueble · Escritorio |
+| [24-exportar-plano-a4-escritorio.png](24-exportar-plano-a4-escritorio.png) | Exportar plano · A4 (1:25 no cabe, 1:50 sí) |
