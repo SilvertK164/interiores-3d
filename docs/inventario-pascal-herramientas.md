@@ -85,3 +85,43 @@ Atajos útiles verificados: `V` seleccionar, `X` borrar, `M` medir, `Z` ambiente
 2. Ocultar la barra de herramientas y el selector de vista de Pascal sin romper nada.
 3. Que la edición con la vista dividida funcione igual en escritorio.
 4. Qué ve una persona en el inspector de Pascal y si hace falta limitarlo.
+
+## 8. Vista 3D, vista dividida, móvil y recorrido (verificado el 2026-10-11)
+
+> Método: se montó el visor de Pascal en un spike con una escena real (`scene-19.json` del repo de Pascal, 3 niveles, 6 ambientes) amoblada con 24 muebles **del catálogo oficial**, y se capturó en 3D, 2D, dividida y en tamaño de celular. Las capturas están en `design/assets/` y se usan en el diseño como **referencia fiel**, no como arte inventado.
+
+### 8.1 Controles reales del visor 3D (`viewer-controls-bar` y `use-viewer`)
+
+| Grupo | Opciones de Pascal | Cómo lo mostramos |
+|---|---|---|
+| **Muros** | Altura completa · Cortados · Bajos (en el estado existe también "translúcido") | 3 chips: Completos · Cortados · Bajos |
+| **Cámara** | Perspectiva · Ortográfica (isométrica) · girar izquierda/derecha · vista superior | 2 chips: Perspectiva · Isométrica |
+| **Estilo** | Sólido (rápido, sin oclusión ambiental) · Realista (con oclusión ambiental) | 2 chips: Sólido · Realista |
+| **Niveles** | Apilados · Explotados · Uno solo · Manual | 3 chips: Juntos · Separados · Uno solo |
+| **Colores** | Arcilla · Blanco · Mono · Plano técnico | Fuera del primer alcance (va en "Estilos") |
+| **Tema de escena** | studio, paper, sunset, overcast, blueprint, mediterranean, twilight, night, verdant | Fuera del primer alcance (va en "Estilos") |
+| **Bordes y sombras** | Bordes: sin, suaves, fuertes · sombras sí/no | Fuera del primer alcance |
+| **Visibilidad** | Escaneos, guías | Solo guías, en "Más" |
+| **Recorrido** | Activar o desactivar | Botón "Recorrer en 3D" |
+
+Todo es estado de `useViewer` (`setWallMode`, `setCameraMode`, `setShading`, `setLevelMode`, `setSceneTheme`…), exportado por `@pascal-app/viewer`: nuestros controles pueden manejarlo sin usar su barra.
+
+### 8.2 Vista dividida
+- `ViewerStage` acepta `modes={['3d','2d','split']}` en cualquier combinación; con **un solo modo** oculta el selector; con `showSwitcher={false}` lo oculta aunque haya varios (así usamos el nuestro).
+- La vista **dividida pone el 3D a la izquierda y el 2D a la derecha**, con la cámara sincronizada. En 2D hay un selector de piso y controles de zoom propios.
+- El 2D real dibuja: ambientes en **colores pastel**, muros como línea oscura, símbolos de muebles y arcos de puertas, sobre una grilla clara, y se puede girar (brújula). Es compatible con nuestra paleta clara.
+
+### 8.3 Móvil
+- Pascal trae un **layout móvil propio** (`EditorLayoutMobile`): barra de pestañas inferior y una hoja inferior que se abre a 50 % o 66 % de la altura y **achica el visor** para previsualizar. El visor de solo lectura funciona en 375 × 812.
+- Decisión del equipo: en móvil y tablet se **abre, recorre, ve renders, exporta y comparte**; la edición es de escritorio.
+
+### 8.4 Recorrido (primera persona)
+- Usa **bloqueo de puntero** (mouse y teclado). El HUD de Pascal muestra el **nivel**, el **nombre del ambiente**, un punto central que se agranda sobre puertas y ventanas (se abren con `E`) y la salida con `Esc`.
+- En el código existe una entrada `joystick`: **por probar** si hay recorrido táctil real. El diseño móvil asume joystick virtual y botón "Salir".
+- El recorrido usa un nodo `spawn` (punto de partida); **por probar** cómo se comporta si no existe.
+
+### 8.5 Hallazgos que afectan al producto
+1. **Textos en inglés.** Los nombres de nivel ("Basement 1", "Ground floor", "Level 1") y varios textos del HUD ("to exit", "Click to resume") vienen de Pascal en inglés y no encontramos un sistema de idioma. Por eso los selectores de nivel, de vista y el HUD del recorrido son **nuestros** y en castellano.
+2. **La escena demo oficial no sirve para interiores** (es una casa con jardín, con puertas y ventanas como ítems). Usamos una escena de prueba del repo y le sumamos muebles del catálogo.
+3. **Dependencia externa del catálogo:** los GLB del catálogo salen del bucket de Pascal (ver la investigación); los renders de muestra usan fotos de stock de Pencil y están marcados como ilustrativos.
+4. **Resolución:** las capturas del panel son de ~700 px de ancho; en el diseño se ven algo suaves al ampliarlas. Para el Demo Day conviene generar capturas del editor real en pantalla completa.
