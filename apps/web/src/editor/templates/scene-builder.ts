@@ -1,11 +1,14 @@
 import type { SceneGraph } from '@interiores/contract'
 import {
   BuildingNode,
+  CabinetModuleNode,
+  CabinetNode,
   CeilingNode,
   DoorNode,
   ItemNode,
   LevelNode,
   MATERIAL_CATALOG,
+  ShelfNode,
   SiteNode,
   SlabNode,
   StairNode,
@@ -15,6 +18,7 @@ import {
   WindowNode,
   ZoneNode,
 } from '@pascal-app/core'
+import { cabinetWidth } from '../../lib/templates/geometry'
 import type { LevelDef, OpeningDef, TemplateDefinition } from '../../lib/templates/types'
 import { validateDefinition } from '../../lib/templates/validate'
 
@@ -41,6 +45,10 @@ const FALLBACK_THUMBNAIL = '/icons/couch.webp'
 const DOOR_HEIGHT = 2.1
 const WINDOW_HEIGHT = 1.2
 const WINDOW_SILL = 0.9
+
+const SHELF_NAMES = { 'wall-shelf': 'Repisa', bookshelf: 'Biblioteca', 'open-rack': 'Góndola', cubby: 'Exhibidor' } as const
+const BAR_LEDGE = { edge: 'back', height: 1.06, depth: 0.35 } as const
+const round3 = (n: number) => Math.round(n * 1000) / 1000
 
 const clean = (s: string) => s.replace(/[^a-z0-9]/g, '_')
 const lib = (id: string) => `library:${id}`
@@ -137,6 +145,70 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
       })
       children.push(id)
     })
+
+    for (const sh of level.shelves ?? []) {
+      const id = sub('shelf', level, sh.id)
+      nodes[id] = ShelfNode.parse({
+        id,
+        parentId: lid,
+        name: sh.name ?? SHELF_NAMES[sh.style],
+        position: [sh.at[0], sh.y ?? FLOOR_Y, sh.at[1]],
+        rotation: [0, sh.rotY ?? 0, 0],
+        width: sh.width,
+        depth: sh.depth,
+        height: sh.height,
+        style: sh.style,
+        rows: sh.rows ?? 1,
+        columns: sh.columns ?? 1,
+        withBack: sh.withBack ?? false,
+        withBottom: sh.withBottom ?? false,
+        ...(sh.material ? { materialPreset: lib(sh.material) } : {}),
+      })
+      children.push(id)
+    }
+
+    for (const c of level.cabinets ?? []) {
+      // Pascal solo dibuja una corrida si tiene módulos hijos; cada módulo se ubica por el centro de su ancho en el eje local x.
+      const runId = sub('cabinet', level, c.id)
+      const tier = c.tier ?? 'base'
+      const countertop = c.countertop ?? tier !== 'tall'
+      const total = cabinetWidth(c)
+      const common = {
+        depth: c.depth,
+        carcassHeight: c.height,
+        withCountertop: countertop,
+        ...(c.frontStyle ? { frontStyle: c.frontStyle } : {}),
+        ...(c.material ? { materialPreset: lib(c.material) } : {}),
+      }
+      let cursor = -total / 2
+      const moduleIds = c.modules.map((m, i) => {
+        const mid = `cabinet-module_${tag}_${clean(level.id)}_${clean(c.id)}_${i + 1}`
+        nodes[mid] = CabinetModuleNode.parse({
+          id: mid,
+          parentId: runId,
+          position: [round3(cursor + m.width / 2), 0, 0],
+          width: m.width,
+          cabinetType: tier,
+          stack: m.stack.map((compartment, k) => ({ id: `${mid}_${k + 1}`, ...compartment })),
+          ...common,
+        })
+        cursor += m.width
+        return mid
+      })
+      nodes[runId] = CabinetNode.parse({
+        id: runId,
+        parentId: lid,
+        name: c.name ?? 'Mostrador',
+        position: [c.at[0], c.y ?? FLOOR_Y, c.at[1]],
+        rotation: c.rotY ?? 0,
+        runTier: tier,
+        width: total,
+        children: moduleIds,
+        ...(c.bar ? { barLedge: BAR_LEDGE } : {}),
+        ...common,
+      })
+      children.push(runId)
+    }
 
     for (const s of level.stairs ?? []) {
       const id = sub('stair', level, s.id)

@@ -1,11 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { COMMERCE_PASCAL_IDS, buildCommerceItems, kenneyAssets } from '../src/editor/commerce-catalog'
+import { COMMERCE_PASCAL_IDS, buildCommerceItems } from '../src/editor/commerce-catalog'
 import { localizeCatalogItem } from '../src/editor/catalog'
 import manifest from '../src/editor/local-items.json' with { type: 'json' }
 
-const publicPath = (p: string) => fileURLToPath(new URL(`../public${p}`, import.meta.url))
 const source = readFileSync(
   fileURLToPath(new URL('../node_modules/@pascal-app/editor/src/components/ui/item-catalog/catalog-items.tsx', import.meta.url)),
   'utf8',
@@ -33,22 +32,18 @@ describe('catálogo de comercio', () => {
     }
   })
 
-  it('cada pieza de Kenney trae su modelo, su textura y su miniatura', () => {
-    const assets = kenneyAssets()
-    expect(assets).toHaveLength(12)
-    for (const a of assets) {
-      expect(existsSync(publicPath(a.src)), a.src).toBe(true)
-      expect(existsSync(publicPath(a.src.replace('model.glb', 'Textures/colormap.png'))), a.id).toBe(true)
-      expect(existsSync(publicPath(a.thumbnail)), a.thumbnail).toBe(true)
-      expect(a.dimensions.every((d) => d > 0)).toBe(true)
-    }
-  })
-
-  it('la pestaña Comercio tiene al menos 20 piezas, sin ids repetidos, y arranca con el gabinete paramétrico', () => {
+  it('la pestaña Comercio tiene al menos 20 piezas de Pascal, sin ids repetidos, y arranca con el gabinete paramétrico', () => {
     const items = buildCommerceItems(localized)
     const ids = items.map((i) => i.id)
     expect(items.length).toBeGreaterThanOrEqual(20)
     expect(new Set(ids).size).toBe(ids.length)
     expect(ids[0]).toBe('cabinet')
+    expect(ids.some((id) => id.startsWith('kenney-'))).toBe(false)
+  })
+
+  it('cada pieza de la pestaña trae un modelo local que existe', () => {
+    for (const item of buildCommerceItems(localized)) {
+      expect(existsSync(fileURLToPath(new URL(`../public${item.src}`, import.meta.url))), item.src).toBe(true)
+    }
   })
 })

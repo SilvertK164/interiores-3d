@@ -22,6 +22,10 @@ function ground(): LevelDef {
       { id: 'interior', type: 'door', wall: 'int', at: 2, width: 0.9 },
     ],
     items: [{ asset: 'cash-register', at: [1, 1] }],
+    shelves: [{ id: 'gondola', style: 'open-rack', at: [2.5, 3.5], width: 1.5, depth: 0.5, height: 1.8, rows: 5 }],
+    cabinets: [
+      { id: 'caja', at: [1.5, 0.45], depth: 0.7, height: 0.8, modules: [{ width: 1.2, stack: [{ type: 'door', doorType: 'double' }] }, { width: 0.6, stack: [{ type: 'drawer', drawerCount: 3 }] }] },
+    ],
     stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1, steps: 12, to: 'alta' }],
   }
 }
@@ -124,5 +128,40 @@ describe('validateDefinition', () => {
     const def = valid()
     lv(def, 1).id = 'pb'
     expect(check(def).some((e) => e.includes('nivel') && e.includes('repetido'))).toBe(true)
+  })
+})
+
+describe('validateDefinition: estantes y gabinetes paramétricos', () => {
+  it('rechaza un estante o un gabinete cuya base cae (aunque sea en parte) fuera de los ambientes', () => {
+    const def = valid()
+    lv(def).shelves = [{ id: 'afuera', style: 'bookshelf', at: [4.9, 3.9], width: 1.8, depth: 0.4, height: 2 }]
+    lv(def).cabinets = [{ id: 'girado', at: [0.2, 2], rotY: Math.PI / 2, depth: 0.7, height: 0.8, modules: [{ width: 1.2, stack: [{ type: 'door' }] }] }]
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('afuera') && e.includes('fuera de los ambientes'))).toBe(true)
+    expect(errors.some((e) => e.includes('girado') && e.includes('fuera de los ambientes'))).toBe(true)
+  })
+
+  it('rechaza medidas que Pascal no admite: estante muy ancho, gabinete sin módulos o de más de 3 m', () => {
+    const def = valid()
+    lv(def).shelves = [{ id: 'enorme', style: 'open-rack', at: [2.5, 2], width: 3.5, depth: 0.5, height: 1.8 }]
+    lv(def).cabinets = [
+      { id: 'vacio', at: [2.5, 2], depth: 0.7, height: 0.8, modules: [] },
+      { id: 'largo', at: [2.5, 2], depth: 0.7, height: 0.8, modules: [{ width: 2, stack: [{ type: 'door' }] }, { width: 1.5, stack: [{ type: 'door' }] }] },
+    ]
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('enorme') && e.includes('medidas'))).toBe(true)
+    expect(errors.some((e) => e.includes('vacio') && e.includes('módulo'))).toBe(true)
+    expect(errors.some((e) => e.includes('largo') && e.includes('3 m'))).toBe(true)
+  })
+
+  it('rechaza ids repetidos entre estantes o entre gabinetes, y materiales que no existen', () => {
+    const def = valid()
+    lv(def).shelves = [
+      { id: 'dup', style: 'cubby', at: [1, 2], width: 1, depth: 0.4, height: 1.2, material: 'laca-inventada' },
+      { id: 'dup', style: 'cubby', at: [3, 2], width: 1, depth: 0.4, height: 1.2 },
+    ]
+    const errors = check(def)
+    expect(errors.some((e) => e.includes('repetido'))).toBe(true)
+    expect(errors.some((e) => e.includes('laca-inventada'))).toBe(true)
   })
 })

@@ -51,6 +51,29 @@ const def: TemplateDefinition = {
         { asset: 'cash-register', at: [1, 1], rotY: Math.PI },
         { asset: 'cash-register', at: [2, 1], y: 0.78 },
       ],
+      shelves: [{ id: 'gondola', style: 'open-rack', at: [2.5, 3.5], width: 1.5, depth: 0.5, height: 1.8, rows: 5, withBack: true, material: 'preset-charcoal' }],
+      cabinets: [
+        {
+          id: 'mostrador',
+          at: [3, 0.5],
+          depth: 0.7,
+          height: 0.8,
+          bar: true,
+          modules: [
+            { width: 1.2, stack: [{ type: 'door', doorType: 'double' }] },
+            { width: 0.6, stack: [{ type: 'drawer', drawerCount: 3 }] },
+          ],
+        },
+        {
+          id: 'vitrina',
+          at: [0.5, 1.5],
+          rotY: Math.PI / 2,
+          depth: 0.5,
+          height: 1.9,
+          tier: 'tall',
+          modules: [{ width: 1, stack: [{ type: 'door', doorType: 'glass', shelfCount: 4 }] }],
+        },
+      ],
       stairs: [{ id: 'escalera', at: [1, 3], rotY: 0, width: 1.1, steps: 14, to: 'alta', rail: 'both' }],
     },
     {
@@ -141,6 +164,44 @@ describe('buildScene', () => {
     expect(stair.toLevelId).toBe(top?.id)
     expect(stair.stepCount).toBe(14)
     expect(stair.railingMode).toBe('both')
+  })
+
+  it('crea los estantes y los gabinetes paramétricos de Pascal', () => {
+    expect(byType('shelf')).toHaveLength(1)
+    expect(byType('cabinet')).toHaveLength(2)
+    expect(byType('cabinet-module')).toHaveLength(3)
+  })
+
+  it('el estante lleva su estilo, sus medidas, su material y su posición sobre la losa', () => {
+    const shelf = nodes['shelf_local_de_prueba_pb_gondola'] as N
+    expect(shelf).toMatchObject({
+      style: 'open-rack',
+      rows: 5,
+      width: 1.5,
+      depth: 0.5,
+      height: 1.8,
+      withBack: true,
+      materialPreset: 'library:preset-charcoal',
+      position: [2.5, 0.05, 3.5],
+    })
+  })
+
+  it('la corrida suma el ancho de sus módulos y los ubica centrados en fila sobre su eje x', () => {
+    const run = nodes['cabinet_local_de_prueba_pb_mostrador'] as N
+    expect(run).toMatchObject({ width: 1.8, runTier: 'base', withCountertop: true, position: [3, 0.05, 0.5] })
+    expect((run.barLedge as { edge: string }).edge).toBe('back')
+    const modules = (run.children as string[]).map((id) => nodes[id] as N)
+    expect(modules.map((m) => m.position)).toEqual([[-0.3, 0, 0], [0.6, 0, 0]])
+    expect(modules.map((m) => m.width)).toEqual([1.2, 0.6])
+    expect(modules.every((m) => m.parentId === run.id)).toBe(true)
+  })
+
+  it('una vitrina alta no lleva mesada, queda girada y tiene la puerta de vidrio con sus estantes', () => {
+    const run = nodes['cabinet_local_de_prueba_pb_vitrina'] as N
+    expect(run).toMatchObject({ runTier: 'tall', withCountertop: false, rotation: Math.PI / 2 })
+    const module = nodes[(run.children as string[])[0] as string] as N
+    expect(module).toMatchObject({ cabinetType: 'tall', withCountertop: false })
+    expect(module.stack).toEqual([expect.objectContaining({ type: 'door', doorType: 'glass', shelfCount: 4 })])
   })
 
   it('las piezas llevan su descriptor, su altura sobre la losa y su giro', () => {

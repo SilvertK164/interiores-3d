@@ -1,18 +1,3 @@
-import kenney from './kenney-pieces.json'
-
-export type CommerceAsset = {
-  id: string
-  category: 'furniture' | 'appliance'
-  name: string
-  tags: string[]
-  src: string
-  thumbnail: string
-  dimensions: [number, number, number]
-  offset: [number, number, number]
-  rotation: [number, number, number]
-  scale: [number, number, number]
-}
-
 /** Piezas del catálogo de Pascal (ya locales) útiles para comercio; el gabinete paramétrico va primero. */
 export const COMMERCE_PASCAL_IDS: readonly string[] = [
   'cabinet',
@@ -50,26 +35,8 @@ export const COMMERCE_PASCAL_IDS: readonly string[] = [
   'air-conditioning',
 ]
 
-type KenneyPiece = (typeof kenney)[number]
-
-export function kenneyAssets(pieces: readonly KenneyPiece[] = kenney): CommerceAsset[] {
-  return pieces.map((p) => ({
-    id: p.id,
-    category: p.category as CommerceAsset['category'],
-    name: p.name,
-    tags: p.tags,
-    src: `/items/${p.folder}/model.glb`,
-    thumbnail: `/items/${p.folder}/thumbnail.png`,
-    dimensions: p.dimensions as [number, number, number],
-    offset: [0, 0, 0],
-    rotation: [0, 0, 0],
-    scale: [1, 1, 1],
-  }))
-}
-
-/** Pestaña Comercio: las piezas de Pascal elegidas (en ese orden) y después las de Kenney. */
-export function buildCommerceItems<T extends { id: string }>(localized: readonly T[]): Array<T | CommerceAsset> {
+/** Pestaña Comercio: las piezas de Pascal elegidas, en ese orden (las que no existan localmente se omiten). */
+export function buildCommerceItems<T extends { id: string }>(localized: readonly T[]): T[] {
   const byId = new Map(localized.map((i) => [i.id, i]))
-  const fromPascal = COMMERCE_PASCAL_IDS.flatMap((id) => byId.get(id) ?? [])
-  return [...fromPascal, ...kenneyAssets()]
+  return COMMERCE_PASCAL_IDS.flatMap((id) => byId.get(id) ?? [])
 }

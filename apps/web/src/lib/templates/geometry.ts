@@ -1,4 +1,4 @@
-import type { ItemDef, Pt, RoomDef, TemplateDefinition, WallDef } from './types'
+import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, TemplateDefinition, WallDef } from './types'
 
 const round = (n: number) => Math.round(n * 1000) / 1000
 
@@ -31,6 +31,37 @@ export function grid(asset: string, origin: Pt, columns: number, rows: number, s
     }
   }
   return out
+}
+
+/** `count` estantes iguales repartidos en línea recta de `from` a `to` (ids `<prefijo>-1`, `<prefijo>-2`…). */
+export function shelfRow(
+  prefix: string,
+  base: Omit<ShelfDef, 'id' | 'at'>,
+  from: Pt,
+  to: Pt,
+  count: number,
+  extra: { rotY?: number; y?: number } = {},
+): ShelfDef[] {
+  return row('', from, to, count).map((p, i) => ({ ...base, ...extra, id: `${prefix}-${i + 1}`, at: p.at }))
+}
+
+/** Ancho total de una corrida de gabinetes: la suma de sus módulos. */
+export function cabinetWidth(cabinet: Pick<CabinetDef, 'modules'>): number {
+  return Math.round(cabinet.modules.reduce((sum, m) => sum + m.width, 0) * 1000) / 1000
+}
+
+/**
+ * Esquinas (x, z) de la base `width × depth` centrada en `at` y girada `rotY`. Sigue la convención de three.js:
+ * el eje local x va a (cos, -sin) y el eje local z (el frente) a (sin, cos).
+ */
+export function footprint(at: Pt, width: number, depth: number, rotY = 0): Pt[] {
+  const c = Math.cos(rotY)
+  const s = Math.sin(rotY)
+  const corner = (kx: number, kz: number): Pt => [
+    round(at[0] + (c * kx * width) / 2 + (s * kz * depth) / 2),
+    round(at[1] + (-s * kx * width) / 2 + (c * kz * depth) / 2),
+  ]
+  return [corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)]
 }
 
 export function roomArea(room: RoomDef): number {

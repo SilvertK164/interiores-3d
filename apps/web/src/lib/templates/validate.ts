@@ -1,3 +1,4 @@
+import { cabinetWidth, footprint } from './geometry'
 import type { LevelDef, OpeningDef, RoomDef, TemplateDefinition, WallDef } from './types'
 
 const EPS = 0.011
@@ -75,7 +76,7 @@ function checkOpenings(openings: readonly OpeningDef[], walls: readonly WallDef[
 }
 
 function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds: ReadonlySet<string>, materialIds: ReadonlySet<string>, errors: string[]) {
-  for (const id of new Set([...duplicates(level.walls.map((w) => w.id)), ...duplicates(level.rooms.map((r) => r.id)), ...duplicates(level.openings.map((o) => o.id)), ...duplicates((level.stairs ?? []).map((s) => s.id))])) {
+  for (const id of new Set([...duplicates(level.walls.map((w) => w.id)), ...duplicates(level.rooms.map((r) => r.id)), ...duplicates(level.openings.map((o) => o.id)), ...duplicates((level.stairs ?? []).map((s) => s.id)), ...duplicates((level.shelves ?? []).map((s) => s.id)), ...duplicates((level.cabinets ?? []).map((c) => c.id))])) {
     errors.push(`El id ${id} está repetido en el nivel ${level.id}.`)
   }
   for (const w of level.walls) {
@@ -99,6 +100,24 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
       errors.push(`La pieza ${item.asset} en (${item.at[0]}, ${item.at[1]}) cae fuera de los ambientes del nivel ${level.id}.`)
     }
   }
+  const inRooms = (corners: [number, number][]) => corners.every(([x, z]) => level.rooms.some((r) => inside(r, x, z)))
+  const between = (n: number | undefined, min: number, max: number) => n === undefined || (Number.isInteger(n) && n >= min && n <= max)
+  for (const sh of level.shelves ?? []) {
+    const ok = sh.width >= 0.3 && sh.width <= 3 && sh.depth >= 0.1 && sh.depth <= 1 && sh.height >= 0.05 && sh.height <= 2.5 && between(sh.rows, 1, 8) && between(sh.columns, 1, 6)
+    if (!ok) errors.push(`El estante ${sh.id} tiene medidas que Pascal no admite (ancho 0,3 a 3 m, fondo 0,1 a 1 m, alto 0,05 a 2,5 m, 1 a 8 filas, 1 a 6 columnas).`)
+    if (!inRooms(footprint(sh.at, sh.width, sh.depth, sh.rotY))) errors.push(`El estante ${sh.id} cae fuera de los ambientes del nivel ${level.id}.`)
+  }
+  for (const c of level.cabinets ?? []) {
+    const width = cabinetWidth(c)
+    if (c.modules.length === 0) {
+      errors.push(`El gabinete ${c.id} no tiene ningún módulo.`)
+      continue
+    }
+    if (width > 3) errors.push(`El gabinete ${c.id} mide ${width} m: Pascal admite hasta 3 m por corrida; divídelo en dos.`)
+    const bad = c.modules.some((m) => m.width < 0.05 || m.width > 3 || m.stack.length === 0) || c.depth < 0.3 || c.depth > 1.2 || c.height < 0.4 || c.height > 2.4
+    if (bad) errors.push(`El gabinete ${c.id} tiene medidas o módulos que Pascal no admite (fondo 0,3 a 1,2 m, alto 0,4 a 2,4 m, cada módulo con al menos un compartimento).`)
+    if (!inRooms(footprint(c.at, width, c.depth, c.rotY))) errors.push(`El gabinete ${c.id} cae fuera de los ambientes del nivel ${level.id}.`)
+  }
   for (const s of level.stairs ?? []) {
     const target = levelIds.indexOf(s.to)
     if (target <= index) errors.push(`La escalera ${s.id} debe subir a un nivel posterior que exista (${s.to}).`)
@@ -110,6 +129,8 @@ function checkLevel(level: LevelDef, levelIds: string[], index: number, assetIds
     level.wallOutside,
     ...level.walls.flatMap((w) => [w.inside, w.outside]),
     ...level.rooms.flatMap((r) => [r.floor, r.ceiling]),
+    ...(level.shelves ?? []).map((sh) => sh.material),
+    ...(level.cabinets ?? []).map((c) => c.material),
   ]
   for (const m of new Set(materials)) {
     if (m && !materialIds.has(m)) errors.push(`El material ${m} no existe en la biblioteca de Pascal.`)

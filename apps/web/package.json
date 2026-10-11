@@ -5,13 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",
-    "prebuild": "pnpm --filter @interiores/contract build && node scripts/vendor-pascal-assets.mjs --check && tsx scripts/vendor-kenney-mini-market.ts --check",
+    "prebuild": "pnpm --filter @interiores/contract build && node scripts/vendor-pascal-assets.mjs --check",
     "build": "next build",
     "start": "next start",
     "typecheck": "node scripts/typecheck.mjs",
     "test": "vitest run",
     "assets:vendor": "node scripts/vendor-pascal-assets.mjs",
-    "assets:kenney": "tsx scripts/vendor-kenney-mini-market.ts",
     "e2e": "playwright test"
   },
   "dependencies": {
@@ -38,7 +37,6 @@
     "@types/node": "22.20.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "fflate": "0.8.3",
     "postcss": "8.5.29",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.15",

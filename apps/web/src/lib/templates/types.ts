@@ -53,6 +53,60 @@ export type StairDef = {
   rail?: 'none' | 'left' | 'right' | 'both'
 }
 
+/** Estante paramétrico de Pascal. `at` es el centro de su base; el frente mira a +z cuando `rotY` es 0. */
+export type ShelfDef = {
+  id: string
+  /** `open-rack` = góndola industrial; `bookshelf` = biblioteca; `cubby` = exhibidor de casilleros; `wall-shelf` = repisa. */
+  style: 'wall-shelf' | 'bookshelf' | 'open-rack' | 'cubby'
+  at: Pt
+  rotY?: number
+  /** Altura de la base sobre el piso (por ejemplo, una repisa de pared); por defecto, sobre la losa. */
+  y?: number
+  width: number
+  depth: number
+  height: number
+  rows?: number
+  columns?: number
+  withBack?: boolean
+  withBottom?: boolean
+  /** Material de la biblioteca de Pascal. */
+  material?: string
+  name?: string
+}
+
+/** Un compartimento del módulo de un gabinete (los mismos nombres y campos que `CabinetNode` de Pascal). */
+export type CompartmentDef =
+  | { type: 'door'; doorType?: 'single-left' | 'single-right' | 'double' | 'glass'; shelfCount?: number }
+  | { type: 'drawer'; drawerCount?: number }
+  | { type: 'shelf'; shelfCount?: number }
+  | { type: 'sink'; sinkLayout?: 'single' | 'double' | 'double-offset' }
+  | { type: 'fridge-single' | 'fridge-double' | 'fridge-top-freezer' | 'fridge-bottom-freezer' | 'oven' | 'microwave' | 'dishwasher' }
+
+export type CabinetModuleDef = { width: number; stack: CompartmentDef[] }
+
+/**
+ * Corrida de gabinetes paramétricos: módulos en fila sobre el eje local x. `at` es el centro de la base de toda la corrida;
+ * el frente mira a +z cuando `rotY` es 0. Sirve para mostradores, cajas, barras, vitrinas y heladeras de exhibición.
+ */
+export type CabinetDef = {
+  id: string
+  at: Pt
+  rotY?: number
+  y?: number
+  depth: number
+  /** Alto del cuerpo (sin zócalo ni mesada); Pascal usa 0,8 m en gabinetes bajos. */
+  height: number
+  tier?: 'base' | 'tall'
+  /** Mesada; por defecto, sí en `base` y no en `tall`. */
+  countertop?: boolean
+  frontStyle?: 'slab' | 'shaker' | 'raised-arch'
+  /** Barra elevada por el lado de atrás (para sentarse en banquetas). */
+  bar?: boolean
+  material?: string
+  name?: string
+  modules: CabinetModuleDef[]
+}
+
 export type LevelDef = {
   id: string
   height?: number
@@ -66,6 +120,8 @@ export type LevelDef = {
   rooms: RoomDef[]
   openings: OpeningDef[]
   items: ItemDef[]
+  shelves?: ShelfDef[]
+  cabinets?: CabinetDef[]
   stairs?: StairDef[]
 }
 
