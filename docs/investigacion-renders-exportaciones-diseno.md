@@ -23,32 +23,47 @@
 1. **Render con IA a partir de una captura del editor** (recomendado para 2 días). Pascal captura el visor (`snapshot-capture.ts`, runtime `capture`); la API del proveedor devuelve una imagen fotorrealista conservando la distribución; se guarda en Supabase Storage y se muestra en una galería por proyecto.
 2. **Path tracing físico en el navegador** con [`three-gpu-pathtracer`](https://github.com/gkjohnson/three-gpu-pathtracer): carga un GLB y calcula iluminación física con WebGL 2. Es exacto con la geometría, gratis y sin API, pero es progresivo (no tiempo real), pesado en GPU y no pudimos confirmar su mantenimiento actual **[fuente externa]**. Requiere exportar el GLB y montarlo en una escena aparte (Pascal usa WebGPU). Reservado como extra.
 
-### Opciones de API para el camino 1
+### Comparativa de proveedores con nivel gratuito (verificada el 2026-10-11)
 
-| Opción | Cómo preserva la geometría | Precio por imagen | Estado de la verificación |
-|---|---|---|---|
-| **Stability AI — Control Structure** | Condicionado por estructura/profundidad de la imagen de referencia | ≈ 3 créditos = ≈ US$ 0,03 | **[fuente externa]** ([listado](https://developer.puter.com/tutorials/stability-ai-api-pricing/)); confirmar en platform.stability.ai |
-| **FLUX.1 Kontext [pro]** (Black Forest Labs) | Edición por instrucción de una imagen (conserva composición) | US$ 0,04 (pro) / 0,08 (max), 1 crédito = US$ 0,01 | Precio oficial según la [página de precios de BFL](https://docs.eu.bfl.ai/quick_start/pricing); Replicate y fal difieren según la fuente |
-| **Gemini 3 Pro Image / 2.5 Flash Image** (Google) | Edición por instrucciones | Entre US$ 0,039 y 0,134 según el blog consultado | **[fuente externa]**, cifras inconsistentes ([comparativa](https://invideo.io/blog/ai-image-model-pricing/)); confirmar en la página de Google. Imagen 4 no sirve (no edita y se discontinúa el 17/08/2026) |
-| **Modelos de interiorismo en Replicate** (p. ej. [`rocketdigitalai/interior-design-sdxl`](https://replicate.com/rocketdigitalai/interior-design-sdxl)) | SDXL con ControlNet de profundidad + estructura, pensado para interiores | Se factura por segundos de GPU; sin cifra confiable | Probar: no encontramos documentación oficial de precio ni de latencia |
-| **Cloudflare Workers AI — FLUX.2 klein 4B / 9B y FLUX.2 dev** | Generación **y edición** en un solo modelo, hasta 4 imágenes de referencia (de 512 × 512 cada una); distribución por referencia, no ControlNet | **Oficial:** 10.000 neurons/día gratis (se reinicia 00:00 UTC); luego US$ 0,011 por 1.000 neurons. Con nuestras cuentas: klein 4B ≈ **US$ 0,0012** por imagen ≈ **91 gratis/día**; klein 9B ≈ US$ 0,017 ≈ 6 gratis/día; dev (25 pasos) ≈ US$ 0,046 ≈ 2 gratis/día | **[verificado]** en la [documentación de Cloudflare](https://developers.cloudflare.com/workers-ai/platform/pricing/) (act. 9/10/2026) y su [catálogo de modelos](https://developers.cloudflare.com/workers-ai/models/). Falta probar la fidelidad geométrica; la entrada de 512 × 512 es baja resolución. |
-| **Comerciales de interiorismo** (Rendair, Decor8, etc.) | Preservan geometría según su marketing | Planes propios | Afirmaciones del proveedor, no independientes |
+**Resultado principal: de 13 proveedores revisados, solo Cloudflare Workers AI tiene un nivel gratuito *recurrente* utilizable para editar o generar imágenes. Stability AI regala 25 créditos una única vez (≈ 5 renders). Los demás son de pago.**
 
-**Niveles gratuitos reales [fuente externa, salvo Cloudflare]:**
-- **Cloudflare Workers AI:** cuota oficial y documentada (arriba). Es la única opción gratuita con documentación oficial verificada.
-- **Gemini (imagen):** los foros reportan que los modelos de imagen suelen mostrar límite 0 en el nivel gratuito y funcionan al activar facturación; un blog afirma 500 pedidos por día, pero advierte que las cuotas se recortaron en diciembre de 2025. **No confiar en el gratis**: mirar la cuota en AI Studio ([foro](https://discuss.google.dev/t/image-generation-at-free-tier-possible-or-not/322034)).
-- **Stability AI:** 25 créditos únicos al registrarse, luego US$ 0,01 por crédito. No encontramos la página oficial del endpoint *Control Structure* con la búsqueda; recordamos que existe (`/v2beta/stable-image/control/structure`), pero **hay que confirmarlo** en la referencia de API oficial.
-- **FLUX.1 Kontext (BFL):** sin nivel gratuito publicado; el playground puede dar un saldo inicial pequeño.
+Cómo se verificó: dos agentes leyeron las páginas **oficiales** de cada proveedor (precios, límites, términos, pasos de la clave) y marcaron lo que no pudieron confirmar. Los precios y la cuota de Cloudflare los comprobamos además nosotros en su documentación. El resto **no está re-verificado por nosotros**: antes de confiar en una cifra, abrir la página citada. Informes completos: [`F1`](analisis-clases/F1-render-gratuito-parte1.md) y [`F2`](analisis-clases/F2-render-gratuito-parte2.md).
 
-**Qué recomendamos hoy (hipótesis a validar con la comparativa):**
-1. **Primera prueba: Cloudflare FLUX.2 klein 4B**, porque es gratis dentro de la cuota, tiene documentación oficial, una sola credencial en el servidor y cuesta ≈ US$ 0,001 después. Se prueba también la 9B si la 4B no alcanza.
-2. **Referencia de fidelidad geométrica: Stability Control Structure** (usa estructura/profundidad como señal de control).
-3. **Referencia de calidad de edición: FLUX.1 Kontext [pro]** (US$ 0,04).
-4. Gemini solo si la cuota de AI Studio muestra que la imagen está habilitada.
+| Proveedor | Modelo recomendable | Imagen de entrada | ¿Gratis real hoy? | Costo al agotarse | Tarjeta | Datos en el nivel gratuito | Verificación |
+|---|---|---|---|---|---|---|---|
+| **Cloudflare Workers AI** | `flux-2-klein-4b` | Sí, hasta 4 referencias, cada una **menor que 512 × 512**; sin control estructural | **Sí: 10.000 neurons/día** (≈ 91 imágenes de 1024 × 1024 con 1 referencia, cuenta nuestra) | US$ 0,011 por 1.000 neurons (≈ US$ 0,0012 por imagen) | No figura en el alta | No entrena con contenido de clientes (oficial, 21/4/2026) | OFICIAL (tarjeta por omisión) |
+| **Stability AI** | `POST /v2beta/stable-image/control/structure` | Sí, **control estructural nativo** (también sketch e image-to-image) | **25 créditos únicos** ≈ 5 renders | 5 créditos = US$ 0,05 por render | Créditos de bienvenida con cuenta Google, según su guía | **Por defecto pueden entrenar** con entradas y salidas; hay opt-out | OFICIAL |
+| **Google Gemini** | `gemini-nano-banana-2.1` | Sí, hasta 14 referencias; sin control estructural | **No**: los modelos de imagen figuran "Not available" en el nivel gratuito; hay que activar facturación (prepago mínimo US$ 5) | ≈ US$ 0,034 (1K) | Sí | En gratis, Google usa los datos y hay revisión humana; en pago, no | OFICIAL |
+| **OpenRouter** | `flux.2-klein-4b`, Nano Banana 2.1 | Sí | **No** (0 de 61 modelos con salida de imagen son `:free`) | US$ 0,014 por MP / ≈ US$ 0,034 | Sí | Sin log de prompts por defecto | OFICIAL |
+| **Together AI** | `FLUX.1-kontext-pro`, `FLUX.2` | Sí, por URL | **No** (primera compra mínima US$ 15) | US$ 0,015 – 0,04 | Sí | Guardan prompts por defecto; hay Zero Data Retention | OFICIAL |
+| **Hugging Face** | `FLUX.1-Kontext-dev`, `FLUX.2-klein-9B` vía terceros | Sí | **No** (cuentas free: "None"; PRO US$ 9/mes) | Según el proveedor final | Según el caso | HF dice no guardar ni entrenar | OFICIAL / parcial NV |
+| **Replicate** | `flux-kontext`, `flux-depth/canny-pro`, `adirik/interior-design` (≈ US$ 0,009) | Sí | No garantizado: sus docs se contradicen | Pago por uso | Sí | Entradas y salidas se borran a la hora | OFICIAL con contradicción |
+| **fal.ai** | `flux-kontext/dev`, klein 4B edit (US$ 0,01/MP) | Sí | Créditos de bienvenida de monto variable que vencen a los 90 días | Pago por uso | Sí | Las salidas son URL **públicas** por defecto | OFICIAL; monto NV |
+| **Segmind, Leonardo, Freepik/Magnific** | varios | Sí | **No** documentado | Pago por uso (Segmind: recarga mínima US$ 10) | Sí | — | OFICIAL |
+| **NVIDIA NIM** | `flux.1-kontext-dev` | **Solo imágenes predefinidas** (no admite capturas propias) | Prueba con restricciones | — | No | Recolecta contenido para mejorar sus productos; prueba sin uso en producción | OFICIAL → **descartar** |
+| **Pollinations** | `flux.2-klein-4b` | Sí | **Ya exige clave** (HTTP 401 sin ella, comprobado el 11/10/2026); solo "Quests" | — | No | Términos NV | OFICIAL → **descartar** |
 
-Con una cuota de 5 renders por usuario por día, 100 renders de prueba y demo cuestan del orden de US$ 0,1 con klein 4B o US$ 3–4 con las opciones de pago. **El costo no es el riesgo: lo son la fidelidad geométrica y la privacidad** de las capturas.
+**Lo que cambió respecto de la investigación anterior:** Gemini ya no tiene nivel gratuito para imagen (los blogs que hablan de "500 por día" están desactualizados); además cerraron o deprecaron varios modelos de imagen entre junio y octubre de 2026, así que **el identificador del modelo debe ser configurable**. Stability cuesta 5 créditos (US$ 0,05) por render según su página oficial, no los 3 de los listados de terceros.
 
-**Estado:** el proveedor **no está elegido**. La tabla de Victoria (sección 4) resultó ser de modelos de *visión* (analizan imágenes) y el equipo confirmó que lo que quiere es **render realista**, así que esa tabla no entra en esta decisión. La comparativa se hace con modelos de generación/edición de imagen.
+**Recomendación (derivada del cuadro, no es un dato de ningún proveedor):**
+1. **Proveedor por defecto y "gratis": Cloudflare + `flux-2-klein-4b`.** Es el único gratuito recurrente. Requiere crear una cuenta en Cloudflare, pero **el plan Free alcanza**: los US$ 5 mensuales corresponden a Workers Paid y solo hacen falta para superar la cuota.
+2. **Proveedor de mayor fidelidad estructural: Stability `control/structure`**, que conserva la estructura de la imagen. Sus 25 créditos sirven para probar la integración y comparar; después es de pago.
+3. **Adaptadores opcionales de pago:** Gemini (facturación prepaga desde US$ 5), fal.ai o Replicate (`adirik/interior-design` si hay que respetar muros). **No presentar como gratis** a los demás.
+4. Si el equipo descarta Cloudflare, **no queda ninguna opción gratuita recurrente**: lo gratuito sería solo la prueba de 25 créditos de Stability y el costo pasaría a cada persona usuaria.
+
+**Límites que hay que probar con capturas reales:**
+- Con Cloudflare, las referencias deben ser menores que **512 × 512**: la captura se reduce y se pierde detalle de muebles pequeños. No hay ControlNet ni profundidad: solo imagen de referencia + prompt, así que la fidelidad geométrica **no está garantizada**.
+- Con Stability, el control estructural es lo que se busca, pero el costo es de créditos y sus términos permiten entrenar con lo enviado salvo que la persona haga opt-out.
+
+**Pasos para crear la clave (insumo de la guía dentro de la interfaz).** La app necesita **dos datos** para Cloudflare (token y Account ID) y uno para Stability:
+- *Cloudflare:* (1) crear cuenta en `dash.cloudflare.com` (correo, contraseña y verificación); (2) abrir `https://dash.cloudflare.com/?to=/:account/ai/workers-ai` y elegir **Use REST API**; (3) **Create a Workers AI API Token** con la plantilla; copiar el token (se muestra una vez); (4) copiar el **Account ID** de la misma pantalla.
+- *Stability:* (1) crear cuenta en `platform.stability.ai` (con Google para recibir los 25 créditos); (2) abrir `https://platform.stability.ai/account/keys` y crear la clave; copiarla (se muestra una vez).
+
+**Contrato de Cloudflare `flux-2-klein-4b` (según la documentación oficial leída por el agente):** `multipart/form-data` obligatorio; campos `prompt`, `input_image_0` a `input_image_3`, `width` y `height` (256–1920), `seed`, `guidance`; `steps` fijo en 4; respuesta `{image: <base64>}` (el formato JPEG/PNG y el sobre `result.image` **no están confirmados**).
+
+**No verificado** (hacerlo antes de apoyarse en ello): que el plan Free corra `klein-4b` en una cuenta real; el permiso mínimo del token; si una entrada de exactamente 512 × 512 es admitida; si Stability otorga los 25 créditos sin cuenta Google; los montos de bienvenida de Replicate y fal.ai.
+
+**Estado:** el proveedor **no está elegido**. La tabla de Victoria (sección 4) resultó ser de modelos de *visión* y el equipo confirmó que lo que quiere es **render realista**, así que esa tabla no entra en esta decisión.
 
 ### Protocolo para decidir con evidencia (30–45 min)
 Tomar 3 capturas del editor (una vivienda, un comercio y un cuarto con muebles) y correr cada candidato —incluida la API que investigó Victoria— con el mismo prompt. Puntuar de 1 a 5: fidelidad de muros y aberturas, fidelidad de muebles, realismo de luz y materiales, tiempo, costo. Guardar capturas y tabla: es la evidencia de la decisión para *Qué decidí yo*.

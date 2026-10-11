@@ -36,7 +36,8 @@ El prefijo `v1` permite rotar la clave maestra o cambiar de algoritmo sin romper
 user_integrations(
   id uuid pk, owner_id uuid → auth.users on delete cascade,
   provider text not null check (provider in (…)),
-  secret_ciphertext text not null,        -- v1.<iv>.<tag>.<ct>
+  secret_ciphertext text not null,        -- v1.<iv>.<tag>.<ct> (solo el secreto)
+  config jsonb not null default '{}',     -- datos NO secretos del proveedor, p. ej. {"accountId": "…"} de Cloudflare
   key_last4 text not null,
   status text not null default 'unverified' check (status in ('unverified','valid','invalid')),
   validated_at timestamptz, created_at, updated_at,
@@ -77,6 +78,7 @@ user_integrations(
 **Ajustes → Integraciones**, una tarjeta por proveedor con:
 - Nombre, si es gratis y sus límites, y el **aviso de privacidad** del nivel gratuito.
 - Guía **"Cómo crear tu clave"** en acordeón, con 4 a 6 pasos, enlaces a las páginas oficiales y capturas.
+- Campos por proveedor: **Cloudflare** pide *token* (secreto) y *Account ID* (no secreto, se guarda en `config`); **Stability** pide solo la clave. Cada formulario se declara en un esquema por proveedor, no a mano.
 - Campo de clave tipo contraseña con mostrar/ocultar, botón **Probar clave**, estado (válida, inválida, sin probar) y selector **Guardar cifrada / Solo esta sesión**.
 - Botones **Reemplazar** y **Eliminar**, con confirmación.
 - Mensajes en castellano, accesibles (etiquetas, `aria-live` para el resultado de la prueba) y responsivos.
