@@ -55,6 +55,7 @@ export function createE2eHooks(options: E2eOptions = {}) {
         gridSnapStep: editor.gridSnapStep,
         snapWall: editor.snappingModeByContext.wall,
         snapItem: editor.snappingModeByContext.item,
+        paintMaterial: editor.activePaintMaterial?.materialPreset ?? null,
       }
     },
     select: (id: string | null) => useViewer.getState().setSelection({ selectedIds: id ? ([id] as never) : [], zoneId: null }),

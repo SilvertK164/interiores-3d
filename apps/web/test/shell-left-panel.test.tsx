@@ -20,9 +20,10 @@ function render(node: React.ReactNode, setup?: (fake: ReturnType<typeof createFa
 }
 
 describe('leftPanelFor', () => {
-  it('Muebles trae el catálogo; todo lo demás deja las plantas y ambientes', () => {
+  it('Muebles trae el catálogo, Materiales las muestras y todo lo demás las plantas y ambientes', () => {
     expect(leftPanelFor('furniture')).toBe('furniture')
-    for (const id of ['select', 'structure', 'openings', 'materials', 'measure', 'more', null] as const) {
+    expect(leftPanelFor('materials')).toBe('materials')
+    for (const id of ['select', 'structure', 'openings', 'measure', 'more', null] as const) {
       expect(leftPanelFor(id)).toBe('levels')
     }
   })
@@ -57,6 +58,12 @@ describe('LeftPanel', () => {
   it('con la herramienta de muebles armada muestra el catálogo', () => {
     const markup = leftOf(({ editor }) => editor.setState({ mode: 'build', tool: 'item' }))
     expect(markup).toContain('aria-label="Muebles"')
+    expect(markup).not.toContain('aria-label="Nivel y ambientes"')
+  })
+
+  it('con la pintura armada muestra los materiales', () => {
+    const markup = leftOf(({ editor }) => editor.setState({ mode: 'material-paint', tool: null }))
+    expect(markup).toContain('aria-label="Materiales"')
     expect(markup).not.toContain('aria-label="Nivel y ambientes"')
   })
 
