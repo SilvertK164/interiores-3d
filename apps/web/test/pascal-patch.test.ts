@@ -34,9 +34,10 @@ describe('parche de @pascal-app/editor (propiedad chrome)', () => {
     for (const attribute of ATTRIBUTES) expect(patch, attribute).toMatch(new RegExp(`^\\+.*${attribute}`, 'm'))
   })
 
-  it('el plano de Pascal ignora el azimut 3D con __madoriPlanNorth (parche en floorplan-panel)', () => {
-    const panel = readFileSync(editorIndex.replace('index.tsx', 'floorplan-panel.tsx'), 'utf8')
-    expect(panel).toContain('__madoriPlanNorth')
-    expect(readFileSync(fromRoot(PATCH_FILE), 'utf8')).toMatch(/^\+.*__madoriPlanNorth/m)
+  it('el plano y la cámara 3D se desenlazan con __madoriDecoupled (parche en floorplan-camera-sync y floorplan-panel)', () => {
+    const dir = editorIndex.replace('index.tsx', '')
+    expect(readFileSync(`${dir}floorplan-camera-sync.ts`, 'utf8')).toContain('__madoriDecoupled')
+    expect(readFileSync(`${dir}floorplan-panel.tsx`, 'utf8')).toContain('__madoriDecoupled')
+    expect(readFileSync(fromRoot(PATCH_FILE), 'utf8')).toMatch(/^\+.*__madoriDecoupled/m)
   })
 })

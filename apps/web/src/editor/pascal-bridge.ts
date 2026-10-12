@@ -7,7 +7,6 @@ import { commitCabinetFields, isCabinetNode } from './cabinet-commit'
 import { type ShellBridge, createBridge } from './shell/bridge'
 import type { CatalogDeps } from './shell/bridge/catalog'
 import type { CoreDeps, HistoryPort } from './shell/bridge/core'
-import type { CameraLike, CameraPort } from './shell/bridge/plan-north'
 import type { LevelsDeps } from './shell/bridge/levels'
 import type { EditDeps } from './shell/bridge/edit'
 import type { MaterialsDeps } from './shell/bridge/materials'
@@ -59,30 +58,6 @@ function historyPort(): HistoryPort {
   }
 }
 
-/** Última cámara que publica Pascal; `subscribeCameraPose` entrega la actual al suscribirse. */
-function cameraPort(): CameraPort {
-  const listeners = new Set<() => void>()
-  let latest: CameraLike | null = null
-  let stop: (() => void) | null = null
-  return {
-    latest: () => latest,
-    subscribe: (listener) => {
-      listeners.add(listener)
-      stop ??= Pascal.subscribeCameraPose((pose) => {
-        latest = pose
-        for (const l of listeners) l()
-      })
-      return () => {
-        listeners.delete(listener)
-        if (listeners.size === 0) {
-          stop?.()
-          stop = null
-        }
-      }
-    },
-  }
-}
-
 function coreDeps(): CoreDeps {
   return {
     editor: Pascal.useEditor,
@@ -91,16 +66,15 @@ function coreDeps(): CoreDeps {
     history: historyPort(),
     applyTheme: applyEditorTheme,
     viewStore: createViewStorage(),
-    camera: cameraPort(),
     // Lo lee el parche de Madori de `level-utils.js` del visor (`patches/@pascal-app__viewer@1.0.3.patch`).
     setHideAbove: (on) => {
       ;(globalThis as { __madoriHideAbove?: boolean }).__madoriHideAbove = on
     },
-    lockPlanNorth: () => {
-      // Lo lee el parche de Madori de `floorplan-panel.tsx` (`patches/@pascal-app__editor@1.0.3.patch`).
-      ;(globalThis as { __madoriPlanNorth?: boolean }).__madoriPlanNorth = true
+    decoupleViews: () => {
+      // Lo leen los parches de Madori de `floorplan-camera-sync.ts` y `floorplan-panel.tsx` (`patches/@pascal-app__editor@1.0.3.patch`).
+      ;(globalThis as { __madoriDecoupled?: boolean }).__madoriDecoupled = true
       return () => {
-        ;(globalThis as { __madoriPlanNorth?: boolean }).__madoriPlanNorth = false
+        ;(globalThis as { __madoriDecoupled?: boolean }).__madoriDecoupled = false
       }
     },
     // `focus([])` oculta el aviso de cámara en inglés (editor/src/store/use-camera-hint-focus.ts); `focus(null)` lo devuelve.

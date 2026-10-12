@@ -1,5 +1,4 @@
 import { createLevelKeeper } from './level-keeper'
-import { type CameraPort, createPlanNorth } from './plan-north'
 import type { BridgeSnapshot, ViewMode, EditorLike, HistoryState, SceneLike, StoreLike, ViewerLike } from './types'
 
 export type HistoryPort = {
@@ -19,10 +18,11 @@ export type CoreDeps = {
   /** Oculta el aviso de cámara en inglés de Pascal; devuelve cómo volver a mostrarlo. */
   hideCameraHint(): () => void
   /** Conserva la vista 2D / 3D / Ambas entre recargas (Pascal la pierde: sus paneles la pisan antes de rehidratar). */
-  /** Cámara 3D de Pascal: con ella el plano entra recto (norte arriba) al pasar a 2D o a Ambas. */
-  camera?: CameraPort
-  /** Pide al plano de Pascal (parche `__madoriPlanNorth`) ignorar el azimut de la cámara 3D; devuelve cómo soltarlo. */
-  lockPlanNorth?(): () => void
+  /**
+   * Desenlaza el plano 2D de la cámara 3D (parche `__madoriDecoupled` de `@pascal-app/editor`): girar, orbitar, hacer zoom,
+   * recorrer o encuadrar en uno no mueve al otro. Devuelve cómo volver a enlazarlos.
+   */
+  decoupleViews?(): () => void
   setHideAbove?(on: boolean): void
   viewStore?: { read(): ViewMode | null; write(view: ViewMode): void }
 }
@@ -57,9 +57,8 @@ export function createCoreSlice(deps: CoreDeps) {
       const saved = deps.viewStore?.read()
       if (saved && saved !== deps.editor.getState().viewMode) deps.editor.getState().setViewMode(saved)
       let last = deps.editor.getState().viewMode
-      const unlockNorth = deps.lockPlanNorth?.() ?? (() => {})
+      const recouple = deps.decoupleViews?.() ?? (() => {})
       const stopKeeper = createLevelKeeper(deps).start()
-      const stopNorth = deps.camera ? createPlanNorth(deps.editor, deps.camera).start() : () => {}
       const stopView = deps.editor.subscribe(() => {
         const view = deps.editor.getState().viewMode
         if (view === last) return
@@ -68,9 +67,8 @@ export function createCoreSlice(deps: CoreDeps) {
       })
       return () => {
         stopView()
-        stopNorth()
         stopKeeper()
-        unlockNorth()
+        recouple()
         showHint()
         undoTheme()
       }

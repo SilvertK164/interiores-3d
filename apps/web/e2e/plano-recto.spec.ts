@@ -4,49 +4,106 @@ import { hook } from './support/hooks'
 import { createProjectViaUi } from './support/projects'
 import { dock, viewButton } from './support/shell'
 
-/** Giro del plano en grados (0 = norte arriba, muros rectos), leído del grupo `data-floorplan-scene` de Pascal. */
-const planRotation = (page: Page) =>
+/** Cómo se ve el plano 2D: su encuadre (viewBox) y su giro en grados (0 = norte arriba), leídos del SVG de Pascal. */
+const plan = (page: Page) =>
   page.evaluate(() => {
-    const scene = document.querySelector('[data-floorplan-scene]')
+    const scene = document.querySelector('[data-floorplan-scene]') as SVGGElement | null
+    const svg = scene?.ownerSVGElement
     const match = /rotate\((-?[\d.]+)/.exec(scene?.getAttribute('transform') ?? '')
-    return scene ? (match ? Number(match[1]) : 0) : Number.NaN
+    const box = (svg?.getAttribute('viewBox') ?? '').split(' ').map(Number)
+    return { box, rotation: scene ? (match ? Number(match[1]) : 0) : Number.NaN, rect: svg ? (({ x, y, width, height }) => ({ x, y, width, height }))(svg.getBoundingClientRect()) : null }
   })
+const camera = async (page: Page) => (await hook(page, 'cameraPose')) as { position: number[]; target: number[]; viewWidth?: number } | null
+const near = (a: number[], b: number[], eps = 1e-3) => a.length === b.length && a.every((v, i) => Math.abs(v - (b[i] ?? 0)) < eps)
 
-test('el plano 2D entra recto (norte arriba) en 2D y en Ambas, aunque la cámara 3D esté en diagonal', async ({ page }) => {
-  test.setTimeout(180_000)
+async function openSplit(page: Page) {
   const store = templateById('concept-store') ?? templateById('loft')
   if (!store) throw new Error('Falta una plantilla')
-  await createProjectViaUi(page, { name: `E2E plano recto ${Date.now()}`, kind: store.kind, template: store.name })
-  await expect(dock(page)).toBeVisible({ timeout: 30_000 })
-  await page.waitForTimeout(3000)
-  for (const view of ['2D', '3D', 'Ambas', '3D', '2D'] as const) {
-    await viewButton(page, view).click()
-    if (view === '3D') continue
-    await expect.poll(async () => Math.abs(await planRotation(page)), { timeout: 15_000 }).toBeLessThan(0.5)
-  }
-})
-
-test('el plano sigue recto aunque la persona gire la cámara 3D (Ambas y 2D)', async ({ page }) => {
-  test.setTimeout(180_000)
-  const store = templateById('concept-store') ?? templateById('loft')
-  if (!store) throw new Error('Falta una plantilla')
-  await createProjectViaUi(page, { name: `E2E plano girado ${Date.now()}`, kind: store.kind, template: store.name })
+  await createProjectViaUi(page, { name: `E2E vistas ${Date.now()}`, kind: store.kind, template: store.name })
   await expect(dock(page)).toBeVisible({ timeout: 30_000 })
   await page.waitForTimeout(3000)
   await viewButton(page, 'Ambas').click()
-  await expect.poll(async () => Math.abs(await planRotation(page)), { timeout: 15_000 }).toBeLessThan(0.5)
-  const azimuth = async () => {
-    const pose = await hook(page, 'cameraPose')
-    return pose ? Math.atan2((pose.position[0] ?? 0) - (pose.target[0] ?? 0), (pose.position[2] ?? 0) - (pose.target[2] ?? 0)) : Number.NaN
-  }
-  const before = await azimuth()
-  for (let i = 0; i < 3; i++) {
+  await expect.poll(async () => (await plan(page)).box.length, { timeout: 15_000 }).toBe(4)
+  await expect.poll(() => camera(page), { timeout: 15_000 }).not.toBeNull()
+  await page.waitForTimeout(2000)
+}
+
+test('Ambas: orbitar y acercar el 3D no cambia el encuadre ni el giro del plano, y el plano arranca con el norte arriba', async ({ page }) => {
+  test.setTimeout(180_000)
+  await openSplit(page)
+  const before = await plan(page)
+  expect(Math.abs(before.rotation)).toBeLessThan(0.5)
+  const cam = (await camera(page)) as NonNullable<Awaited<ReturnType<typeof camera>>>
+  // Una pose distinta: otro lado de la planta, más cerca y con otro centro.
+  await hook(page, 'setCameraPose', { position: [-6, 5, 2], target: [1, 0, 1], viewWidth: 6 })
+  await expect.poll(async () => near((await camera(page))?.position ?? [], cam.position, 0.5)).toBe(false)
+  for (let i = 0; i < 2; i++) {
     await hook(page, 'orbit', 'cw')
-    await page.waitForTimeout(2500)
-    expect(Math.abs(await planRotation(page)), `plano tras girar la cámara ${i + 1} vez`).toBeLessThan(0.5)
+    await page.waitForTimeout(1500)
   }
-  await expect.poll(azimuth, { timeout: 10_000 }).not.toBeCloseTo(before, 1)
+  const after = await plan(page)
+  expect(after.rotation).toBe(before.rotation)
+  expect(after.box).toEqual(before.box)
   await viewButton(page, '2D').click()
   await page.waitForTimeout(1500)
-  expect(Math.abs(await planRotation(page))).toBeLessThan(0.5)
+  const alone = await plan(page)
+  expect(Math.abs(alone.rotation)).toBeLessThan(0.5)
+})
+
+test('Ambas: hacer zoom y paneo en el plano no mueve la cámara 3D', async ({ page }) => {
+  test.setTimeout(180_000)
+  await openSplit(page)
+  const before = await plan(page)
+  const cam = (await camera(page)) as NonNullable<Awaited<ReturnType<typeof camera>>>
+  const rect = before.rect as { x: number; y: number; width: number; height: number }
+  const cx = rect.x + rect.width / 2
+  const cy = rect.y + rect.height / 2
+  await page.mouse.move(cx, cy)
+  for (let i = 0; i < 4; i++) {
+    await page.mouse.wheel(0, -300)
+    await page.waitForTimeout(250)
+  }
+  await expect.poll(async () => (await plan(page)).box[2]).not.toBe(before.box[2])
+  const moved = await camera(page)
+  expect(near(moved?.position ?? [], cam.position)).toBe(true)
+  expect(near(moved?.target ?? [], cam.target)).toBe(true)
+  expect(moved?.viewWidth).toBeCloseTo(cam.viewWidth ?? 0, 3)
+})
+
+test('Ambas: Recorrer solo mueve la cámara del 3D; el plano no se mueve ni gira', async ({ page }) => {
+  test.setTimeout(180_000)
+  await openSplit(page)
+  const before = await plan(page)
+  const levelId = ((await hook(page, 'levels'))[0] as { id: string }).id
+  expect(await hook(page, 'walkAt', levelId, 0, 0, 0)).toBe(true)
+  await page.waitForTimeout(2500)
+  const start = await hook(page, 'walkEye', levelId)
+  await page.keyboard.down('KeyW')
+  await page.waitForTimeout(4000)
+  await page.keyboard.up('KeyW')
+  const end = await hook(page, 'walkEye', levelId)
+  expect(Math.hypot((end?.x ?? 0) - (start?.x ?? 0), (end?.z ?? 0) - (start?.z ?? 0))).toBeGreaterThan(0.2)
+  // Durante el recorrido Pascal oculta los paneles: el plano se compara al volver.
+  await hook(page, 'walkStop')
+  await expect.poll(async () => (await plan(page)).box.length, { timeout: 15_000 }).toBe(4)
+  await page.waitForTimeout(1500)
+  const after = await plan(page)
+  expect(after.rotation).toBe(before.rotation)
+  expect(after.box).toEqual(before.box)
+})
+
+test('Ambas: lo que se edita en una vista se ve en la otra', async ({ page }) => {
+  test.setTimeout(180_000)
+  await openSplit(page)
+  const id = (await hook(page, 'addItem')) as string
+  await expect.poll(() => hook(page, 'has3d', id)).toBe(true)
+  await expect.poll(() => page.evaluate((nodeId) => Boolean(document.querySelector(`[data-floorplan-scene] [data-node-id="${nodeId}"]`)), id)).toBe(true)
+  const spot = () => page.evaluate((nodeId) => {
+    const el = document.querySelector(`[data-floorplan-scene] [data-node-id="${nodeId}"]`)
+    const r = el?.getBoundingClientRect()
+    return r ? [Math.round(r.x), Math.round(r.y)] : null
+  }, id)
+  const was = await spot()
+  await hook(page, 'moveNode', id, [3, 0, 3])
+  await expect.poll(spot).not.toEqual(was)
 })

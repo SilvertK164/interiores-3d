@@ -135,6 +135,13 @@ export function createE2eHooks(options: E2eOptions = {}) {
         .map((n) => ({ id: n.id, level: (n as unknown as { level: number }).level, visible: sceneRegistry.nodes.get(n.id)?.visible ?? null }))
         .sort((a, b) => a.level - b.level),
     /** Gira la cámara 3D igual que los botones de Pascal (para comprobar que el plano 2D no gira con ella). */
+    /** Pone la cámara 3D en una pose (el mismo evento que usan los botones de vista de Pascal). */
+    setCameraPose: (next: { position: [number, number, number]; target: [number, number, number]; viewWidth?: number }) =>
+      emitter.emit('camera-controls:apply-pose', { ...next, projection: (pose?.projection ?? 'perspective') as never } as never),
+    /** Si el visor 3D ya dibujó el objeto de ese nodo. */
+    has3d: (id: string) => sceneRegistry.nodes.has(id),
+    /** Mueve un nodo (su posición) como lo haría arrastrarlo en cualquiera de las dos vistas. */
+    moveNode: (id: string, position: [number, number, number]) => useScene.getState().updateNode(id as never, { position } as never),
     orbit: (dir: 'cw' | 'ccw') => emitter.emit(dir === 'cw' ? 'camera-controls:orbit-cw' : 'camera-controls:orbit-ccw'),
     /** Agregan una puerta o una ventana en el primer muro y devuelven su id (`null` si no hay muro). */
     addDoor: () => {
