@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react'
 import type { TemplateInfo } from '@/lib/templates'
 import { templateMeta } from '@/lib/ui-text'
+import { SkeletonImage } from './Skeleton'
 
 type Props = {
   template: TemplateInfo
@@ -24,8 +25,7 @@ const INFO: Record<NonNullable<Props['size']>, string> = {
 export function TemplateFace({ template, size = 'small', badge, selectable = false }: Props) {
   return (
     <>
-      <img
-        alt=""
+      <SkeletonImage
         className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         src={template.thumbnail}
       />

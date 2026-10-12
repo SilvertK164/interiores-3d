@@ -2,9 +2,10 @@
 
 import type { ProjectKind, ProjectSummary } from '@interiores/contract'
 import { Box, Ellipsis, House, Store } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { kindLabel, whenLabel } from '@/lib/ui-text'
+import { BusyLink } from './BusyLink'
+import { SkeletonImage } from './Skeleton'
 
 const KIND_ICON = { vivienda: House, comercio: Store } as const
 
@@ -18,14 +19,13 @@ export function ProjectCard({ project, now }: { project: ProjectSummary; now: Da
   const [imageFailed, setImageFailed] = useState(false)
   const showImage = project.templateId !== null && !imageFailed
   return (
-    <Link
+    <BusyLink
       className="group focus-ring grid size-full min-h-0 grid-rows-[minmax(0,1fr)_auto] rounded-3xl bg-white p-[7px] shadow-soft transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-[3px] hover:shadow-lift"
       href={`/proyectos/${project.id}`}
     >
       <span className="relative isolate block min-h-0 overflow-hidden rounded-[18px]">
         {showImage ? (
-          <img
-            alt=""
+          <SkeletonImage
             className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             onError={() => setImageFailed(true)}
             src={`/templates/${project.templateId}.jpg`}
@@ -54,6 +54,6 @@ export function ProjectCard({ project, now }: { project: ProjectSummary; now: Da
           Guardado
         </span>
       </span>
-    </Link>
+    </BusyLink>
   )
 }

@@ -1,37 +1,43 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { type FormEvent, useState } from 'react'
 import { AppShell } from '@/components/AppShell'
 import { Logo } from '@/components/Logo'
 import { supabaseBrowser } from '@/lib/supabase/browser'
+import { useNavigate } from '@/lib/use-navigate'
 
 const LABEL = 'mb-1.5 ml-1.5 block text-[13px] text-ink-muted'
 
 export default function LoginPage() {
-  const router = useRouter()
+  const nav = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
+  const locked = busy || nav.pending
+
   async function submit(mode: 'login' | 'register', e: FormEvent) {
     e.preventDefault()
+    if (locked) return
     setBusy(true)
     setMessage(null)
     const auth = supabaseBrowser().auth
     const { data, error } =
       mode === 'login' ? await auth.signInWithPassword({ email, password }) : await auth.signUp({ email, password })
-    setBusy(false)
     if (error) {
+      setBusy(false)
       setMessage(mode === 'login' ? 'Correo o contraseña incorrectos.' : 'No pudimos crear tu cuenta. Revisa el correo y usa al menos 6 caracteres.')
       return
     }
     if (!data.session) {
+      setBusy(false)
       setMessage('Te enviamos un correo para confirmar tu cuenta. Ábrelo y vuelve a ingresar.')
       return
     }
-    router.replace('/proyectos')
+    // Los botones siguen ocupados (`nav.pending`) hasta que llega /proyectos.
+    nav.go('/proyectos', 'replace')
+    setBusy(false)
   }
 
   return (
@@ -91,14 +97,14 @@ export default function LoginPage() {
               {message}
             </p>
           )}
-          <button className="btn btn-primary h-12" disabled={busy} type="submit">
+          <button aria-busy={locked || undefined} className="btn btn-primary h-12" disabled={locked} type="submit">
             Ingresar
           </button>
           <p className="text-center text-sm text-ink-muted">
             ¿Primera vez?{' '}
             <button
               className="focus-ring cursor-pointer rounded font-medium text-brand disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={busy}
+              disabled={locked}
               onClick={(e) => submit('register', e)}
               type="button"
             >

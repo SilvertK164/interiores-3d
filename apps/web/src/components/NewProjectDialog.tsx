@@ -2,10 +2,11 @@
 
 import type { ProjectKind } from '@interiores/contract'
 import { Check, House, Sparkles, SquareDashed, Store, X } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useId, useRef } from 'react'
 import { templatesForKind } from '@/lib/templates'
 import { useNewProject } from '@/lib/use-new-project'
+import { BusyLink } from './BusyLink'
+import { Loader } from './Loader'
 import { Logo } from './Logo'
 import { TemplateFace } from './TemplateFace'
 
@@ -181,22 +182,26 @@ export function NewProjectDialog({ open, presetTemplateId, onClose, onPartial }:
         )}
 
         <footer className="flex flex-wrap items-center gap-2.5">
-          <span className="text-sm text-ink-muted">Podrás cambiar todo después.</span>
+          {np.busy ? (
+            <Loader inline label={np.pending ? 'Guardando la plantilla' : 'Creando proyecto'} size="sm" />
+          ) : (
+            <span className="text-sm text-ink-muted">Podrás cambiar todo después.</span>
+          )}
           <span className="flex-1" />
           <button className="btn btn-ghost" onClick={close} type="button">
             Cancelar
           </button>
           {np.pending ? (
             <>
-              <Link className="btn btn-ghost" href={`/proyectos/${np.pending.project.id}`}>
+              <BusyLink className="btn btn-ghost" href={`/proyectos/${np.pending.project.id}`}>
                 Abrir el proyecto vacío
-              </Link>
-              <button className="btn btn-primary" disabled={np.busy} onClick={np.retry} type="button">
+              </BusyLink>
+              <button aria-busy={np.busy || undefined} className="btn btn-primary" disabled={np.busy} onClick={np.retry} type="button">
                 Reintentar guardar la plantilla
               </button>
             </>
           ) : (
-            <button className="btn btn-primary" disabled={np.busy} type="submit">
+            <button aria-busy={np.busy || undefined} className="btn btn-primary" disabled={np.busy} type="submit">
               <Sparkles aria-hidden size={20} />
               Crear proyecto
             </button>

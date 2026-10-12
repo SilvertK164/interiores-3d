@@ -1,8 +1,9 @@
 import type { ProjectSummary } from '@interiores/contract'
 import { Plus, Search } from 'lucide-react'
-import { Loader } from './Loader'
+import { PROJECT_ITEM, PROJECT_LIST } from '@/lib/ui-layout'
 import { Logo } from './Logo'
 import { ProjectCard } from './ProjectCard'
+import { ProjectCardsSkeleton, SkeletonRegion } from './Skeleton'
 
 type Props = {
   /** `null` mientras carga. */
@@ -22,9 +23,9 @@ export function ProjectsSection({ projects, visible, query, error, now, onNew }:
   if (error) return <p className={`${PANEL} text-sm text-destructive`} role="alert">{error}</p>
   if (projects === null) {
     return (
-      <div className={PANEL}>
-        <Loader label="Cargando tus proyectos" />
-      </div>
+      <SkeletonRegion className={PROJECT_LIST} label="Cargando tus proyectos">
+        <ProjectCardsSkeleton />
+      </SkeletonRegion>
     )
   }
   if (projects.length === 0) {
@@ -55,12 +56,9 @@ export function ProjectsSection({ projects, visible, query, error, now, onNew }:
     )
   }
   return (
-    <ul
-      aria-label="Tus proyectos"
-      className="grid min-h-0 auto-cols-auto grid-flow-row gap-4 pb-1 desk:auto-cols-[minmax(240px,calc((100%-3rem)/4))] desk:grid-flow-col desk:grid-rows-[minmax(0,1fr)] desk:overflow-x-auto desk:overflow-y-hidden desk:px-1 desk:pb-6 desk:pt-1 [scrollbar-width:thin]"
-    >
+    <ul aria-label="Tus proyectos" className={PROJECT_LIST}>
       {visible.map((p) => (
-        <li className="min-h-[220px] min-w-0 desk:min-h-0" key={p.id}>
+        <li className={PROJECT_ITEM} key={p.id}>
           <ProjectCard now={now} project={p} />
         </li>
       ))}

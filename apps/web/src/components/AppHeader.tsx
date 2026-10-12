@@ -1,6 +1,6 @@
 import { FlaskConical, LogOut, Plus, Search } from 'lucide-react'
-import Link from 'next/link'
 import { initialsFromEmail } from '@/lib/ui-text'
+import { BusyLink } from './BusyLink'
 import { Logo } from './Logo'
 
 type Props = {
@@ -9,12 +9,14 @@ type Props = {
   onQuery: (value: string) => void
   onNew: () => void
   onSignOut: () => void
+  /** Cerrando sesión (incluye la navegación a /login): el botón queda ocupado y no admite otro clic. */
+  signingOut?: boolean
 }
 
 const ROUND = 'glass focus-ring grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-ink transition-transform duration-200 ease-out hover:-translate-y-px'
 
 /** Cabecera de "Tus proyectos": marca, buscador de vidrio, nuevo proyecto, laboratorio, avatar y salir. */
-export function AppHeader({ email, query, onQuery, onNew, onSignOut }: Props) {
+export function AppHeader({ email, query, onQuery, onNew, onSignOut, signingOut = false }: Props) {
   return (
     <header className="flex flex-wrap items-center gap-3 desk:flex-nowrap desk:gap-4">
       <Logo showName />
@@ -34,9 +36,9 @@ export function AppHeader({ email, query, onQuery, onNew, onSignOut }: Props) {
         <Plus aria-hidden size={20} />
         Nuevo proyecto
       </button>
-      <Link aria-label="Laboratorio" className={ROUND} href="/laboratorio" title="Laboratorio">
+      <BusyLink aria-label="Laboratorio" className={ROUND} href="/laboratorio" title="Laboratorio">
         <FlaskConical aria-hidden size={20} />
-      </Link>
+      </BusyLink>
       <span
         className="grid size-[42px] shrink-0 place-items-center rounded-full bg-brand-wash text-sm font-medium text-brand-deep"
         role="img"
@@ -45,7 +47,15 @@ export function AppHeader({ email, query, onQuery, onNew, onSignOut }: Props) {
       >
         {initialsFromEmail(email)}
       </span>
-      <button aria-label="Salir" className={ROUND} onClick={onSignOut} title="Salir" type="button">
+      <button
+        aria-busy={signingOut || undefined}
+        aria-label="Salir"
+        className={`${ROUND} disabled:cursor-not-allowed disabled:opacity-60`}
+        disabled={signingOut}
+        onClick={onSignOut}
+        title="Salir"
+        type="button"
+      >
         <LogOut aria-hidden size={20} />
       </button>
     </header>

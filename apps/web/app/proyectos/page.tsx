@@ -6,22 +6,25 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { AppHeader } from '@/components/AppHeader'
 import { AppShell } from '@/components/AppShell'
-import { Loader } from '@/components/Loader'
 import { NewProjectDialog } from '@/components/NewProjectDialog'
 import { ProjectsSection } from '@/components/ProjectsSection'
+import { HeaderChipsSkeleton, ProjectsPageSkeleton } from '@/components/Skeleton'
 import { TemplateGallery } from '@/components/TemplateGallery'
 import { friendlyMessage } from '@/lib/api/errors'
 import { api } from '@/lib/api/instance'
 import { filterProjects, filterTemplates } from '@/lib/project-search'
 import { supabaseBrowser } from '@/lib/supabase/browser'
+import { CHIPS_ROW, GREETING_ROW, PROJECTS_FRAME, SECTION, SECTION_TITLE } from '@/lib/ui-layout'
+import { useNavigate } from '@/lib/use-navigate'
 import { greetingForHour, nameFromEmail, pluralProjects, whenLabel } from '@/lib/ui-text'
 import { useSession } from '@/lib/use-session'
 
-const H2 = 'font-display text-[19px] font-bold tracking-[-0.02em]'
 const CHIP = 'chip glass bg-white/70'
 
 export default function ProjectsPage() {
   const router = useRouter()
+  const nav = useNavigate()
+  const [leaving, setLeaving] = useState(false)
   const { session, loading } = useSession()
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -46,12 +49,21 @@ export default function ProjectsPage() {
 
   const openDialog = (templateId: string | null = null) => setDialog({ open: true, templateId })
   const closeDialog = () => setDialog((d) => ({ ...d, open: false }))
-  const signOut = () => supabaseBrowser().auth.signOut().then(() => router.replace('/login'))
+  const signOut = async () => {
+    if (leaving || nav.pending) return
+    setLeaving(true)
+    try {
+      await supabaseBrowser().auth.signOut()
+      nav.go('/login', 'replace')
+    } catch {
+      setLeaving(false)
+    }
+  }
 
   if (loading || !session) {
     return (
       <AppShell>
-        <Loader fullscreen />
+        <ProjectsPageSkeleton />
       </AppShell>
     )
   }
@@ -68,10 +80,17 @@ export default function ProjectsPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto flex min-h-dvh max-w-[1360px] flex-col gap-4 px-[clamp(20px,4vw,56px)] pb-6 pt-[18px] desk:grid desk:h-dvh desk:min-h-[620px] desk:grid-rows-[auto_auto_minmax(0,1fr)_minmax(0,1fr)] desk:gap-3.5 desk:overflow-hidden desk:pb-[22px]">
-        <AppHeader email={email} onNew={() => openDialog()} onQuery={setQuery} onSignOut={signOut} query={query} />
+      <div className={PROJECTS_FRAME}>
+        <AppHeader
+          email={email}
+          onNew={() => openDialog()}
+          onQuery={setQuery}
+          onSignOut={signOut}
+          query={query}
+          signingOut={leaving || nav.pending}
+        />
 
-        <div className="flex items-end gap-5 pt-1">
+        <div className={GREETING_ROW}>
           <div>
             <p className="text-sm text-ink-muted">{greetingForHour(now.getHours())}</p>
             <h1 className="mt-0.5 font-display text-[clamp(28px,3.6vw,46px)] font-medium leading-[1.05] tracking-[-0.035em]">
@@ -85,8 +104,9 @@ export default function ProjectsPage() {
               )}
             </h1>
           </div>
+          {projects === null && !error && <HeaderChipsSkeleton />}
           {projects && projects.length > 0 && lastChange && (
-            <div className="ml-auto hidden gap-2 pb-1.5 desk:flex">
+            <div className={CHIPS_ROW}>
               <span className={CHIP}>
                 <Folder aria-hidden size={14} />
                 {pluralProjects(projects.length)}
@@ -99,8 +119,8 @@ export default function ProjectsPage() {
           )}
         </div>
 
-        <section className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2.5">
-          <h2 className={H2}>Tus proyectos</h2>
+        <section className={SECTION}>
+          <h2 className={SECTION_TITLE}>Tus proyectos</h2>
           <ProjectsSection
             error={error}
             now={now}
@@ -111,9 +131,9 @@ export default function ProjectsPage() {
           />
         </section>
 
-        <section className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2.5">
+        <section className={SECTION}>
           <div className="flex items-baseline justify-between">
-            <h2 className={H2}>Empieza desde una plantilla</h2>
+            <h2 className={SECTION_TITLE}>Empieza desde una plantilla</h2>
             <button className="focus-ring cursor-pointer rounded text-sm font-medium text-brand" onClick={() => openDialog()} type="button">
               Ver todas
             </button>

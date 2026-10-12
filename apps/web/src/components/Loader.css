@@ -38,6 +38,16 @@
   height: 112px;
 }
 
+/* En fila: la ventana va a la izquierda y el texto a la derecha. */
+.madori-loader--inline {
+  flex-direction: row;
+  gap: 0.5rem;
+  text-align: left;
+}
+.madori-loader--inline .madori-loader__win {
+  height: 28px;
+}
+
 .madori-loader__label {
   color: #3a4458;
   font-size: 0.875rem;

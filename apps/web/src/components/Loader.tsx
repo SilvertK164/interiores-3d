@@ -1,3 +1,5 @@
+'use client'
+
 import { useId } from 'react'
 import { WINDOW } from '@/lib/brand'
 import './Loader.css'
@@ -11,6 +13,8 @@ type Props = {
   showLabel?: boolean
   /** Ocupa toda la pantalla (página o editor que aún no se mostró). */
   fullscreen?: boolean
+  /** Ventana y texto en una fila (para junto a un botón o dentro de un formulario). */
+  inline?: boolean
   className?: string
 }
 
@@ -20,6 +24,7 @@ export function Loader({
   label = 'Abriendo tu espacio',
   showLabel = true,
   fullscreen = false,
+  inline = false,
   className = '',
 }: Props) {
   const clipId = `madori-clip-${useId().replace(/[^\w-]/g, '')}`
@@ -27,6 +32,7 @@ export function Loader({
     'madori-loader',
     `madori-loader--${size}`,
     fullscreen && 'madori-loader--screen',
+    inline && 'madori-loader--inline',
     className,
   ].filter(Boolean)
   return (

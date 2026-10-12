@@ -1,7 +1,6 @@
 'use client'
 
 import type { ProjectKind } from '@interiores/contract'
-import { useRouter } from 'next/navigation'
 import { type FormEvent, useCallback, useRef, useState } from 'react'
 import { friendlyMessage } from './api/errors'
 import { api } from './api/instance'
@@ -12,6 +11,7 @@ import {
   normalizeProjectName,
   retrySaveTemplate,
 } from './templates/create-from-template'
+import { useNavigate } from './use-navigate'
 
 const DEFAULT_KIND: ProjectKind = 'comercio'
 const SAVE_FAILED = 'El proyecto se creó, pero no pudimos guardar la plantilla. Puedes reintentar.'
@@ -22,7 +22,7 @@ const firstTemplateOf = (kind: ProjectKind) => templatesForKind(kind)[0]?.id ?? 
  * Conserva la protección contra doble clic (un candado síncrono, porque el estado de React llega tarde).
  */
 export function useNewProject(onPartial?: () => void) {
-  const router = useRouter()
+  const { go } = useNavigate()
   const [name, setNameState] = useState('')
   const [kind, setKind] = useState<ProjectKind>(DEFAULT_KIND)
   const [templateId, setTemplateId] = useState<string | null>(firstTemplateOf(DEFAULT_KIND))
@@ -63,7 +63,7 @@ export function useNewProject(onPartial?: () => void) {
 
   function finish(result: CreateFromTemplateResult, failMessage: string) {
     if (result.saved) {
-      router.push(`/proyectos/${result.project.id}`) // el candado sigue puesto: la página se reemplaza
+      go(`/proyectos/${result.project.id}`) // el candado sigue puesto: la página se reemplaza
       return
     }
     setPending(result)
