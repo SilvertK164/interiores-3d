@@ -1,5 +1,5 @@
 import { WallNode, useScene } from '@pascal-app/core'
-import { armToolMode } from '@pascal-app/editor'
+import { armToolMode, getHistoryCommandState, useEditor } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import type { PascalChrome } from './chrome'
 
@@ -35,6 +35,26 @@ export function createE2eHooks(options: E2eOptions = {}) {
       return wall.id
     },
     armWall: () => armToolMode({ mode: 'build', tool: 'wall' }),
+    /** Lectura directa de Pascal (no del shell): lo que las pruebas comparan con lo que el shell muestra. */
+    state: () => {
+      const editor = useEditor.getState()
+      const selection = useViewer.getState().selection
+      const history = getHistoryCommandState()
+      return {
+        phase: editor.phase,
+        mode: editor.mode,
+        tool: editor.tool,
+        viewMode: editor.viewMode,
+        readOnly: useScene.getState().readOnly,
+        firstPerson: editor.isFirstPersonMode,
+        canUndo: history.canUndo,
+        canRedo: history.canRedo,
+        selectedIds: [...selection.selectedIds] as string[],
+        zoneId: selection.zoneId as string | null,
+        levelId: selection.levelId as string | null,
+      }
+    },
+    select: (id: string | null) => useViewer.getState().setSelection({ selectedIds: id ? ([id] as never) : [], zoneId: null }),
   }
 }
 
