@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   type Arming,
   DOCK,
@@ -20,6 +20,7 @@ import { SHORTCUTS } from './more-model'
 import { Dock, ToolMenu } from './ui/Dock'
 import { ShortcutsDialog } from './ui/ShortcutsDialog'
 import { useBridge, useShell } from './use-bridge'
+import { useDismiss } from './use-dismiss'
 
 /** El dock del modo Editar. Lo que marca sale del estado REAL de Pascal; cada entrada arma la herramienta por el puente. */
 export function ShellDock() {
@@ -30,14 +31,7 @@ export function ShellDock() {
   const root = useRef<HTMLDivElement>(null)
 
   // Un clic fuera del dock cierra el menú abierto.
-  useEffect(() => {
-    if (!openMenu) return
-    const onDown = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpenMenu(null)
-    }
-    document.addEventListener('pointerdown', onDown)
-    return () => document.removeEventListener('pointerdown', onDown)
-  }, [openMenu])
+  useDismiss(openMenu !== null, root, () => setOpenMenu(null))
 
   /** Cierra el menú y devuelve el teclado al botón que lo abrió. */
   const closeMenu = () => {
