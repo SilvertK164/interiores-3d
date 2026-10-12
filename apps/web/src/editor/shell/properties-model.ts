@@ -4,6 +4,7 @@ import { shoelaceArea } from './bridge/levels'
 import type { SceneNodeLike } from './bridge/types'
 import { itemBuilder } from './properties-item'
 import { doorBuilder, windowBuilder } from './properties-openings'
+import { PARAMETRIC_BUILDERS } from './properties-parametric'
 import {
   LIMITS,
   metersPatch,
@@ -192,7 +193,7 @@ const BUILDERS: Readonly<Record<string, Builder>> = {
   // @@types
 }
 
-const builderOf = (target: PropTarget) => BUILDERS[target.node.type]
+const builderOf = (target: PropTarget) => BUILDERS[target.node.type] ?? PARAMETRIC_BUILDERS[target.node.type]
 
 /** Campos del panel; los tipos sin constructor (piso, escalera…) no tienen: reciben el panel mínimo (D5). */
 export const fieldsFor = (target: PropTarget): FieldView[] =>
