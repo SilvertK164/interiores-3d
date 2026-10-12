@@ -1,9 +1,8 @@
 'use client'
 
 import { loadPlugin } from '@pascal-app/core'
-import { CATALOG_ITEMS, Editor, ItemsPanel, type SceneGraph } from '@pascal-app/editor'
+import { CATALOG_ITEMS, Editor, type SceneGraph } from '@pascal-app/editor'
 import { builtinPlugin } from '@pascal-app/nodes'
-import { Sofa, Store } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
@@ -13,7 +12,6 @@ import { useNavigate } from '@/lib/use-navigate'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { localizeCatalog } from './catalog-assets'
-import { buildCommerceItems } from './commerce-catalog'
 import { HIDDEN_CHROME, type PascalChrome } from './chrome'
 import { installE2eHooks } from './e2e-hooks'
 import { createPascalBridge } from './pascal-bridge'
@@ -50,7 +48,6 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   }, [])
 
   const items = useMemo(() => localizeCatalog(CATALOG_ITEMS), [])
-  const commerceItems = useMemo(() => buildCommerceItems(items), [items])
 
   useEffect(() => {
     let cancelled = false
@@ -104,24 +101,6 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   const bridge = useMemo(() => createPascalBridge(), [])
   const { go, pending: leaving } = useNavigate()
 
-  const sidebarTabs = useMemo(
-    () => [
-      {
-        id: 'items',
-        label: 'Muebles',
-        icon: <Sofa aria-hidden size={20} />,
-        component: () => <ItemsPanel items={items} showSourceFilter={false} showTagFilters={false} />,
-      },
-      {
-        id: 'commerce',
-        label: 'Comercio',
-        icon: <Store aria-hidden size={20} />,
-        component: () => <ItemsPanel items={commerceItems} showSourceFilter={false} showTagFilters={false} />,
-      },
-    ],
-    [items, commerceItems],
-  )
-
   if (phase.kind === 'loading') return <LoaderPortal />
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>
 
@@ -135,7 +114,6 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         onLoad={onLoad}
         onSave={onSave}
         projectId={projectId}
-        sidebarTabs={sidebarTabs}
       />
       <EditorShell
         backBusy={leaving}
