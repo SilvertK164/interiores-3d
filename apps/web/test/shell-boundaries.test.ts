@@ -10,7 +10,7 @@ const walk = (dir: string): string[] =>
     entry.isDirectory() ? walk(join(dir, entry.name)) : /\.(?:tsx?|mjs|jsx?)$/.test(entry.name) ? [join(dir, entry.name)] : [],
   )
 /** Cualquier forma de traer Pascal, three o R3F: `from`, `import 'x'`, `import('x')`, `require('x')`, comillas simples o dobles. */
-export const PASCAL = /(?:\bfrom|\bimport|\brequire)\s*\(?\s*['"](?:@pascal-app\/|three(?:['"/])|@react-three\/)/
+const PASCAL = /(?:\bfrom|\bimport|\brequire)\s*\(?\s*['"](?:@pascal-app\/|three(?:['"/])|@react-three\/)/
 
 describe('frontera con Pascal', () => {
   it('la prueba detecta las formas de importar (no pasa por vacío)', () => {
