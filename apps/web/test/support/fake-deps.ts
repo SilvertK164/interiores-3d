@@ -72,6 +72,11 @@ export function createFakeDeps() {
     history,
     applyTheme: vi.fn(() => undoTheme),
     hideCameraHint: vi.fn(() => showHint),
+    acquireReadOnly: vi.fn(() => {
+      scene.setState({ readOnly: true })
+      return () => scene.setState({ readOnly: false })
+    }),
+    cancelActiveTool: vi.fn(),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */
