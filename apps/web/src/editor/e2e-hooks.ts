@@ -16,6 +16,7 @@ export function installE2eHooks(): void {
     /** Solo para las capturas de las plantillas: 'up' | 'cutaway' | 'down' | 'translucent'. */
     setWallMode: (mode: string) => useViewer.getState().setWallMode(mode as never),
     wallCount: () => nodes().filter((n) => n.type === 'wall').length,
+    theme: () => ({ sceneTheme: useViewer.getState().sceneTheme, unit: useViewer.getState().unit }),
     addWall: () => {
       const level = nodes().find((n) => n.type === 'level')
       if (!level) throw new Error('No hay nivel donde agregar el muro')

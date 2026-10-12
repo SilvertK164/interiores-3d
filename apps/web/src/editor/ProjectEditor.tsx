@@ -14,6 +14,7 @@ import { fromEnvelope, toEnvelope } from './adapter'
 import { localizeCatalog } from './catalog-assets'
 import { buildCommerceItems } from './commerce-catalog'
 import { installE2eHooks } from './e2e-hooks'
+import { applyEditorTheme } from './pascal-bridge'
 import { SaveBanner } from './SaveBanner'
 import { type SaveOutcome, type SaverStatus, type SceneSaver, createSceneSaver } from './scene-saver'
 
@@ -93,6 +94,9 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     })
     return () => data.subscription.unsubscribe()
   }, [])
+
+  // Tema claro de Madori: escena `studio`, metros y la tipografía en <body> (los portales de Pascal cuelgan de ahí).
+  useEffect(() => applyEditorTheme(), [])
 
   const sidebarTabs = useMemo(
     () => [
