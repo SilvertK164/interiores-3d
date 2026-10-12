@@ -36,4 +36,13 @@ describe('controles de Vista 3D', () => {
     expect(textOf(markup)).toContain('Renderizar')
     expect(markup.match(/Pronto/g)).toHaveLength(2)
   })
+
+  it('Exportar plano está activo junto a Compartir y Renderizar', () => {
+    const markup = renderToStaticMarkup(<ShareRender onExportPlan={noop} />)
+    expect(textOf(markup)).toContain('Exportar plano')
+    const exportButton = markup.match(/<button[^>]*>(?:(?!<\/button>)[\s\S])*Exportar plano<\/button>/g) ?? []
+    expect(exportButton).toHaveLength(1)
+    expect(exportButton[0]).not.toContain('disabled')
+    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(2)
+  })
 })

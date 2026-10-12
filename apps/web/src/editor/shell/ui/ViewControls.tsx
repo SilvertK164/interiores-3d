@@ -1,4 +1,4 @@
-import { Share2, Sparkles, type LucideIcon } from 'lucide-react'
+import { FileDown, Share2, Sparkles, type LucideIcon } from 'lucide-react'
 import { cx } from '@/lib/cx'
 import { ChipRow, FLOAT } from './primitives'
 import { SoonButton } from './status'
@@ -72,10 +72,18 @@ export function ViewBar({
   )
 }
 
-/** Compartir y Renderizar: visibles pero deshabilitados, con "Pronto". */
-export function ShareRender() {
+/** Exportar plano (activo) junto a Compartir y Renderizar (visibles pero deshabilitados, con "Pronto"). */
+export function ShareRender({ onExportPlan }: { onExportPlan?: (opener: HTMLElement) => void } = {}) {
   return (
     <div className="absolute bottom-6 right-5 z-10 flex items-center gap-3">
+      <button
+        type="button"
+        onClick={(event) => onExportPlan?.(event.currentTarget)}
+        className={cx(FLOAT, 'focus-ring inline-flex h-12 cursor-pointer items-center gap-2 rounded-full px-5 text-[15px] font-semibold text-ink transition-colors duration-150 ease-out hover:bg-white')}
+      >
+        <FileDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
+        Exportar plano
+      </button>
       <SoonButton icon={Share2} label="Compartir" />
       <SoonButton icon={Sparkles} label="Renderizar" tone="primary" />
     </div>

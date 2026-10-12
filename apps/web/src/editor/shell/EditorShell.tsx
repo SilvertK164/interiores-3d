@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SaverStatus } from '../scene-saver'
 import type { ShellBridge } from './bridge'
 import { selectShellState } from './bridge/selectors'
+import { ExportPlanDialog } from './ExportPlanDialog'
 import type { CatalogItemLike } from './furniture-model'
 import { installKeyTrap } from './key-trap'
 import { LeftPanel } from './LeftPanel'
@@ -22,7 +23,7 @@ function FrameViews() {
   return null
 }
 
-function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
+function ShellBody({ catalog, onExportPlan }: { catalog: readonly CatalogItemLike[]; onExportPlan: (opener: HTMLElement | null) => void }) {
   const { mode, firstPerson } = useShell((s) => {
     const state = selectShellState(s)
     return { mode: state.mode, firstPerson: state.firstPerson }
@@ -33,12 +34,12 @@ function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
       <LeftPanel catalog={catalog} />
       {mode === 'editar' ? (
         <>
-          <ShellDock />
+          <ShellDock onExportPlan={onExportPlan} />
           <ShellUndoRedo />
           <PropertiesPanel />
         </>
       ) : (
-        <ShellView />
+        <ShellView onExportPlan={onExportPlan} />
       )}
     </>
   )
@@ -53,6 +54,7 @@ export function EditorShell({
   bridge,
   catalog,
   projectName,
+  author = '',
   saveStatus,
   onBack,
   backBusy,
@@ -60,10 +62,18 @@ export function EditorShell({
   bridge: ShellBridge
   catalog: readonly CatalogItemLike[]
   projectName: string
+  /** Nombre de la cuenta (o el correo): va en el cajetín del plano. */
+  author?: string
   saveStatus: SaverStatus
   onBack: () => void
   backBusy?: boolean
 }) {
+  const [exportOpen, setExportOpen] = useState(false)
+  const exportOpener = useRef<HTMLElement | null>(null)
+  const openExport = (opener: HTMLElement | null) => {
+    exportOpener.current = opener
+    setExportOpen(true)
+  }
   useEffect(() => {
     const stop = bridge.mountDefaults()
     // Las teclas de Pascal no llegan a sus atajos con el foco en un botón del shell, ni en Ver (donde Ctrl+Z ni siquiera
@@ -85,7 +95,8 @@ export function EditorShell({
       <div data-editor-shell className="editor-shell pointer-events-none absolute inset-0 z-40 overflow-hidden">
         <FrameViews />
         <ShellTopBar name={projectName} saveStatus={saveStatus} onBack={onBack} backBusy={backBusy} />
-        <ShellBody catalog={catalog} />
+        <ShellBody catalog={catalog} onExportPlan={openExport} />
+        <ExportPlanDialog author={author} onClose={() => setExportOpen(false)} open={exportOpen} opener={exportOpener} projectName={projectName} />
       </div>
     </BridgeProvider>
   )

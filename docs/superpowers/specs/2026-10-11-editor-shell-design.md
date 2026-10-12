@@ -19,12 +19,12 @@ Que el editor se vea y se maneje como el resto de Madori: claro, en castellano y
 8. **Catálogo:** todos los ítems del catálogo y de Comercio (hoy 144 carpetas en `public/items`) tienen nombre y categoría en castellano (una prueba falla si falta alguno) y miniatura con **fondo transparente** (una prueba lee la esquina de cada una).
 9. **Tema:** ningún panel, barra o dock tiene fondo oscuro (prueba de luminancia del color de fondo calculado) pese a que Pascal pone `body.dark` al montar.
 10. **Parche vigilado:** una prueba comprueba que el dock, el inspector, los ayudantes y el selector de nivel de Pascal **no existen en pantalla**; si una actualización rompe el parche, falla.
-11. Compartir, Renderizar, Exportar plano y Subir mi mueble se ven **deshabilitados con "Pronto"** y no hacen nada.
+11. Compartir, Renderizar y Subir mi mueble se ven **deshabilitados con "Pronto"** y no hacen nada. **Exportar plano** ya está activo (spec 4, 2026-10-12): en el menú Más de Editar y como botón en Ver abre su diálogo.
 12. Accesibilidad básica: el dock es una barra de herramientas (`role="toolbar"`) con botones `aria-pressed` operables con teclado, objetivos táctiles de al menos 44 px, foco visible y movimiento reducido respetado.
 
 ## 2. Qué NO hace este spec
 - **Móvil y tablet** (Ver, Recorrer, hojas inferiores): spec propio.
-- **Compartir, Renderizar, Exportar plano y Subir mi mueble:** solo sus botones deshabilitados.
+- **Compartir, Renderizar y Subir mi mueble:** solo sus botones deshabilitados (Exportar plano se hizo en el spec 4).
 - Traducir el resto del texto de Pascal (unas 550 líneas en unos 99 archivos: paleta de comandos, medidas del HUD, paneles avanzados). Solo se traduce lo que reemplazamos.
 - Herramientas de techo, cerco, ascensor, punto de aparición e instalaciones (ductos, tuberías).
 - Edición de varios elementos a la vez en el panel de propiedades.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { NAME_MAX, NAME_MIN, greetingName, initialsFor, normalizeName, savedName } from '../src/lib/person-name'
+import { NAME_MAX, NAME_MIN, authorName, greetingName, initialsFor, normalizeName, savedName } from '../src/lib/person-name'
 
 const withName = (name: unknown, email = 'silvert.quispe@correo.com') => ({ email, user_metadata: { name } })
 
@@ -73,5 +73,22 @@ describe('initialsFor', () => {
   it('sin nada devuelve "?"', () => {
     expect(initialsFor(null, null)).toBe('?')
     expect(initialsFor(undefined, '1234@correo.com')).toBe('?')
+  })
+})
+
+describe('authorName (el autor del cajetín del plano)', () => {
+  it('es el nombre de la cuenta', () => {
+    expect(authorName(withName('Ana María'))).toBe('Ana María')
+  })
+
+  it('si la cuenta no tiene nombre, es el correo entero', () => {
+    expect(authorName(withName(undefined, 'silvert.quispe@correo.com'))).toBe('silvert.quispe@correo.com')
+    expect(authorName({ email: ' ana@correo.com ', user_metadata: null })).toBe('ana@correo.com')
+  })
+
+  it('sin cuenta es vacío', () => {
+    expect(authorName(null)).toBe('')
+    expect(authorName(undefined)).toBe('')
+    expect(authorName({ email: null })).toBe('')
   })
 })

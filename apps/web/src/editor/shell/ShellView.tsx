@@ -8,7 +8,13 @@ import { useBridge, useShell } from './use-bridge'
 import { viewActions, viewGroups } from './view-model'
 
 /** Lo que se ve en Ver: el panel Vista 3D, la barra de cámara y Compartir y Renderizar (deshabilitados con "Pronto"). */
-export function ShellView({ decisions = DECISIONS }: { decisions?: Pick<Decisions, 'cameraControl' | 'styleControl' | 'walkthrough'> }) {
+export function ShellView({
+  decisions = DECISIONS,
+  onExportPlan,
+}: {
+  decisions?: Pick<Decisions, 'cameraControl' | 'styleControl' | 'walkthrough'>
+  onExportPlan?: (opener: HTMLElement | null) => void
+}) {
   const bridge = useBridge()
   const options = useShell(selectViewOptions)
   return (
@@ -29,7 +35,7 @@ export function ShellView({ decisions = DECISIONS }: { decisions?: Pick<Decision
           else if (id === 'orbit-left' || id === 'orbit-right' || id === 'top') bridge.moveCamera(id)
         }}
       />
-      <ShareRender />
+      <ShareRender onExportPlan={onExportPlan} />
     </>
   )
 }

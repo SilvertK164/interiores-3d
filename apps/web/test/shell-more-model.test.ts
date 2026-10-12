@@ -20,7 +20,7 @@ describe('menú Más', () => {
     expect(SHORTCUTS.map((s) => s.keys)).toContain('Supr')
   })
 
-  it('Compartir, Renderizar y Exportar plano son los botones "Pronto"', () => {
-    expect(SOON_ITEMS.map((i) => i.label)).toEqual(['Compartir', 'Renderizar', 'Exportar plano'])
+  it('Compartir y Renderizar son los botones "Pronto"; Exportar plano ya es real (spec 4, criterio 2)', () => {
+    expect(SOON_ITEMS.map((i) => i.label)).toEqual(['Compartir', 'Renderizar'])
   })
 })

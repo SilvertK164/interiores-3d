@@ -17,17 +17,25 @@ const pressedLabels = (markup: string) =>
   [...markup.matchAll(/aria-pressed="true"[^>]*>(?:<svg[\s\S]*?<\/svg>)?([^<]+)<\/button>/g)].map((m) => m[1])
 
 describe('MoreMenu', () => {
-  const markup = render(<MoreMenu onClose={noop} onShortcuts={noop} />)
+  const markup = render(<MoreMenu onClose={noop} onExportPlan={noop} onShortcuts={noop} />)
 
-  it('ofrece eliminar, cuadrícula, ajustes, atajos y los tres botones Pronto deshabilitados', () => {
+  it('ofrece eliminar, cuadrícula, ajustes, atajos, Exportar plano y los dos botones Pronto deshabilitados', () => {
     const text = textOf(markup)
     for (const label of ['Eliminar elementos', 'Cuadrícula', 'Ajuste de muros', 'Ajuste de muebles', 'Atajos de teclado', 'Próximamente', 'Compartir', 'Renderizar', 'Exportar plano']) {
       expect(text, label).toContain(label)
     }
-    expect(markup.match(/Pronto/g)).toHaveLength(3)
-    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(3)
+    expect(markup.match(/Pronto/g)).toHaveLength(2)
+    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(2)
     expect(markup).toContain('role="dialog"')
     expect(markup).toContain('aria-label="Más opciones"')
+  })
+
+  it('Exportar plano es un botón activo (sin "Pronto") con su ícono decorativo', () => {
+    const buttons = markup.match(/<button[^>]*>(?:(?!<\/button>)[\s\S])*Exportar plano<\/button>/g) ?? []
+    expect(buttons).toHaveLength(1)
+    expect(buttons[0]).not.toContain('disabled')
+    expect(buttons[0]).not.toContain('Pronto')
+    expect(buttons[0]).toMatch(/<svg[^>]*aria-hidden="true"/)
   })
 
   it('marca la cuadrícula y los ajustes que tiene Pascal ahora (0,5 m; muros en cuadrícula; muebles en alineación)', () => {
@@ -35,7 +43,7 @@ describe('MoreMenu', () => {
   })
 
   it('refleja otros valores de Pascal', () => {
-    const other = render(<MoreMenu onClose={noop} onShortcuts={noop} />, ({ editor }) =>
+    const other = render(<MoreMenu onClose={noop} onExportPlan={noop} onShortcuts={noop} />, ({ editor }) =>
       editor.setState({ gridSnapStep: 0.1, snappingModeByContext: { wall: 'angles', item: 'off', polygon: 'grid', rotation: 'angles' }, mode: 'delete' }),
     )
     expect(pressedLabels(other)).toEqual(['Eliminar elementos', '10 cm', 'Ángulos', 'Libre'])

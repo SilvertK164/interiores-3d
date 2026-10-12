@@ -29,3 +29,8 @@ export function initialsFor(name: string | null | undefined, email: string | nul
   const words = lettersWords(name ?? '')
   return words.length > 0 ? initialsFromWords(words) : initialsFromEmail(email)
 }
+
+/** Autor del cajetín del plano: el nombre de la cuenta y, si no tiene, el correo entero (las cuentas anteriores al registro con nombre). */
+export function authorName(user: AccountLike): string {
+  return savedName(user) || (user?.email ?? '').trim()
+}

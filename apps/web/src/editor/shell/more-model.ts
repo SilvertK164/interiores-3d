@@ -44,9 +44,8 @@ export const SHORTCUTS: readonly { keys: string; label: string }[] = [
   { keys: 'Ctrl + S', label: 'Guardar ahora' },
 ]
 
-/** Funciones que llegan en una próxima versión: botones deshabilitados con "Pronto" (criterio 11). */
+/** Funciones que llegan en una próxima versión: botones deshabilitados con "Pronto" (criterio 11 del spec 3; "Exportar plano" ya es real, spec 4). */
 export const SOON_ITEMS: readonly { id: string; label: string }[] = [
   { id: 'share', label: 'Compartir' },
   { id: 'render', label: 'Renderizar' },
-  { id: 'export-plan', label: 'Exportar plano' },
 ]

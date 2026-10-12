@@ -10,6 +10,8 @@ import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
 import { useNavigate } from '@/lib/use-navigate'
+import { authorName } from '@/lib/person-name'
+import { useSession } from '@/lib/use-session'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { localizeCatalog } from './catalog-assets'
@@ -110,6 +112,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   // El puente con Pascal y el shell de Madori; `EditorShell` aplica el tema claro y oculta el aviso de cámara al montarse.
   const bridge = useMemo(() => createPascalBridge(), [])
   const { go, pending: leaving } = useNavigate()
+  const { session } = useSession()
   const rootRef = useRef<HTMLDivElement>(null)
   const sceneLoading = useSceneLoading(rootRef, phase.kind === 'ready')
 
@@ -133,6 +136,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         projectId={projectId}
       />
       <EditorShell
+        author={authorName(session?.user)}
         backBusy={leaving}
         bridge={bridge}
         catalog={items}
