@@ -59,3 +59,10 @@ test('la columna lateral de Pascal (rieles y paneles de plugins) no ocupa lugar:
   expect((await viewer.boundingBox())?.x).toBeLessThan(2)
   await expect(page.getByText('Create a Pascal plugin')).toHaveCount(0)
 })
+
+test('la brújula de Pascal (en inglés, y tapaba Deshacer y Rehacer) no se ve', async ({ page }) => {
+  await createProjectViaUi(page, { name: `E2E brujula ${Date.now()}`, template: null })
+  await expect(page.getByRole('button', { name: 'Deshacer' })).toBeVisible({ timeout: 15_000 })
+  await settle(page)
+  await expect(page.getByRole('button', { name: 'Align view to north' })).toBeHidden()
+})

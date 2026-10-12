@@ -81,3 +81,8 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* La brújula de Pascal ("Align view to north", en inglés) cae justo sobre Deshacer y Rehacer y la maqueta no la trae. */
+button[aria-label='Align view to north'] {
+  display: none;
+}
