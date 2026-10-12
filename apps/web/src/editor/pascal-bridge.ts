@@ -2,6 +2,7 @@ import * as Core from '@pascal-app/core'
 import * as Pascal from '@pascal-app/editor'
 import { appFontClasses } from '@/components/AppShell'
 import { type ShellBridge, createBridge } from './shell/bridge'
+import type { CatalogDeps } from './shell/bridge/catalog'
 import type { CoreDeps, HistoryPort } from './shell/bridge/core'
 import type { LevelsDeps } from './shell/bridge/levels'
 import type { ModeDeps } from './shell/bridge/mode'
@@ -85,11 +86,21 @@ function levelsDeps(): LevelsDeps {
   }
 }
 
+type PascalCatalogItem = (typeof Pascal.CATALOG_ITEMS)[number]
+
+function catalogDeps(): CatalogDeps {
+  return {
+    // Las tarjetas salen de `CATALOG_ITEMS` de Pascal (ya con rutas locales): el ítem que vuelve es uno de ellos.
+    activateCatalogItem: (item) => Pascal.activateCatalogItem(item as PascalCatalogItem),
+  }
+}
+
 export function createPascalBridge(): ShellBridge {
   return createBridge({
     ...coreDeps(),
     ...modeDeps(),
     ...levelsDeps(),
+    ...catalogDeps(),
     // @@deps
   })
 }

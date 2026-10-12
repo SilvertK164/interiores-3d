@@ -22,6 +22,7 @@ export type EditorLike = {
   setPhase(phase: Phase): void
   setViewMode(mode: ViewMode): void
   setFirstPersonMode(enabled: boolean): void
+  selectedItem: { id: string } | null
   structureLayer: 'zones' | 'elements'
   gridSnapStep: number
   snappingModeByContext: Record<SnapContext, SnapMode>

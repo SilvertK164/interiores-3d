@@ -32,6 +32,7 @@ export function createFakeDeps() {
     tool: 'wall',
     viewMode: '3d',
     isFirstPersonMode: false,
+    selectedItem: null,
     armToolMode: vi.fn((next: { mode: EditorMode; tool?: string }) => editor.setState({ mode: next.mode, tool: next.tool ?? null })),
     setPhase: vi.fn((phase: EditorLike['phase']) => editor.setState({ phase })),
     setViewMode: vi.fn((viewMode: EditorLike['viewMode']) => editor.setState({ viewMode })),
@@ -91,6 +92,7 @@ export function createFakeDeps() {
     }),
     cancelActiveTool: vi.fn(),
     createLevel: vi.fn((_input: { buildingId: string; level: number }) => 'level_nuevo'),
+    activateCatalogItem: vi.fn(),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */
