@@ -1,4 +1,5 @@
 import { type CoreDeps, createCoreSlice } from './core'
+import { createLevelsSlice } from './levels'
 import { type ModeDeps, createModeSlice } from './mode'
 import { createToolsSlice } from './tools'
 
@@ -10,6 +11,7 @@ export function createBridge(deps: BridgeDeps) {
     ...createCoreSlice(deps),
     ...createModeSlice(deps),
     ...createToolsSlice(deps),
+    ...createLevelsSlice(deps),
     // @@slices
   }
 }
