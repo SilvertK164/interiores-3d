@@ -11,3 +11,7 @@ export const undoRedo = (page: Page) => ({
   undo: page.getByRole('button', { name: 'Deshacer' }),
   redo: page.getByRole('button', { name: 'Rehacer' }),
 })
+
+export const dock = (page: Page) => page.getByRole('toolbar', { name: 'Herramientas de edición' })
+
+export const dockButton = (page: Page, name: string) => dock(page).getByRole('button', { name, exact: true })

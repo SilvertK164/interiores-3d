@@ -52,6 +52,9 @@ export function createE2eHooks(options: E2eOptions = {}) {
         selectedIds: [...selection.selectedIds] as string[],
         zoneId: selection.zoneId as string | null,
         levelId: selection.levelId as string | null,
+        gridSnapStep: editor.gridSnapStep,
+        snapWall: editor.snappingModeByContext.wall,
+        snapItem: editor.snappingModeByContext.item,
       }
     },
     select: (id: string | null) => useViewer.getState().setSelection({ selectedIds: id ? ([id] as never) : [], zoneId: null }),
