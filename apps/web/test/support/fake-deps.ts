@@ -90,6 +90,7 @@ export function createFakeDeps() {
       return () => scene.setState({ readOnly: false })
     }),
     cancelActiveTool: vi.fn(),
+    createLevel: vi.fn((_input: { buildingId: string; level: number }) => 'level_nuevo'),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

@@ -1,7 +1,9 @@
+import * as Core from '@pascal-app/core'
 import * as Pascal from '@pascal-app/editor'
 import { appFontClasses } from '@/components/AppShell'
 import { type ShellBridge, createBridge } from './shell/bridge'
 import type { CoreDeps, HistoryPort } from './shell/bridge/core'
+import type { LevelsDeps } from './shell/bridge/levels'
 import type { ModeDeps } from './shell/bridge/mode'
 import { DECISIONS } from './shell/decisions'
 import { createViewStorage } from './shell/view-storage'
@@ -72,10 +74,22 @@ function modeDeps(): ModeDeps {
   }
 }
 
+/** Misma receta que "Add level above" del selector de planta de Pascal (editor/src/components/ui/floating-level-selector.tsx). */
+function levelsDeps(): LevelsDeps {
+  return {
+    createLevel: ({ buildingId, level }) => {
+      const node = Core.LevelNode.parse({ level, height: Core.DEFAULT_LEVEL_HEIGHT, children: [], parentId: buildingId })
+      Pascal.useScene.getState().createNode(node, buildingId as never)
+      return node.id
+    },
+  }
+}
+
 export function createPascalBridge(): ShellBridge {
   return createBridge({
     ...coreDeps(),
     ...modeDeps(),
+    ...levelsDeps(),
     // @@deps
   })
 }

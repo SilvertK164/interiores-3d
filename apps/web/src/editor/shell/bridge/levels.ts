@@ -1,9 +1,15 @@
 import { levelDisplayName, zoneDisplayName } from '@/lib/editor-names'
+import { createClickGuard } from '../click-guard'
 import type { CoreDeps } from './core'
 import type { BridgeSnapshot, SceneLike, SceneNodeLike, ViewerLike } from './types'
 
 type LevelNodeLike = SceneNodeLike & { level: number; name?: string | null }
 type ZoneNodeLike = SceneNodeLike & { name?: string | null; polygon?: readonly (readonly [number, number])[] }
+
+export type LevelsDeps = {
+  /** `LevelNode.parse` + `createNode` de Pascal: crea la planta dentro del edificio y devuelve su id. */
+  createLevel(input: { buildingId: string; level: number }): string
+}
 
 /** Edificio de la selección (o el primero) y sus plantas ordenadas por índice, como el selector de planta de Pascal. */
 function levelsOf(scene: SceneLike, viewer: ViewerLike): { buildingId: string | null; levels: LevelNodeLike[] } {
@@ -48,14 +54,24 @@ export function selectZones(s: BridgeSnapshot): {
   return { zones, selectedId: s.viewer.selection.zoneId }
 }
 
-export function createLevelsSlice(deps: CoreDeps) {
+export function createLevelsSlice(deps: CoreDeps & LevelsDeps) {
+  const allowAdd = createClickGuard()
   const current = () => levelsOf(deps.scene.getState(), deps.viewer.getState())
   return {
     selectLevel(id: string): void {
       const { buildingId } = current()
       deps.viewer.getState().setSelection(buildingId ? { buildingId, levelId: id } : { levelId: id })
     },
-    // @@levels-actions
+    /** Agrega una planta sobre la más alta (como "Add level above" de Pascal) y la deja activa. En Ver no hace nada. */
+    addLevel(): string | null {
+      if (deps.scene.getState().readOnly || !allowAdd()) return null
+      const { buildingId, levels } = current()
+      if (!buildingId) return null
+      const level = levels.length > 0 ? Math.max(...levels.map((l) => l.level)) + 1 : 0
+      const id = deps.createLevel({ buildingId, level })
+      deps.viewer.getState().setSelection({ buildingId, levelId: id })
+      return id
+    },
     /** Elegir un ambiente de la lista lo selecciona (en Ver no hay selección). */
     selectZone(id: string): void {
       if (deps.scene.getState().readOnly) return
