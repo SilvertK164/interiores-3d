@@ -259,3 +259,324 @@ index 157809cdf66e0f6c296d070881c3ff6b9a23b827..dc9edc3143ccdd93515fa6a85e3ca66b
                        <HelperManager />
                      </div>
                    )}
+diff --git a/src/index.tsx b/src/index.tsx
+index 5c8bebbc5271d88e682c8c23afbfd4c9994e996d..ef265028de7341f7226ccbd6bd6f4457e083a4dd 100644
+--- a/src/index.tsx
++++ b/src/index.tsx
+@@ -438,8 +438,13 @@ export type {
+   FloorplanAnnotationVisibility,
+ } from './lib/floorplan/annotation-visibility'
+ export {
++  exportFloorplanPages,
+   exportFloorplanPdf,
+   type FloorplanExportScope,
++  type FloorplanLevelMeasure,
++  type FloorplanPagesOptions,
++  type FloorplanPagesResult,
++  measureFloorplanLevels,
+ } from './lib/floorplan/floorplan-export'
+ export {
+   createFloorplanContextExtensions,
+diff --git a/src/lib/floorplan/floorplan-export.tsx b/src/lib/floorplan/floorplan-export.tsx
+index 61478e5d842e9d6f8ad811513c98444e56c06294..bd1c545bcec6bf09246965fb6f6d2aa68057d653 100644
+--- a/src/lib/floorplan/floorplan-export.tsx
++++ b/src/lib/floorplan/floorplan-export.tsx
+@@ -301,6 +301,206 @@ export async function exportFloorplanPdf(scope: FloorplanExportScope): Promise<v
+   }
+ }
+ 
++/* ── Madori: planos configurables (hoja, escala fija y norte arriba) ─────────────────────────────────────── */
++type PdfRaw = FloorplanPdfDocument['raw']
++
++export type FloorplanLevelMeasure = {
++  id: string
++  name: string | null
++  level: number
++  /** Medidas del dibujo de la planta en metros, sin el margen de cotas. */
++  widthM: number
++  heightM: number
++  empty: boolean
++}
++
++export type FloorplanPagesOptions = {
++  /** Ids de las plantas elegidas; el orden sale de la planta (de la más baja a la más alta). */
++  levels: readonly string[]
++  /** Hoja y área útil en puntos del PDF, con el origen arriba a la izquierda. */
++  page: {
++    widthPt: number
++    heightPt: number
++    usable: { x: number; y: number; width: number; height: number }
++  }
++  /** Puntos del PDF por metro del plano (a 1:50 son 56,69). */
++  scale: number
++  /** Cambia o descarta (null) la geometría de cada nodo antes de dibujarla. */
++  mapGeometry?: (node: AnyNode | undefined, geometry: FloorplanGeometry) => FloorplanGeometry | null
++  /** Geometría propia que se suma al plano de la planta (por ejemplo, superficies). */
++  extraGeometry?: (levelId: string) => FloorplanGeometry[]
++  /** Envuelve el documento que usa el renderizador de Pascal (por ejemplo, para filtrar colores). */
++  wrapRaw?: (raw: PdfRaw) => PdfRaw
++  /** Se llama una vez, con el documento sin envolver, antes de la primera página (fuentes, metadatos). */
++  setup?: (raw: PdfRaw) => void | Promise<void>
++  /** Se llama al final de cada página, con el documento sin envolver y sin recorte (marco y cajetín). */
++  pageChrome?: (
++    raw: PdfRaw,
++    context: { index: number; count: number; levelId: string },
++  ) => void | Promise<void>
++  onProgress?: (done: number, total: number) => void
++  signal?: AbortSignal
++}
++
++export type FloorplanPagesResult = { blob: Blob; pages: number; skippedImages: number }
++
++const MADORI_ROTATION_DEG = 0
++
++function madoriHost(): HTMLDivElement {
++  const host = document.createElement('div')
++  host.style.cssText =
++    'position:fixed;left:-10000px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;'
++  document.body.appendChild(host)
++  return host
++}
++
++function madoriGeometries(levelId: AnyNodeId): ExportGeometry[] {
++  const { nodes, installedPlugins } = useScene.getState()
++  const viewer = useViewer.getState()
++  const floorplanMode = useFloorplanMode.getState().mode
++  const annotationState = useFloorplanAnnotationVisibility.getState()
++  return collectFloorplanGeometry(
++    nodes,
++    levelId,
++    'full',
++    'metric',
++    viewer.metricNotation,
++    resolveFloorplanExportAnnotationVisibility(floorplanMode, annotationState.visibility),
++    'floor-plan',
++    resolveFloorplanWallDimensionReference(floorplanMode, annotationState.wallDimensionReference),
++    installedPlugins,
++  )
++}
++
++/** Mide cada planta del edificio activo (de la más baja a la más alta): metros de ancho y alto del dibujo. */
++export async function measureFloorplanLevels(): Promise<FloorplanLevelMeasure[]> {
++  const { nodes } = useScene.getState()
++  const host = madoriHost()
++  const result: FloorplanLevelMeasure[] = []
++  try {
++    for (const level of resolveExportLevels(nodes)) {
++      const node = nodes[level.id]
++      const base = {
++        id: level.id as string,
++        name: node?.name?.trim() || null,
++        level: node ? levelIndexOf(node) : 0,
++      }
++      const geometries = madoriGeometries(level.id)
++      const mounted = geometries.some((geometry) => geometry.model)
++        ? await mountFloorplanSvg(host, geometries, MADORI_ROTATION_DEG)
++        : null
++      if (!mounted) {
++        result.push({ ...base, widthM: 0, heightM: 0, empty: true })
++        continue
++      }
++      try {
++        const bounds = measureFloorplanBounds(mounted.svg, '[data-floorplan-model]')
++        result.push({ ...base, widthM: bounds?.width ?? 0, heightM: bounds?.height ?? 0, empty: !bounds })
++      } finally {
++        mounted.cleanup()
++      }
++    }
++  } finally {
++    host.remove()
++  }
++  return result
++}
++
++/**
++ * Genera un PDF con una página por planta elegida, a escala fija y con el norte arriba, y devuelve el Blob (no descarga
++ * nada). El dibujo queda centrado en el área útil y recortado a ella: un exceso nunca pisa el cajetín.
++ */
++export async function exportFloorplanPages(
++  options: FloorplanPagesOptions,
++): Promise<FloorplanPagesResult> {
++  const { nodes } = useScene.getState()
++  const chosen = resolveExportLevels(nodes).filter((level) => options.levels.includes(level.id))
++  if (chosen.length === 0) throw new Error('[floorplan-export] no level to export')
++  const { page, scale } = options
++  const { doc, raw, finish } = await createFloorplanPdfDocument(
++    [page.widthPt, page.heightPt],
++    options.wrapRaw,
++  )
++  if (options.setup) await options.setup(raw)
++  const host = madoriHost()
++  const area = page.usable
++  let pages = 0
++  let skippedImages = 0
++  const onImageError = () => {
++    skippedImages += 1
++  }
++  try {
++    for (const [index, level] of chosen.entries()) {
++      if (options.signal?.aborted) throw new DOMException('Exportación cancelada', 'AbortError')
++      options.onProgress?.(index, chosen.length)
++      await nextFrames(1)
++      const geometries = madoriGeometries(level.id).map((geometry) => ({
++        ...geometry,
++        model:
++          geometry.model && options.mapGeometry
++            ? options.mapGeometry(nodes[geometry.id], geometry.model)
++            : geometry.model,
++      }))
++      const extras = options.extraGeometry ? options.extraGeometry(level.id) : []
++      doc.addPage([page.widthPt, page.heightPt])
++      pages += 1
++      const mounted = geometries.some((geometry) => geometry.model)
++        ? await mountFloorplanSvg(host, geometries, MADORI_ROTATION_DEG)
++        : null
++      if (mounted) {
++        try {
++          await mounted.setScreenUnitsPerPixel(1 / scale)
++          const { viewport } = mounted
++          const width = viewport.width * scale
++          const height = viewport.height * scale
++          const placement = {
++            x: area.x + (area.width - width) / 2,
++            y: area.y + (area.height - height) / 2,
++            width,
++            height,
++          }
++          raw.save()
++          raw.rect(area.x, area.y, area.width, area.height).clip()
++          const model = combineGeometryList([...geometries.map((geometry) => geometry.model), ...extras])
++          if (model) {
++            await renderFloorplanGeometryToPdfKit(doc, model, {
++              annotationLayer: false,
++              placement,
++              rotationDeg: MADORI_ROTATION_DEG,
++              viewport,
++              onImageError,
++              signal: options.signal,
++            })
++          }
++          const annotations = combineGeometryList(geometries.map((geometry) => geometry.annotations))
++          if (annotations) {
++            await renderFloorplanGeometryToPdfKit(doc, annotations, {
++              annotationLabelShifts: mounted.annotationLabelShifts,
++              annotationLayer: true,
++              placement,
++              rotationDeg: MADORI_ROTATION_DEG,
++              viewport,
++              onImageError,
++              signal: options.signal,
++            })
++          }
++          raw.restore()
++        } finally {
++          mounted.cleanup()
++        }
++      }
++      if (options.pageChrome) {
++        await options.pageChrome(raw, { index, count: chosen.length, levelId: level.id as string })
++      }
++      options.onProgress?.(index + 1, chosen.length)
++    }
++    return { blob: await finish(), pages, skippedImages }
++  } finally {
++    host.remove()
++  }
++}
++/* ── fin del parche de planos ─────────────────────────────────────────────────────────────────────────────── */
++
+ export function collectFloorplanSchedules(
+   nodes: Record<string, AnyNode>,
+   levelId: AnyNodeId,
+diff --git a/src/lib/floorplan/floorplan-pdfkit-document.ts b/src/lib/floorplan/floorplan-pdfkit-document.ts
+index 9db43343a5fd8980e165824e050c49961c6cfc5a..f73e502dcc88018b875b4a77fce1d22916b655df 100644
+--- a/src/lib/floorplan/floorplan-pdfkit-document.ts
++++ b/src/lib/floorplan/floorplan-pdfkit-document.ts
+@@ -167,22 +167,31 @@ export class FloorplanPdfDocument {
+   }
+ }
+ 
+-export async function createFloorplanPdfDocument(defaultPageSize: readonly [number, number]) {
++export async function createFloorplanPdfDocument(
++  defaultPageSize: readonly [number, number],
++  /** Madori: envuelve el documento que usa el renderizador (filtro de colores del modo Papel). */
++  wrapRaw?: (raw: PdfKitDocumentInstance) => PdfKitDocumentInstance,
++) {
+   const [{ default: PDFDocument }, { default: blobStream }] = await Promise.all([
+     import('pdfkit/js/pdfkit.standalone'),
+     import('blob-stream'),
+   ])
+   const raw = new PDFDocument({ autoFirstPage: false, compress: true, margin: 0 })
+   const stream = raw.pipe(blobStream())
++  // Madori: cerrar el documento y devolver el Blob sin descargarlo.
++  const finish = () =>
++    new Promise<Blob>((resolve, reject) => {
++      stream.on('finish', () => resolve(stream.toBlob('application/pdf')))
++      stream.on('error', reject)
++      raw.on('error', reject)
++      raw.end()
++    })
+   return {
+-    doc: new FloorplanPdfDocument(raw, defaultPageSize),
++    doc: new FloorplanPdfDocument(wrapRaw ? wrapRaw(raw) : raw, defaultPageSize),
++    raw,
++    finish,
+     save: async (filename: string) => {
+-      const blob = await new Promise<Blob>((resolve, reject) => {
+-        stream.on('finish', () => resolve(stream.toBlob('application/pdf')))
+-        stream.on('error', reject)
+-        raw.on('error', reject)
+-        raw.end()
+-      })
++      const blob = await finish()
+       const url = URL.createObjectURL(blob)
+       const anchor = document.createElement('a')
+       anchor.href = url
+diff --git a/src/lib/floorplan/floorplan-pdfkit-renderer.ts b/src/lib/floorplan/floorplan-pdfkit-renderer.ts
+index 4fb0cfe3a88bc2841871d70489d7adf3c86219bd..6b8165560cd41676fbd4d4517b08fe4a9c5b0555 100644
+--- a/src/lib/floorplan/floorplan-pdfkit-renderer.ts
++++ b/src/lib/floorplan/floorplan-pdfkit-renderer.ts
+@@ -32,6 +32,8 @@ type StyledGeometry = Extract<
+ >
+ 
+ type RenderContext = {
++  onImageError?: (error: unknown) => void
++  signal?: AbortSignal
+   annotationLabelShiftIndex: number
+   annotationLabelShifts: readonly FloorplanPoint[]
+   annotationLayer: boolean
+@@ -55,6 +57,10 @@ export async function renderFloorplanGeometryToPdfKit(
+     placement: FloorplanPdfKitPlacement
+     rotationDeg: number
+     viewport: FloorplanExportBounds
++    /** Madori: una imagen que no carga no tumba el PDF; quien llama la cuenta. */
++    onImageError?: (error: unknown) => void
++    /** Madori: al cancelar, la siguiente imagen corta el dibujo de la planta en curso. */
++    signal?: AbortSignal
+   },
+ ): Promise<void> {
+   const pointsPerUnit = options.placement.width / options.viewport.width
+@@ -72,6 +78,8 @@ export async function renderFloorplanGeometryToPdfKit(
+     annotationLayer: options.annotationLayer,
+     sceneRotationDeg: options.rotationDeg,
+     unitsPerPoint: 1 / pointsPerUnit,
++    onImageError: options.onImageError,
++    signal: options.signal,
+   })
+   raw.restore()
+ }
+@@ -158,7 +166,13 @@ async function renderGeometry(
+       drawEqualSpacingBadge(doc, geometry, context)
+       return
+     case 'image':
+-      await drawImage(doc, geometry)
++      if (context.signal?.aborted) throw new DOMException('Exportación cancelada', 'AbortError')
++      try {
++        await drawImage(doc, geometry)
++      } catch (error) {
++        if (!context.onImageError) throw error
++        context.onImageError(error)
++      }
+       return
+     case 'group':
+       raw.save()

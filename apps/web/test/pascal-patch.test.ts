@@ -6,6 +6,7 @@ const fromRoot = (path: string) => fileURLToPath(new URL(`../../../${path}`, imp
 const editorIndex = fileURLToPath(
   new URL('../node_modules/@pascal-app/editor/src/components/editor/index.tsx', import.meta.url),
 )
+const editorSrc = fileURLToPath(new URL('../node_modules/@pascal-app/editor/src/', import.meta.url))
 const PATCH_FILE = 'patches/@pascal-app__editor@1.0.3.patch'
 const ATTRIBUTES = ['data-pascal-dock', 'data-pascal-inspector', 'data-pascal-helpers', 'data-pascal-level-selector']
 const FLAGS = ['dock', 'inspector', 'helpers', 'levelSelector']
@@ -39,5 +40,21 @@ describe('parche de @pascal-app/editor (propiedad chrome)', () => {
     expect(readFileSync(`${dir}floorplan-camera-sync.ts`, 'utf8')).toContain('__madoriDecoupled')
     expect(readFileSync(`${dir}floorplan-panel.tsx`, 'utf8')).toContain('__madoriDecoupled')
     expect(readFileSync(fromRoot(PATCH_FILE), 'utf8')).toMatch(/^\+.*__madoriDecoupled/m)
+  })
+
+  it('el parche de planos agrega measureFloorplanLevels y exportFloorplanPages, los exporta y conserva los parches anteriores', () => {
+    const exportFile = readFileSync(`${editorSrc}lib/floorplan/floorplan-export.tsx`, 'utf8')
+    expect(exportFile).toContain('export async function exportFloorplanPages')
+    expect(exportFile).toContain('export async function measureFloorplanLevels')
+    const index = readFileSync(`${editorSrc}index.tsx`, 'utf8')
+    for (const name of ['exportFloorplanPages', 'measureFloorplanLevels', 'FloorplanPagesOptions', 'FloorplanPagesResult', 'FloorplanLevelMeasure']) {
+      expect(index, name).toContain(name)
+    }
+    expect(readFileSync(`${editorSrc}lib/floorplan/floorplan-pdfkit-renderer.ts`, 'utf8')).toContain('onImageError')
+    expect(readFileSync(`${editorSrc}lib/floorplan/floorplan-pdfkit-document.ts`, 'utf8')).toContain('wrapRaw')
+    const patch = readFileSync(fromRoot(PATCH_FILE), 'utf8')
+    for (const name of ['exportFloorplanPages', 'measureFloorplanLevels', 'onImageError', 'wrapRaw', '__madoriDecoupled', 'data-pascal-dock']) {
+      expect(patch, name).toMatch(new RegExp(`^\\+.*${name}`, 'm'))
+    }
   })
 })
