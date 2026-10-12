@@ -13,6 +13,7 @@ import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { localizeCatalog } from './catalog-assets'
 import { buildCommerceItems } from './commerce-catalog'
+import { HIDDEN_CHROME, type PascalChrome } from './chrome'
 import { installE2eHooks } from './e2e-hooks'
 import { applyEditorTheme } from './pascal-bridge'
 import { SaveBanner } from './SaveBanner'
@@ -31,6 +32,8 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   const [status, setStatus] = useState<SaverStatus>('idle')
   const [detail, setDetail] = useState<string | undefined>()
   const [dismissed, setDismissed] = useState(false)
+  // Madori dibuja su propio dock, inspector, ayudantes y selector de nivel; los de Pascal quedan ocultos (parche `chrome`).
+  const [chrome, setChrome] = useState<PascalChrome>(HIDDEN_CHROME)
   const saver = useRef<SceneSaver<SceneGraph> | null>(null)
   const graphRef = useRef<SceneGraph | null>(null)
 
@@ -77,7 +80,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         })
         graphRef.current = fromEnvelope(project.scene)
         setPhase({ kind: 'ready', name: project.name })
-        if (process.env.NEXT_PUBLIC_E2E === '1') installE2eHooks()
+        if (process.env.NEXT_PUBLIC_E2E === '1') installE2eHooks({ setChrome })
       } catch (err) {
         if (!cancelled) setPhase({ kind: 'error', message: friendlyMessage(err) })
       }
@@ -123,6 +126,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     <div className="relative h-screen w-screen">
       <SaveBanner detail={detail} dismissed={dismissed} onKeepEditing={() => setDismissed(true)} status={status} />
       <Editor
+        chrome={chrome}
         guardAgainstSceneWipe
         layoutVersion="v2"
         onLoad={onLoad}

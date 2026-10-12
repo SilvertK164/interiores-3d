@@ -1,12 +1,15 @@
 import { WallNode, useScene } from '@pascal-app/core'
+import { armToolMode } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
+import type { PascalChrome } from './chrome'
 
 type SceneNode = { id: string; type: string }
+type E2eOptions = { setChrome?: (chrome: PascalChrome) => void }
 
 /** Solo para Playwright: lee y modifica la escena sin depender de píxeles. */
-export function installE2eHooks(): void {
+export function createE2eHooks(options: E2eOptions = {}) {
   const nodes = () => Object.values(useScene.getState().nodes) as SceneNode[]
-  ;(window as unknown as { __e2e: unknown }).__e2e = {
+  return {
     ready: () => nodes().some((n) => n.type === 'level'),
     counts: () => {
       const total: Record<string, number> = {}
@@ -22,5 +25,21 @@ export function installE2eHooks(): void {
       if (!level) throw new Error('No hay nivel donde agregar el muro')
       useScene.getState().createNode(WallNode.parse({ start: [0, 0], end: [4, 0] }), level.id as never)
     },
+    /** Muestra u oculta el chrome de Pascal (la prueba de guarda lo enciende para comprobar que sus selectores existen). */
+    setChrome: (chrome: PascalChrome) => options.setChrome?.(chrome),
+    /** Selecciona el primer muro y devuelve su id (`null` si no hay). */
+    selectFirstWall: () => {
+      const wall = nodes().find((n) => n.type === 'wall')
+      if (!wall) return null
+      useViewer.getState().setSelection({ selectedIds: [wall.id] as never })
+      return wall.id
+    },
+    armWall: () => armToolMode({ mode: 'build', tool: 'wall' }),
   }
+}
+
+export type E2eApi = ReturnType<typeof createE2eHooks>
+
+export function installE2eHooks(options?: E2eOptions): void {
+  ;(window as unknown as { __e2e: E2eApi }).__e2e = createE2eHooks(options)
 }
