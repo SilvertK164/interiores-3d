@@ -17,6 +17,7 @@
     "assets:vendor": "node scripts/vendor-pascal-assets.mjs",
     "fonts:pdf": "node scripts/vendor-pdf-fonts.mjs",
     "brand:build": "tsx scripts/build-brand-paths.ts",
+    "pdfjs:vendor": "node scripts/vendor-pdfjs.mjs",
     "e2e": "playwright test"
   },
   "dependencies": {
