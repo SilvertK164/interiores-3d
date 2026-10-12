@@ -50,3 +50,12 @@ test('el dock, el inspector, los ayudantes y el selector de nivel de Pascal no e
   await settle(page)
   expect((await found(page)).porAtributo).toEqual({ dock: 0, inspector: 0, helpers: 0, 'level-selector': 0 })
 })
+
+test('la columna lateral de Pascal (rieles y paneles de plugins) no ocupa lugar: el visor empieza en el borde de la pantalla', async ({ page }) => {
+  await createProjectViaUi(page, { name: `E2E columna ${Date.now()}`, template: null })
+  const viewer = page.locator('[data-viewer-bounds]').first()
+  await expect(viewer).toBeVisible({ timeout: 15_000 })
+  await settle(page)
+  expect((await viewer.boundingBox())?.x).toBeLessThan(2)
+  await expect(page.getByText('Create a Pascal plugin')).toHaveCount(0)
+})
