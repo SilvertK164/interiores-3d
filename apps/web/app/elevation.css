@@ -84,7 +84,9 @@
    in intensity as the card "lifts" toward the light source.
    Drop shadow stack grounds the elevation.
    ════════════════════════════════════════ */
-.dark {
+/* Madori no tiene modo oscuro (Pascal pone `dark` en <body> y en su raíz): este bloque, que pintaba bordes blancos internos,
+   queda inactivo y las sombras claras de :root valen siempre. */
+:root.madori-sin-modo-oscuro {
   --shadow-color: rgba(0, 0, 0, 0.18);
 
   /* Highlight intensity (inset top edge) */

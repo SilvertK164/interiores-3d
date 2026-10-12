@@ -36,33 +36,40 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Las clases `font-barlow` de Pascal usan la tipografía de la interfaz (DM Sans); la variable la pone `applyEditorTheme` en <body>. */
+  --font-barlow: var(--font-dm), ui-sans-serif, system-ui, sans-serif;
 }
 
+/*
+ * Tokens de shadcn que Pascal usa para lo que el shell no reemplaza (diálogos, plano 2D, cargador): paleta Madori en claro.
+ * Noche #0B1F4D como tinta, Cobalto #1F5FE0 como acción primaria, Alba #DCE6FF como fondo suave y #EEF2F8 como lienzo.
+ * Pascal pone `dark` en <body>: no hay variantes oscuras que activar porque estos tokens no cambian con esa clase.
+ */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.998 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(0.998 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(0.998 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --radius: 0.75rem;
+  --background: #ffffff;
+  --foreground: #0b1f4d;
+  --card: #ffffff;
+  --card-foreground: #0b1f4d;
+  --popover: #ffffff;
+  --popover-foreground: #0b1f4d;
+  --primary: #1f5fe0;
+  --primary-foreground: #ffffff;
+  --secondary: #dce6ff;
+  --secondary-foreground: #0b1f4d;
+  --muted: #eef2f8;
+  --muted-foreground: #5b6578;
+  --accent: #dce6ff;
+  --accent-foreground: #0b1f4d;
+  --destructive: #b42318;
+  --border: #d3dcee;
+  --input: #d3dcee;
+  --ring: #1f5fe0;
+  --sidebar: #eef2f8;
+  --sidebar-foreground: #0b1f4d;
+  --sidebar-border: #d3dcee;
+  --sidebar-accent: #dce6ff;
+  --sidebar-accent-foreground: #0b1f4d;
 }
 
 html,
