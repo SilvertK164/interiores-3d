@@ -45,7 +45,7 @@ describe('ShellUndoRedo', () => {
 describe('EditorShell', () => {
   const shell = (setup?: Parameters<typeof render>[1], status: 'saved' | 'idle' = 'saved') =>
     render(
-      (bridge) => <EditorShell bridge={bridge} projectName="Loft Palermo" saveStatus={status} onBack={noop} />,
+      (bridge) => <EditorShell bridge={bridge} catalog={[]} projectName="Loft Palermo" saveStatus={status} onBack={noop} />,
       setup,
     )
 

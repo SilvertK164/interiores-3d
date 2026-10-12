@@ -140,6 +140,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
       <EditorShell
         backBusy={leaving}
         bridge={bridge}
+        catalog={items}
         onBack={() => go('/proyectos')}
         projectName={phase.name}
         saveStatus={status}

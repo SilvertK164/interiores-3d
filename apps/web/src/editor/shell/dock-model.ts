@@ -87,6 +87,11 @@ export function armingForButton(id: DockId): Arming | null {
   return null
 }
 
+/** Qué panel va a la izquierda según el botón activo del dock. */
+export function leftPanelFor(id: DockId | null): 'levels' | 'furniture' {
+  return id === 'furniture' ? 'furniture' : 'levels'
+}
+
 /** La tabla 4.3 del spec: cómo debe quedar Pascal (`phase` ausente = no cambia). Las pruebas en navegador la comparan con el estado real. */
 export function expectedState(arming: Arming): { phase?: Phase; mode: EditorMode; tool: string | null } {
   switch (arming.kind) {

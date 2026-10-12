@@ -4,17 +4,18 @@ import { useEffect } from 'react'
 import type { SaverStatus } from '../scene-saver'
 import type { ShellBridge } from './bridge'
 import { selectShellState } from './bridge/selectors'
-import { LevelsPanel } from './LevelsPanel'
+import type { CatalogItemLike } from './furniture-model'
+import { LeftPanel } from './LeftPanel'
 import { ShellDock } from './ShellDock'
 import { ShellTopBar } from './ShellTopBar'
 import { ShellUndoRedo } from './ShellUndoRedo'
 import { BridgeProvider, useShell } from './use-bridge'
 
-function ShellBody() {
+function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
   const mode = useShell((s) => selectShellState(s).mode)
   return (
     <>
-      <LevelsPanel />
+      <LeftPanel catalog={catalog} />
       {mode === 'editar' && (
         <>
           <ShellDock />
@@ -32,12 +33,14 @@ function ShellBody() {
  */
 export function EditorShell({
   bridge,
+  catalog,
   projectName,
   saveStatus,
   onBack,
   backBusy,
 }: {
   bridge: ShellBridge
+  catalog: readonly CatalogItemLike[]
   projectName: string
   saveStatus: SaverStatus
   onBack: () => void
@@ -54,7 +57,7 @@ export function EditorShell({
     <BridgeProvider bridge={bridge}>
       <div data-editor-shell className="editor-shell pointer-events-none absolute inset-0 z-40 overflow-hidden">
         <ShellTopBar name={projectName} saveStatus={saveStatus} onBack={onBack} backBusy={backBusy} />
-        <ShellBody />
+        <ShellBody catalog={catalog} />
       </div>
     </BridgeProvider>
   )
