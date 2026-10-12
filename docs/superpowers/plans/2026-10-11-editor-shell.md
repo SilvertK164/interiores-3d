@@ -11997,6 +11997,1104 @@ git commit -m "test(editor): editar, guardar, deshacer, duplicar y borrar desde 
 
 ---
 
+### Task 9i: Propiedades de estantes (ancho, fondo, alto, filas, columnas e interruptores)
+
+**Responsable sugerido:** Victoria. Revisa: Silvert.
+
+**Por qué existe esta subtarea (hallazgo verificado en `node_modules/@pascal-app`).** El panel de las Tareas 9a a 9d solo cubría Muro, Puerta, Ventana, Mueble y Ambiente. Los nodos **paramétricos** `shelf`, `cabinet` y `stair` (las piezas de las plantillas de comercio: góndola, exhibidor, mostrador) caían en el panel mínimo (solo Borrar), aunque en el lienzo se alargan con tiradores. Las subtareas 9i a 9l los cubren con el mismo patrón: un constructor por tipo (`Builder`), campos en metros con coma, límites que se ajustan, cambio por `commitFields` (historial de Pascal) y pruebas de ida y vuelta.
+
+| Dato | Valor confirmado | Dónde |
+|---|---|---|
+| Estante: campos y límites del esquema | `width` 0,3 a 3; `depth` 0,1 a 1; `height` 0,05 a 2,5; `rows` entero 1 a 8; `columns` entero 1 a 6; `withBack`, `withSides`, `withBottom` booleanos; `style`: `wall-shelf`, `bookshelf`, `open-rack`, `cubby` | `core/dist/schema/nodes/shelf.js` (`ShelfNode`); `nodes/dist/shelf/dimensions.js` (`sanitizeShelfDimensions`) |
+| Inspector de Pascal | solo pone el mínimo (`max: 1000`) y muestra `columns` en bookshelf y cubby, `withSides` solo en bookshelf, `withBack` en bookshelf y open-rack, `withBottom` en bookshelf y cubby | `nodes/dist/shelf/parametrics.js` (`shelfParametrics`, `visibleIf`) |
+| Tiradores del lienzo | `NodeArrowHandles` con `linear-resize` sobre `width` (mín 0,3), `depth` (mín 0,1) y `height` (mín 0,05); aplican `{ width }`, `{ depth }`, `{ height }` sin más | `nodes/dist/shelf/definition.js` (`shelfWidthHandle`, `shelfDepthHandle`, `shelfHeightHandle`) |
+| Cómo se aplica | `commitParametricNodeFields(id, patch)`: junta `derive`/`reconcile` del descriptor (el estante no tiene) y llama a `updateNodes` | `editor/src/lib/parametric-node-update.ts` |
+
+**Un valor sobre el máximo del esquema no vuelve a cargar** (el inspector deja escribir 1000 pero `ShelfNode` lo rechaza): por eso los límites de este panel son los del esquema y no los `max` del inspector.
+
+**Files:**
+- Create: `apps/web/src/editor/shell/properties-fields.ts` (ayudantes de campos que comparten 9i, 9j y 9k), `apps/web/src/editor/shell/properties-parametric.ts` (registro y constructor del estante), `apps/web/test/shell-properties-shelf.test.ts`
+- Modify: `apps/web/src/editor/shell/properties-model.ts` (exporta `Builder` y consulta `PARAMETRIC_BUILDERS`)
+
+**Interfaces:**
+- Consumes: `Builder`, `PropNode`, `PropTarget`, `Patch`, `metersPatch` y `builderOf` (9a); `formatMeters`, `formatSize` (`@/lib/format`, 7b); `FieldView` (1h); `target`/`values` de `test/support/properties.ts` (9a).
+- Produces:
+  - `properties-fields.ts` (hoja sin dependencias de ejecución del modelo): `num(value, fallback)`, `countPatch(raw, range, current): number | null` (un entero escrito solo con dígitos, ajustado al rango; `null` si no es un entero o no cambia), `toggleField(id, label, on): FieldView` (la ficha solo sabe de números, textos y listas: un interruptor es una lista **Sí / No** con valores `yes` / `no`) y `togglePatch(raw, current): boolean | null`.
+  - `properties-parametric.ts`: `SHELF_LIMITS` (los rangos de arriba), `shelfBuilder` y `PARAMETRIC_BUILDERS: Readonly<Record<string, Builder>>` (los tipos paramétricos con panel propio; 9j y 9k suman los suyos). `builderOf` busca primero en `BUILDERS` y después aquí; **es una consulta dentro de una función**, así que el ciclo de importación entre `properties-model` y `properties-parametric` no se evalúa al cargar (los dos módulos solo usan lo del otro dentro de funciones).
+  - Estante: Estilo (solo lectura), Ancho, Fondo, Alto, Filas y, según el estilo, Columnas, Paneles laterales, Panel trasero y Tabla de base. Título: el estilo ("Biblioteca", "Góndola", "Cubículos", "Estante de pared"); subtítulo: ancho × fondo; Duplicar medio metro más allá.
+
+- [ ] **Paso 1: Escribir la prueba (rojo)**
+
+Create `apps/web/test/shell-properties-shelf.test.ts`:
+
+```ts
+import { ShelfNode } from '@pascal-app/core/schema'
+import { describe, expect, it } from 'vitest'
+import { countPatch, togglePatch } from '../src/editor/shell/properties-fields'
+import {
+  type PropTarget,
+  canDuplicate,
+  duplicatePatch,
+  fieldsFor,
+  patchFor,
+  subtitleFor,
+  titleFor,
+} from '../src/editor/shell/properties-model'
+import { SHELF_LIMITS } from '../src/editor/shell/properties-parametric'
+import { values } from './support/properties'
+
+const shelfAt = (extra: Record<string, unknown> = {}): PropTarget => ({
+  node: ShelfNode.parse({
+    position: [1, 0, 1], style: 'bookshelf', width: 1, depth: 0.5, height: 1.8, rows: 3, columns: 2,
+    withBack: true, withSides: true, withBottom: false, ...extra,
+  }) as unknown as PropTarget['node'],
+  hostLength: null,
+  descendants: 0,
+})
+const ids = (t: PropTarget) => fieldsFor(t).map((f) => f.id)
+/** Aplica el cambio al nodo como lo hace Pascal (une los campos) para volver a leerlo. */
+const applied = (t: PropTarget, patch: Record<string, unknown> | null): PropTarget => ({ ...t, node: { ...t.node, ...patch } })
+
+describe('estante', () => {
+  it('una biblioteca muestra su estilo, las tres medidas en metros, filas, columnas y los tres interruptores', () => {
+    const t = shelfAt()
+    expect(fieldsFor(t).map((f) => [f.id, f.label])).toEqual([
+      ['style', 'Estilo'], ['width', 'Ancho'], ['depth', 'Fondo'], ['height', 'Alto'], ['rows', 'Filas'],
+      ['columns', 'Columnas'], ['withSides', 'Paneles laterales'], ['withBack', 'Panel trasero'], ['withBottom', 'Tabla de base'],
+    ])
+    expect(values(t)).toEqual({
+      style: 'Biblioteca', width: '1,00 m', depth: '0,50 m', height: '1,80 m', rows: '3', columns: '2',
+      withSides: 'yes', withBack: 'yes', withBottom: 'no',
+    })
+  })
+
+  it('cada estilo muestra solo lo que le corresponde (como el inspector de Pascal)', () => {
+    expect(ids(shelfAt({ style: 'wall-shelf' }))).toEqual(['style', 'width', 'depth', 'height', 'rows'])
+    expect(ids(shelfAt({ style: 'open-rack' }))).toEqual(['style', 'width', 'depth', 'height', 'rows', 'withBack'])
+    expect(ids(shelfAt({ style: 'cubby' }))).toEqual(['style', 'width', 'depth', 'height', 'rows', 'columns', 'withBottom'])
+  })
+
+  it('fuera de rango se ajusta al límite del esquema', () => {
+    const t = shelfAt()
+    expect(patchFor(t, 'width', '10')).toEqual({ width: 3 })
+    expect(patchFor(t, 'width', '10 cm')).toEqual({ width: 0.3 })
+    expect(patchFor(t, 'depth', '5')).toEqual({ depth: 1 })
+    expect(patchFor(t, 'depth', '0')).toEqual({ depth: 0.1 })
+    expect(patchFor(t, 'height', '9')).toEqual({ height: 2.5 })
+    expect(patchFor(t, 'height', '0')).toEqual({ height: 0.05 })
+    expect(patchFor(t, 'rows', '20')).toEqual({ rows: 8 })
+    expect(patchFor(t, 'rows', '0')).toEqual({ rows: 1 })
+    expect(patchFor(t, 'columns', '99')).toEqual({ columns: 6 })
+  })
+
+  it('un valor igual al actual, que no es un número o de un campo que el estilo no muestra no cambia nada', () => {
+    const t = shelfAt()
+    for (const [id, raw] of [['width', '1'], ['width', '1,0 m'], ['width', 'ancho'], ['rows', '3'], ['rows', '2,5'], ['rows', 'tres'], ['columns', '2'], ['otro', '1']]) {
+      expect(patchFor(t, id as string, raw as string), `${id} ${raw}`).toBeNull()
+    }
+    expect(patchFor(shelfAt({ style: 'wall-shelf' }), 'columns', '3')).toBeNull()
+    expect(patchFor(shelfAt({ style: 'open-rack' }), 'withSides', 'no')).toBeNull()
+  })
+
+  it('el cambio aplicado al nodo se lee de vuelta, y el valor anterior se recupera (lo que hace Deshacer)', () => {
+    const t = shelfAt()
+    expect(values(applied(t, patchFor(t, 'width', '2'))).width).toBe('2,00 m')
+    expect(values(applied(t, patchFor(t, 'rows', '5'))).rows).toBe('5')
+    const off = applied(t, patchFor(t, 'withBack', 'no'))
+    expect(values(off).withBack).toBe('no')
+    expect(patchFor(off, 'withBack', 'no')).toBeNull()
+    expect(patchFor(off, 'withBack', 'yes')).toEqual({ withBack: true })
+    expect(values(applied(off, { withBack: true })).withBack).toBe('yes')
+  })
+
+  it('los interruptores solo aceptan Sí o No y devuelven un booleano', () => {
+    const t = shelfAt()
+    expect(patchFor(t, 'withBottom', 'yes')).toEqual({ withBottom: true })
+    expect(patchFor(t, 'withBack', 'yes')).toBeNull()
+    expect(patchFor(t, 'withBack', 'tal vez')).toBeNull()
+  })
+
+  it('los límites son los del esquema real: dentro se acepta y un paso más allá se rechaza', () => {
+    for (const [key, [min, max]] of Object.entries(SHELF_LIMITS)) {
+      const eps = key === 'rows' || key === 'columns' ? 1 : 0.001
+      expect(ShelfNode.safeParse({ [key]: min }).success, `${key} mínimo`).toBe(true)
+      expect(ShelfNode.safeParse({ [key]: max }).success, `${key} máximo`).toBe(true)
+      expect(ShelfNode.safeParse({ [key]: min - eps }).success, `${key} bajo el mínimo`).toBe(false)
+      expect(ShelfNode.safeParse({ [key]: max + eps }).success, `${key} sobre el máximo`).toBe(false)
+    }
+  })
+
+  it('título, subtítulo y copia desplazada', () => {
+    expect(titleFor(shelfAt())).toBe('Biblioteca')
+    expect(titleFor(shelfAt({ style: 'open-rack' }))).toBe('Góndola')
+    expect(subtitleFor(shelfAt())).toBe('1,00 × 0,50 m')
+    expect(duplicatePatch(shelfAt())).toEqual({ position: [1.5, 0, 1.5] })
+    expect(canDuplicate(shelfAt())).toBe(true)
+  })
+
+  it('countPatch y togglePatch', () => {
+    expect(countPatch('3', [1, 8], 2)).toBe(3)
+    expect(countPatch(' 9 ', [1, 8], 2)).toBe(8)
+    expect(countPatch('2', [1, 8], 2)).toBeNull()
+    expect(countPatch('2,5', [1, 8], 2)).toBeNull()
+    expect(countPatch('-1', [1, 8], 2)).toBeNull()
+    expect(togglePatch('no', true)).toBe(false)
+    expect(togglePatch('yes', true)).toBeNull()
+    expect(togglePatch('x', true)).toBeNull()
+  })
+})
+```
+
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-shelf`
+Expected: FAIL — `Cannot find module '../src/editor/shell/properties-fields'`.
+
+- [ ] **Paso 2: Escribir los ayudantes de campos**
+
+Create `apps/web/src/editor/shell/properties-fields.ts`:
+
+```ts
+import type { FieldView } from './ui/PropertiesCard'
+
+/** Un número finito o, si no lo es, el valor de respaldo (los nodos de Pascal pueden venir sin el campo). */
+export const num = (value: unknown, fallback: number) => (typeof value === 'number' && Number.isFinite(value) ? value : fallback)
+
+/** Un campo de cantidad: solo dígitos ("3"); fuera del rango se ajusta; solo devuelve el valor si es distinto del actual. */
+export function countPatch(raw: string, range: readonly [number, number], current: number): number | null {
+  if (!/^\s*\d+\s*$/.test(raw)) return null
+  const next = Math.min(range[1], Math.max(range[0], Number(raw)))
+  return next === current ? null : next
+}
+
+const YES_NO = [
+  { value: 'yes', label: 'Sí' },
+  { value: 'no', label: 'No' },
+] as const
+
+/** Un interruptor del panel: la ficha solo conoce números, textos y listas, así que va como lista de Sí y No. */
+export const toggleField = (id: string, label: string, on: boolean): FieldView => ({
+  kind: 'select',
+  id,
+  label,
+  value: on ? 'yes' : 'no',
+  options: YES_NO,
+})
+
+/** Lo que eligió la persona en un interruptor: `null` si no es Sí ni No, o si ya estaba así. */
+export function togglePatch(raw: string, current: boolean): boolean | null {
+  if (raw !== 'yes' && raw !== 'no') return null
+  const next = raw === 'yes'
+  return next === current ? null : next
+}
+```
+
+- [ ] **Paso 3: Escribir el estante y su registro, y consultarlo desde el modelo**
+
+Create `apps/web/src/editor/shell/properties-parametric.ts`:
+
+```ts
+import { formatMeters, formatSize } from '@/lib/format'
+import { countPatch, num, toggleField, togglePatch } from './properties-fields'
+import { type Builder, type Patch, type PropNode, metersPatch } from './properties-model'
+import type { FieldView } from './ui/PropertiesCard'
+
+/**
+ * Rangos del estante: los de `ShelfNode` (`core/dist/schema/nodes/shelf.js`) y de `sanitizeShelfDimensions`
+ * (`nodes/dist/shelf/dimensions.js`). El inspector de Pascal (`shelfParametrics`) solo pone el mínimo (`max: 1000`),
+ * pero un valor sobre el máximo del esquema no vuelve a cargar.
+ */
+export const SHELF_LIMITS = {
+  width: [0.3, 3],
+  depth: [0.1, 1],
+  height: [0.05, 2.5],
+  rows: [1, 8],
+  columns: [1, 6],
+} as const satisfies Record<string, readonly [number, number]>
+
+/** Lo que Pascal asume cuando el estante no trae el campo (los `default` de `ShelfNode`). */
+const SHELF_DEFAULTS = { width: 1.2, depth: 0.3, height: 0.9, rows: 1, columns: 1 } as const
+
+const SHELF_STYLES: Readonly<Record<string, string>> = {
+  'wall-shelf': 'Estante de pared',
+  bookshelf: 'Biblioteca',
+  'open-rack': 'Góndola',
+  cubby: 'Cubículos',
+}
+
+/** Qué columnas e interruptores tiene cada estilo (los `visibleIf` de `shelfParametrics`). */
+const SHELF_SHOWS: Readonly<Record<string, readonly string[]>> = {
+  'wall-shelf': [],
+  bookshelf: ['columns', 'withSides', 'withBack', 'withBottom'],
+  'open-rack': ['withBack'],
+  cubby: ['columns', 'withBottom'],
+}
+
+/** Los interruptores: id, rótulo y valor que Pascal asume si el nodo no lo trae. */
+const SHELF_FLAGS = [
+  ['withSides', 'Paneles laterales', true],
+  ['withBack', 'Panel trasero', false],
+  ['withBottom', 'Tabla de base', false],
+] as const
+
+const styleOf = (node: PropNode) => (typeof node.style === 'string' && node.style in SHELF_STYLES ? node.style : 'wall-shelf')
+const flagOf = (node: PropNode, id: string, fallback: boolean) => (typeof node[id] === 'boolean' ? (node[id] as boolean) : fallback)
+const shelfSize = (node: PropNode) => ({
+  width: num(node.width, SHELF_DEFAULTS.width),
+  depth: num(node.depth, SHELF_DEFAULTS.depth),
+  height: num(node.height, SHELF_DEFAULTS.height),
+  rows: Math.round(num(node.rows, SHELF_DEFAULTS.rows)),
+  columns: Math.round(num(node.columns, SHELF_DEFAULTS.columns)),
+})
+const change = (key: string, value: boolean | number | null): Patch | null => (value === null ? null : { [key]: value })
+
+const shelfBuilder: Builder = {
+  fields: ({ node }) => {
+    const shows = SHELF_SHOWS[styleOf(node)] ?? []
+    const size = shelfSize(node)
+    const fields: FieldView[] = [
+      { kind: 'readonly', id: 'style', label: 'Estilo', value: SHELF_STYLES[styleOf(node)] ?? '' },
+      { kind: 'number', id: 'width', label: 'Ancho', value: formatMeters(size.width) },
+      { kind: 'number', id: 'depth', label: 'Fondo', value: formatMeters(size.depth) },
+      { kind: 'number', id: 'height', label: 'Alto', value: formatMeters(size.height) },
+      { kind: 'number', id: 'rows', label: 'Filas', value: String(size.rows) },
+    ]
+    if (shows.includes('columns')) fields.push({ kind: 'number', id: 'columns', label: 'Columnas', value: String(size.columns) })
+    for (const [id, label, fallback] of SHELF_FLAGS) if (shows.includes(id)) fields.push(toggleField(id, label, flagOf(node, id, fallback)))
+    return fields
+  },
+  patch: ({ node }, fieldId, raw) => {
+    const shows = SHELF_SHOWS[styleOf(node)] ?? []
+    const size = shelfSize(node)
+    if (fieldId === 'width') return change('width', metersPatch(raw, SHELF_LIMITS.width, size.width))
+    if (fieldId === 'depth') return change('depth', metersPatch(raw, SHELF_LIMITS.depth, size.depth))
+    if (fieldId === 'height') return change('height', metersPatch(raw, SHELF_LIMITS.height, size.height))
+    if (fieldId === 'rows') return change('rows', countPatch(raw, SHELF_LIMITS.rows, size.rows))
+    if (fieldId === 'columns') return shows.includes('columns') ? change('columns', countPatch(raw, SHELF_LIMITS.columns, size.columns)) : null
+    const flag = SHELF_FLAGS.find(([id]) => id === fieldId)
+    return flag && shows.includes(fieldId) ? change(fieldId, togglePatch(raw, flagOf(node, fieldId, flag[2]))) : null
+  },
+  title: ({ node }) => SHELF_STYLES[styleOf(node)] ?? 'Estante',
+  subtitle: ({ node }) => formatSize(shelfSize(node).width, shelfSize(node).depth),
+  duplicate: ({ node }) => {
+    const [x, y, z] = Array.isArray(node.position) ? node.position : [0, 0, 0]
+    return { position: [num(x, 0) + 0.5, num(y, 0), num(z, 0) + 0.5] }
+  },
+}
+
+/** Los tipos paramétricos con panel propio (estante aquí; gabinete en 9j y escalera en 9k). */
+export const PARAMETRIC_BUILDERS: Readonly<Record<string, Builder>> = {
+  shelf: shelfBuilder,
+}
+```
+
+Modify `apps/web/src/editor/shell/properties-model.ts`:
+
+```diff
+@@
+-type Builder = {
++export type Builder = {
+@@
++import { PARAMETRIC_BUILDERS } from './properties-parametric'
+ import type { FieldView } from './ui/PropertiesCard'
+@@
+-const builderOf = (target: PropTarget) => BUILDERS[target.node.type]
++const builderOf = (target: PropTarget) => BUILDERS[target.node.type] ?? PARAMETRIC_BUILDERS[target.node.type]
+```
+
+
+- [ ] **Paso 4: Verde, tipos y lint**
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-shelf shell-properties-model shell-properties-wall-zone shell-properties-openings shell-properties-item shell-boundaries`
+Expected: PASS (`shell-properties-shelf`: 9 pruebas; las demás siguen igual).
+
+Run: `pnpm --filter @interiores/web typecheck && pnpm lint`
+Expected: `Tipos OK …` y Biome sin errores nuevos (si se queja del orden de los `import` de `properties-model.ts`, déjalos en el orden que pida).
+
+- [ ] **Paso 5: Commit**
+
+```bash
+git add apps/web/src/editor/shell/properties-fields.ts apps/web/src/editor/shell/properties-parametric.ts apps/web/src/editor/shell/properties-model.ts apps/web/test/shell-properties-shelf.test.ts
+git commit -m "feat(editor): propiedades de estantes (ancho, fondo, alto, filas, columnas e interruptores) con los límites del esquema" -- apps/web/src/editor/shell/properties-fields.ts apps/web/src/editor/shell/properties-parametric.ts apps/web/src/editor/shell/properties-model.ts apps/web/test/shell-properties-shelf.test.ts
+```
+
+---
+
+### Task 9j: Propiedades de gabinetes (ancho, fondo y alto del cuerpo)
+
+**Responsable sugerido:** Silvert. Revisa: Victoria.
+
+**Hallazgo que cambia el *cómo* se aplica el cambio.** A diferencia del estante, el gabinete **no** se puede editar con `commitParametricNodeFields` a secas: sus tiradores del lienzo (`cabinetWidthHandle`, `cabinetDepthHandle`, `cabinetHeightHandle`) aplican el cambio con `commitCabinetResize`, que reacomoda los módulos de la hilera, sus vecinos en esquina y los gabinetes de pared (`nodes/dist/cabinet/definition.js`); el descriptor `cabinetParametrics` no trae `derive` ni `reconcile`, así que un cambio plano dejaría los módulos con el fondo o el alto viejo. Por eso esta tarea aplica el cambio **con el mismo tirador que usa el lienzo** (`handle.apply` y `handle.commit` con `createSceneApi(useScene)`, en un solo paso del historial con `runAsSingleSceneHistoryStep`).
+
+| Dato | Valor confirmado | Dónde |
+|---|---|---|
+| Campos y límites | `width` 0,3 a 3; `depth` 0,3 a 1,2; `carcassHeight` 0,4 a 2,4 (igual en `cabinet` y `cabinet-module`) | `nodes/dist/cabinet/parametrics.js` (`cabinetParametrics`, `cabinetModuleParametrics`); `core/dist/schema/nodes/cabinet.js` (`CabinetNode`, `CabinetModuleNode`, `cabinetBoxFields`) |
+| De fábrica | ancho 0,5; fondo 0,6; alto del cuerpo 0,8 | `core/dist/schema/nodes/cabinet.js` (`CABINET_METRIC_DEFAULTS`), `nodes/dist/cabinet/definition.js` (`defaults`) |
+| Tiradores del lienzo | topes de arrastre más estrechos (1,2 m de ancho y 0,8 m de fondo); no se aplican aquí, que admite todo lo que el esquema vuelve a cargar | `nodes/dist/cabinet/resize-limits.js` |
+| Hilera con módulos | el ancho de una hilera sale de sus módulos y Pascal **no** ofrece tiradores de ancho ni de alto sobre ella (`cabinetHandles`): el panel muestra solo cuántos módulos tiene y se edita cada módulo | `nodes/dist/cabinet/definition.js` (`cabinetHandles`), `run-layout.js` |
+
+**Files:**
+- Create: `apps/web/src/editor/shell/properties-cabinet.ts`, `apps/web/src/editor/cabinet-commit.ts`, `apps/web/test/shell-properties-cabinet.test.ts`
+- Modify: `apps/web/src/editor/shell/properties-parametric.ts` (registra los dos constructores), `apps/web/src/editor/shell/properties-model.ts` (rótulo del módulo), `apps/web/src/editor/pascal-bridge.ts` (`commitFields` de los gabinetes)
+
+**Interfaces:**
+- Consumes: `Builder`, `PropNode`, `Patch`, `metersPatch` y `PARAMETRIC_BUILDERS` (9a y 9i); `num` (9i); `formatMeters`, `formatSize` (7b); `EditDeps.commitFields` (9e); de `@pascal-app/core` (solo `src/editor/`): `nodeRegistry`, `createSceneApi`, `runAsSingleSceneHistoryStep`, `useScene`.
+- Produces:
+  - `CABINET_LIMITS`, `cabinetBuilder` (gabinete suelto: Ancho, Fondo y Alto del cuerpo; **hilera con módulos**: solo "Módulos", solo lectura) y `cabinetModuleBuilder` (Ancho, Fondo y Alto del cuerpo). Título "Gabinete" y "Módulo de gabinete"; subtítulo ancho × fondo (o "2 módulos"). Sin Duplicar: la copia de un gabinete tiene reglas propias en Pascal (`cleanCabinetDuplicateNode`) que el clon genérico de 9f no aplica.
+  - `isCabinetNode(node)` y `commitCabinetFields(node, patch)` (`src/editor/cabinet-commit.ts`): busca el tirador lineal del eje del campo (`width` en x, `depth` en z, `carcassHeight` en y; para el ancho, el último de los de eje x, que es el derecho), calcula el cambio con `apply` y lo aplica con su `commit`. Si el tirador no existe o no está visible para ese nodo (un módulo de ancho fijo, como un electrodoméstico), **no hace nada** y la ficha vuelve al valor real (9h).
+
+- [ ] **Paso 1: Escribir la prueba (rojo)**
+
+Create `apps/web/test/shell-properties-cabinet.test.ts`:
+
+```ts
+import { CabinetModuleNode, CabinetNode } from '@pascal-app/core/schema'
+import { describe, expect, it } from 'vitest'
+import {
+  type PropTarget,
+  canDuplicate,
+  deleteWarning,
+  fieldsFor,
+  patchFor,
+  subtitleFor,
+  titleFor,
+} from '../src/editor/shell/properties-model'
+import { CABINET_LIMITS } from '../src/editor/shell/properties-cabinet'
+import { values } from './support/properties'
+
+const asTarget = (node: unknown, descendants = 0): PropTarget => ({ node: node as PropTarget['node'], hostLength: null, descendants })
+const single = (extra: Record<string, unknown> = {}) => asTarget(CabinetNode.parse(extra))
+const cabModule = (extra: Record<string, unknown> = {}) => asTarget(CabinetModuleNode.parse(extra))
+const applied = (t: PropTarget, patch: Record<string, unknown> | null): PropTarget => ({ ...t, node: { ...t.node, ...patch } })
+
+describe('gabinete', () => {
+  it('un gabinete suelto muestra Ancho, Fondo y Alto del cuerpo en metros', () => {
+    const t = single()
+    expect(fieldsFor(t).map((f) => [f.id, f.label])).toEqual([['width', 'Ancho'], ['depth', 'Fondo'], ['carcassHeight', 'Alto del cuerpo']])
+    expect(values(t)).toEqual({ width: '0,50 m', depth: '0,60 m', carcassHeight: '0,80 m' })
+    expect(titleFor(t)).toBe('Gabinete')
+    expect(subtitleFor(t)).toBe('0,50 × 0,60 m')
+  })
+
+  it('una hilera con módulos solo muestra cuántos tiene: se edita cada módulo', () => {
+    const run = single({ children: ['cabinet-module_a', 'cabinet-module_b'] })
+    expect(fieldsFor(run)).toEqual([{ kind: 'readonly', id: 'modules', label: 'Módulos', value: '2' }])
+    expect(subtitleFor(run)).toBe('2 módulos')
+    expect(subtitleFor(single({ children: ['cabinet-module_a'] }))).toBe('1 módulo')
+    for (const id of ['width', 'depth', 'carcassHeight']) expect(patchFor(run, id, '1'), id).toBeNull()
+  })
+
+  it('un módulo muestra los mismos tres campos y su propio título, también al borrarlo', () => {
+    const t = cabModule()
+    expect(fieldsFor(t).map((f) => f.id)).toEqual(['width', 'depth', 'carcassHeight'])
+    expect(titleFor(t)).toBe('Módulo de gabinete')
+    expect(deleteWarning({ ...t, descendants: 1 })).toBe('Este módulo de gabinete tiene 1 elemento que también se borrará.')
+  })
+
+  it('fuera de rango se ajusta al límite', () => {
+    for (const t of [single(), cabModule()]) {
+      expect(patchFor(t, 'width', '10')).toEqual({ width: 3 })
+      expect(patchFor(t, 'width', '10 cm')).toEqual({ width: 0.3 })
+      expect(patchFor(t, 'depth', '5')).toEqual({ depth: 1.2 })
+      expect(patchFor(t, 'depth', '0')).toEqual({ depth: 0.3 })
+      expect(patchFor(t, 'carcassHeight', '9')).toEqual({ carcassHeight: 2.4 })
+      expect(patchFor(t, 'carcassHeight', '0')).toEqual({ carcassHeight: 0.4 })
+    }
+  })
+
+  it('un valor igual al actual o que no es un número no cambia nada', () => {
+    for (const t of [single(), cabModule()]) {
+      for (const [id, raw] of [['width', '0,5'], ['depth', '60 cm'], ['carcassHeight', '0,80'], ['width', 'ancho'], ['otro', '1']]) {
+        expect(patchFor(t, id as string, raw as string), `${id} ${raw}`).toBeNull()
+      }
+    }
+  })
+
+  it('el cambio aplicado al nodo se lee de vuelta, y el valor anterior se recupera (lo que hace Deshacer)', () => {
+    const t = single()
+    const wider = applied(t, patchFor(t, 'width', '1,2'))
+    expect(values(wider).width).toBe('1,20 m')
+    expect(values(applied(wider, { width: 0.5 })).width).toBe('0,50 m')
+    expect(values(applied(t, patchFor(t, 'carcassHeight', '0,9'))).carcassHeight).toBe('0,90 m')
+  })
+
+  it('los límites son los del esquema real: el máximo se acepta y un paso más allá se rechaza', () => {
+    for (const schema of [CabinetNode, CabinetModuleNode]) {
+      for (const [key, [min, max]] of Object.entries(CABINET_LIMITS)) {
+        expect(schema.safeParse({ [key]: min }).success, `${key} mínimo`).toBe(true)
+        expect(schema.safeParse({ [key]: max }).success, `${key} máximo`).toBe(true)
+        expect(schema.safeParse({ [key]: max + 0.001 }).success, `${key} sobre el máximo`).toBe(false)
+      }
+      expect(schema.safeParse({ depth: 0.299 }).success).toBe(false)
+      expect(schema.safeParse({ carcassHeight: 0.399 }).success).toBe(false)
+    }
+  })
+
+  it('un gabinete no se duplica desde el panel', () => {
+    expect(canDuplicate(single())).toBe(false)
+    expect(canDuplicate(cabModule())).toBe(false)
+  })
+})
+```
+
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-cabinet`
+Expected: FAIL — `Cannot find module '../src/editor/shell/properties-cabinet'`.
+
+- [ ] **Paso 2: Escribir los constructores del gabinete y registrarlos**
+
+Create `apps/web/src/editor/shell/properties-cabinet.ts`:
+
+```ts
+import { formatMeters, formatSize } from '@/lib/format'
+import { num } from './properties-fields'
+import { type Builder, type Patch, type PropNode, metersPatch } from './properties-model'
+import type { FieldView } from './ui/PropertiesCard'
+
+/**
+ * Rangos del gabinete y de su módulo: los de `cabinetParametrics` y `cabinetModuleParametrics`
+ * (`nodes/dist/cabinet/parametrics.js`), que coinciden con `CabinetNode` y `CabinetModuleNode`
+ * (`core/dist/schema/nodes/cabinet.js`). Los tiradores del lienzo topan antes (1,2 m de ancho y 0,8 m de fondo,
+ * `resize-limits.js`); aquí se admite todo lo que el esquema vuelve a cargar.
+ */
+export const CABINET_LIMITS = {
+  width: [0.3, 3],
+  depth: [0.3, 1.2],
+  carcassHeight: [0.4, 2.4],
+} as const satisfies Record<string, readonly [number, number]>
+
+/** De fábrica (`defaults` de la definición y `CABINET_METRIC_DEFAULTS`). */
+const DEFAULTS = { width: 0.5, depth: 0.6, carcassHeight: 0.8 } as const
+
+const size = (node: PropNode) => ({
+  width: num(node.width, DEFAULTS.width),
+  depth: num(node.depth, DEFAULTS.depth),
+  carcassHeight: num(node.carcassHeight, DEFAULTS.carcassHeight),
+})
+
+/** Los módulos de una hilera cuelgan de ella con ids `cabinet-module_…` (la misma regla de `cabinetHandles`). */
+const modulesOf = (node: PropNode) =>
+  Array.isArray(node.children) ? node.children.filter((id) => typeof id === 'string' && (id.startsWith('cabinet_') || id.startsWith('cabinet-module_'))).length : 0
+
+const boxFields = (node: PropNode): FieldView[] => {
+  const current = size(node)
+  return [
+    { kind: 'number', id: 'width', label: 'Ancho', value: formatMeters(current.width) },
+    { kind: 'number', id: 'depth', label: 'Fondo', value: formatMeters(current.depth) },
+    { kind: 'number', id: 'carcassHeight', label: 'Alto del cuerpo', value: formatMeters(current.carcassHeight) },
+  ]
+}
+
+function boxPatch(node: PropNode, fieldId: string, raw: string): Patch | null {
+  if (fieldId !== 'width' && fieldId !== 'depth' && fieldId !== 'carcassHeight') return null
+  const value = metersPatch(raw, CABINET_LIMITS[fieldId], size(node)[fieldId])
+  return value === null ? null : { [fieldId]: value }
+}
+
+const boxSubtitle = (node: PropNode) => formatSize(size(node).width, size(node).depth)
+
+export const cabinetBuilder: Builder = {
+  fields: ({ node }) => {
+    const modules = modulesOf(node)
+    return modules > 0 ? [{ kind: 'readonly', id: 'modules', label: 'Módulos', value: String(modules) }] : boxFields(node)
+  },
+  patch: ({ node }, fieldId, raw) => (modulesOf(node) > 0 ? null : boxPatch(node, fieldId, raw)),
+  subtitle: ({ node }) => {
+    const modules = modulesOf(node)
+    return modules > 0 ? `${modules} ${modules === 1 ? 'módulo' : 'módulos'}` : boxSubtitle(node)
+  },
+}
+
+export const cabinetModuleBuilder: Builder = {
+  fields: ({ node }) => boxFields(node),
+  patch: ({ node }, fieldId, raw) => boxPatch(node, fieldId, raw),
+  subtitle: ({ node }) => boxSubtitle(node),
+}
+```
+
+Modify `apps/web/src/editor/shell/properties-parametric.ts`:
+
+```diff
+@@
+ import { formatMeters, formatSize } from '@/lib/format'
++import { cabinetBuilder, cabinetModuleBuilder } from './properties-cabinet'
+ import { countPatch, num, toggleField, togglePatch } from './properties-fields'
+@@
+ export const PARAMETRIC_BUILDERS: Readonly<Record<string, Builder>> = {
+   shelf: shelfBuilder,
++  cabinet: cabinetBuilder,
++  'cabinet-module': cabinetModuleBuilder,
+ }
+```
+
+Modify `apps/web/src/editor/shell/properties-model.ts` (el rótulo del módulo para su título y para el aviso de borrado):
+
+```diff
+@@
+   cabinet: { label: 'Gabinete', article: 'Este' },
++  'cabinet-module': { label: 'Módulo de gabinete', article: 'Este' },
+```
+
+
+- [ ] **Paso 3: Aplicar el cambio con el tirador del lienzo**
+
+Create `apps/web/src/editor/cabinet-commit.ts`:
+
+```ts
+import * as Core from '@pascal-app/core'
+
+type AnyNode = Core.AnyNode
+
+/** Eje del tirador de cada campo del panel (`nodes/dist/cabinet/definition.js`: ancho en x, fondo en z, alto en y). */
+const AXIS = { width: 'x', depth: 'z', carcassHeight: 'y' } as const
+
+/** Un gabinete (`cabinet`) o uno de sus módulos (`cabinet-module`). */
+export const isCabinetNode = (node: AnyNode) => node.type === 'cabinet' || node.type === 'cabinet-module'
+
+/**
+ * Cambia el ancho, el fondo o el alto con el mismo tirador que usa el lienzo: `apply` calcula el cambio y `commit`
+ * (`commitCabinetResize`) reacomoda los módulos, los vecinos en esquina y los gabinetes de pared. Todo queda en **un**
+ * paso del historial. Si el tirador no existe o no está visible para este nodo (un módulo de ancho fijo), no hace nada.
+ */
+export function commitCabinetFields(node: AnyNode, patch: Record<string, unknown>): void {
+  const field = (Object.keys(AXIS) as (keyof typeof AXIS)[]).find((key) => typeof patch[key] === 'number')
+  if (!field) return
+  const sceneApi = Core.createSceneApi(Core.useScene)
+  const handles = (Core.nodeRegistry.get(node.type)?.handles?.(node as never, sceneApi) ?? []) as unknown as {
+    kind: string
+    axis?: string
+    visible?: (node: never, sceneApi: never) => boolean
+    apply: (node: never, value: number, sceneApi: never, modifiers: { altKey: boolean; shiftKey: boolean }) => Record<string, unknown>
+    commit?: (node: never, patch: never, sceneApi: never, modifiers: { altKey: boolean; shiftKey: boolean }) => void
+  }[]
+  const handle = handles.filter((candidate) => candidate.kind === 'linear-resize' && candidate.axis === AXIS[field]).at(-1)
+  if (!handle || (handle.visible && !handle.visible(node as never, sceneApi as never))) return
+  const modifiers = { altKey: false, shiftKey: false }
+  const next = handle.apply(node as never, patch[field] as number, sceneApi as never, modifiers)
+  Core.runAsSingleSceneHistoryStep(Core.useScene, () => {
+    if (handle.commit) handle.commit(node as never, next as never, sceneApi as never, modifiers)
+    else sceneApi.update(node.id as never, next as never)
+  })
+}
+```
+
+Modify `apps/web/src/editor/pascal-bridge.ts`:
+
+```diff
+@@
++import { commitCabinetFields, isCabinetNode } from './cabinet-commit'
+ import type { EditDeps } from './shell/bridge/edit'
+@@
+-    commitFields: (id, patch) => Pascal.commitParametricNodeFields(id as AnyNodeId, patch as Partial<AnyNode>),
++    commitFields: (id, patch) => {
++      const node = Core.useScene.getState().nodes[id as AnyNodeId]
++      // Los gabinetes se redimensionan con la rutina de sus tiradores (reacomoda módulos y vecinos); el resto, con la del inspector.
++      if (node && isCabinetNode(node)) commitCabinetFields(node, patch)
++      else Pascal.commitParametricNodeFields(id as AnyNodeId, patch as Partial<AnyNode>)
++    },
+```
+
+
+- [ ] **Paso 4: Verde, tipos y lint**
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-cabinet shell-properties-shelf shell-properties-model shell-bridge-edit shell-boundaries`
+Expected: PASS (`shell-properties-cabinet`: 8 pruebas).
+
+Run: `pnpm --filter @interiores/web typecheck && pnpm lint`
+Expected: `Tipos OK …` y Biome sin errores nuevos. `commitCabinetFields` no tiene prueba unitaria (necesita el almacén real de Pascal): la cubre la Tarea 9l en el navegador (cambiar el fondo y Deshacer). Si el compilador rechaza algún acceso a `nodeRegistry`, ajústalo con `as never`, como el resto del puente.
+
+- [ ] **Paso 5: Commit**
+
+```bash
+git add apps/web/src/editor/shell/properties-cabinet.ts apps/web/src/editor/shell/properties-parametric.ts apps/web/src/editor/shell/properties-model.ts apps/web/src/editor/cabinet-commit.ts apps/web/src/editor/pascal-bridge.ts apps/web/test/shell-properties-cabinet.test.ts
+git commit -m "feat(editor): propiedades de gabinetes (ancho, fondo y alto del cuerpo) aplicadas con la rutina de sus tiradores" -- apps/web/src/editor/shell/properties-cabinet.ts apps/web/src/editor/shell/properties-parametric.ts apps/web/src/editor/shell/properties-model.ts apps/web/src/editor/cabinet-commit.ts apps/web/src/editor/pascal-bridge.ts apps/web/test/shell-properties-cabinet.test.ts
+```
+
+---
+
+### Task 9k: Propiedades de escaleras (ancho y escalones) y de sus tramos
+
+**Responsable sugerido:** Victoria. Revisa: Silvert.
+
+**Hallazgo que parte la tarea en dos nodos.** Una escalera **recta** (la que se coloca por omisión) es un grupo (`stair`) de **tramos** (`stair-segment`): el ancho y los escalones de una recta viven en cada tramo, y el lienzo le da tiradores a los tramos, no al grupo (`stairHandles`: "Straight stairs have no parent-level shape arrows"). Solo las escaleras **curvas y de caracol** guardan `width` y `stepCount` en el propio nodo `stair`. Por eso hay dos constructores: `stair` (curva y caracol: Ancho y Escalones; recta: cuántos tramos tiene, y se elige un tramo) y `stair-segment` (Ancho y Escalones del tramo; un descanso solo tiene Ancho).
+
+| Dato | Valor confirmado | Dónde |
+|---|---|---|
+| Escalera curva y caracol | `width` mín 0,4 (el panel de Pascal topa en 10); `stepCount` entero 2 a 32 (el panel lo redondea con `Math.max(2, Math.round(value))`); el inspector solo los muestra si `stairType !== 'straight'` | `nodes/dist/stair/parametrics.js` (`stairParametrics`), `nodes/dist/stair/panel.js` (`MetricControl` de Ancho y Escalones), `nodes/dist/stair/definition.js` (`MIN_CURVED_WIDTH`) |
+| Tramo | `width` mín 0,5; `stepCount` 2 a 30 (solo si `segmentType === 'stair'`); `height`, `length`, `thickness` quedan fuera | `nodes/dist/stair-segment/parametrics.js` (`stairSegmentParametrics`) |
+| Esquema | `StairNode` y `StairSegmentNode` solo tienen `z.number()` sin tope: los máximos (10 de ancho) son los del panel de Pascal; de fábrica ancho 1,0 y 10 escalones | `core/dist/schema/nodes/stair.js`, `stair-segment.js` |
+| Cómo se aplica | `commitParametricNodeFields`: el descriptor de la escalera solo tiene `derive` al cambiar `stairType` (no se toca aquí) y el del tramo no tiene | `editor/src/lib/parametric-node-update.ts`, `nodes/dist/stair/parametrics.js` |
+
+**Files:**
+- Create: `apps/web/src/editor/shell/properties-stair.ts`, `apps/web/test/shell-properties-stair.test.ts`
+- Modify: `apps/web/src/editor/shell/properties-parametric.ts` (registra los constructores), `apps/web/src/editor/shell/properties-model.ts` (rótulo del tramo), `apps/web/test/shell-properties-model.test.ts` (la escalera deja de ser un "tipo sin panel propio")
+
+**Interfaces:**
+- Consumes: `Builder`, `PropNode`, `metersPatch`, `PARAMETRIC_BUILDERS` (9a y 9i); `num`, `countPatch` (9i); `formatMeters` (7b).
+- Produces: `STAIR_LIMITS`, `FLIGHT_LIMITS`, `stairBuilder` y `flightBuilder`. Sin Duplicar en ninguno (9a lo deja así para la escalera). Con esto `stair` deja de ir al panel mínimo; el piso, el cielorraso y la columna siguen yendo.
+
+- [ ] **Paso 1: Escribir la prueba (rojo)**
+
+Create `apps/web/test/shell-properties-stair.test.ts`:
+
+```ts
+import { StairNode, StairSegmentNode } from '@pascal-app/core/schema'
+import { describe, expect, it } from 'vitest'
+import {
+  type PropTarget,
+  canDuplicate,
+  fieldsFor,
+  patchFor,
+  subtitleFor,
+  titleFor,
+} from '../src/editor/shell/properties-model'
+import { values } from './support/properties'
+
+const asTarget = (node: unknown): PropTarget => ({ node: node as PropTarget['node'], hostLength: null, descendants: 0 })
+const FLIGHT = StairSegmentNode.parse({})
+const spiral = (extra: Record<string, unknown> = {}) => asTarget(StairNode.parse({ stairType: 'spiral', ...extra }))
+const flight = (extra: Record<string, unknown> = {}) => asTarget(StairSegmentNode.parse(extra))
+const applied = (t: PropTarget, patch: Record<string, unknown> | null): PropTarget => ({ ...t, node: { ...t.node, ...patch } })
+
+describe('escalera curva y de caracol', () => {
+  it('muestra Ancho y Escalones, y su tipo como subtítulo', () => {
+    const t = spiral()
+    expect(fieldsFor(t).map((f) => [f.id, f.label])).toEqual([['width', 'Ancho'], ['stepCount', 'Escalones']])
+    expect(values(t)).toEqual({ width: '1,00 m', stepCount: '10' })
+    expect(titleFor(t)).toBe('Escalera')
+    expect(subtitleFor(t)).toBe('Caracol')
+    expect(subtitleFor(asTarget(StairNode.parse({ stairType: 'curved' })))).toBe('Curva')
+  })
+
+  it('fuera de rango se ajusta; igual al actual o no numérico no cambia nada', () => {
+    const t = spiral()
+    expect(patchFor(t, 'width', '20')).toEqual({ width: 10 })
+    expect(patchFor(t, 'width', '0,1')).toEqual({ width: 0.4 })
+    expect(patchFor(t, 'stepCount', '99')).toEqual({ stepCount: 32 })
+    expect(patchFor(t, 'stepCount', '1')).toEqual({ stepCount: 2 })
+    for (const [id, raw] of [['width', '1'], ['stepCount', '10'], ['stepCount', '10,5'], ['stepCount', 'diez'], ['width', 'ancho'], ['otro', '1']]) {
+      expect(patchFor(t, id as string, raw as string), `${id} ${raw}`).toBeNull()
+    }
+  })
+
+  it('el cambio aplicado al nodo se lee de vuelta, y el valor anterior se recupera (lo que hace Deshacer)', () => {
+    const t = spiral()
+    expect(values(applied(t, patchFor(t, 'width', '1,5'))).width).toBe('1,50 m')
+    const more = applied(t, patchFor(t, 'stepCount', '14'))
+    expect(values(more).stepCount).toBe('14')
+    expect(values(applied(more, { stepCount: 10 })).stepCount).toBe('10')
+  })
+})
+
+describe('escalera recta', () => {
+  it('solo muestra cuántos tramos tiene y pide elegir un tramo', () => {
+    const t = asTarget(StairNode.parse({ children: [FLIGHT.id] }))
+    expect(fieldsFor(t)).toEqual([{ kind: 'readonly', id: 'tramos', label: 'Tramos', value: '1' }])
+    expect(subtitleFor(t)).toBe('Elige un tramo para cambiar sus medidas')
+    expect(patchFor(t, 'width', '2')).toBeNull()
+  })
+})
+
+describe('tramo de escalera', () => {
+  it('un tramo muestra Ancho y Escalones; un descanso, solo Ancho', () => {
+    expect(fieldsFor(flight()).map((f) => [f.id, f.label])).toEqual([['width', 'Ancho'], ['stepCount', 'Escalones']])
+    expect(values(flight())).toEqual({ width: '1,00 m', stepCount: '10' })
+    expect(titleFor(flight())).toBe('Tramo de escalera')
+    expect(subtitleFor(flight())).toBe('10 escalones')
+    expect(fieldsFor(flight({ segmentType: 'landing' })).map((f) => f.id)).toEqual(['width'])
+    expect(titleFor(flight({ segmentType: 'landing' }))).toBe('Descanso')
+    expect(patchFor(flight({ segmentType: 'landing' }), 'stepCount', '5')).toBeNull()
+  })
+
+  it('fuera de rango se ajusta; el cambio se lee de vuelta', () => {
+    const t = flight()
+    expect(patchFor(t, 'width', '20')).toEqual({ width: 10 })
+    expect(patchFor(t, 'width', '0,2')).toEqual({ width: 0.5 })
+    expect(patchFor(t, 'stepCount', '99')).toEqual({ stepCount: 30 })
+    expect(patchFor(t, 'stepCount', '0')).toEqual({ stepCount: 2 })
+    expect(patchFor(t, 'stepCount', '10')).toBeNull()
+    expect(values(applied(t, patchFor(t, 'width', '1,2'))).width).toBe('1,20 m')
+  })
+
+  it('ni la escalera ni el tramo se duplican desde el panel', () => {
+    expect(canDuplicate(spiral())).toBe(false)
+    expect(canDuplicate(flight())).toBe(false)
+  })
+})
+```
+
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-stair`
+Expected: FAIL — `AssertionError: expected [] to deeply equal [ [ 'width', 'Ancho' ], [ 'stepCount', 'Escalones' ] ]` (la escalera todavía va al panel mínimo).
+
+- [ ] **Paso 2: Escribir los constructores de la escalera y del tramo y registrarlos**
+
+Create `apps/web/src/editor/shell/properties-stair.ts`:
+
+```ts
+import { formatMeters } from '@/lib/format'
+import { countPatch, num } from './properties-fields'
+import { type Builder, type Patch, type PropNode, metersPatch } from './properties-model'
+
+/**
+ * Escalera curva o de caracol: `stairParametrics` (`nodes/dist/stair/parametrics.js`) pone ancho mín 0,4 y 2 a 32
+ * escalones; el panel de Pascal (`stair/panel.js`) topa el ancho en 10. El esquema (`StairNode`) no tiene topes.
+ */
+export const STAIR_LIMITS = { width: [0.4, 10], stepCount: [2, 32] } as const satisfies Record<string, readonly [number, number]>
+/** Tramo: `stairSegmentParametrics` (`nodes/dist/stair-segment/parametrics.js`): ancho mín 0,5 y 2 a 30 escalones. */
+export const FLIGHT_LIMITS = { width: [0.5, 10], stepCount: [2, 30] } as const satisfies Record<string, readonly [number, number]>
+
+/** De fábrica en `StairNode` y `StairSegmentNode`: 1 m de ancho y 10 escalones. */
+const DEFAULTS = { width: 1, stepCount: 10 } as const
+const TYPES: Readonly<Record<string, string>> = { straight: 'Recta', curved: 'Curva', spiral: 'Caracol' }
+
+const isCurved = (node: PropNode) => node.stairType === 'curved' || node.stairType === 'spiral'
+const widthOf = (node: PropNode) => num(node.width, DEFAULTS.width)
+const stepsOf = (node: PropNode) => Math.round(num(node.stepCount, DEFAULTS.stepCount))
+const change = (key: string, value: number | null): Patch | null => (value === null ? null : { [key]: value })
+
+/** Ancho y escalones con los límites que le toquen (los mismos campos en la escalera curva y en el tramo). */
+function patchOf(node: PropNode, fieldId: string, raw: string, limits: typeof STAIR_LIMITS | typeof FLIGHT_LIMITS): Patch | null {
+  if (fieldId === 'width') return change('width', metersPatch(raw, limits.width, widthOf(node)))
+  if (fieldId === 'stepCount') return change('stepCount', countPatch(raw, limits.stepCount, stepsOf(node)))
+  return null
+}
+
+export const stairBuilder: Builder = {
+  fields: ({ node }) =>
+    isCurved(node)
+      ? [
+          { kind: 'number', id: 'width', label: 'Ancho', value: formatMeters(widthOf(node)) },
+          { kind: 'number', id: 'stepCount', label: 'Escalones', value: String(stepsOf(node)) },
+        ]
+      : [{ kind: 'readonly', id: 'tramos', label: 'Tramos', value: String(Array.isArray(node.children) ? node.children.length : 0) }],
+  patch: ({ node }, fieldId, raw) => (isCurved(node) ? patchOf(node, fieldId, raw, STAIR_LIMITS) : null),
+  subtitle: ({ node }) => (isCurved(node) ? (TYPES[String(node.stairType)] ?? '') : 'Elige un tramo para cambiar sus medidas'),
+}
+
+const isLanding = (node: PropNode) => node.segmentType === 'landing'
+
+export const flightBuilder: Builder = {
+  fields: ({ node }) => [
+    { kind: 'number', id: 'width', label: 'Ancho', value: formatMeters(widthOf(node)) },
+    ...(isLanding(node) ? [] : [{ kind: 'number' as const, id: 'stepCount', label: 'Escalones', value: String(stepsOf(node)) }]),
+  ],
+  patch: ({ node }, fieldId, raw) => (fieldId === 'stepCount' && isLanding(node) ? null : patchOf(node, fieldId, raw, FLIGHT_LIMITS)),
+  title: ({ node }) => (isLanding(node) ? 'Descanso' : 'Tramo de escalera'),
+  subtitle: ({ node }) => (isLanding(node) ? undefined : `${stepsOf(node)} escalones`),
+}
+```
+
+Modify `apps/web/src/editor/shell/properties-parametric.ts`:
+
+```diff
+@@
+ import { countPatch, num, toggleField, togglePatch } from './properties-fields'
+ import { type Builder, type Patch, type PropNode, metersPatch } from './properties-model'
++import { flightBuilder, stairBuilder } from './properties-stair'
+@@
+   'cabinet-module': cabinetModuleBuilder,
++  stair: stairBuilder,
++  'stair-segment': flightBuilder,
+ }
+```
+
+Modify `apps/web/src/editor/shell/properties-model.ts` (rótulo del tramo para el aviso de borrado):
+
+```diff
+@@
+   stair: { label: 'Escalera', article: 'Esta' },
++  'stair-segment': { label: 'Tramo de escalera', article: 'Este' },
+```
+
+Modify `apps/web/test/shell-properties-model.test.ts` (la escalera ya tiene panel propio; el cielorraso ocupa su lugar en la prueba del panel mínimo):
+
+```diff
+@@
+-  it('un piso o una escalera solo tienen el nombre del tipo: sin campos, sin Duplicar', () => {
+-    for (const [type, label] of [['slab', 'Piso'], ['stair', 'Escalera'], ['column', 'Columna'], ['raro', 'Elemento']] as const) {
++  it('un piso o un cielorraso solo tienen el nombre del tipo: sin campos, sin Duplicar', () => {
++    for (const [type, label] of [['slab', 'Piso'], ['ceiling', 'Cielorraso'], ['column', 'Columna'], ['raro', 'Elemento']] as const) {
+```
+
+
+- [ ] **Paso 3: Verde, tipos y lint**
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-stair shell-properties-cabinet shell-properties-shelf shell-properties-model shell-boundaries`
+Expected: PASS (`shell-properties-stair`: 7 pruebas; `shell-properties-model` sigue con 7).
+
+Run: `pnpm --filter @interiores/web typecheck && pnpm lint`
+Expected: `Tipos OK …` y Biome sin errores nuevos.
+
+- [ ] **Paso 4: Commit**
+
+```bash
+git add apps/web/src/editor/shell/properties-stair.ts apps/web/src/editor/shell/properties-parametric.ts apps/web/src/editor/shell/properties-model.ts apps/web/test/shell-properties-stair.test.ts apps/web/test/shell-properties-model.test.ts
+git commit -m "feat(editor): propiedades de escaleras (ancho y escalones) y de sus tramos" -- apps/web/src/editor/shell/properties-stair.ts apps/web/src/editor/shell/properties-parametric.ts apps/web/src/editor/shell/properties-model.ts apps/web/test/shell-properties-stair.test.ts apps/web/test/shell-properties-model.test.ts
+```
+
+---
+
+### Task 9l: Estantes, gabinetes y escaleras en el panel (íconos, ganchos y pruebas en navegador)
+
+**Responsable sugerido:** Silvert. Revisa: Victoria.
+
+**Qué ajusta y qué no.** El despacho por tipo **ya está hecho** sin tocar la 9a ni la 9g: `builderOf` (9i) consulta `BUILDERS` y luego `PARAMETRIC_BUILDERS`, y el panel conectado (9g) no sabe de tipos (llama a `fieldsFor`, `patchFor`, `duplicatePatch` y `deleteWarning`), así que `shelf`, `cabinet`, `cabinet-module`, `stair` y `stair-segment` dejan de ir al panel mínimo con solo registrar su constructor. Lo que falta es lo visible y la prueba de punta a punta: el ícono de cada tipo, los ganchos para armar escenas y las pruebas en navegador con recarga y Deshacer (el criterio 6 del spec: Estante, Gabinete y Escalera, igual que los otros cinco tipos).
+
+**Files:**
+- Create: `apps/web/test/shell-properties-panel-parametric.test.tsx`, `apps/web/e2e/propiedades-parametricas.spec.ts`
+- Modify: `apps/web/src/editor/shell/PropertiesPanel.tsx` (íconos), `apps/web/src/editor/e2e-hooks.ts` (ganchos `addShelf`, `addCabinet`, `addStair` y `addFlight`)
+- Test: las dos pruebas nuevas (la segunda, en navegador real)
+
+**Interfaces:**
+- Consumes: `PropertiesPanel` (9g); los constructores de 9i a 9k; `hook`, `counts`, `ready`, `undoRedo`, `createBlankProject` (4f); los ganchos `node`, `select` y `deleteNode` (9h).
+- Produces: íconos de `lucide-react` (`Library` para el estante, `Archive` para el gabinete y su módulo, `Triangle` para el tramo, además del ya existente de la escalera) y los ganchos `addShelf()`, `addCabinet()`, `addStair()` (caracol) y `addFlight()` (escalera recta con un tramo; devuelve el id **del tramo**), todos con el id del nodo creado.
+
+- [ ] **Paso 1: Escribir las pruebas (rojo)**
+
+Create `apps/web/test/shell-properties-panel-parametric.test.tsx`:
+
+```tsx
+import { CabinetNode, ShelfNode, StairNode, StairSegmentNode } from '@pascal-app/core/schema'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { describe, expect, it } from 'vitest'
+import { createBridge } from '../src/editor/shell/bridge'
+import type { SceneLike } from '../src/editor/shell/bridge/types'
+import { PropertiesPanel } from '../src/editor/shell/PropertiesPanel'
+import { BridgeProvider } from '../src/editor/shell/use-bridge'
+import { createFakeDeps } from './support/fake-deps'
+
+const textOf = (markup: string) => markup.replace(/<[^>]+>/g, '')
+const SHELF = ShelfNode.parse({ position: [1, 0, 1], style: 'bookshelf', width: 1, depth: 0.5, height: 1.8, rows: 3, columns: 2, withBack: true })
+const CABINET = CabinetNode.parse({})
+const FLIGHT = StairSegmentNode.parse({})
+const STRAIGHT = StairNode.parse({ children: [FLIGHT.id] })
+const SPIRAL = StairNode.parse({ stairType: 'spiral' })
+const nodes = Object.fromEntries([SHELF, CABINET, FLIGHT, STRAIGHT, SPIRAL].map((n) => [n.id, n])) as unknown as SceneLike['nodes']
+
+function render(id: string) {
+  const fake = createFakeDeps()
+  fake.scene.setState({ nodes })
+  fake.viewer.setState({ selection: { buildingId: null, levelId: null, zoneId: null, selectedIds: [id] } })
+  return renderToStaticMarkup(
+    <BridgeProvider bridge={createBridge(fake.deps)}>
+      <PropertiesPanel />
+    </BridgeProvider>,
+  )
+}
+
+describe('PropertiesPanel con los tipos paramétricos', () => {
+  it('un estante muestra sus medidas, filas, columnas e interruptores, con Duplicar y su ícono', () => {
+    const markup = render(SHELF.id)
+    for (const word of ['Biblioteca', 'Ancho', 'Fondo', 'Alto', 'Filas', 'Columnas', 'Panel trasero', 'Duplicar', 'Borrar']) {
+      expect(textOf(markup), word).toContain(word)
+    }
+    expect(markup).toContain('value="1,00 m"')
+    expect(markup).toContain('lucide-library')
+    expect(textOf(markup)).not.toMatch(/withBack|Width|Rows/)
+  })
+
+  it('un gabinete muestra su alto del cuerpo, sin Duplicar, con su ícono', () => {
+    const markup = render(CABINET.id)
+    expect(textOf(markup)).toContain('Alto del cuerpo')
+    expect(textOf(markup)).not.toContain('Duplicar')
+    expect(markup).toContain('lucide-archive')
+  })
+
+  it('una escalera de caracol muestra Ancho y Escalones', () => {
+    const markup = render(SPIRAL.id)
+    for (const word of ['Escalera', 'Caracol', 'Escalones']) expect(textOf(markup), word).toContain(word)
+    expect(markup).toContain('value="10"')
+  })
+
+  it('una escalera recta pide elegir un tramo y no muestra Escalones', () => {
+    const text = textOf(render(STRAIGHT.id))
+    expect(text).toContain('Tramos')
+    expect(text).toContain('Elige un tramo para cambiar sus medidas')
+    expect(text).not.toContain('Escalones')
+  })
+
+  it('un tramo muestra su título y sus escalones', () => {
+    const text = textOf(render(FLIGHT.id))
+    for (const word of ['Tramo de escalera', 'Ancho', 'Escalones', '10 escalones']) expect(text, word).toContain(word)
+  })
+})
+```
+
+Create `apps/web/e2e/propiedades-parametricas.spec.ts`:
+
+```ts
+import { type Page, expect, test } from '@playwright/test'
+import { ready } from './support/editor'
+import { hook } from './support/hooks'
+import { createBlankProject } from './support/projects'
+import { undoRedo } from './support/shell'
+
+type Json = Record<string, unknown>
+
+const panel = (page: Page) => page.getByRole('complementary', { name: 'Propiedades' })
+const field = (page: Page, label: string) => panel(page).getByLabel(label, { exact: true })
+const nodeOf = async (page: Page, id: string) => (await hook(page, 'node', id)) as Json | null
+const addVia = (name: string) => async (page: Page) => (await hook(page, name)) as string
+
+/** Escribe en un campo y lo confirma con Enter (así lo hace una persona). */
+async function setField(page: Page, label: string, value: string) {
+  const input = field(page, label)
+  await input.fill(value)
+  await input.press('Enter')
+}
+
+/** Espera a que termine el guardado de lo último: el chip pasa de "Guardado" a "Guardando…" y vuelve. */
+async function waitSaved(page: Page) {
+  const chip = page.getByTestId('save-status')
+  await expect(chip).not.toHaveText('Guardado', { timeout: 10_000 })
+  await expect(chip).toHaveText('Guardado', { timeout: 30_000 })
+}
+
+const CASES = [
+  { name: 'estante (ancho)', add: addVia('addShelf'), label: 'Ancho', value: '2', read: (n: Json) => n.width, before: 1, after: 2 },
+  { name: 'estante (filas)', add: addVia('addShelf'), label: 'Filas', value: '5', read: (n: Json) => n.rows, before: 3, after: 5 },
+  { name: 'gabinete (fondo)', add: addVia('addCabinet'), label: 'Fondo', value: '0,5', read: (n: Json) => n.depth, before: 0.6, after: 0.5 },
+  { name: 'escalera de caracol (escalones)', add: addVia('addStair'), label: 'Escalones', value: '14', read: (n: Json) => n.stepCount, before: 10, after: 14 },
+  { name: 'tramo de escalera recta (ancho)', add: addVia('addFlight'), label: 'Ancho', value: '1,2', read: (n: Json) => n.width, before: 1, after: 1.2 },
+]
+
+for (const c of CASES) {
+  test(`${c.name}: editar un campo cambia el nodo, se guarda y Deshacer lo revierte`, async ({ page }) => {
+    const url = await createBlankProject(page, c.name)
+    const id = await c.add(page)
+    await waitSaved(page)
+    await hook(page, 'select', id)
+    await expect(panel(page)).toBeVisible({ timeout: 15_000 })
+    const read = async () => c.read((await nodeOf(page, id)) ?? {})
+    expect(await read()).toBe(c.before)
+
+    await setField(page, c.label, c.value)
+    await expect.poll(read).toBe(c.after)
+
+    const { undo, redo } = undoRedo(page)
+    await undo.click()
+    await expect.poll(read).toBe(c.before)
+    await redo.click()
+    await expect.poll(read).toBe(c.after)
+
+    await waitSaved(page)
+    await page.goto(url)
+    await ready(page)
+    expect(await read()).toBe(c.after)
+  })
+}
+
+test('un estante: lo fuera de rango se ajusta al límite y lo que no es un número se descarta', async ({ page }) => {
+  await createBlankProject(page, 'límites del estante')
+  const id = await addVia('addShelf')(page)
+  await hook(page, 'select', id)
+  await expect(field(page, 'Ancho')).toHaveValue('1,00 m', { timeout: 15_000 })
+
+  await setField(page, 'Ancho', '10')
+  await expect(field(page, 'Ancho')).toHaveValue('3,00 m')
+  expect((await nodeOf(page, id))?.width).toBe(3)
+  await setField(page, 'Filas', '20')
+  await expect(field(page, 'Filas')).toHaveValue('8')
+  await setField(page, 'Filas', 'muchas')
+  await expect(field(page, 'Filas')).toHaveValue('8')
+})
+
+test('un estante: el interruptor Panel trasero cambia el nodo y Deshacer lo revierte', async ({ page }) => {
+  await createBlankProject(page, 'interruptor')
+  const id = await addVia('addShelf')(page)
+  await hook(page, 'select', id)
+  const back = field(page, 'Panel trasero')
+  await expect(back).toHaveValue('yes', { timeout: 15_000 })
+  await back.selectOption('no')
+  await expect.poll(async () => (await nodeOf(page, id))?.withBack).toBe(false)
+  await undoRedo(page).undo.click()
+  await expect.poll(async () => (await nodeOf(page, id))?.withBack).toBe(true)
+  await expect(back).toHaveValue('yes')
+})
+
+test('una escalera recta no se edita en el grupo: muestra sus tramos y pide elegir uno', async ({ page }) => {
+  await createBlankProject(page, 'recta')
+  const flightId = await addVia('addFlight')(page)
+  const parentId = (await nodeOf(page, flightId))?.parentId as string
+  await hook(page, 'select', parentId)
+  await expect(panel(page).getByText('Tramos')).toBeVisible({ timeout: 15_000 })
+  await expect(field(page, 'Ancho')).toHaveCount(0)
+})
+```
+
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-panel-parametric`
+Expected: FAIL — `AssertionError: expected '<aside …' to contain 'lucide-library'` (todavía no hay íconos para estos tipos y se dibuja la caja genérica).
+
+Run (Supabase local arriba: `pnpm db:start && pnpm db:env`): `pnpm --filter @interiores/web e2e e2e/propiedades-parametricas.spec.ts`
+Expected: FAIL — `TypeError: window.__e2e.addShelf is not a function`.
+
+- [ ] **Paso 2: Los íconos de cada tipo**
+
+Modify `apps/web/src/editor/shell/PropertiesPanel.tsx`:
+
+```diff
+@@
+ import {
++  Archive,
+   Box,
+   BrickWall,
+   DoorOpen,
+   Layers2,
++  Library,
+   type LucideIcon,
+@@
+   stair: Triangle,
++  'stair-segment': Triangle,
++  shelf: Library,
++  cabinet: Archive,
++  'cabinet-module': Archive,
+ }
+```
+
+- [ ] **Paso 3: Los ganchos para armar estantes, gabinetes y escaleras**
+
+Modify `apps/web/src/editor/e2e-hooks.ts`:
+
+```diff
+@@
+-import { DoorNode, ItemNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
++import { CabinetNode, DoorNode, ItemNode, ShelfNode, StairNode, StairSegmentNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
+@@
+     addZone: () => createUnder(ZoneNode.parse({ name: 'Zone 1', polygon: [[0, 0], [3, 0], [3, 2], [0, 2]] }), firstOf('level')),
++    /** Un estante (biblioteca de 3 filas y 2 columnas), un gabinete suelto y una escalera de caracol en el primer nivel. */
++    addShelf: () =>
++      createUnder(ShelfNode.parse({ position: [1, 0, 1.5], style: 'bookshelf', rows: 3, columns: 2, width: 1, depth: 0.4, height: 1.8, withBack: true }), firstOf('level')),
++    addCabinet: () => createUnder(CabinetNode.parse({ position: [2, 0, 1.5] }), firstOf('level')),
++    addStair: () => createUnder(StairNode.parse({ position: [3, 0, 1.5], stairType: 'spiral', width: 1, stepCount: 10 }), firstOf('level')),
++    /** Una escalera recta con un tramo; devuelve el id del tramo (el padre es `node(id).parentId`). */
++    addFlight: () => {
++      const stairId = createUnder(StairNode.parse({ position: [4, 0, 1.5] }), firstOf('level'))
++      return stairId ? createUnder(StairSegmentNode.parse({ parentId: stairId }), stairId) : null
++    },
+```
+
+
+- [ ] **Paso 4: Verde, tipos, lint y navegador**
+
+Run: `pnpm --filter @interiores/web exec vitest run shell-properties-panel-parametric shell-properties-panel shell-boundaries`
+Expected: PASS (`shell-properties-panel-parametric`: 5 pruebas; `shell-properties-panel`: 5).
+
+Run: `pnpm --filter @interiores/web typecheck && pnpm lint`
+Expected: `Tipos OK …` (`ShelfNode.parse`, `CabinetNode.parse`, `StairNode.parse` y `StairSegmentNode.parse` compilan contra los tipos reales) y Biome sin errores nuevos.
+
+Run (Supabase local arriba): `pnpm --filter @interiores/web e2e e2e/propiedades-parametricas.spec.ts e2e/propiedades.spec.ts`
+Expected: PASS (`propiedades-parametricas.spec.ts`: 8 pruebas; `propiedades.spec.ts`: 10). Esto no se pudo correr al escribir el plan. Si falla **gabinete (fondo)**, `commitCabinetFields` (9j) no encontró el tirador de fondo o no es visible para ese nodo: mira `Core.nodeRegistry.get('cabinet').handles(node, sceneApi)` en la consola y comprueba que alguno tenga `axis: 'z'`; si el fondo cambia pero Deshacer necesita dos pasos, revisa que `runAsSingleSceneHistoryStep` envuelva el `commit`. Si falla **tramo de escalera recta**, comprueba en el navegador que al hacer clic en un tramo de una escalera recta Pascal selecciona el tramo y no el grupo (de lo contrario, la escalera recta solo muestra sus tramos y habrá que ofrecer elegirlos desde el panel: se anota en `docs/ESTADO.md`).
+
+- [ ] **Paso 5: Commit**
+
+```bash
+git add apps/web/src/editor/shell/PropertiesPanel.tsx apps/web/src/editor/e2e-hooks.ts apps/web/test/shell-properties-panel-parametric.test.tsx apps/web/e2e/propiedades-parametricas.spec.ts
+git commit -m "test(editor): estantes, gabinetes y escaleras en el panel (íconos, ganchos y pruebas en navegador con recarga y deshacer)" -- apps/web/src/editor/shell/PropertiesPanel.tsx apps/web/src/editor/e2e-hooks.ts apps/web/test/shell-properties-panel-parametric.test.tsx apps/web/e2e/propiedades-parametricas.spec.ts
+```
+
+---
+
 ### Task 10a: Vista 3D por el puente: muros, niveles, cámara, estilo, girar, vista superior y Recorrer
 
 **Responsable sugerido:** Silvert. Revisa: Victoria.
@@ -14009,7 +15107,7 @@ Hecha con el spec delante, cuando el plan ya estaba escrito entero; lo que apare
 | 3. Ver: sin dock ni propiedades, y Supr, Retroceso y atajos no cambian la escena | 4b (`shell-bridge-mode`), 4d (`shell-connected`), 4f (`modos.spec.ts`), 5f ("en Ver el dock no está en pantalla"), 9g ("en Ver no hay panel de propiedades"), 11c (`teclas.spec.ts`) |
 | 4. 2D, 3D y Ambas cambia la vista y se conserva al recargar | 4f (`modos.spec.ts`) |
 | 5. Deshacer y Rehacer según el historial real | 4b (`shell-selectors`), 4f ("Deshacer y Rehacer se habilitan y deshabilitan solos…") |
-| 6. Propiedades: cambia el nodo, se guarda y Deshacer lo revierte, para los cinco tipos | 9a a 9d (modelos), 9e y 9f (puente), 9h (`propiedades.spec.ts`: un caso por tipo, con recarga) |
+| 6. Propiedades: cambia el nodo, se guarda y Deshacer lo revierte, para los ocho tipos (Muro, Puerta, Ventana, Mueble, Ambiente, Estante, Gabinete y Escalera) | 9a a 9d y 9i a 9k (modelos), 9e y 9f (puente), 9h y 9l (`propiedades.spec.ts` y `propiedades-parametricas.spec.ts`: un caso por tipo, con recarga) |
 | 7. Castellano: sin palabras de la lista de inglés; "Planta baja" y "Planta 1" | 5c (atajos), 6a y 6d (plantas y ambientes), 7a y 7e (muebles), 8a, 8d y 8e (materiales), 12a (barrido de todo el shell, atributos incluidos) |
 | 8. Catálogo: 144 ítems con nombre y categoría en castellano y miniatura con fondo transparente | 7a (`catalog-es.test.ts`: cada carpeta), 7g (`item-thumbnails.test.ts` y `miniaturas.spec.ts`: las cuatro esquinas de cada una) |
 | 9. Tema: ningún panel con fondo oscuro pese a `body.dark` | 2a (`theme-luminance`), 2b (`tema.spec.ts`), 4f ("ninguna pieza flotante del shell tiene fondo oscuro…") |
@@ -14023,7 +15121,7 @@ Hecha con el spec delante, cuando el plan ya estaba escrito entero; lo que apare
 | D2 enfoque combinado | tema (2), parche mínimo (3), shell propio (4 a 10) |
 | D3 Ver = solo lectura de Pascal | 4b, 4f y, para el teclado, 11a a 11c |
 | D4 "Pronto" | 1c, 1g, 5d, 8d, 10c |
-| D5 panel de propiedades propio | 9a a 9h (tipo sin panel propio: nombre y Borrar, en 9g) |
+| D5 panel de propiedades propio | 9a a 9l (estante, gabinete y escalera en 9i a 9l; tipo sin panel propio: nombre y Borrar, en 9g) |
 | D6 "Ambiente" con la herramienta de zonas | rama de 0c (`zoneTool`), 5a, 6a a 6d |
 | D7 ocultar los controles de Ver sin soporte | rama de 0c (`walkthrough`, `cameraControl`, `styleControl`), 10b, 10c |
 | D8 azul noche en lo activo | 1b (`SegButton`), 1e, 2a y 2b |

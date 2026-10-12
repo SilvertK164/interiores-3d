@@ -14,7 +14,7 @@ Que el editor se vea y se maneje como el resto de Madori: claro, en castellano y
 3. **Ver:** el dock y el panel de propiedades no están en pantalla, y Supr, Retroceso y los atajos de herramienta no cambian la escena (el número de nodos no varía).
 4. **2D / 3D / Ambas** cambia la vista y se conserva al recargar.
 5. **Deshacer / Rehacer** se habilitan y deshabilitan solos según el historial real (sin cambios: ambos deshabilitados; tras crear un muro: Deshacer habilitado).
-6. **Propiedades:** al seleccionar una puerta y cambiar su ancho a 1,00 m, el nodo cambia, se guarda (sobrevive a recargar) y Deshacer lo revierte. Igual para Muro, Ventana, Mueble y Ambiente.
+6. **Propiedades:** al seleccionar una puerta y cambiar su ancho a 1,00 m, el nodo cambia, se guarda (sobrevive a recargar) y Deshacer lo revierte. Igual para Muro, Puerta, Ventana, Mueble, Ambiente, Estante, Gabinete y Escalera.
 7. **Castellano:** el texto de la barra, el dock, los paneles propios y los nombres de nivel no contiene palabras de una lista de inglés conocida ("Ground Floor", "Furniture", "Search…"). Niveles sin nombre se ven como "Planta baja" y "Planta 1".
 8. **Catálogo:** todos los ítems del catálogo y de Comercio (hoy 144 carpetas en `public/items`) tienen nombre y categoría en castellano (una prueba falla si falta alguno) y miniatura con **fondo transparente** (una prueba lee la esquina de cada una).
 9. **Tema:** ningún panel, barra o dock tiene fondo oscuro (prueba de luminancia del color de fondo calculado) pese a que Pascal pone `body.dark` al montar.
@@ -38,7 +38,7 @@ Que el editor se vea y se maneje como el resto de Madori: claro, en castellano y
 | D2 | **Enfoque combinado:** tema por CSS + `pnpm patch` mínimo del editor + shell propio en castellano encima del lienzo. Se descartan reescribir el editor 2D (su panel no se exporta) y solo repintar. | Aprobada |
 | D3 | **Ver = solo lectura** con el modo de solo lectura de Pascal; **Editar** muestra el dock y los paneles. | Aprobada |
 | D4 | Funciones futuras visibles pero **deshabilitadas con "Pronto"**. | Aprobada |
-| D5 | **Panel de propiedades propio** para Muro, Puerta, Ventana, Mueble y Ambiente (con Duplicar y Borrar); el resto de tipos, un panel mínimo (nombre del tipo y Borrar). | Aprobada |
+| D5 | **Panel de propiedades propio** para Muro, Puerta, Ventana, Mueble, Ambiente, Estante (`shelf`), Gabinete (`cabinet` y sus módulos) y Escalera (`stair` y sus tramos), con Duplicar donde Pascal lo permite y Borrar; el resto de tipos, un panel mínimo (nombre del tipo y Borrar). | Aprobada |
 | D6 | **"Habitación automática" no existe en Pascal.** En Estructura va **"Ambiente"** (herramienta de zonas, que nombra el ambiente y lo suma a la lista con sus m²). Cerrar muros ya genera piso y cielorraso solos. | Por defecto, a confirmar |
 | D7 | Los controles de Ver **sin soporte comprobado en Pascal** (Cámara perspectiva/isométrica, Estilo sólido/realista) **se ocultan** si la verificación previa no los confirma. | Por defecto, a confirmar |
 | D8 | Botones activos del dock y de los selectores en **azul noche `#0B1F4D`** con texto blanco; el cobalto queda para las acciones primarias. | Por defecto, a confirmar |
@@ -82,7 +82,7 @@ Solo `apps/web/src/editor/` importa Pascal, `three` y R3F. El shell vive ahí; l
 ### 4.4 Paneles
 - **Nivel y ambientes:** lista de zonas del nivel con m² (`deriveZoneQuantityReport(...).footprintArea`, `formatAreaLabel`); al elegir una se selecciona. Los niveles sin nombre se muestran "Planta baja", "Planta 1"…
 - **Muebles:** búsqueda, chips de categoría y tarjetas con miniatura transparente, todo en castellano; la pestaña Comercio es una categoría más. "Subir mi mueble" aparece como "Pronto".
-- **Propiedades:** campos definidos desde los esquemas de cada nodo, con unidades en metros; los cambios van por `commitParametricNodeFields(id, patch)`, así que entran al historial. Duplicar crea una copia desplazada; Borrar pide confirmación solo si el elemento tiene hijos.
+- **Propiedades:** campos definidos desde los esquemas de cada nodo, con unidades en metros; los cambios van por `commitParametricNodeFields(id, patch)`, así que entran al historial. Estante, Gabinete y Escalera son nodos paramétricos que en el lienzo se alargan con tiradores: sus campos son ancho, fondo, alto, filas y columnas (más interruptores) del estante, ancho, fondo y alto del cuerpo del gabinete (aplicados con la rutina de sus tiradores, que reacomoda sus módulos), y ancho y escalones de la escalera curva o de caracol y de cada tramo de una recta. Duplicar crea una copia desplazada; Borrar pide confirmación solo si el elemento tiene hijos.
 
 ### 4.5 Teclado
 Pascal escucha teclas globales (`1 2 3 f z m v b x p g r t e c`, Supr, Retroceso, Ctrl+Z/C/X/V) y WASD/Espacio para la cámara. Ignora entradas de texto pero no botones ni listas. Nuestros paneles frenan la propagación de esas teclas mientras tienen el foco. Ctrl+S se mantiene (el guardado es automático). La paleta de comandos Ctrl+K sigue en inglés y queda fuera de este spec.
