@@ -9,14 +9,16 @@ import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
+import { useNavigate } from '@/lib/use-navigate'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { localizeCatalog } from './catalog-assets'
 import { buildCommerceItems } from './commerce-catalog'
 import { HIDDEN_CHROME, type PascalChrome } from './chrome'
 import { installE2eHooks } from './e2e-hooks'
-import { applyEditorTheme } from './pascal-bridge'
+import { createPascalBridge } from './pascal-bridge'
 import { SaveBanner } from './SaveBanner'
+import { EditorShell } from './shell/EditorShell'
 import { type SaveOutcome, type SaverStatus, type SceneSaver, createSceneSaver } from './scene-saver'
 
 let pluginReady: Promise<unknown> | null = null
@@ -98,8 +100,9 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     return () => data.subscription.unsubscribe()
   }, [])
 
-  // Tema claro de Madori: escena `studio`, metros y la tipografía en <body> (los portales de Pascal cuelgan de ahí).
-  useEffect(() => applyEditorTheme(), [])
+  // El puente con Pascal y el shell de Madori; `EditorShell` aplica el tema claro y oculta el aviso de cámara al montarse.
+  const bridge = useMemo(() => createPascalBridge(), [])
+  const { go, pending: leaving } = useNavigate()
 
   const sidebarTabs = useMemo(
     () => [
@@ -123,7 +126,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>
 
   return (
-    <div className="relative h-screen w-screen">
+    <div className="relative h-screen w-screen overflow-hidden">
       <SaveBanner detail={detail} dismissed={dismissed} onKeepEditing={() => setDismissed(true)} status={status} />
       <Editor
         chrome={chrome}
@@ -133,6 +136,13 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         onSave={onSave}
         projectId={projectId}
         sidebarTabs={sidebarTabs}
+      />
+      <EditorShell
+        backBusy={leaving}
+        bridge={bridge}
+        onBack={() => go('/proyectos')}
+        projectName={phase.name}
+        saveStatus={status}
       />
     </div>
   )
