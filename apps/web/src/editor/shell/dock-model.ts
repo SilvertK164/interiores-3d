@@ -3,6 +3,7 @@ import {
   BrickWall,
   Box,
   ChartNoAxesColumnIncreasing,
+  Disc3,
   DoorOpen,
   Ellipsis,
   Grid3x3,
@@ -12,6 +13,7 @@ import {
   PaintBucket,
   RectangleHorizontal,
   RectangleVertical,
+  Spline,
   Ruler,
   Sofa,
   Square,
@@ -25,6 +27,8 @@ import type { DockButton, MenuEntry } from './ui/Dock'
 
 export type DockId = 'select' | 'structure' | 'openings' | 'furniture' | 'materials' | 'measure' | 'more'
 export type StructureTool = 'wall' | 'zone' | 'slab' | 'ceiling' | 'stair' | 'column'
+/** Entradas del menú Estructura: las herramientas más las variantes de escalera (que arman `stair` con su tipo). */
+export type StructureEntryId = StructureTool | 'stair-curved' | 'stair-spiral'
 export type OpeningTool = 'door' | 'window'
 export type MeasureKind = 'distance' | 'angle' | 'area' | 'perimeter' | 'volume'
 
@@ -49,17 +53,19 @@ export const DOCK: readonly (DockButton & { id: DockId })[] = [
 
 type Entry<T extends string> = { id: T; label: string; icon: LucideIcon }
 
-const STRUCTURE: readonly Entry<StructureTool>[] = [
+const STRUCTURE: readonly Entry<StructureEntryId>[] = [
   { id: 'wall', label: 'Muro', icon: BrickWall },
   { id: 'zone', label: 'Ambiente', icon: SquareDashed },
   { id: 'slab', label: 'Piso', icon: Grid3x3 },
   { id: 'ceiling', label: 'Cielorraso', icon: Layers2 },
-  { id: 'stair', label: 'Escalera', icon: ChartNoAxesColumnIncreasing },
+  { id: 'stair', label: 'Escalera recta', icon: ChartNoAxesColumnIncreasing },
+  { id: 'stair-curved', label: 'Escalera curva', icon: Spline },
+  { id: 'stair-spiral', label: 'Escalera caracol', icon: Disc3 },
   { id: 'column', label: 'Columna', icon: RectangleVertical },
 ]
 
 /** Menú Estructura. Si el spike dijo que la herramienta de ambientes no funciona, no se ofrece. */
-export const structureEntries = (decisions: Pick<Decisions, 'zoneTool'> = DECISIONS): readonly Entry<StructureTool>[] =>
+export const structureEntries = (decisions: Pick<Decisions, 'zoneTool'> = DECISIONS): readonly Entry<StructureEntryId>[] =>
   STRUCTURE.filter((e) => e.id !== 'zone' || decisions.zoneTool)
 
 export const OPENING_ENTRIES: readonly Entry<OpeningTool>[] = [

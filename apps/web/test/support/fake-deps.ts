@@ -121,6 +121,8 @@ export function createFakeDeps() {
     deleteNodes: vi.fn(),
     moveCamera: vi.fn(),
     startWalkthrough: vi.fn(() => editor.setState({ isFirstPersonMode: true })),
+    armNodePatch: vi.fn(),
+    clearNodePatch: vi.fn(),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

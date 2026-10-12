@@ -4,6 +4,7 @@ import {
   DOCK,
   MEASURE_ENTRIES,
   OPENING_ENTRIES,
+  type StructureTool,
   activeDockId,
   expectedState,
   structureEntries,
@@ -16,7 +17,7 @@ import { dock, dockButton, modeButton } from './support/shell'
 type Step = { label: string; via?: string; arming: Arming }
 const STEPS: Step[] = [
   { label: 'Seleccionar', arming: { kind: 'select' } },
-  ...structureEntries().map((e): Step => ({ via: 'Estructura', label: e.label, arming: { kind: 'tool', tool: e.id } })),
+  ...structureEntries().map((e): Step => ({ via: 'Estructura', label: e.label, arming: { kind: 'tool', tool: e.id.startsWith('stair') ? 'stair' : (e.id as StructureTool) } })),
   ...OPENING_ENTRIES.map((e): Step => ({ via: 'Aberturas', label: e.label, arming: { kind: 'tool', tool: e.id } })),
   { label: 'Muebles', arming: { kind: 'furniture' } },
   { label: 'Materiales', arming: { kind: 'paint' } },

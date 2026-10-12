@@ -21,8 +21,8 @@ export const SHELF_LIMITS = {
 /** Lo que Pascal asume cuando el estante no trae el campo (los `default` de `ShelfNode`). */
 const SHELF_DEFAULTS = { width: 1.2, depth: 0.3, height: 0.9, rows: 1, columns: 1 } as const
 
-const SHELF_STYLES: Readonly<Record<string, string>> = {
-  'wall-shelf': 'Estante de pared',
+export const SHELF_STYLES: Readonly<Record<string, string>> = {
+  'wall-shelf': 'Repisa de pared',
   bookshelf: 'Biblioteca',
   'open-rack': 'Góndola',
   cubby: 'Cubículos',
@@ -59,7 +59,13 @@ const shelfBuilder: Builder = {
     const shows = SHELF_SHOWS[styleOf(node)] ?? []
     const size = shelfSize(node)
     const fields: FieldView[] = [
-      { kind: 'readonly', id: 'style', label: 'Estilo', value: SHELF_STYLES[styleOf(node)] ?? '' },
+      {
+        kind: 'select',
+        id: 'style',
+        label: 'Estilo',
+        value: styleOf(node),
+        options: Object.entries(SHELF_STYLES).map(([value, label]) => ({ value, label })),
+      },
       { kind: 'number', id: 'width', label: 'Ancho', value: formatMeters(size.width) },
       { kind: 'number', id: 'depth', label: 'Fondo', value: formatMeters(size.depth) },
       { kind: 'number', id: 'height', label: 'Alto', value: formatMeters(size.height) },
@@ -72,6 +78,7 @@ const shelfBuilder: Builder = {
   patch: ({ node }, fieldId, raw) => {
     const shows = SHELF_SHOWS[styleOf(node)] ?? []
     const size = shelfSize(node)
+    if (fieldId === 'style') return raw in SHELF_STYLES && raw !== styleOf(node) ? { style: raw } : null
     if (fieldId === 'width') return change('width', metersPatch(raw, SHELF_LIMITS.width, size.width))
     if (fieldId === 'depth') return change('depth', metersPatch(raw, SHELF_LIMITS.depth, size.depth))
     if (fieldId === 'height') return change('height', metersPatch(raw, SHELF_LIMITS.height, size.height))

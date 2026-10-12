@@ -33,7 +33,7 @@ describe('estante', () => {
       ['columns', 'Columnas'], ['withSides', 'Paneles laterales'], ['withBack', 'Panel trasero'], ['withBottom', 'Tabla de base'],
     ])
     expect(values(t)).toEqual({
-      style: 'Biblioteca', width: '1,00 m', depth: '0,50 m', height: '1,80 m', rows: '3', columns: '2',
+      style: 'bookshelf', width: '1,00 m', depth: '0,50 m', height: '1,80 m', rows: '3', columns: '2',
       withSides: 'yes', withBack: 'yes', withBottom: 'no',
     })
   })
@@ -42,6 +42,21 @@ describe('estante', () => {
     expect(ids(shelfAt({ style: 'wall-shelf' }))).toEqual(['style', 'width', 'depth', 'height', 'rows'])
     expect(ids(shelfAt({ style: 'open-rack' }))).toEqual(['style', 'width', 'depth', 'height', 'rows', 'withBack'])
     expect(ids(shelfAt({ style: 'cubby' }))).toEqual(['style', 'width', 'depth', 'height', 'rows', 'columns', 'withBottom'])
+  })
+
+  it('el estilo es una lista editable con los cuatro estilos en castellano y cambiarlo solo escribe el estilo', () => {
+    const t = shelfAt()
+    const style = fieldsFor(t).find((f) => f.id === 'style')
+    expect(style).toMatchObject({ kind: 'select', value: 'bookshelf' })
+    expect((style as { options: readonly { value: string; label: string }[] }).options).toEqual([
+      { value: 'wall-shelf', label: 'Repisa de pared' },
+      { value: 'bookshelf', label: 'Biblioteca' },
+      { value: 'open-rack', label: 'Góndola' },
+      { value: 'cubby', label: 'Cubículos' },
+    ])
+    expect(patchFor(t, 'style', 'cubby')).toEqual({ style: 'cubby' })
+    expect(patchFor(t, 'style', 'bookshelf')).toBeNull()
+    expect(patchFor(t, 'style', 'mesa')).toBeNull()
   })
 
   it('fuera de rango se ajusta al límite del esquema', () => {

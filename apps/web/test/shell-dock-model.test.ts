@@ -29,13 +29,15 @@ describe('DOCK', () => {
 })
 
 describe('menús', () => {
-  it('Estructura: Muro, Ambiente, Piso, Cielorraso, Escalera y Columna (D6: "Ambiente", nunca "zona")', () => {
+  it('Estructura: Muro, Ambiente, Piso, Cielorraso, las tres escaleras y Columna (D6: "Ambiente", nunca "zona")', () => {
     expect(structureEntries().map((e) => [e.id, e.label])).toEqual([
       ['wall', 'Muro'],
       ['zone', 'Ambiente'],
       ['slab', 'Piso'],
       ['ceiling', 'Cielorraso'],
-      ['stair', 'Escalera'],
+      ['stair', 'Escalera recta'],
+      ['stair-curved', 'Escalera curva'],
+      ['stair-spiral', 'Escalera caracol'],
       ['column', 'Columna'],
     ])
   })
@@ -43,7 +45,7 @@ describe('menús', () => {
   it('si el spike de la Tarea 0 dice que la herramienta de ambientes no funciona, Estructura no la ofrece', () => {
     const ids = structureEntries({ zoneTool: false }).map((e) => e.id)
     expect(ids).not.toContain('zone')
-    expect(ids).toHaveLength(5)
+    expect(ids).toHaveLength(7)
   })
 
   it('Aberturas: Puerta y Ventana; Medir: distancia, ángulo, área, perímetro y volumen', () => {

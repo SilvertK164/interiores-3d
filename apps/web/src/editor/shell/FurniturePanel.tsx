@@ -3,8 +3,15 @@
 import { useMemo, useState } from 'react'
 import { COMMERCE_PASCAL_IDS } from '../commerce-catalog'
 import { ALL_CHIP, type CatalogItemLike, FURNITURE_CHIPS, filterFurniture, toCards } from './furniture-model'
+import { CABINET_CARDS, type CabinetPresetId, SHELF_CARDS, type ShelfStyle } from './presets-model'
+import { CustomPresets } from './ui/CustomPresets'
 import { FurnitureCatalog } from './ui/FurnitureCatalog'
 import { useBridge, useShell } from './use-bridge'
+
+const GROUPS = [
+  { id: 'shelf', title: 'Estantes', cards: SHELF_CARDS },
+  { id: 'cabinet', title: 'Gabinetes', cards: CABINET_CARDS },
+] as const
 
 const COMMERCE_IDS: ReadonlySet<string> = new Set(COMMERCE_PASCAL_IDS)
 
@@ -12,6 +19,8 @@ const COMMERCE_IDS: ReadonlySet<string> = new Set(COMMERCE_PASCAL_IDS)
 export function FurniturePanel({ items }: { items: readonly CatalogItemLike[] }) {
   const bridge = useBridge()
   const selectedId = useShell((s) => s.editor.selectedItem?.id ?? null)
+  const tool = useShell((s) => s.editor.tool)
+  const [armed, setArmed] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [chip, setChip] = useState(ALL_CHIP)
   const byId = useMemo(() => new Map(items.map((item) => [item.id, item])), [items])
@@ -25,9 +34,22 @@ export function FurniturePanel({ items }: { items: readonly CatalogItemLike[] })
       onChip={setChip}
       cards={cards}
       onPick={(id) => {
+        setArmed(null)
         const item = byId.get(id)
         if (item) bridge.placeItem(item)
       }}
+      custom={
+        query === '' && chip === ALL_CHIP ? (
+          <CustomPresets
+            groups={GROUPS}
+            activeId={tool === 'shelf' || tool === 'cabinet' ? armed : null}
+            onPick={(group, id) => {
+              setArmed(`${group}:${id}`)
+              bridge.placePreset(group === 'shelf' ? { kind: 'shelf', style: id as ShelfStyle } : { kind: 'cabinet', preset: id as CabinetPresetId })
+            }}
+          />
+        ) : null
+      }
     />
   )
 }

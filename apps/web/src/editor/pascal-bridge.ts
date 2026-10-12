@@ -14,6 +14,7 @@ import type { ModeDeps } from './shell/bridge/mode'
 import type { ViewDeps } from './shell/bridge/view'
 import type { MaterialItemLike } from './shell/materials-model'
 import { DECISIONS } from './shell/decisions'
+import { nodePresets } from './node-presets'
 import { createViewStorage } from './shell/view-storage'
 
 /**
@@ -234,6 +235,7 @@ export function createPascalBridge(): ShellBridge {
     ...materialsDeps(),
     ...editDeps(),
     ...viewDeps(),
+    ...nodePresets(),
     // @@deps
   })
 }

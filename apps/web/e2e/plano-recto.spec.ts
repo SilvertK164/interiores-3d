@@ -37,7 +37,7 @@ test('el plano sigue recto aunque la persona gire la cámara 3D (Ambas y 2D)', a
   await expect.poll(async () => Math.abs(await planRotation(page)), { timeout: 15_000 }).toBeLessThan(0.5)
   const azimuth = async () => {
     const pose = await hook(page, 'cameraPose')
-    return pose ? Math.atan2(pose.position[0]! - pose.target[0]!, pose.position[2]! - pose.target[2]!) : Number.NaN
+    return pose ? Math.atan2((pose.position[0] ?? 0) - (pose.target[0] ?? 0), (pose.position[2] ?? 0) - (pose.target[2] ?? 0)) : Number.NaN
   }
   const before = await azimuth()
   for (let i = 0; i < 3; i++) {

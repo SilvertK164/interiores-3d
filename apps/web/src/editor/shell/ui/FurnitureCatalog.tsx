@@ -1,4 +1,5 @@
 import { Search, Upload } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { cx } from '@/lib/cx'
 import { Badge, ChipRow, FLOAT, SIDE_PANEL } from './primitives'
 
@@ -54,6 +55,7 @@ export function FurnitureCatalog({
   onChip,
   cards,
   onPick,
+  custom,
 }: {
   query: string
   onQuery: (query: string) => void
@@ -62,6 +64,8 @@ export function FurnitureCatalog({
   onChip: (id: string) => void
   cards: readonly CatalogCard[]
   onPick: (id: string) => void
+  /** Sección "A medida" (arriba del catálogo). */
+  custom?: ReactNode
 }) {
   return (
     <aside aria-label="Muebles" className={cx(FLOAT, SIDE_PANEL)}>
@@ -94,15 +98,18 @@ export function FurnitureCatalog({
           <Badge className="ml-auto">Pronto</Badge>
         </button>
       </div>
-      {cards.length === 0 ? (
-        <p className="mt-4 text-[14px] text-ink-muted">No encontramos muebles con ese nombre.</p>
-      ) : (
-        <ul className="shell-scroll mt-3.5 grid min-h-0 flex-1 grid-cols-2 content-start gap-2.5 overflow-y-auto pb-1 pr-0.5">
-          {cards.map((card) => (
-            <Card key={card.id} card={card} onPick={onPick} />
-          ))}
-        </ul>
-      )}
+      <div className="shell-scroll mt-3.5 min-h-0 flex-1 overflow-y-auto pb-1 pr-0.5">
+        {custom}
+        {cards.length === 0 ? (
+          <p className="mt-1 text-[14px] text-ink-muted">No encontramos muebles con ese nombre.</p>
+        ) : (
+          <ul className="grid grid-cols-2 content-start gap-2.5">
+            {cards.map((card) => (
+              <Card key={card.id} card={card} onPick={onPick} />
+            ))}
+          </ul>
+        )}
+      </div>
     </aside>
   )
 }

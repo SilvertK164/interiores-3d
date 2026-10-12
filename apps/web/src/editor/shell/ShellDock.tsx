@@ -58,7 +58,12 @@ export function ShellDock() {
       <ToolMenu
         title="Estructura"
         entries={asMenuEntries(structureEntries(), tool)}
-        onPick={(id) => pick({ kind: 'tool', tool: id as StructureTool })}
+        onPick={(id) => {
+          if (id === 'stair-curved' || id === 'stair-spiral') {
+            bridge.placePreset({ kind: 'stair', stairType: id === 'stair-curved' ? 'curved' : 'spiral' })
+            closeMenu()
+          } else pick({ kind: 'tool', tool: id as StructureTool })
+        }}
         onClose={closeMenu}
       />
     ),

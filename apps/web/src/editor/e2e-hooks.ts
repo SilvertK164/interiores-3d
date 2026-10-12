@@ -92,6 +92,14 @@ export function createE2eHooks(options: E2eOptions = {}) {
     },
     deleteNode: (id: string) => useScene.getState().deleteNode(id as never),
     cameraPose: () => pose,
+    /** Copia de todos los nodos de un tipo. */
+    nodesOf: (type: string) => nodes().filter((n) => n.type === type).map((n) => JSON.parse(JSON.stringify(n)) as Record<string, unknown>),
+    /** Hace clic con la herramienta armada en ese punto del suelo del nivel activo (mueve y confirma, como el lienzo). */
+    placeAt: (x: number, z: number) => {
+      const event = { localPosition: [x, 0, z], position: [x, 0, z], nativeEvent: { stopPropagation() {} }, stopPropagation() {} }
+      emitter.emit('grid:move', event as never)
+      emitter.emit('grid:click', event as never)
+    },
     /** Las plantas por índice con su id y si el visor las dibuja ahora (`Object3D.visible`). */
     levels: () =>
       nodes()
