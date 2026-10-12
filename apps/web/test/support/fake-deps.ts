@@ -105,6 +105,8 @@ export function createFakeDeps() {
     // El mismo objeto en cada llamada: las pruebas miran `deps.useMaterialsModel().select`.
     useMaterialsModel: vi.fn(() => materials),
     commitFields: vi.fn(),
+    duplicateNode: vi.fn((_input: { id: string; rootPatch: Record<string, unknown> }): string | null => 'copia_1'),
+    deleteNodes: vi.fn(),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

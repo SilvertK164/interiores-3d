@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createBridge } from '../src/editor/shell/bridge'
 import { selectEditTarget } from '../src/editor/shell/bridge/edit'
 import type { SceneLike } from '../src/editor/shell/bridge/types'
 import { createFakeDeps } from './support/fake-deps'
+
+afterEach(() => vi.useRealTimers())
 
 const SCENE = {
   building_1: { id: 'building_1', type: 'building', children: ['level_a'] },
@@ -62,7 +64,7 @@ describe('selectEditTarget', () => {
   })
 })
 
-describe('commit y clearSelection', () => {
+describe('commit, duplicate y remove', () => {
   it('commit pasa el cambio a Pascal; en Ver o con un elemento que ya no existe no hace nada', () => {
     const { bridge, deps, scene } = setup()
     bridge.commit('door_1', { width: 1 })
@@ -78,5 +80,51 @@ describe('commit y clearSelection', () => {
     select(['item_1'])
     bridge.clearSelection()
     expect(viewer.getState().selection).toMatchObject({ selectedIds: [], zoneId: null })
+  })
+
+  it('duplicar crea la copia con el cambio de la copia y la deja elegida; un ambiente copiado se elige por zoneId', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(10_000)
+    const { bridge, deps, viewer } = setup()
+    expect(bridge.duplicate('item_1', { position: [1.5, 0, 1.5] })).toBe('copia_1')
+    expect(deps.duplicateNode).toHaveBeenCalledWith({ id: 'item_1', rootPatch: { position: [1.5, 0, 1.5] } })
+    expect(viewer.getState().selection).toMatchObject({ selectedIds: ['copia_1'], zoneId: null })
+    vi.setSystemTime(20_000)
+    bridge.duplicate('zone_1', { name: 'Sala (copia)' })
+    expect(viewer.getState().selection).toMatchObject({ selectedIds: [], zoneId: 'copia_1' })
+  })
+
+  it('un doble clic en Duplicar crea una sola copia', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(10_000)
+    const { bridge, deps } = setup()
+    bridge.duplicate('item_1', {})
+    expect(bridge.duplicate('item_1', {})).toBeNull()
+    expect(deps.duplicateNode).toHaveBeenCalledTimes(1)
+  })
+
+  it('duplicar no hace nada en Ver, con un elemento que ya no existe o si Pascal no pudo crear la copia', () => {
+    const { bridge, deps, scene } = setup()
+    expect(bridge.duplicate('no_existe', {})).toBeNull()
+    vi.mocked(deps.duplicateNode).mockReturnValueOnce(null)
+    vi.useFakeTimers()
+    vi.setSystemTime(90_000)
+    expect(bridge.duplicate('item_1', {})).toBeNull()
+    scene.setState({ readOnly: true })
+    vi.setSystemTime(95_000)
+    expect(bridge.duplicate('item_1', {})).toBeNull()
+    expect(deps.duplicateNode).toHaveBeenCalledTimes(1)
+  })
+
+  it('borrar pide a Pascal borrar el elemento y limpia la selección; en Ver o inexistente no hace nada', () => {
+    const { bridge, deps, viewer, select, scene } = setup()
+    select(['item_1'])
+    bridge.remove('item_1')
+    expect(deps.deleteNodes).toHaveBeenCalledWith(['item_1'])
+    expect(viewer.getState().selection).toMatchObject({ selectedIds: [], zoneId: null })
+    bridge.remove('no_existe')
+    scene.setState({ readOnly: true })
+    bridge.remove('item_1')
+    expect(deps.deleteNodes).toHaveBeenCalledTimes(1)
   })
 })

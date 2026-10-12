@@ -126,10 +126,31 @@ function materialsDeps(): MaterialsDeps {
 type AnyNode = Core.AnyNode
 type AnyNodeId = Core.AnyNodeId
 
-/** Editar con la misma función que usa el inspector de Pascal (`parametric-inspector.tsx`). */
+/** Editar, duplicar y borrar con las mismas funciones que usa el inspector de Pascal (`parametric-inspector.tsx`). */
 function editDeps(): EditDeps {
   return {
     commitFields: (id, patch) => Pascal.commitParametricNodeFields(id as AnyNodeId, patch as Partial<AnyNode>),
+    deleteNodes: (ids) => Pascal.useScene.getState().deleteNodes(ids as AnyNodeId[]),
+    duplicateNode: ({ id, rootPatch }) => {
+      const scene = Pascal.useScene.getState()
+      const subtree = Core.collectSubtree(scene.nodes, id as AnyNodeId)
+      if (!subtree) return null
+      const clone = Core.cloneNodesInto([subtree.root, ...subtree.descendants], {
+        rootId: id as AnyNodeId,
+        parentId: (subtree.root.parentId ?? undefined) as AnyNodeId | undefined,
+      })
+      // `cloneNodesInto` no reasigna `wallId` (la referencia al muro que aloja la abertura): en un muro copiado, sus puertas
+      // y ventanas tienen que apuntar al muro nuevo, no al original.
+      const copies = clone.nodes.map((node) => {
+        const own = (node.id === clone.rootId ? { ...node, ...rootPatch } : node) as AnyNode & { wallId?: string }
+        const host = own.wallId ? clone.idMap.get(own.wallId as AnyNodeId) : undefined
+        return host ? ({ ...own, wallId: host } as AnyNode) : (own as AnyNode)
+      })
+      Core.runAsSingleSceneHistoryStep(Pascal.useScene, () =>
+        Pascal.useScene.getState().createNodes(copies.map((node) => ({ node, parentId: (node.parentId ?? undefined) as AnyNodeId | undefined }))),
+      )
+      return clone.rootId
+    },
   }
 }
 
