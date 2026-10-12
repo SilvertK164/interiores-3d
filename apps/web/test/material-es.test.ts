@@ -1,13 +1,25 @@
-import { MATERIAL_CATALOG, MATERIAL_CATEGORIES } from '@pascal-app/core/material-library'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { MATERIAL_CATEGORY_ES, MATERIAL_ES, materialCategoryEs, materialNameEs } from '../src/lib/material-es'
 
+// La frontera D8 prohíbe importar @pascal-app/* fuera de src/editor/: el catálogo de Pascal se lee como texto.
+const library = readFileSync(fileURLToPath(new URL('../node_modules/@pascal-app/core/dist/material-library.js', import.meta.url)), 'utf8')
+const catalogSource = library.slice(library.indexOf('export const MATERIAL_CATALOG'))
+const MATERIAL_CATALOG = [...catalogSource.matchAll(/\n {8}id: '([^']+)',\n {8}label: '([^']+)'/g)].map((m) => ({ id: m[1] as string, label: m[2] as string }))
+const categoriesSource = library.slice(library.indexOf('export const MATERIAL_CATEGORIES'), library.indexOf('export const MATERIAL_SURFACES'))
+const MATERIAL_CATEGORIES = [...categoriesSource.matchAll(/'([a-z]+)',/g)].map((m) => m[1] as string)
 const IDS = MATERIAL_CATALOG.map((item) => item.id)
 const words = (text: string) => text.toLowerCase().split(/[^a-záéíóúüñ]+/).filter((word) => word.length > 2)
 // Palabras que se escriben igual en castellano y en inglés.
 const SAME_IN_SPANISH = new Set(['beige', 'metal', 'bouclé', 'panel'])
 
 describe('materiales en castellano', () => {
+  it('la lectura del catálogo de Pascal encuentra los 114 materiales y las 16 categorías', () => {
+    expect(MATERIAL_CATALOG).toHaveLength(114)
+    expect(MATERIAL_CATEGORIES).toHaveLength(16)
+  })
+
   it('cada material de la biblioteca de Pascal tiene nombre (si Pascal suma uno, esta prueba lo dice)', () => {
     expect(IDS.filter((id) => !(id in MATERIAL_ES))).toEqual([])
   })
