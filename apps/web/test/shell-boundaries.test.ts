@@ -14,20 +14,23 @@ const PASCAL = /(?:\bfrom|\bimport|\brequire)\s*\(?\s*['"](?:@pascal-app\/|three
 
 describe('frontera con Pascal', () => {
   it('la prueba detecta las formas de importar (no pasa por vacío)', () => {
-    for (const line of [
-      `import { x } from '@pascal-app/core'`,
-      `import { x } from "@pascal-app/editor"`,
-      `import * as THREE from 'three'`,
-      `import { y } from 'three/examples/jsm/x'`,
-      `import { Canvas } from '@react-three/fiber'`,
-      `import 'three'`,
-      `export { z } from "three"`,
-      `const m = await import('@pascal-app/viewer')`,
-      `const r = require('three')`,
-    ])
-      expect(PASCAL.test(line), line).toBe(true)
-    expect(PASCAL.test(`import { cx } from '@/lib/cx'`)).toBe(false)
-    expect(PASCAL.test(`import x from 'three-stdlib-fake'`)).toBe(false)
+    // Las muestras se arman por partes para que ni esta prueba ni el grep de tests/boundaries.test.ts las confundan con imports reales.
+    const s = "'"
+    const d = '"'
+    const lines = [
+      `import { x } from ${s}@pascal-app/core${s}`,
+      `import { x } from ${d}@pascal-app/editor${d}`,
+      `import * as THREE from ${s}three${s}`,
+      `import { y } from ${s}three/examples/jsm/x${s}`,
+      `import { Canvas } from ${s}@react-three/fiber${s}`,
+      `import ${s}three${s}`,
+      `export { z } from ${d}three${d}`,
+      `const m = await import(${s}@pascal-app/viewer${s})`,
+      `const r = require(${s}three${s})`,
+    ]
+    for (const line of lines) expect(PASCAL.test(line), line).toBe(true)
+    expect(PASCAL.test(`import { cx } from ${s}@/lib/cx${s}`)).toBe(false)
+    expect(PASCAL.test(`import x from ${s}three-stdlib-fake${s}`)).toBe(false)
   })
 
   it('ningún archivo de src/editor/shell importa Pascal, three ni R3F (solo src/editor/pascal-bridge.ts lo hace)', () => {
