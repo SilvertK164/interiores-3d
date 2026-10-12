@@ -1,0 +1,32 @@
+diff --git a/web/Html.js b/web/Html.js
+index 81d68b7f4e9893a7d0b436a398bb38883d333374..2a675f05bb465413ff8e2eef5cce846d8333d6b2 100644
+--- a/web/Html.js
++++ b/web/Html.js
+@@ -140,7 +140,10 @@ const Html = /* @__PURE__ */React.forwardRef(({
+   }, [occlude]);
+   React.useLayoutEffect(() => {
+     if (group.current) {
+-      const currentRoot = root.current = ReactDOM.createRoot(el);
++      // Madori: si el desmontaje de este mismo elemento sigue pendiente (React vuelve a correr el efecto), se reutiliza su raíz.
++      const pending = el.__madoriRoot;
++      if (pending) el.__madoriRoot = undefined;
++      const currentRoot = root.current = pending || ReactDOM.createRoot(el);
+       scene.updateMatrixWorld();
+       if (transform) {
+         el.style.cssText = `position:absolute;top:0;left:0;pointer-events:none;overflow:hidden;`;
+@@ -153,7 +156,14 @@ const Html = /* @__PURE__ */React.forwardRef(({
+       }
+       return () => {
+         if (target) target.removeChild(el);
+-        currentRoot.unmount();
++        // Madori: se desmonta fuera del render en curso (React 19 avisa si se hace de forma síncrona).
++        el.__madoriRoot = currentRoot;
++        queueMicrotask(() => {
++          if (el.__madoriRoot === currentRoot) {
++            el.__madoriRoot = undefined;
++            currentRoot.unmount();
++          }
++        });
+       };
+     }
+   }, [target, transform]);
