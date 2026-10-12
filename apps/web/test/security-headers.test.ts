@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 // @ts-expect-error módulo .mjs sin tipos: lo usa next.config.mjs
 import { buildSecurityHeaders, originOf } from '../security-headers.mjs'
+// @ts-expect-error next.config.mjs no tiene tipos
 import nextConfig from '../next.config.mjs'
 
 type Header = { key: string; value: string }
@@ -34,7 +35,7 @@ describe('cabeceras de seguridad de la web', () => {
     expect(csp).not.toContain("'unsafe-eval'")
     expect(csp).toMatch(/worker-src[^;]*blob:/)
     expect(csp).toMatch(/img-src[^;]*blob:[^;]*data:|img-src[^;]*data:[^;]*blob:/)
-    const connect = /connect-src ([^;]*)/.exec(csp)?.[1] ?? ''
+    const connect = /connect-src ([^;]*)/.exec(csp ?? '')?.[1] ?? ''
     for (const origin of ['https://madori-api.vercel.app', 'https://abc.supabase.co', 'https://cdn.jsdelivr.net', 'https://www.gstatic.com'])
       expect(connect).toContain(origin)
     expect(connect).not.toMatch(/(^| )\*( |$)/)
