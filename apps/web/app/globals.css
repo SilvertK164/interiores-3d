@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "./elevation.css";
 @import "./app-shell.css";
+@import "./editor-shell.css";
 @source "../node_modules/@pascal-app/editor/src";
 @source "../node_modules/@pascal-app/nodes/dist";
 
