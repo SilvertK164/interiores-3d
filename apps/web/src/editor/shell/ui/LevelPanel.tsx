@@ -1,7 +1,17 @@
 import { ChevronDown, Layers, Plus, SquareDashed } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import { cx } from '@/lib/cx'
+import { LevelManage, type LevelManageActions, type LevelManageInfo, LevelMenuButton } from './LevelManage'
 import { FLOAT } from './primitives'
+
+/** Gestión de plantas (solo en Editar): datos de cada una, acciones y la planta cuyo menú está abierto. */
+export type LevelManagement = {
+  infos: Readonly<Record<string, LevelManageInfo>>
+  actions: LevelManageActions
+  openId: string | null
+  onOpen: (id: string | null) => void
+  notice: string | null
+}
 
 export type LevelOption = { id: string; name: string }
 export type ZoneRow = { id: string; name: string; area: string }
@@ -16,6 +26,7 @@ export function LevelPicker({
   onAdd,
   adding,
   canAdd = true,
+  manage,
 }: {
   levels: readonly LevelOption[]
   activeId: string | null
@@ -25,6 +36,7 @@ export function LevelPicker({
   onAdd: () => void
   adding?: boolean
   canAdd?: boolean
+  manage?: LevelManagement
 }) {
   const active = levels.find((l) => l.id === activeId)
   return (
@@ -50,21 +62,33 @@ export function LevelPicker({
               const on = l.id === activeId
               return (
                 <li key={l.id}>
-                  <button
-                    type="button"
-                    aria-current={on ? 'true' : undefined}
-                    onClick={() => onPick(l.id)}
-                    className={cx(
-                      'focus-ring flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 text-left text-[15px] transition-colors duration-150 ease-out',
-                      on ? 'bg-brand-wash font-semibold text-ink' : 'text-ink hover:bg-ink/5',
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      type="button"
+                      aria-current={on ? 'true' : undefined}
+                      onClick={() => onPick(l.id)}
+                      className={cx(
+                        'focus-ring flex h-11 min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-xl px-3 text-left text-[15px] transition-colors duration-150 ease-out',
+                        on ? 'bg-brand-wash font-semibold text-ink' : 'text-ink hover:bg-ink/5',
+                      )}
+                    >
+                      <Layers aria-hidden="true" className={cx('size-[18px] shrink-0', on ? 'text-brand' : 'text-ink-muted')} />
+                      <span className="flex-1 truncate">{l.name}</span>
+                    </button>
+                    {manage && (
+                      <LevelMenuButton name={l.name} open={manage.openId === l.id} onToggle={() => manage.onOpen(manage.openId === l.id ? null : l.id)} />
                     )}
-                  >
-                    <Layers
-                      aria-hidden="true"
-                      className={cx('size-[18px]', on ? 'text-brand' : 'text-ink-muted')}
+                  </div>
+                  {manage && manage.openId === l.id && manage.infos[l.id] && (
+                    <LevelManage
+                      id={l.id}
+                      name={l.name}
+                      info={manage.infos[l.id] as LevelManageInfo}
+                      actions={manage.actions}
+                      notice={manage.notice}
+                      onClose={() => manage.onOpen(null)}
                     />
-                    <span className="flex-1 truncate">{l.name}</span>
-                  </button>
+                  )}
                 </li>
               )
             })}

@@ -2,7 +2,9 @@
 
 import { useRef, useState } from 'react'
 import { formatArea } from '@/lib/format'
+import { selectLevelInfo } from './bridge/level-manage'
 import { selectLevels, selectZones } from './bridge/levels'
+import { stairNotice } from './level-manage-model'
 import { LevelPanel } from './ui/LevelPanel'
 import { useDismiss } from './use-dismiss'
 import { useBridge, useShell } from './use-bridge'
@@ -13,6 +15,10 @@ export function LevelsPanel() {
   const { levels, activeId } = useShell(selectLevels)
   const { zones, selectedId } = useShell(selectZones)
   const readOnly = useShell((s) => s.scene.readOnly)
+  const infoList = useShell(selectLevelInfo)
+  const infos = Object.fromEntries(infoList.map((i) => [i.id, i]))
+  const [menuId, setMenuId] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   useDismiss(open, root, () => setOpen(false))
@@ -24,6 +30,24 @@ export function LevelsPanel() {
           activeId,
           open,
           canAdd: !readOnly,
+          manage: readOnly
+            ? undefined
+            : {
+                infos,
+                openId: menuId,
+                notice,
+                onOpen: (id) => {
+                  setMenuId(id)
+                  setNotice(null)
+                },
+                actions: {
+                  onRename: bridge.renameLevel,
+                  onHeight: bridge.setLevelHeight,
+                  onMove: (id, direction) => setNotice(stairNotice(bridge.moveLevel(id, direction).brokenStairs)),
+                  onDuplicate: (id) => bridge.duplicateLevel(id),
+                  onDelete: (id) => bridge.deleteLevel(id),
+                },
+              },
           onToggle: () => setOpen((value) => !value),
           onPick: (id) => {
             bridge.selectLevel(id)
