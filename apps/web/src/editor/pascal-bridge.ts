@@ -1,5 +1,6 @@
 import * as Core from '@pascal-app/core'
 import * as Pascal from '@pascal-app/editor'
+import { flushSync } from 'react-dom'
 import { appFontClasses } from '@/components/AppShell'
 import { commitCabinetFields, isCabinetNode } from './cabinet-commit'
 import { type ShellBridge, createBridge } from './shell/bridge'
@@ -9,6 +10,7 @@ import type { LevelsDeps } from './shell/bridge/levels'
 import type { EditDeps } from './shell/bridge/edit'
 import type { MaterialsDeps } from './shell/bridge/materials'
 import type { ModeDeps } from './shell/bridge/mode'
+import type { ViewDeps } from './shell/bridge/view'
 import type { MaterialItemLike } from './shell/materials-model'
 import { DECISIONS } from './shell/decisions'
 import { createViewStorage } from './shell/view-storage'
@@ -160,6 +162,32 @@ function editDeps(): EditDeps {
   }
 }
 
+const CAMERA_EVENTS = {
+  'orbit-left': 'camera-controls:orbit-ccw',
+  'orbit-right': 'camera-controls:orbit-cw',
+  top: 'camera-controls:top-view',
+} as const
+
+/**
+ * Vista 3D. Recorrer repite la receta de `requestWalkthroughPointerLock` de Pascal (no se exporta): primera persona con
+ * `flushSync`, para que sus controles ya estén montados cuando llegue el puntero, y puntero bloqueado sobre el lienzo, todo
+ * dentro del clic. Si el navegador lo rechaza (espera de ~1,25 s tras un desbloqueo), un clic sobre el lienzo lo vuelve a pedir.
+ */
+function viewDeps(): ViewDeps {
+  return {
+    moveCamera: (move) => Core.emitter.emit(CAMERA_EVENTS[move]),
+    startWalkthrough: () => {
+      flushSync(() => Pascal.useEditor.getState().setFirstPersonMode(true))
+      const canvas = document.querySelector<HTMLCanvasElement>('[data-pascal-viewer-3d] canvas')
+      if (!canvas) return
+      if (!canvas.hasAttribute('tabindex')) canvas.tabIndex = -1
+      canvas.focus({ preventScroll: true })
+      const request = canvas.requestPointerLock() as unknown as Promise<void> | undefined
+      request?.catch?.(() => undefined)
+    },
+  }
+}
+
 export function createPascalBridge(): ShellBridge {
   return createBridge({
     ...coreDeps(),
@@ -168,6 +196,7 @@ export function createPascalBridge(): ShellBridge {
     ...catalogDeps(),
     ...materialsDeps(),
     ...editDeps(),
+    ...viewDeps(),
     // @@deps
   })
 }

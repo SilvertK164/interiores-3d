@@ -65,6 +65,14 @@ export function createFakeDeps() {
     setSelection: vi.fn((update: Partial<ViewerLike['selection']>) =>
       viewer.setState({ selection: { ...viewer.getState().selection, ...update } }),
     ),
+    wallMode: 'up',
+    levelMode: 'stacked',
+    cameraMode: 'perspective',
+    shading: 'solid',
+    setWallMode: vi.fn((wallMode: ViewerLike['wallMode']) => viewer.setState({ wallMode })),
+    setLevelMode: vi.fn((levelMode: ViewerLike['levelMode']) => viewer.setState({ levelMode })),
+    setCameraMode: vi.fn((cameraMode: ViewerLike['cameraMode']) => viewer.setState({ cameraMode })),
+    setShading: vi.fn((shading: ViewerLike['shading']) => viewer.setState({ shading })),
     // @@fake-viewer
   })
   const scene = createFakeStore<SceneLike>({ readOnly: false, nodes: {} })
@@ -107,6 +115,8 @@ export function createFakeDeps() {
     commitFields: vi.fn(),
     duplicateNode: vi.fn((_input: { id: string; rootPatch: Record<string, unknown> }): string | null => 'copia_1'),
     deleteNodes: vi.fn(),
+    moveCamera: vi.fn(),
+    startWalkthrough: vi.fn(() => editor.setState({ isFirstPersonMode: true })),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

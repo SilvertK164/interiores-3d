@@ -8,6 +8,10 @@ export type EditorMode = 'select' | 'edit' | 'delete' | 'build' | 'material-pain
 export type ViewMode = '2d' | '3d' | 'split'
 export type SnapMode = 'grid' | 'lines' | 'angles' | 'off'
 export type SnapContext = 'wall' | 'item' | 'polygon' | 'rotation'
+export type WallMode = 'up' | 'cutaway' | 'down' | 'translucent'
+export type LevelMode = 'stacked' | 'exploded' | 'solo' | 'manual'
+export type CameraMode = 'perspective' | 'orthographic'
+export type Shading = 'solid' | 'rendered'
 
 export type StoreLike<S> = { getState(): S; subscribe(listener: () => void): () => void }
 
@@ -48,6 +52,14 @@ export type SelectionLike = {
 export type ViewerLike = {
   selection: SelectionLike
   setSelection(update: Partial<{ buildingId: string | null; levelId: string | null; zoneId: string | null; selectedIds: string[] }>): void
+  wallMode: WallMode
+  levelMode: LevelMode
+  cameraMode: CameraMode
+  shading: Shading
+  setWallMode(mode: WallMode): void
+  setLevelMode(mode: LevelMode): void
+  setCameraMode(mode: CameraMode): void
+  setShading(shading: Shading): void
   // @@viewer-like
 }
 

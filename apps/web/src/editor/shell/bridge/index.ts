@@ -4,9 +4,10 @@ import { type EditDeps, createEditSlice } from './edit'
 import { type LevelsDeps, createLevelsSlice } from './levels'
 import { type MaterialsDeps, createMaterialsSlice } from './materials'
 import { type ModeDeps, createModeSlice } from './mode'
+import { type ViewDeps, createViewSlice } from './view'
 import { createToolsSlice } from './tools'
 
-export type BridgeDeps = CoreDeps & ModeDeps & LevelsDeps & CatalogDeps & MaterialsDeps & EditDeps
+export type BridgeDeps = CoreDeps & ModeDeps & LevelsDeps & CatalogDeps & MaterialsDeps & EditDeps & ViewDeps
 
 /** El puente: todo lo que el shell sabe hacer con Pascal, con dependencias inyectadas (los dobles de las pruebas o los almacenes reales). */
 export function createBridge(deps: BridgeDeps) {
@@ -18,6 +19,7 @@ export function createBridge(deps: BridgeDeps) {
     ...createCatalogSlice(deps),
     ...createMaterialsSlice(deps),
     ...createEditSlice(deps),
+    ...createViewSlice(deps),
     // @@slices
   }
 }
