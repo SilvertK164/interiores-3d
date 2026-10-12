@@ -1,5 +1,5 @@
 import { CabinetNode, DoorNode, ItemNode, ShelfNode, StairNode, StairSegmentNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
-import { armToolMode, getHistoryCommandState, useEditor } from '@pascal-app/editor'
+import { armToolMode, getHistoryCommandState, subscribeCameraPose, useEditor } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import type { PascalChrome } from './chrome'
 
@@ -20,6 +20,11 @@ const SOFA = {
 export function createE2eHooks(options: E2eOptions = {}) {
   const nodes = () => Object.values(useScene.getState().nodes) as SceneNode[]
   const firstOf = (type: string) => nodes().find((n) => n.type === type)?.id
+  /** La última cámara que publicó Pascal (para comprobar giros y vista superior sin leer píxeles). */
+  let pose: { position: readonly number[]; target: readonly number[]; projection: string } | null = null
+  subscribeCameraPose((next) => {
+    pose = next
+  })
   /** Crea el nodo bajo ese padre y devuelve su id (`null` si no hay padre). */
   const createUnder = (node: { id: string }, parentId: string | undefined) => {
     if (!parentId) return null
@@ -73,6 +78,10 @@ export function createE2eHooks(options: E2eOptions = {}) {
         snapWall: editor.snappingModeByContext.wall,
         snapItem: editor.snappingModeByContext.item,
         paintMaterial: editor.activePaintMaterial?.materialPreset ?? null,
+        wallMode: useViewer.getState().wallMode as string,
+        levelMode: useViewer.getState().levelMode as string,
+        cameraMode: useViewer.getState().cameraMode as string,
+        shading: useViewer.getState().shading as string,
       }
     },
     select: (id: string | null) => useViewer.getState().setSelection({ selectedIds: id ? ([id] as never) : [], zoneId: null }),
@@ -82,6 +91,7 @@ export function createE2eHooks(options: E2eOptions = {}) {
       return node ? (JSON.parse(JSON.stringify(node)) as Record<string, unknown>) : null
     },
     deleteNode: (id: string) => useScene.getState().deleteNode(id as never),
+    cameraPose: () => pose,
     /** Agregan una puerta o una ventana en el primer muro y devuelven su id (`null` si no hay muro). */
     addDoor: () => {
       const wallId = firstOf('wall')

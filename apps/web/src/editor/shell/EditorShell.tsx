@@ -5,16 +5,22 @@ import type { SaverStatus } from '../scene-saver'
 import type { ShellBridge } from './bridge'
 import { selectShellState } from './bridge/selectors'
 import type { CatalogItemLike } from './furniture-model'
+import { installKeyTrap } from './key-trap'
 import { LeftPanel } from './LeftPanel'
 import { PropertiesPanel } from './PropertiesPanel'
 import { ShellDock } from './ShellDock'
 import { ShellTopBar } from './ShellTopBar'
 import { ShellUndoRedo } from './ShellUndoRedo'
 import { ShellView } from './ShellView'
+import { WalkthroughHint } from './WalkthroughHint'
 import { BridgeProvider, useShell } from './use-bridge'
 
 function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
-  const mode = useShell((s) => selectShellState(s).mode)
+  const { mode, firstPerson } = useShell((s) => {
+    const state = selectShellState(s)
+    return { mode: state.mode, firstPerson: state.firstPerson }
+  })
+  if (firstPerson) return <WalkthroughHint />
   return (
     <>
       <LeftPanel catalog={catalog} />
@@ -53,7 +59,16 @@ export function EditorShell({
 }) {
   useEffect(() => {
     const stop = bridge.mountDefaults()
+    // Las teclas de Pascal no llegan a sus atajos con el foco en un botón del shell, ni en Ver (donde Ctrl+Z ni siquiera
+    // debe deshacer: el historial de Pascal no mira el solo lectura).
+    const untrap = installKeyTrap({
+      state: () => {
+        const { mode, firstPerson } = selectShellState(bridge.snapshot())
+        return { mode, walking: firstPerson }
+      },
+    })
     return () => {
+      untrap()
       stop()
       bridge.dispose()
     }
