@@ -131,11 +131,11 @@ Los llena la Tarea 0 (la 0a mide el parche; la 0b y la 0c, el resto). Las tareas
 | Experimento | Resultado | Fecha |
 |---|---|---|
 | (a) Parche | Funciona (patch en pnpm-workspace.yaml) | 2026-10-12 |
-| (b) Recorrer | sin medir: lo mide la Tarea 0b | — |
-| (c) Cámara y estilo de la Vista 3D | sin medir: lo mide la Tarea 0b | — |
-| (d) Colocar un mueble desde `structure` | sin medir: lo mide la Tarea 0b | — |
-| (e) Herramienta de ambientes | sin medir: lo mide la Tarea 0b | — |
-| (f) Historial | sin medir: lo mide la Tarea 0b | — |
+| (b) Recorrer | Funciona: `primera_persona=true puntero_bloqueado=CANVAS`, `sale_con_esc=true` (ventana real, medido por el usuario) | 2026-10-12 |
+| (c) Cámara y estilo de la Vista 3D | Funciona: `ortografica=true perspectiva=true estilo_distinto=true errores=0` | 2026-10-12 |
+| (d) Colocar un mueble desde `structure` | Funciona: `fase=structure muebles 0 -> 1`; desde `furnish`: `muebles 0 -> 1` | 2026-10-12 |
+| (e) Herramienta de ambientes | Funciona: `ambientes=1` con `zoneId` | 2026-10-12 |
+| (f) Historial | Pascal: `inicio` sin deshacer ni rehacer, tras el muro `canUndo=true`, tras deshacer `canRedo=true` | 2026-10-12 |
 <!-- /spike-resultados -->
 
 ## Desviaciones y decisiones frente al spec
