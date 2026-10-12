@@ -29,6 +29,18 @@ export function buildApp(deps: Deps, options: BuildOptions = {}) {
     for (const method of [route.method].flat()) options.onRoute?.({ method, url: route.url })
   })
 
+  // La API solo devuelve JSON: nada de enmarcarla, de adivinar tipos ni de guardar en caché respuestas con datos de una persona.
+  app.addHook('onSend', async (_req, reply) => {
+    reply.headers({
+      'x-content-type-options': 'nosniff',
+      'cache-control': 'no-store',
+      'referrer-policy': 'no-referrer',
+      'x-frame-options': 'DENY',
+      'strict-transport-security': 'max-age=63072000; includeSubDomains',
+      'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+    })
+  })
+
   app.register(cors, {
     origin: deps.corsOrigins && deps.corsOrigins.length > 0 ? deps.corsOrigins : false,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],

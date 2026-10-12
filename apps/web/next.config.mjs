@@ -1,3 +1,5 @@
+import { buildSecurityHeaders } from './security-headers.mjs'
+
 const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
 
 /** @type {import('next').NextConfig} */
@@ -9,6 +11,10 @@ const nextConfig = {
   // se piden al CDN predeterminado de sus paquetes. Un archivo local siempre tiene prioridad.
   async rewrites() {
     return { fallback: [{ source: '/material/:path*', destination: 'https://editor.pascal.app/material/:path*' }] }
+  },
+  // Cabeceras de seguridad (docs/seguridad-revision.md). Fuera de producción solo las inofensivas.
+  async headers() {
+    return [{ source: '/:path*', headers: buildSecurityHeaders(process.env, process.env.NODE_ENV === 'production') }]
   },
   // Solo en las pruebas en navegador: la insignia "N" de desarrollo de Next (abajo a la izquierda) tapa los controles del shell y
   // bloquea los clics de Playwright. No toca el overlay de errores: un error de ejecución sigue apareciendo y rompe la prueba.
