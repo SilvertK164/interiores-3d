@@ -22,7 +22,7 @@ export function refreshItemAssets(graph: SceneGraph, manifest: LocalItemsManifes
     const asset = item.asset
     const folder = asset?.src ? FOLDER.exec(asset.src)?.[1] : undefined
     if (item.type !== 'item' || !asset?.src || !folder) continue
-    const local = localizeCatalogItem({ id: asset.id ?? '', src: `${BUCKET}/${folder}/model.glb` }, manifest)
+    const local = localizeCatalogItem<{ id: string; src: string; thumbnail?: string; floorPlanUrl?: string }>({ id: asset.id ?? '', src: `${BUCKET}/${folder}/model.glb` }, manifest)
     if (!local) continue
     const next: ItemAsset = { ...asset, src: local.src }
     for (const key of ['thumbnail', 'floorPlanUrl'] as const) {

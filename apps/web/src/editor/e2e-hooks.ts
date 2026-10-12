@@ -146,7 +146,7 @@ export function createE2eHooks(options: E2eOptions = {}) {
     breakItemAssets: () => {
       const items = nodes().filter((n) => n.type === 'item') as unknown as { id: string; asset: { id: string } }[]
       for (const item of items) {
-        const folder = (item.asset as { src: string }).src.split('/')[2]
+        const folder = (item.asset as unknown as { src: string }).src.split('/')[2]
         useScene.getState().updateNode(item.id as never, { asset: { ...item.asset, floorPlanUrl: `/items/${folder}/floor-plan.svg` } } as never)
       }
       return items.length
