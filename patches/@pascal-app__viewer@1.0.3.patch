@@ -1,0 +1,14 @@
+diff --git a/dist/systems/level/level-utils.js b/dist/systems/level/level-utils.js
+index fb7750246572561b762a97df22b49a23587ef408..837d5706c18bea1c7eaa5dbd74b1e3267125c864 100644
+--- a/dist/systems/level/level-utils.js
++++ b/dist/systems/level/level-utils.js
+@@ -29,6 +29,9 @@ export function resolveLevelVisibility({ levelMode, hasSelectedLevel, isSelected
+         return { visible: false, shadowOnly: false };
+     const hidden = levelMode === 'solo' && hasSelectedLevel && !isSelected;
+     const shadowOnly = hidden && selectedIndex !== undefined && index > selectedIndex;
++    // Madori: con `__madoriHideAbove` se ocultan del todo las plantas superiores a la activa (las inferiores siguen visibles).
++    if (globalThis.__madoriHideAbove && hasSelectedLevel && selectedIndex !== undefined && index > selectedIndex)
++        return { visible: false, shadowOnly: false };
+     return { visible: shadowOnly || !hidden, shadowOnly };
+ }
+ /**

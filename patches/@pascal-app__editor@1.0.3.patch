@@ -1,5 +1,5 @@
 diff --git a/src/components/editor/floorplan-panel.tsx b/src/components/editor/floorplan-panel.tsx
-index fc56af07361709346668b929311748651a0d4fab..d59223ce89f903db277e1f5b2af4ebfb8eac5788 100644
+index fc56af07361709346668b929311748651a0d4fab..ff0c46989239deedee659a97b34f40a47bd51d2c 100644
 --- a/src/components/editor/floorplan-panel.tsx
 +++ b/src/components/editor/floorplan-panel.tsx
 @@ -6607,11 +6607,20 @@ export function FloorplanPanel({
@@ -25,6 +25,15 @@ index fc56af07361709346668b929311748651a0d4fab..d59223ce89f903db277e1f5b2af4ebfb
  
        latestNavigationSyncPoseRef.current = pose
  
+@@ -11376,7 +11385,7 @@ export function FloorplanPanel({
+ 
+         {levelNode?.type !== 'level' && !hasAmbientBuildingLevel ? (
+           <div className="flex h-full items-center justify-center px-6 text-center text-muted-foreground text-sm">
+-            Switch to a building level to view and edit the floorplan.
++            Elige un nivel del edificio para ver y editar el plano.
+           </div>
+         ) : isFloorplanOpen ? (
+           // The panel stays mounted in 3D mode (display:none) to keep the
 diff --git a/src/components/editor/index.tsx b/src/components/editor/index.tsx
 index 157809cdf66e0f6c296d070881c3ff6b9a23b827..dc9edc3143ccdd93515fa6a85e3ca66b4e720f43 100644
 --- a/src/components/editor/index.tsx

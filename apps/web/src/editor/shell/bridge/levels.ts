@@ -12,7 +12,7 @@ export type LevelsDeps = {
 }
 
 /** Edificio de la selección (o el primero) y sus plantas ordenadas por índice, como el selector de planta de Pascal. */
-function levelsOf(scene: SceneLike, viewer: ViewerLike): { buildingId: string | null; levels: LevelNodeLike[] } {
+export function levelsOf(scene: SceneLike, viewer: ViewerLike): { buildingId: string | null; levels: LevelNodeLike[] } {
   const { nodes } = scene
   const picked = viewer.selection.buildingId ? nodes[viewer.selection.buildingId] : undefined
   const building = picked?.type === 'building' ? picked : Object.values(nodes).find((n) => n.type === 'building')

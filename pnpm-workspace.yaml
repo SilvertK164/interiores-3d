@@ -6,4 +6,5 @@ allowBuilds:
   esbuild: true
 patchedDependencies:
   '@pascal-app/editor@1.0.3': patches/@pascal-app__editor@1.0.3.patch
+  '@pascal-app/viewer@1.0.3': patches/@pascal-app__viewer@1.0.3.patch
   '@react-three/drei@10.7.9': patches/@react-three__drei@10.7.9.patch

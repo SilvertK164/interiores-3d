@@ -90,6 +90,10 @@ function coreDeps(): CoreDeps {
     applyTheme: applyEditorTheme,
     viewStore: createViewStorage(),
     camera: cameraPort(),
+    // Lo lee el parche de Madori de `level-utils.js` del visor (`patches/@pascal-app__viewer@1.0.3.patch`).
+    setHideAbove: (on) => {
+      ;(globalThis as { __madoriHideAbove?: boolean }).__madoriHideAbove = on
+    },
     lockPlanNorth: () => {
       // Lo lee el parche de Madori de `floorplan-panel.tsx` (`patches/@pascal-app__editor@1.0.3.patch`).
       ;(globalThis as { __madoriPlanNorth?: boolean }).__madoriPlanNorth = true
