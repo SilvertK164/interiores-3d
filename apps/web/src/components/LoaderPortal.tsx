@@ -17,6 +17,16 @@ const fraunces = Fraunces({
   axes: ['SOFT', 'opsz'],
 })
 
+// El portal se vuelve a montar al pasar de una pantalla de carga a la siguiente (ruta, editor, escena 3D): cada instancia
+// retoma la animación en el punto donde iba la anterior en vez de empezar de cero. Si pasa más de 1 s sin ningún portal,
+// es otra carga y empieza de nuevo.
+type Shared = { t0: number; mounted: number; lastSeen: number }
+const sharedClock = (): Shared => {
+  const w = window as unknown as { __madoriLoader?: Shared }
+  w.__madoriLoader ??= { t0: performance.now(), mounted: 0, lastSeen: Number.NEGATIVE_INFINITY }
+  return w.__madoriLoader
+}
+
 type Props = {
   /** Texto para lectores de pantalla (no se ve en pantalla). */
   label?: string
@@ -45,6 +55,28 @@ export function LoaderPortal({ label = 'Abriendo tu proyecto', className = '' }:
   const slotRef = useRef<HTMLSpanElement>(null)
   const clipId = `madori-clip-${useId().replace(/[^\w-]/g, '')}`
   const { left, right } = portalLetters(APP_NAME)
+
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+    const clock = sharedClock()
+    const now = performance.now()
+    const continuing = clock.mounted > 0 || now - clock.lastSeen < 1000
+    if (!continuing) clock.t0 = now
+    clock.mounted += 1
+    if (continuing) {
+      const elapsed = now - clock.t0
+      for (const animation of root.getAnimations({ subtree: true })) {
+        const name = (animation as CSSAnimation).animationName
+        if (name === 'madori-portal-fade') animation.finish()
+        else animation.currentTime = elapsed
+      }
+    }
+    return () => {
+      clock.mounted -= 1
+      clock.lastSeen = performance.now()
+    }
+  }, [])
 
   // Centro (--dx, --dy) y escala (--S) del portal grande. Se miden con offset*, que las transformaciones no alteran,
   // y se repiten al cambiar el tamaño de la ventana o de la palabra (también cuando llega la fuente).
