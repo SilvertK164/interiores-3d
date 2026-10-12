@@ -1,0 +1,9 @@
+DM Sans (Colophon Foundry y Google), licencia SIL Open Font License 1.1 (ver OFL.txt, que debe viajar con los archivos).
+Origen: paquete npm @fontsource/dm-sans versión 5.3.0 (https://www.npmjs.com/package/@fontsource/dm-sans), carpeta files/.
+Variantes: latin y latin-ext, pesos 400 y 700, formato woff.
+Generado por apps/web/scripts/vendor-pdf-fonts.mjs (pnpm --filter @interiores/web fonts:pdf). No editar a mano.
+
+DMSans-latin-400.woff  sha256 38702875fe179437d200e7ba6f7fab4d497ffe48117ef332029b2081751186ad  (origen: files/dm-sans-latin-400-normal.woff)
+DMSans-latin-700.woff  sha256 af422a448ac00679a8dbb13532db3616829c5a35b58d3eeea5903ce17ad2e36a  (origen: files/dm-sans-latin-700-normal.woff)
+DMSans-latin-ext-400.woff  sha256 3d63423c3204f61bb196d1ae3729b7f2871d87abd4403d198f4810923888c016  (origen: files/dm-sans-latin-ext-400-normal.woff)
+DMSans-latin-ext-700.woff  sha256 56084e69490970432de58b4a2406ee4daa1f58d90f9600ae3fda0e895a6355e7  (origen: files/dm-sans-latin-ext-700-normal.woff)
