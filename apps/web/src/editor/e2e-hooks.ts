@@ -1,5 +1,6 @@
+import { Vector3 } from 'three'
 import { sceneRegistry, emitter, CabinetNode, DoorNode, ItemNode, ShelfNode, StairNode, StairSegmentNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
-import { armToolMode, getHistoryCommandState, subscribeCameraPose, useEditor } from '@pascal-app/editor'
+import { armToolMode, getHistoryCommandState, subscribeCameraPose, useEditor, useFirstPersonHud } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import type { PascalChrome } from './chrome'
 
@@ -94,6 +95,33 @@ export function createE2eHooks(options: E2eOptions = {}) {
     cameraPose: () => pose,
     /** Copia de todos los nodos de un tipo. */
     nodesOf: (type: string) => nodes().filter((n) => n.type === type).map((n) => JSON.parse(JSON.stringify(n)) as Record<string, unknown>),
+    /** Los ojos del recorrido: posición (mundo y de la planta `levelId`), giro y los textos de planta y ambiente que muestra Pascal. */
+    walkEye: (levelId?: string) => {
+      const cam = (globalThis as { __madoriCamera?: { position: { x: number; y: number; z: number }; rotation: { y: number } } }).__madoriCamera
+      if (!cam) return null
+      const hud = useFirstPersonHud.getState()
+      const level = levelId ? sceneRegistry.nodes.get(levelId) : null
+      const local = level ? level.worldToLocal(new Vector3(cam.position.x, cam.position.y, cam.position.z)) : null
+      return {
+        x: cam.position.x, y: cam.position.y, z: cam.position.z, yaw: cam.rotation.y,
+        lx: local?.x ?? null, lz: local?.z ?? null, ly: local?.y ?? null,
+        floor: hud.floorLabel as string | null, zone: hud.zoneLabel as string | null,
+      }
+    },
+    /** Empieza el recorrido en ese punto de la planta (coordenadas de la planta, ojos a `eye` m sobre su piso), mirando a `yaw`. */
+    walkAt: (levelId: string, x: number, z: number, yaw: number, eye = 1.7) => {
+      const level = sceneRegistry.nodes.get(levelId)
+      if (!level) return false
+      level.updateWorldMatrix(true, false)
+      const world = level.localToWorld(new Vector3(x, 0, z))
+      ;(globalThis as { __madoriSpawn?: unknown }).__madoriSpawn = { position: [world.x, world.y + eye, world.z], yaw }
+      useEditor.getState().setFirstPersonMode(true)
+      return true
+    },
+    walkStop: () => {
+      useEditor.getState().setFirstPersonMode(false)
+      ;(globalThis as { __madoriSpawn?: unknown }).__madoriSpawn = undefined
+    },
     /** Hace clic con la herramienta armada en ese punto del suelo del nivel activo (mueve y confirma, como el lienzo). */
     placeAt: (x: number, z: number) => {
       const event = { localPosition: [x, 0, z], position: [x, 0, z], nativeEvent: { stopPropagation() {} }, stopPropagation() {} }

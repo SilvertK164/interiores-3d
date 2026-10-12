@@ -1,6 +1,7 @@
 import * as Core from '@pascal-app/core'
 import * as Pascal from '@pascal-app/editor'
 import { flushSync } from 'react-dom'
+import { Vector3 } from 'three'
 import { appFontClasses } from '@/components/AppShell'
 import { commitCabinetFields, isCabinetNode } from './cabinet-commit'
 import { type ShellBridge, createBridge } from './shell/bridge'
@@ -200,6 +201,9 @@ function editDeps(): EditDeps {
   }
 }
 
+/** Altura de los ojos al empezar a recorrer: el jugador cae solo hasta el piso. */
+const WALK_EYE_HEIGHT = 1.7
+
 const CAMERA_EVENTS = {
   'orbit-left': 'camera-controls:orbit-ccw',
   'orbit-right': 'camera-controls:orbit-cw',
@@ -214,7 +218,19 @@ const CAMERA_EVENTS = {
 function viewDeps(): ViewDeps {
   return {
     moveCamera: (move) => Core.emitter.emit(CAMERA_EVENTS[move]),
-    startWalkthrough: () => {
+    startWalkthrough: (spawn, levelId) => {
+      // Punto de partida dentro del edificio (lo lee el parche de `first-person-controls.tsx`): de coordenadas de la planta a las del mundo.
+      const level = levelId ? Core.sceneRegistry.nodes.get(levelId) : null
+      if (spawn && level) {
+        level.updateWorldMatrix(true, false)
+        const world = level.localToWorld(new Vector3(spawn.x, 0, spawn.z))
+        ;(globalThis as { __madoriSpawn?: unknown }).__madoriSpawn = { position: [world.x, world.y + WALK_EYE_HEIGHT, world.z], yaw: spawn.yaw }
+        const stop = Pascal.useEditor.subscribe((state) => {
+          if (state.isFirstPersonMode) return
+          stop()
+          ;(globalThis as { __madoriSpawn?: unknown }).__madoriSpawn = undefined
+        })
+      }
       flushSync(() => Pascal.useEditor.getState().setFirstPersonMode(true))
       const canvas = document.querySelector<HTMLCanvasElement>('[data-pascal-viewer-3d] canvas')
       if (!canvas) return

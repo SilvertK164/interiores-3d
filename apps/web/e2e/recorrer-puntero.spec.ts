@@ -16,7 +16,7 @@ test('Recorrer bloquea el puntero sobre el lienzo 3D y Esc lo libera y vuelve a 
   await expect
     .poll(() => page.evaluate(() => document.pointerLockElement?.tagName ?? null), { timeout: 10_000 })
     .toBe('CANVAS')
-  await expect(page.getByText('Recorriendo el proyecto. Pulsa Esc para volver.')).toBeVisible()
+  await expect(page.getByText('Recorriendo el proyecto. Muévete con W A S D, mira con el ratón y pulsa Esc para volver.')).toBeVisible()
   await page.keyboard.press('Escape')
   await expect.poll(() => page.evaluate(() => document.pointerLockElement)).toBeNull()
   await expect.poll(async () => (await hook(page, 'state')).firstPerson).toBe(false)

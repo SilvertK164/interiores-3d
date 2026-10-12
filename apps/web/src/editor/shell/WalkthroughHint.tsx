@@ -14,7 +14,7 @@ export function WalkthroughHint() {
       className={cx(FLOAT, 'absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 rounded-full py-2 pl-5 pr-2')}
     >
       <Footprints aria-hidden="true" className="size-5 text-ink-muted" strokeWidth={1.9} />
-      <span className="text-[15px] font-medium text-ink">Recorriendo el proyecto. Pulsa Esc para volver.</span>
+      <span className="text-[15px] font-medium text-ink">Recorriendo el proyecto. Muévete con W A S D, mira con el ratón y pulsa Esc para volver.</span>
       <button
         type="button"
         onClick={bridge.stopWalkthrough}

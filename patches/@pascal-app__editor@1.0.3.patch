@@ -1,3 +1,51 @@
+diff --git a/src/components/editor/first-person-controls.tsx b/src/components/editor/first-person-controls.tsx
+index 953a88b00aa9cc77c4bd0438eeb5540d00523025..462943ed9f8a8d215a15435a2a3b5ee1dcf78940 100644
+--- a/src/components/editor/first-person-controls.tsx
++++ b/src/components/editor/first-person-controls.tsx
+@@ -667,6 +667,13 @@ export const FirstPersonControls = () => {
+   const selectedLevelId = useViewer((state) => state.selection.levelId)
+   const placedSpawnNode = useScene((state) => resolvePlacedSpawnNode(state.nodes, selectedLevelId))
+   const isDroneMode = useEditor((state) => state.firstPersonMovementMode === 'drone')
++  // Madori: deja la cámara a mano para las pruebas e2e (medir cuánto avanza el recorrido); no cambia nada del recorrido.
++  useEffect(() => {
++    ;(globalThis as { __madoriCamera?: unknown }).__madoriCamera = camera
++    return () => {
++      ;(globalThis as { __madoriCamera?: unknown }).__madoriCamera = undefined
++    }
++  }, [camera])
+   const controllerRef = useRef<BVHEcctrlApi | null>(null)
+   const movementInputRef = useRef<MovementInput>({ ...inactiveMovementInput })
+   const hadPointerLockRef = useRef(false)
+@@ -737,6 +744,7 @@ export const FirstPersonControls = () => {
+   const replaceColliderWorld = useCallback((nextWorld: FirstPersonColliderWorld | null) => {
+     worldRef.current?.dispose()
+     worldRef.current = nextWorld
++    ;(globalThis as { __madoriWorld?: unknown }).__madoriWorld = nextWorld
+     setWorld(nextWorld)
+   }, [])
+ 
+@@ -1047,7 +1055,10 @@ export const FirstPersonControls = () => {
+   }, [isDroneMode, resolveInteractableTarget])
+ 
+   const placedSpawn = useMemo<FirstPersonSpawn | null>(() => {
+-    if (!(placedSpawnNode && placedSpawnNode.type === 'spawn')) return null
++    // Madori: sin nodo de salida, Recorrer empieza donde pide `__madoriSpawn` (dentro del ambiente más grande de la planta activa).
++    if (!(placedSpawnNode && placedSpawnNode.type === 'spawn')) {
++      return (globalThis as { __madoriSpawn?: FirstPersonSpawn }).__madoriSpawn ?? null
++    }
+ 
+     const spawnObject = sceneRegistry.nodes.get(placedSpawnNode.id)
+     if (spawnObject) {
+@@ -1796,7 +1807,8 @@ export const FirstPersonOverlay = ({ onExit }: { onExit: () => void }) => {
+       suspended={suspended}
+       zoneLabel={zoneLabel}
+     >
+-      {!hasPlacedSpawn && (
++      {/* Madori: el aviso en inglés se reemplazó por la ayuda propia del shell. */}
++      {false && !hasPlacedSpawn && (
+         <div className="corner-smooth rounded-full border border-border/40 bg-background/80 px-3 py-1 text-center text-muted-foreground text-xs shadow-elevation-3 backdrop-blur-xl">
+           Place a spawn point from the Build tab to control where walkthrough starts.
+         </div>
 diff --git a/src/components/editor/floorplan-panel.tsx b/src/components/editor/floorplan-panel.tsx
 index fc56af07361709346668b929311748651a0d4fab..ff0c46989239deedee659a97b34f40a47bd51d2c 100644
 --- a/src/components/editor/floorplan-panel.tsx

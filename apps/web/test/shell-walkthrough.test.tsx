@@ -15,7 +15,7 @@ describe('WalkthroughHint', () => {
         <WalkthroughHint />
       </BridgeProvider>,
     )
-    expect(textOf(markup)).toBe('Recorriendo el proyecto. Pulsa Esc para volver.Salir')
+    expect(textOf(markup)).toBe('Recorriendo el proyecto. Muévete con W A S D, mira con el ratón y pulsa Esc para volver.Salir')
     expect(markup).toContain('role="status"')
   })
 })

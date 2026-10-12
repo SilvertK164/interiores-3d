@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createBridge } from '../src/editor/shell/bridge'
 import { selectViewOptions } from '../src/editor/shell/bridge/view'
 import { createFakeDeps } from './support/fake-deps'
+import { withLoft } from './support/loft'
 
 const setup = () => {
   const fake = createFakeDeps()
@@ -54,5 +55,43 @@ describe('cámara y recorrido', () => {
     bridge.startWalkthrough()
     bridge.stopWalkthrough()
     expect(editor.getState().isFirstPersonMode).toBe(false)
+  })
+})
+
+describe('Recorrer empieza dentro del edificio', () => {
+  it('pide el punto de partida del ambiente más grande de la planta activa', () => {
+    const fake = withLoft()
+    fake.scene.setState({ readOnly: true })
+    const bridge = createBridge(fake.deps)
+    bridge.startWalkthrough()
+    // Sala de estar (12 m²) es el ambiente más grande de la planta baja; su centro es (2, 1,5).
+    expect(fake.deps.startWalkthrough).toHaveBeenCalledWith(expect.objectContaining({ x: 2, z: 1.5 }), 'level_a')
+  })
+
+  it('sin ambientes arranca sin punto (Pascal usa la cámara)', () => {
+    const fake = createFakeDeps()
+    fake.scene.setState({ readOnly: true })
+    createBridge(fake.deps).startWalkthrough()
+    expect(fake.deps.startWalkthrough).toHaveBeenCalledWith(null, null)
+  })
+
+  it('durante el recorrido las plantas van Juntas y al salir vuelve el modo que había', () => {
+    const fake = withLoft()
+    fake.scene.setState({ readOnly: true })
+    fake.viewer.setState({ levelMode: 'solo' })
+    const bridge = createBridge(fake.deps)
+    bridge.startWalkthrough()
+    expect(fake.viewer.getState().levelMode).toBe('stacked')
+    bridge.stopWalkthrough()
+    expect(fake.viewer.getState().levelMode).toBe('solo')
+  })
+
+  it('también restaura el modo si Pascal sale solo (Esc)', () => {
+    const fake = withLoft()
+    fake.scene.setState({ readOnly: true })
+    fake.viewer.setState({ levelMode: 'exploded' })
+    createBridge(fake.deps).startWalkthrough()
+    fake.editor.setState({ isFirstPersonMode: false })
+    expect(fake.viewer.getState().levelMode).toBe('exploded')
   })
 })

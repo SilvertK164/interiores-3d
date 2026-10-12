@@ -83,7 +83,7 @@ test('Recorrer pasa a primera persona, deja solo el aviso y Esc devuelve el pane
   await toView(page)
   await bar(page).getByRole('button', { name: 'Recorrer' }).click()
   await expect.poll(async () => (await hook(page, 'state')).firstPerson, { timeout: 15_000 }).toBe(true)
-  await expect(page.getByText('Recorriendo el proyecto. Pulsa Esc para volver.')).toBeVisible()
+  await expect(page.getByText('Recorriendo el proyecto. Muévete con W A S D, mira con el ratón y pulsa Esc para volver.')).toBeVisible()
   await expect(panel(page)).toHaveCount(0)
   await page.keyboard.press('Escape')
   await expect.poll(async () => (await hook(page, 'state')).firstPerson).toBe(false)
