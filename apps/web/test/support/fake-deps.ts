@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import type { BridgeDeps } from '../../src/editor/shell/bridge'
-import type { EditorLike, EditorMode, HistoryState, SceneLike, ViewerLike } from '../../src/editor/shell/bridge/types'
+import type { EditorLike, EditorMode, HistoryState, SceneLike, SnapContext, SnapMode, ViewerLike } from '../../src/editor/shell/bridge/types'
 
 export function createFakeStore<S extends object>(initial: S) {
   let state = initial
@@ -36,6 +36,19 @@ export function createFakeDeps() {
     setPhase: vi.fn((phase: EditorLike['phase']) => editor.setState({ phase })),
     setViewMode: vi.fn((viewMode: EditorLike['viewMode']) => editor.setState({ viewMode })),
     setFirstPersonMode: vi.fn((enabled: boolean) => editor.setState({ isFirstPersonMode: enabled })),
+    structureLayer: 'elements',
+    gridSnapStep: 0.5,
+    snappingModeByContext: { wall: 'grid', item: 'lines', polygon: 'grid', rotation: 'angles' },
+    setStructureLayer: vi.fn((structureLayer: 'zones' | 'elements') => editor.setState({ structureLayer })),
+    armMaterialPaint: vi.fn(() => editor.setState({ mode: 'material-paint', tool: null })),
+    setMode: vi.fn((mode: EditorMode) => editor.setState({ mode })),
+    setTool: vi.fn((tool: string | null) => editor.setState({ tool, ...(tool ? { mode: 'build' as const } : {}) })),
+    setLastMeasurementKind: vi.fn(),
+    setToolDefaults: vi.fn(),
+    setGridSnapStep: vi.fn((gridSnapStep: number) => editor.setState({ gridSnapStep })),
+    setSnappingMode: vi.fn((context: SnapContext, mode: SnapMode) =>
+      editor.setState({ snappingModeByContext: { ...editor.getState().snappingModeByContext, [context]: mode } }),
+    ),
     // @@fake-editor
   })
   const viewer = createFakeStore<ViewerLike>({

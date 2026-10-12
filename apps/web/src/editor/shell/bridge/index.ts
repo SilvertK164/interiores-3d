@@ -1,5 +1,6 @@
 import { type CoreDeps, createCoreSlice } from './core'
 import { type ModeDeps, createModeSlice } from './mode'
+import { createToolsSlice } from './tools'
 
 export type BridgeDeps = CoreDeps & ModeDeps
 
@@ -8,6 +9,7 @@ export function createBridge(deps: BridgeDeps) {
   return {
     ...createCoreSlice(deps),
     ...createModeSlice(deps),
+    ...createToolsSlice(deps),
     // @@slices
   }
 }

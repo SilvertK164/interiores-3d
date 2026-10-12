@@ -6,6 +6,8 @@
 export type Phase = 'site' | 'structure' | 'furnish'
 export type EditorMode = 'select' | 'edit' | 'delete' | 'build' | 'material-paint' | 'terrain-sculpt'
 export type ViewMode = '2d' | '3d' | 'split'
+export type SnapMode = 'grid' | 'lines' | 'angles' | 'off'
+export type SnapContext = 'wall' | 'item' | 'polygon' | 'rotation'
 
 export type StoreLike<S> = { getState(): S; subscribe(listener: () => void): () => void }
 
@@ -20,6 +22,17 @@ export type EditorLike = {
   setPhase(phase: Phase): void
   setViewMode(mode: ViewMode): void
   setFirstPersonMode(enabled: boolean): void
+  structureLayer: 'zones' | 'elements'
+  gridSnapStep: number
+  snappingModeByContext: Record<SnapContext, SnapMode>
+  setStructureLayer(layer: 'zones' | 'elements'): void
+  armMaterialPaint(): void
+  setMode(mode: EditorMode): void
+  setTool(tool: string | null): void
+  setLastMeasurementKind(kind: string): void
+  setToolDefaults(tool: string, defaults: Record<string, unknown> | null): void
+  setGridSnapStep(step: number): void
+  setSnappingMode(context: SnapContext, mode: SnapMode): void
   // @@editor-like
 }
 
