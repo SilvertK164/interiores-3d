@@ -268,7 +268,7 @@ describe('alfombras debajo de todo', () => {
       levels: [{ ...base, items: [{ asset: 'sofa', at: [1, 1] }, { asset: 'rectangular-carpet', at: [2, 2] }, { asset: 'cash-register', at: [3, 3] }, { asset: 'round-carpet', at: [2, 3] }], shelves: [], cabinets: [], stairs: [] }, ...def.levels.slice(1)],
     }
     const { nodes } = buildScene(carpets, withCarpet)
-    const level = Object.values(nodes).find((n) => n.type === 'level') as { children: string[] }
+    const level = (Object.values(nodes) as { type: string; children: string[] }[]).find((n) => n.type === 'level') as { children: string[] }
     const nameOf = (id: string) => (nodes[id as keyof typeof nodes] as { name?: string }).name
     const names = level.children.map(nameOf)
     const firstOther = names.findIndex((n) => !/Alfombra/.test(String(n)))
