@@ -53,8 +53,8 @@ describe('metersPatch', () => {
 })
 
 describe('tipos sin panel propio y aviso de borrado', () => {
-  it('un piso o una escalera solo tienen el nombre del tipo: sin campos, sin Duplicar', () => {
-    for (const [type, label] of [['slab', 'Piso'], ['stair', 'Escalera'], ['column', 'Columna'], ['raro', 'Elemento']] as const) {
+  it('un piso o un cielorraso solo tienen el nombre del tipo: sin campos, sin Duplicar', () => {
+    for (const [type, label] of [['slab', 'Piso'], ['ceiling', 'Cielorraso'], ['column', 'Columna'], ['raro', 'Elemento']] as const) {
       expect(typeLabel(type)).toBe(label)
       expect(titleFor(target({ type }))).toBe(label)
       expect(fieldsFor(target({ type }))).toEqual([])

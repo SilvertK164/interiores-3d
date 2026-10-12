@@ -54,6 +54,7 @@ const TYPES: Readonly<Record<string, { label: string; article: 'Este' | 'Esta' }
   slab: { label: 'Piso', article: 'Este' },
   ceiling: { label: 'Cielorraso', article: 'Este' },
   stair: { label: 'Escalera', article: 'Esta' },
+  'stair-segment': { label: 'Tramo de escalera', article: 'Este' },
   column: { label: 'Columna', article: 'Esta' },
   shelf: { label: 'Estante', article: 'Este' },
   cabinet: { label: 'Gabinete', article: 'Este' },

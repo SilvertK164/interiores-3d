@@ -2,6 +2,7 @@ import { formatMeters, formatSize } from '@/lib/format'
 import { cabinetBuilder, cabinetModuleBuilder } from './properties-cabinet'
 import { countPatch, num, toggleField, togglePatch } from './properties-fields'
 import { type Builder, type Patch, type PropNode, metersPatch } from './properties-model'
+import { flightBuilder, stairBuilder } from './properties-stair'
 import type { FieldView } from './ui/PropertiesCard'
 
 /**
@@ -92,4 +93,6 @@ export const PARAMETRIC_BUILDERS: Readonly<Record<string, Builder>> = {
   shelf: shelfBuilder,
   cabinet: cabinetBuilder,
   'cabinet-module': cabinetModuleBuilder,
+  stair: stairBuilder,
+  'stair-segment': flightBuilder,
 }
