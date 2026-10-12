@@ -4,13 +4,20 @@ import { useEffect } from 'react'
 import type { SaverStatus } from '../scene-saver'
 import type { ShellBridge } from './bridge'
 import { selectShellState } from './bridge/selectors'
+import { ShellDock } from './ShellDock'
 import { ShellTopBar } from './ShellTopBar'
 import { ShellUndoRedo } from './ShellUndoRedo'
 import { BridgeProvider, useShell } from './use-bridge'
 
 function ShellBody() {
   const mode = useShell((s) => selectShellState(s).mode)
-  return mode === 'editar' ? <ShellUndoRedo /> : null
+  if (mode !== 'editar') return null
+  return (
+    <>
+      <ShellDock />
+      <ShellUndoRedo />
+    </>
+  )
 }
 
 /**
