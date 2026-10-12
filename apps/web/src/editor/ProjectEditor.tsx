@@ -15,6 +15,7 @@ import { localizeCatalog } from './catalog-assets'
 import { HIDDEN_CHROME, type PascalChrome } from './chrome'
 import { installE2eHooks } from './e2e-hooks'
 import { createPascalBridge } from './pascal-bridge'
+import { createSaveHandler } from './save-handler'
 import { SaveBanner } from './SaveBanner'
 import { EditorShell } from './shell/EditorShell'
 import { type SaveOutcome, type SaverStatus, type SceneSaver, createSceneSaver } from './scene-saver'
@@ -40,12 +41,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   // `<Editor>` vuelve a cargar la escena cada vez que cambia la identidad de `onLoad`:
   // estas funciones deben ser estables o cada cambio de estado de guardado borraría lo editado.
   const onLoad = useCallback(async () => graphRef.current, [])
-  const onSave = useCallback(async (scene: SceneGraph, options?: { keepalive?: boolean }) => {
-    const s = saver.current
-    if (!s) return
-    if (options?.keepalive) await s.flushNow(scene)
-    else await s.save(scene)
-  }, [])
+  const onSave = useMemo(() => createSaveHandler<SceneGraph>(() => saver.current), [])
 
   const items = useMemo(() => localizeCatalog(CATALOG_ITEMS), [])
 
@@ -88,6 +84,19 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
       cancelled = true
     }
   }, [projectId])
+
+  // Lo que el guardador tiene en espera (ya encolado por Pascal, aún sin enviar) se manda al cerrar la página; Pascal solo
+  // envía lo que él todavía no encoló.
+  useEffect(() => {
+    const flush = () => void saver.current?.flushNow().catch(() => {})
+    window.addEventListener('pagehide', flush)
+    window.addEventListener('beforeunload', flush)
+    return () => {
+      window.removeEventListener('pagehide', flush)
+      window.removeEventListener('beforeunload', flush)
+      flush()
+    }
+  }, [])
 
   // Al volver a ingresar (otra pestaña) o renovarse el token, el guardado pausado por sesión vencida se reanuda.
   useEffect(() => {
