@@ -1,10 +1,12 @@
 'use client'
 
 import {
+  Archive,
   Box,
   BrickWall,
   DoorOpen,
   Layers2,
+  Library,
   type LucideIcon,
   RectangleVertical,
   Sofa,
@@ -27,6 +29,10 @@ const ICONS: Readonly<Record<string, LucideIcon>> = {
   slab: Square,
   ceiling: Layers2,
   stair: Triangle,
+  'stair-segment': Triangle,
+  shelf: Library,
+  cabinet: Archive,
+  'cabinet-module': Archive,
 }
 
 /** Propiedades del elemento elegido (modo Editar). Con nada elegido, o con un elemento que ya no existe, no se dibuja. */

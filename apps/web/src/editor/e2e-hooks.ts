@@ -1,4 +1,4 @@
-import { DoorNode, ItemNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
+import { CabinetNode, DoorNode, ItemNode, ShelfNode, StairNode, StairSegmentNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
 import { armToolMode, getHistoryCommandState, useEditor } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import type { PascalChrome } from './chrome'
@@ -94,6 +94,16 @@ export function createE2eHooks(options: E2eOptions = {}) {
     /** Agregan un mueble o un ambiente en el primer nivel y devuelven su id. */
     addItem: () => createUnder(ItemNode.parse({ position: [1, 0, 1.5], asset: SOFA }), firstOf('level')),
     addZone: () => createUnder(ZoneNode.parse({ name: 'Zone 1', polygon: [[0, 0], [3, 0], [3, 2], [0, 2]] }), firstOf('level')),
+    /** Un estante (biblioteca de 3 filas y 2 columnas), un gabinete suelto y una escalera de caracol en el primer nivel. */
+    addShelf: () =>
+      createUnder(ShelfNode.parse({ position: [1, 0, 1.5], style: 'bookshelf', rows: 3, columns: 2, width: 1, depth: 0.4, height: 1.8, withBack: true }), firstOf('level')),
+    addCabinet: () => createUnder(CabinetNode.parse({ position: [2, 0, 1.5] }), firstOf('level')),
+    addStair: () => createUnder(StairNode.parse({ position: [3, 0, 1.5], stairType: 'spiral', width: 1, stepCount: 10 }), firstOf('level')),
+    /** Una escalera recta con un tramo; devuelve el id del tramo (el padre es `node(id).parentId`). */
+    addFlight: () => {
+      const stairId = createUnder(StairNode.parse({ position: [4, 0, 1.5] }), firstOf('level'))
+      return stairId ? createUnder(StairSegmentNode.parse({ parentId: stairId }), stairId) : null
+    },
   }
 }
 
