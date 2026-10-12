@@ -1,4 +1,4 @@
-import { WallNode, useScene } from '@pascal-app/core'
+import { DoorNode, ItemNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
 import { armToolMode, getHistoryCommandState, useEditor } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import type { PascalChrome } from './chrome'
@@ -6,9 +6,26 @@ import type { PascalChrome } from './chrome'
 type SceneNode = { id: string; type: string }
 type E2eOptions = { setChrome?: (chrome: PascalChrome) => void }
 
+/** Un sofá del catálogo para los ganchos que arman escenas. */
+const SOFA = {
+  id: 'sofa',
+  category: 'furniture',
+  name: 'Sofa',
+  thumbnail: '/items/sofa/thumbnail.webp',
+  src: '/items/sofa/model.glb',
+  dimensions: [2.06, 0.74, 1.01] as [number, number, number],
+}
+
 /** Solo para Playwright: lee y modifica la escena sin depender de píxeles. */
 export function createE2eHooks(options: E2eOptions = {}) {
   const nodes = () => Object.values(useScene.getState().nodes) as SceneNode[]
+  const firstOf = (type: string) => nodes().find((n) => n.type === type)?.id
+  /** Crea el nodo bajo ese padre y devuelve su id (`null` si no hay padre). */
+  const createUnder = (node: { id: string }, parentId: string | undefined) => {
+    if (!parentId) return null
+    useScene.getState().createNode(node as never, parentId as never)
+    return node.id
+  }
   return {
     ready: () => nodes().some((n) => n.type === 'level'),
     counts: () => {
@@ -59,6 +76,24 @@ export function createE2eHooks(options: E2eOptions = {}) {
       }
     },
     select: (id: string | null) => useViewer.getState().setSelection({ selectedIds: id ? ([id] as never) : [], zoneId: null }),
+    /** El nodo tal como lo tiene Pascal (copia simple), o `null` si ya no existe. */
+    node: (id: string) => {
+      const node = useScene.getState().nodes[id as never]
+      return node ? (JSON.parse(JSON.stringify(node)) as Record<string, unknown>) : null
+    },
+    deleteNode: (id: string) => useScene.getState().deleteNode(id as never),
+    /** Agregan una puerta o una ventana en el primer muro y devuelven su id (`null` si no hay muro). */
+    addDoor: () => {
+      const wallId = firstOf('wall')
+      return createUnder(DoorNode.parse({ position: [1, 1.05, 0], wallId, parentId: wallId }), wallId)
+    },
+    addWindow: () => {
+      const wallId = firstOf('wall')
+      return createUnder(WindowNode.parse({ position: [2.5, 1.5, 0], wallId, parentId: wallId }), wallId)
+    },
+    /** Agregan un mueble o un ambiente en el primer nivel y devuelven su id. */
+    addItem: () => createUnder(ItemNode.parse({ position: [1, 0, 1.5], asset: SOFA }), firstOf('level')),
+    addZone: () => createUnder(ZoneNode.parse({ name: 'Zone 1', polygon: [[0, 0], [3, 0], [3, 2], [0, 2]] }), firstOf('level')),
   }
 }
 

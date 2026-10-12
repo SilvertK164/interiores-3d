@@ -77,7 +77,10 @@ function FieldRow({ field, onCommit }: { field: FieldView; onCommit: (id: string
           autoComplete="off"
           spellCheck={false}
           onBlur={(event) => {
-            if (event.currentTarget.value !== field.value) onCommit(field.id, event.currentTarget.value)
+            const input = event.currentTarget
+            if (input.value !== field.value) onCommit(field.id, input.value)
+            // Si el cambio no se aplicó (no es un número, o es igual al actual) el campo vuelve al valor del nodo.
+            input.value = field.value
           }}
           onKeyDown={(event) => {
             if (event.key === 'Escape') event.currentTarget.value = field.value
