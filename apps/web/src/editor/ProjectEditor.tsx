@@ -5,6 +5,7 @@ import { CATALOG_ITEMS, Editor, type SceneGraph } from '@pascal-app/editor'
 import { builtinPlugin } from '@pascal-app/nodes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LoaderPortal } from '@/components/LoaderPortal'
+import { useSceneLoading } from './use-scene-loading'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
@@ -109,12 +110,19 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   // El puente con Pascal y el shell de Madori; `EditorShell` aplica el tema claro y oculta el aviso de cámara al montarse.
   const bridge = useMemo(() => createPascalBridge(), [])
   const { go, pending: leaving } = useNavigate()
+  const rootRef = useRef<HTMLDivElement>(null)
+  const sceneLoading = useSceneLoading(rootRef, phase.kind === 'ready')
 
   if (phase.kind === 'loading') return <LoaderPortal />
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className="relative h-screen w-screen overflow-hidden" ref={rootRef}>
+      {sceneLoading && (
+        <div className="fixed inset-0 z-[300]" style={{ background: '#FFF4E2' }}>
+          <LoaderPortal />
+        </div>
+      )}
       <SaveBanner detail={detail} dismissed={dismissed} onKeepEditing={() => setDismissed(true)} status={status} />
       <Editor
         chrome={chrome}
