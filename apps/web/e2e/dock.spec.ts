@@ -126,4 +126,5 @@ test('Esc en el diálogo de atajos lo cierra sin desarmar la herramienta de Pasc
   await page.keyboard.press('Escape')
   await expect(shortcuts).toBeHidden()
   expect((await hook(page, 'state')).tool).toBe('wall')
+  await expect(dockButton(page, 'Más')).toBeFocused()
 })

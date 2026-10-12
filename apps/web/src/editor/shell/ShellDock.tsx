@@ -105,7 +105,11 @@ export function ShellDock() {
         onSelect={onSelect}
         menus={menus}
       />
-      <ShortcutsDialog open={shortcuts} shortcuts={SHORTCUTS} onClose={() => setShortcuts(false)} />
+      <ShortcutsDialog open={shortcuts} shortcuts={SHORTCUTS} onClose={() => {
+          setShortcuts(false)
+          // El panel Más se desmontó al abrir el diálogo: el foco vuelve a su botón.
+          root.current?.querySelector<HTMLElement>('[data-dock="more"]')?.focus()
+        }} />
     </div>
   )
 }
