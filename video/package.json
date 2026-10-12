@@ -1,0 +1,22 @@
+{
+  "name": "madori-video",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Teaser y video explicativo de Madori con HyperFrames. Independiente del monorepo pnpm.",
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/copiar-assets.mjs",
+    "generar": "node src/generar.mjs",
+    "prep": "npm run generar && npm run assets",
+    "check": "npm run prep && hyperframes check teaser && hyperframes check explicativo",
+    "preview": "npm run prep && hyperframes preview teaser",
+    "preview:explicativo": "npm run prep && hyperframes preview explicativo",
+    "teaser": "npm run prep && hyperframes render teaser -o out/teaser.mp4",
+    "explicativo": "npm run prep && hyperframes render explicativo -o out/explicativo.mp4"
+  },
+  "devDependencies": {
+    "gsap": "3.15.0",
+    "hyperframes": "0.8.150",
+    "lucide-static": "1.55.0"
+  }
+}
