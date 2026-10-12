@@ -1,11 +1,12 @@
 import type { LucideIcon } from 'lucide-react'
 import { type KeyboardEvent, type ReactNode, useEffect, useRef } from 'react'
 import { cx } from '@/lib/cx'
+import { moveFocusOnKey } from './focus-nav'
 import { FLOAT } from './primitives'
 
 export type DockButton = { id: string; label: string; icon: LucideIcon; menu?: boolean; popup?: 'menu' | 'dialog' }
 
-/** Barra de herramientas del modo Editar: botones de ≥ 44 px con ícono y etiqueta debajo; el menú abierto sale sobre su botón. */
+/** Barra de herramientas del modo Editar: botones de ≥ 44 px con ícono y etiqueta debajo; el menú abierto sale sobre su botón y las flechas, Inicio y Fin mueven el foco entre los botones. */
 export function Dock({
   items,
   active,
@@ -26,6 +27,7 @@ export function Dock({
       <div
         role="toolbar"
         aria-label="Herramientas de edición"
+        onKeyDown={(event) => moveFocusOnKey(event, '[data-dock]', 'horizontal')}
         className={cx(FLOAT, 'flex items-center gap-1 rounded-[28px] p-2')}
       >
         {items.map((it) => {
@@ -82,13 +84,7 @@ export function ToolMenu({
       event.stopPropagation()
       return onClose()
     }
-    const buttons = [...(ref.current?.querySelectorAll<HTMLElement>(ITEM) ?? [])]
-    const at = buttons.indexOf(document.activeElement as HTMLElement)
-    const next =
-      event.key === 'ArrowDown' ? at + 1 : event.key === 'ArrowUp' ? at - 1 : event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : null
-    if (next === null || buttons.length === 0) return
-    event.preventDefault()
-    buttons[(next + buttons.length) % buttons.length]?.focus()
+    moveFocusOnKey(event, ITEM, 'vertical')
   }
   return (
     <div
