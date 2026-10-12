@@ -116,7 +116,7 @@ docs/                                                pascal-notes.md, ESTADO.md,
 | **6a a 6d** | Plantas y ambientes: nombres en castellano, superficies, elegir y agregar planta, el panel conectado. |
 | **7a a 7g** | Catálogo de muebles en castellano, modelo del panel, colocar un mueble, quitar la barra lateral de Pascal y las 144 miniaturas con fondo transparente. |
 | **8a a 8e** | Materiales: los 114 nombres en castellano, el modelo del panel, pintar por el puente, el panel y su montaje en el dock con pruebas en navegador. |
-| **9a a 9h** | Propiedades de muro, ambiente, puerta, ventana y mueble: los modelos (9a a 9d), editar, duplicar y borrar por el puente (9e y 9f), el panel (9g) y sus pruebas en navegador (9h). |
+| **9a a 9l** | Propiedades de muro, ambiente, puerta, ventana y mueble: los modelos (9a a 9d), editar, duplicar y borrar por el puente (9e y 9f), el panel (9g) y sus pruebas en navegador (9h). Estante, gabinete y escalera: sus modelos (9i a 9k) y el panel con sus íconos y pruebas en navegador (9l). |
 | **10a a 10c** | Vista 3D: muros, niveles, cámara, estilo, girar, vista superior y Recorrer. |
 | **11a a 11e** | Teclado y accesibilidad: qué teclas de Pascal se frenan, el oyente, las flechas del dock y las pruebas en navegador. |
 | **12a a 12b** | Barrido de castellano, se quita la maqueta, capturas, documentación y verificación final. |
