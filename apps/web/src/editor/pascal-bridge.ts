@@ -1,6 +1,7 @@
 import * as Core from '@pascal-app/core'
 import * as Pascal from '@pascal-app/editor'
 import { appFontClasses } from '@/components/AppShell'
+import { commitCabinetFields, isCabinetNode } from './cabinet-commit'
 import { type ShellBridge, createBridge } from './shell/bridge'
 import type { CatalogDeps } from './shell/bridge/catalog'
 import type { CoreDeps, HistoryPort } from './shell/bridge/core'
@@ -129,7 +130,12 @@ type AnyNodeId = Core.AnyNodeId
 /** Editar, duplicar y borrar con las mismas funciones que usa el inspector de Pascal (`parametric-inspector.tsx`). */
 function editDeps(): EditDeps {
   return {
-    commitFields: (id, patch) => Pascal.commitParametricNodeFields(id as AnyNodeId, patch as Partial<AnyNode>),
+    commitFields: (id, patch) => {
+      const node = Core.useScene.getState().nodes[id as AnyNodeId]
+      // Los gabinetes se redimensionan con la rutina de sus tiradores (reacomoda módulos y vecinos); el resto, con la del inspector.
+      if (node && isCabinetNode(node)) commitCabinetFields(node, patch)
+      else Pascal.commitParametricNodeFields(id as AnyNodeId, patch as Partial<AnyNode>)
+    },
     deleteNodes: (ids) => Pascal.useScene.getState().deleteNodes(ids as AnyNodeId[]),
     duplicateNode: ({ id, rootPatch }) => {
       const scene = Pascal.useScene.getState()

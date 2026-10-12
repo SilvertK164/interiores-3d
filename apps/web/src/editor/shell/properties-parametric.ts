@@ -1,4 +1,5 @@
 import { formatMeters, formatSize } from '@/lib/format'
+import { cabinetBuilder, cabinetModuleBuilder } from './properties-cabinet'
 import { countPatch, num, toggleField, togglePatch } from './properties-fields'
 import { type Builder, type Patch, type PropNode, metersPatch } from './properties-model'
 import type { FieldView } from './ui/PropertiesCard'
@@ -89,4 +90,6 @@ const shelfBuilder: Builder = {
 /** Los tipos paramétricos con panel propio (estante aquí; gabinete en 9j y escalera en 9k). */
 export const PARAMETRIC_BUILDERS: Readonly<Record<string, Builder>> = {
   shelf: shelfBuilder,
+  cabinet: cabinetBuilder,
+  'cabinet-module': cabinetModuleBuilder,
 }

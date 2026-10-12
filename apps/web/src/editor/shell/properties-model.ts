@@ -57,6 +57,7 @@ const TYPES: Readonly<Record<string, { label: string; article: 'Este' | 'Esta' }
   column: { label: 'Columna', article: 'Esta' },
   shelf: { label: 'Estante', article: 'Este' },
   cabinet: { label: 'Gabinete', article: 'Este' },
+  'cabinet-module': { label: 'Módulo de gabinete', article: 'Este' },
   fence: { label: 'Cerco', article: 'Este' },
   roof: { label: 'Techo', article: 'Este' },
 }
