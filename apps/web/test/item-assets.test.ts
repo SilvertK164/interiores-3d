@@ -8,7 +8,7 @@ const manifest = {
   lamp: ['floor-plan.svg', 'model.glb', 'thumbnail.webp'],
 }
 const item = (id: string, asset: Record<string, unknown>) => ({ id: `item_${id}`, type: 'item', asset: { id, name: id, ...asset } })
-const graph = (...nodes: ReturnType<typeof item>[]) => ({ nodes: Object.fromEntries(nodes.map((n) => [n.id, n])), rootNodeIds: [] as string[] })
+const graph = (...nodes: ReturnType<typeof item>[]) => ({ nodes: Object.fromEntries(nodes.map((n) => [n.id, n])) as Record<string, unknown>, rootNodeIds: [] as string[] })
 const assetOf = (g: ReturnType<typeof graph>, id: string) => (g.nodes[`item_${id}`] as ReturnType<typeof item>).asset as Record<string, unknown>
 
 describe('rutas de los muebles de proyectos ya guardados', () => {
