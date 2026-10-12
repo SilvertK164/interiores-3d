@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fitCamera, fitPlan, insetsFrom } from '../src/editor/shell/framing'
+import { fitCamera, fitPlan, frameMargin, insetsFrom } from '../src/editor/shell/framing'
 
 const pane = { x: 0, y: 0, width: 640, height: 720 }
 
@@ -30,12 +30,10 @@ describe('encuadre del plano 2D', () => {
     const right = 640 / 2 + (content.maxX - view.centerX) / s
     const top = 720 / 2 + (content.minY - view.centerY) / s
     const bottom = 720 / 2 + (content.maxY - view.centerY) / s
-    expect(left).toBeGreaterThanOrEqual(288 + 24 - 0.01)
+    expect(left).toBeGreaterThanOrEqual(288 + 12 - 0.01)
     expect(right).toBeLessThanOrEqual(640 - 24 + 0.01)
-    expect(top).toBeGreaterThanOrEqual(76 + 24 - 0.01)
-    expect(bottom).toBeLessThanOrEqual(616 - 24 + 0.01)
-    // Centrada: sobra lo mismo a cada lado de la zona libre.
-    expect(left - 288).toBeCloseTo(640 - right, 1)
+    expect(top).toBeGreaterThanOrEqual(76 + 12 - 0.01)
+    expect(bottom).toBeLessThanOrEqual(616 - 12 + 0.01)
   })
 
   it('sin paneles la planta queda centrada y limitada por el lado más justo', () => {
@@ -48,6 +46,22 @@ describe('encuadre del plano 2D', () => {
   it('un lienzo casi tapado por los paneles no da un encuadre inválido', () => {
     const view = fitPlan(content, { width: 300, height: 300 }, { left: 280, right: 0, top: 0, bottom: 0 }, 24)
     expect(Number.isFinite(view.width) && view.width > 0).toBe(true)
+  })
+})
+
+describe('la planta ocupa la mayor parte del panel', () => {
+  const content = { minX: -6, minY: -3.5, maxX: 6, maxY: 3.5 }
+  it('con margen del 8 % y sin paneles, la planta llena más del 80 % del lado que la limita', () => {
+    const surface = { width: 960, height: 1080 }
+    expect(frameMargin(surface)).toBe(77)
+    const view = fitPlan(content, surface, { left: 0, right: 0, top: 0, bottom: 0 }, frameMargin(surface))
+    expect(12 / view.width).toBeGreaterThan(0.8) // ancho de la planta / ancho visible
+  })
+
+  it('con el panel de plantas a la izquierda llena más del 60 % del ancho del lienzo', () => {
+    const surface = { width: 960, height: 1080 }
+    const view = fitPlan(content, surface, { left: 290, right: 0, top: 76, bottom: 104 }, frameMargin(surface))
+    expect(12 / view.width).toBeGreaterThan(0.6)
   })
 })
 

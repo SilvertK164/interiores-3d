@@ -22,14 +22,29 @@ export function insetsFrom(pane: Rect, panels: readonly Panel[]): Insets {
   return out
 }
 
-/** La zona libre del lienzo (en píxeles) una vez descontados los paneles y el margen; nunca menor a 1 px. */
-const freeZone = (size: { width: number; height: number }, insets: Insets, margin: number) => ({
-  width: Math.max(1, size.width - insets.left - insets.right - 2 * margin),
-  height: Math.max(1, size.height - insets.top - insets.bottom - 2 * margin),
-  /** Cuánto se aparta el centro de la zona libre del centro del lienzo, en píxeles (derecha y abajo positivos). */
-  offsetX: (insets.left - insets.right) / 2,
-  offsetY: (insets.top - insets.bottom) / 2,
-})
+/** Holgura junto a un panel flotante (ya hay un borde visible: no hace falta el margen completo). */
+export const PANEL_GAP = 12
+
+/**
+ * La zona libre del lienzo (en píxeles): se descuentan los paneles, con una holgura corta junto a cada uno y el margen completo en
+ * los bordes libres; nunca menor a 1 px. `offset*` es cuánto se aparta su centro del centro del lienzo (derecha y abajo positivos).
+ */
+const freeZone = (size: { width: number; height: number }, insets: Insets, margin: number) => {
+  const edge = (inset: number) => (inset > 0 ? inset + PANEL_GAP : margin)
+  const left = edge(insets.left)
+  const right = edge(insets.right)
+  const top = edge(insets.top)
+  const bottom = edge(insets.bottom)
+  return {
+    width: Math.max(1, size.width - left - right),
+    height: Math.max(1, size.height - top - bottom),
+    offsetX: (left - right) / 2,
+    offsetY: (top - bottom) / 2,
+  }
+}
+
+/** Margen alrededor de la planta: el 8 % del lado menor del lienzo (en píxeles). */
+export const frameMargin = (canvas: { width: number; height: number }) => Math.round(0.08 * Math.min(canvas.width, canvas.height))
 
 export type PlanBounds = { minX: number; minY: number; maxX: number; maxY: number }
 export type PlanView = { centerX: number; centerY: number; width: number }

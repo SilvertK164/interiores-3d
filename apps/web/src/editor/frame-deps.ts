@@ -3,7 +3,7 @@ import * as Pascal from '@pascal-app/editor'
 import { Box3, Vector3 } from 'three'
 import type { FrameMeasure } from './shell/frame-insets'
 import type { FrameDeps } from './shell/bridge/frame'
-import { fitCamera, fitPlan } from './shell/framing'
+import { fitCamera, fitPlan, frameMargin } from './shell/framing'
 
 type PlanFit = (content: { minX: number; minY: number; maxX: number; maxY: number }, surface: { width: number; height: number }) => { centerX: number; centerY: number; width: number } | null
 
@@ -34,19 +34,21 @@ function activeBox(): { center: [number, number, number]; radius: number } | nul
  */
 export function frameDeps(): FrameDeps {
   return {
-    frameViews: ({ plan, scene }: FrameMeasure) => {
+    frameViews: ({ plan, scene }: FrameMeasure): boolean => {
       const global = globalThis as { __madoriPlanFit?: PlanFit }
       if (plan) {
-        global.__madoriPlanFit = (content, surface) => fitPlan(content, surface, plan.insets)
+        global.__madoriPlanFit = (content, surface) => fitPlan(content, surface, plan.insets, frameMargin(surface))
         window.dispatchEvent(new Event('madori:plan-fit'))
       } else {
         global.__madoriPlanFit = undefined
       }
       const box = scene ? activeBox() : null
       if (scene && box) {
-        const pose = fitCamera({ box, insets: scene.insets, canvas: scene.canvas, fov: FOV })
+        const pose = fitCamera({ box, insets: scene.insets, canvas: scene.canvas, fov: FOV, margin: frameMargin(scene.canvas) })
         Core.emitter.emit('camera-controls:apply-pose', { ...pose, fov: FOV, projection: Pascal.useViewer.getState().cameraMode } as never)
       }
+      // Sin lienzo o sin geometría todavía: la escena sigue cargando y el shell reintenta.
+      return (plan !== null || scene !== null) && (scene === null || box !== null)
     },
   }
 }

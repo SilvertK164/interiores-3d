@@ -108,39 +108,54 @@ test('Ambas: lo que se edita en una vista se ve en la otra', async ({ page }) =>
   await expect.poll(spot).not.toEqual(was)
 })
 
-test('Ambas: cada vista se encuadra a la planta completa sin quedar bajo los paneles', async ({ page }) => {
-  test.setTimeout(180_000)
-  await openSplit(page)
-  await page.waitForTimeout(2500)
+test('Ambas: al abrir el Concept store la planta baja queda activa y llena el panel 2D sin quedar bajo los paneles', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1920, height: 1080 })
+  await createProjectViaUi(page, { name: `E2E encuadre ${Date.now()}`, kind: 'comercio', template: 'Concept' })
+  await expect(dock(page)).toBeVisible({ timeout: 30_000 })
+  await viewButton(page, 'Ambas').click()
+  await page.waitForTimeout(2000)
+  // Se vuelve a abrir en Ambas (la vista se recuerda): el encuadre debe salir solo, sin esperar a un cambio de vista.
+  await page.reload()
+  await expect(dock(page)).toBeVisible({ timeout: 60_000 })
+  await page.waitForTimeout(9000)
+  const [ground] = (await hook(page, 'levels')) as { id: string; level: number }[]
+  expect((await hook(page, 'state')).levelId).toBe(ground?.id)
+  await expect(page.getByRole('complementary', { name: 'Nivel y ambientes' }).getByRole('button', { name: /Planta baja/ }).first()).toBeVisible()
+
+  await page.screenshot({ path: '../../.superpowers/ambas-encuadre.png' })
   const boxes = await page.evaluate(() => {
     const r = (el: Element | null | undefined) => {
       const b = el?.getBoundingClientRect()
       return b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null
     }
     const scene = document.querySelector('[data-floorplan-scene]') as SVGGElement | null
-    // Las paredes y muebles del nivel activo (el fondo y la cuadrícula del plano no cuentan).
-    const content = scene?.querySelector('[data-node-id]')?.parentElement
-    return {
-      svg: r(scene?.ownerSVGElement),
-      content: r(content),
-      left: r(document.querySelector('[data-frame-panel="left"]')),
-      bottom: r(document.querySelector('[data-frame-panel="bottom"]')),
+    // Caja envolvente de lo dibujado en la planta (muros, ambientes, losas, muebles, escaleras): sin el terreno ni las guías.
+    let minX = Number.POSITIVE_INFINITY
+    let minY = Number.POSITIVE_INFINITY
+    let maxX = Number.NEGATIVE_INFINITY
+    let maxY = Number.NEGATIVE_INFINITY
+    for (const el of scene?.querySelectorAll('[data-node-id]') ?? []) {
+      const b = el.getBoundingClientRect()
+      if (b.width === 0 && b.height === 0) continue
+      minX = Math.min(minX, b.x)
+      minY = Math.min(minY, b.y)
+      maxX = Math.max(maxX, b.right)
+      maxY = Math.max(maxY, b.bottom)
     }
+    return { svg: r(scene?.ownerSVGElement), content: { x: minX, y: minY, w: maxX - minX, h: maxY - minY }, left: r(document.querySelector('[data-frame-panel="left"]')), bottom: r(document.querySelector('[data-frame-panel="bottom"]')) }
   })
-  const { svg, content, left, bottom } = boxes as Record<string, { x: number; y: number; w: number; h: number } | null>
-  expect(svg && content && left && bottom).toBeTruthy()
-  const c = content as { x: number; y: number; w: number; h: number }
-  const l = left as { x: number; y: number; w: number; h: number }
-  const b = bottom as { x: number; y: number; w: number; h: number }
-  const s = svg as { x: number; y: number; w: number; h: number }
-  // Entra completa en el lienzo...
-  expect(c.x).toBeGreaterThanOrEqual(s.x - 1)
-  expect(c.x + c.w).toBeLessThanOrEqual(s.x + s.w + 1)
-  expect(c.y).toBeGreaterThanOrEqual(s.y - 1)
-  expect(c.y + c.h).toBeLessThanOrEqual(s.y + s.h + 1)
-  // ...y ni el panel de plantas ni el dock la tapan.
-  expect(c.x).toBeGreaterThanOrEqual(l.x + l.w - 1)
-  expect(c.y + c.h).toBeLessThanOrEqual(b.y + 1)
-  // Y llena una parte razonable de la zona libre (no queda chica en una esquina).
-  expect(c.w).toBeGreaterThan((s.w - (l.x + l.w - s.x)) * 0.5)
+  type Box = { x: number; y: number; w: number; h: number }
+  const { svg, content, left, bottom } = boxes as { svg: Box; content: Box; left: Box; bottom: Box }
+  // Entra completa en el lienzo y ni el panel de plantas ni el dock la tapan...
+  expect(content.x).toBeGreaterThanOrEqual(svg.x - 1)
+  expect(content.x + content.w).toBeLessThanOrEqual(svg.x + svg.w + 1)
+  expect(content.y).toBeGreaterThanOrEqual(svg.y - 1)
+  expect(content.y + content.h).toBeLessThanOrEqual(svg.y + svg.h + 1)
+  const sharesRows = content.y < left.y + left.h && content.y + content.h > left.y
+  if (sharesRows) expect(content.x).toBeGreaterThanOrEqual(left.x + left.w - 1)
+  const sharesColumns = content.x < bottom.x + bottom.w && content.x + content.w > bottom.x
+  if (sharesColumns) expect(content.y + content.h).toBeLessThanOrEqual(bottom.y + 1)
+  // ...y ocupa la mayor parte del panel (no queda diminuta como cuando se encuadraba el terreno).
+  expect(Math.max(content.w / svg.w, content.h / svg.h)).toBeGreaterThan(0.6)
 })

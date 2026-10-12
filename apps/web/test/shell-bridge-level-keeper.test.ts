@@ -12,7 +12,7 @@ const setup = (levelId: string | null = null) => {
   fake.scene.setState({ nodes: LOFT })
   select(fake, levelId)
   const setHideAbove = vi.fn()
-  const stop = createLevelKeeper({ ...fake.deps, setHideAbove }).start()
+  const stop = createLevelKeeper({ ...fake.deps, setHideAbove }, { userTouched: () => true }).start()
   return { ...fake, setHideAbove, stop }
 }
 
@@ -45,7 +45,7 @@ describe('nivel activo por defecto', () => {
   it('sin edificio o sin plantas no hace nada ni rompe', () => {
     const fake = createFakeDeps()
     select(fake, null)
-    createLevelKeeper({ ...fake.deps, setHideAbove: vi.fn() }).start()
+    createLevelKeeper({ ...fake.deps, setHideAbove: vi.fn() }, { userTouched: () => true }).start()
     expect(fake.viewer.getState().selection.levelId).toBeNull()
   })
 
@@ -64,7 +64,7 @@ describe('el 3D sigue a la planta activa en Editar', () => {
     fake.viewer.setState({ levelMode: 'exploded' })
     select(fake, 'level_a')
     const setHideAbove = vi.fn()
-    createLevelKeeper({ ...fake.deps, setHideAbove }).start()
+    createLevelKeeper({ ...fake.deps, setHideAbove }, { userTouched: () => true }).start()
     expect(setHideAbove).toHaveBeenLastCalledWith(true)
     expect(fake.viewer.getState().levelMode).toBe('stacked')
     fake.scene.setState({ readOnly: true })
@@ -76,5 +76,49 @@ describe('el 3D sigue a la planta activa en Editar', () => {
     const fake = setup('level_a')
     fake.stop()
     expect(fake.setHideAbove).toHaveBeenLastCalledWith(false)
+  })
+})
+
+describe('la planta inicial es siempre la de menor índice', () => {
+  const open = (levelId: string | null, options: { touched?: () => boolean; now?: () => number } = {}) => {
+    const fake = createFakeDeps()
+    fake.scene.setState({ nodes: LOFT })
+    select(fake, levelId)
+    let clock = 0
+    const keeper = createLevelKeeper({ ...fake.deps, setHideAbove: vi.fn() }, { now: options.now ?? (() => clock), userTouched: options.touched ?? (() => false) })
+    keeper.start()
+    return { ...fake, advance: (ms: number) => { clock += ms } }
+  }
+
+  it('si Pascal abre en una planta alta, vuelve a la planta baja', () => {
+    expect(open('level_b').viewer.getState().selection.levelId).toBe('level_a')
+  })
+
+  it('si Pascal vuelve a elegir una planta alta mientras la escena se asienta y nadie tocó nada, se corrige', () => {
+    const fake = open('level_a')
+    select(fake, 'level_b')
+    expect(fake.viewer.getState().selection.levelId).toBe('level_a')
+  })
+
+  it('si la persona ya interactuó, respeta su elección', () => {
+    const fake = open('level_a', { touched: () => true })
+    select(fake, 'level_b')
+    expect(fake.viewer.getState().selection.levelId).toBe('level_b')
+  })
+
+  it('pasado el tiempo de asentamiento, respeta la elección', () => {
+    const fake = open('level_a')
+    fake.advance(6000)
+    select(fake, 'level_b')
+    expect(fake.viewer.getState().selection.levelId).toBe('level_b')
+  })
+
+  it('si las plantas aparecen después (la escena carga más tarde), también empieza en la baja', () => {
+    const fake = createFakeDeps()
+    select(fake, null)
+    createLevelKeeper({ ...fake.deps, setHideAbove: vi.fn() }, { now: () => 0, userTouched: () => false }).start()
+    fake.scene.setState({ nodes: LOFT })
+    select(fake, 'level_b')
+    expect(fake.viewer.getState().selection.levelId).toBe('level_a')
   })
 })

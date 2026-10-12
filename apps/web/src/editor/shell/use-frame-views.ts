@@ -25,7 +25,14 @@ export function useFrameViews() {
       clearTimeout(timer)
       timer = setTimeout(() => bridge.frameViews(measureFrame()), SETTLE_MS)
     }
-    frame()
+    // Al abrir, la escena y los lienzos tardan en estar listos: se reintenta hasta encuadrar y una vez más cuando la geometría se asienta.
+    let tries = 0
+    let framed = 0
+    const retry = setInterval(() => {
+      tries++
+      if (framed < 2) framed = bridge.frameViews(measureFrame()) ? framed + 1 : 0
+      if (tries >= 30 || framed >= 2) clearInterval(retry)
+    }, 600)
     window.addEventListener('resize', frame)
     // El divisor de Ambas cambia el tamaño de los lienzos sin cambiar la ventana.
     const observer = new ResizeObserver(frame)
@@ -38,6 +45,7 @@ export function useFrameViews() {
     const rewatch = setTimeout(watch, SETTLE_MS * 2)
     return () => {
       clearTimeout(timer)
+      clearInterval(retry)
       clearTimeout(rewatch)
       window.removeEventListener('resize', frame)
       observer.disconnect()
