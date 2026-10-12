@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { Loader } from '@/components/Loader'
 import { useSession } from '@/lib/use-session'
 
 export default function Home() {
@@ -10,5 +11,5 @@ export default function Home() {
   useEffect(() => {
     if (!loading) router.replace(session ? '/proyectos' : '/login')
   }, [loading, session, router])
-  return <p className="p-6 text-muted-foreground">Cargando…</p>
+  return <Loader fullscreen />
 }

@@ -10,14 +10,18 @@
   --color-brand-wash: #dce6ff;
   --color-brand-mist: #eef3ff;
   --color-canvas: #eef2f8;
-  --color-ink: #0e1220;
+  /* Noche: la tinta de todo el texto (≈ 14:1 sobre canvas). Nunca como fondo: la interfaz es clara. */
+  --color-ink: #0b1f4d;
   --color-ink-muted: #5b6578;
-  /* Cálido: solo el sol del logo. */
-  --color-sun: #ffb35c;
+  /* Sol: cálido, solo para formas (el sol del logo y detalles). Nunca para texto: no pasa 4,5:1 sobre fondos claros. */
+  --color-sun: #ffb02e;
+  /* Cielo y Crema: fondos suaves de la marca (el vidrio de la ventana y la intro). */
+  --color-sky: #cfe0ff;
+  --color-cream: #fff4e2;
   --color-ok: #0f6b46;
   --color-ok-dot: #1fa971;
-  --shadow-soft: 0 10px 30px rgb(14 18 32 / 0.08);
-  --shadow-lift: 0 18px 50px rgb(14 18 32 / 0.14);
+  --shadow-soft: 0 10px 30px rgb(11 31 77 / 0.08);
+  --shadow-lift: 0 18px 50px rgb(11 31 77 / 0.14);
   --shadow-brand: 0 8px 20px rgb(31 95 224 / 0.28);
 }
 
@@ -106,7 +110,7 @@
   background: transparent;
   color: var(--color-ink);
   &:hover:not(:disabled) {
-    background: rgb(14 18 32 / 0.06);
+    background: rgb(11 31 77 / 0.06);
   }
 }
 
@@ -118,7 +122,7 @@
   background: rgb(255 255 255 / 0.75);
   padding-inline: 1.25rem;
   font-size: 0.9375rem;
-  box-shadow: inset 0 0 0 1px rgb(14 18 32 / 0.06);
+  box-shadow: inset 0 0 0 1px rgb(11 31 77 / 0.06);
   outline: none;
   transition: box-shadow 180ms ease-out;
   &::placeholder {
@@ -145,14 +149,14 @@
   -webkit-backdrop-filter: blur(22px) saturate(1.3);
   backdrop-filter: blur(22px) saturate(1.3);
   box-shadow:
-    0 2px 6px rgb(14 18 32 / 0.06),
-    0 30px 80px rgb(14 18 32 / 0.22);
+    0 2px 6px rgb(11 31 77 / 0.06),
+    0 30px 80px rgb(11 31 77 / 0.22);
 }
 .app-dialog[open] {
   animation: app-pop 220ms ease-out;
 }
 .app-dialog::backdrop {
-  background: rgb(14 18 32 / 0.28);
+  background: rgb(11 31 77 / 0.28);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
@@ -185,7 +189,7 @@
     backdrop-filter: none;
   }
   .app-dialog::backdrop {
-    background: rgb(14 18 32 / 0.55);
+    background: rgb(11 31 77 / 0.55);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

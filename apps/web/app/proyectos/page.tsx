@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { AppHeader } from '@/components/AppHeader'
 import { AppShell } from '@/components/AppShell'
+import { Loader } from '@/components/Loader'
 import { NewProjectDialog } from '@/components/NewProjectDialog'
 import { ProjectsSection } from '@/components/ProjectsSection'
 import { TemplateGallery } from '@/components/TemplateGallery'
@@ -47,7 +48,13 @@ export default function ProjectsPage() {
   const closeDialog = () => setDialog((d) => ({ ...d, open: false }))
   const signOut = () => supabaseBrowser().auth.signOut().then(() => router.replace('/login'))
 
-  if (loading || !session) return <AppShell><p className="p-6 text-ink-muted">Cargando…</p></AppShell>
+  if (loading || !session) {
+    return (
+      <AppShell>
+        <Loader fullscreen />
+      </AppShell>
+    )
+  }
 
   // La fecha y la hora solo se usan aquí, después de cargar la sesión (en el navegador): no hay diferencias con el servidor.
   const now = new Date()

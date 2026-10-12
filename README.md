@@ -1,4 +1,4 @@
-# Interiores — diseñador de interiores 2D y 3D
+# Madori — diseñador de interiores 2D y 3D
 
 TP final de IISAIA (FIUBA) de **Silvert Quispe** y **Victoria Villalba**. Diseña viviendas y comercios en un editor 2D/3D, guarda cada proyecto en tu cuenta y lo vuelve a abrir desde cualquier navegador.
 

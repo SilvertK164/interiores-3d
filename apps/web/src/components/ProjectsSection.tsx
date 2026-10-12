@@ -1,5 +1,6 @@
 import type { ProjectSummary } from '@interiores/contract'
 import { Plus, Search } from 'lucide-react'
+import { Loader } from './Loader'
 import { Logo } from './Logo'
 import { ProjectCard } from './ProjectCard'
 
@@ -19,7 +20,13 @@ const PANEL = 'glass grid min-h-0 place-items-center rounded-[28px] p-4 text-cen
 /** Fila "Tus proyectos": tarjetas con scroll horizontal interno, invitación si no hay ninguno, o aviso si falló la carga. */
 export function ProjectsSection({ projects, visible, query, error, now, onNew }: Props) {
   if (error) return <p className={`${PANEL} text-sm text-destructive`} role="alert">{error}</p>
-  if (projects === null) return <p className={`${PANEL} text-sm text-ink-muted`}>Cargando tus proyectos…</p>
+  if (projects === null) {
+    return (
+      <div className={PANEL}>
+        <Loader label="Cargando tus proyectos" />
+      </div>
+    )
+  }
   if (projects.length === 0) {
     return (
       <div className={PANEL}>

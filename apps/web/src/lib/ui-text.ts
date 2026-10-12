@@ -1,7 +1,7 @@
 import type { ProjectKind } from '@interiores/contract'
 
 /** Nombre de la plataforma: único lugar donde se escribe (logo, login y título de las páginas). Para cambiarlo, edita esta línea. */
-export const APP_NAME = 'Interiores 3D'
+export const APP_NAME = 'Madori'
 
 /** Textos pequeños de la interfaz: funciones puras (la hora actual se pasa como parámetro para poder probarlas). */
 
