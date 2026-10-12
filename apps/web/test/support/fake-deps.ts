@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 import type { BridgeDeps } from '../../src/editor/shell/bridge'
 import type { EditorLike, EditorMode, HistoryState, SceneLike, SnapContext, SnapMode, ViewerLike } from '../../src/editor/shell/bridge/types'
 import type { MaterialItemLike } from '../../src/editor/shell/materials-model'
+import type { LevelMeasure, PlanBuildArgs, PlanResult } from '../../src/lib/export/types'
 
 /** Biblioteca de materiales de mentira: un color liso, una madera y un techo. */
 export const FAKE_MATERIALS: MaterialItemLike[] = [
@@ -127,6 +128,8 @@ export function createFakeDeps() {
     deleteLevel: vi.fn(),
     armNodePatch: vi.fn(),
     clearNodePatch: vi.fn(),
+    measureLevels: vi.fn(async (): Promise<LevelMeasure[]> => []),
+    buildPlan: vi.fn(async (_args: PlanBuildArgs): Promise<PlanResult> => ({ blob: new Blob(['%PDF-1.4']), pages: 1, skippedImages: 0 })),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

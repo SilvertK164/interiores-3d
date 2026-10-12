@@ -50,7 +50,8 @@ function toUnicodeMap(cmap: string): Map<number, string> {
     for (const [, low, high, single, list] of (block[1] ?? '').matchAll(range)) {
       const first = Number.parseInt(low ?? '', 16)
       const last = Number.parseInt(high ?? '', 16)
-      const targets = list ? [...list.matchAll(/<([0-9a-fA-F]+)>/g)].map((m) => utf16(m[1] ?? '')) : []
+      // Una ligadura ("fi") es un solo destino con dos caracteres: `<0066 0069>`.
+      const targets = list ? [...list.matchAll(/<([0-9a-fA-F\s]+)>/g)].map((m) => utf16((m[1] ?? '').replace(/\s+/g, ''))) : []
       for (let code = first; code <= last; code++) {
         map.set(code, single ? String.fromCharCode(Number.parseInt(single, 16) + code - first) : (targets[code - first] ?? ''))
       }
