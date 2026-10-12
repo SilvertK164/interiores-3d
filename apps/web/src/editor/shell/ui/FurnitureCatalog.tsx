@@ -26,7 +26,7 @@ function Card({ card, onPick }: { card: CatalogCard; onPick: (id: string) => voi
         )}
       >
         <span className="relative block aspect-[4/3] w-full overflow-hidden rounded-[14px] bg-[#F1F5FC]">
-          {/* biome-ignore lint/performance/noImgElement: miniaturas propias de 512 px, ya optimizadas (webp con fondo transparente) */}
+          {/* biome-ignore lint/performance/noImgElement: miniaturas propias de 256 px, ya optimizadas (webp con fondo transparente) */}
           <img
             src={card.thumbnail}
             alt=""
