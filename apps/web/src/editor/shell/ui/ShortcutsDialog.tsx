@@ -20,7 +20,18 @@ export function ShortcutsDialog({
     else if (!open && dialog.open) dialog.close()
   }, [open])
   return (
-    <dialog ref={ref} aria-label="Atajos de teclado" onClose={onClose} className="app-dialog max-w-[480px]">
+    <dialog
+      ref={ref}
+      aria-label="Atajos de teclado"
+      onClose={onClose}
+      onKeyDown={(event) => {
+        // Pascal también escucha Esc y el cierre nativo no llega: el diálogo se cierra aquí.
+        if (event.key !== 'Escape') return
+        event.preventDefault()
+        ref.current?.close()
+      }}
+      className="app-dialog max-w-[480px]"
+    >
       <form method="dialog" className="flex flex-col gap-4 p-6">
         <h2 className="font-display text-xl font-bold tracking-[-0.02em]">Atajos de teclado</h2>
         <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-2 text-[14px]">
