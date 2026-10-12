@@ -130,7 +130,7 @@ Los llena la Tarea 0 (la 0a mide el parche; la 0b y la 0c, el resto). Las tareas
 <!-- spike-resultados -->
 | Experimento | Resultado | Fecha |
 |---|---|---|
-| (a) Parche | sin medir: lo mide la Tarea 0a | — |
+| (a) Parche | Funciona (patch en pnpm-workspace.yaml) | 2026-10-12 |
 | (b) Recorrer | sin medir: lo mide la Tarea 0b | — |
 | (c) Cámara y estilo de la Vista 3D | sin medir: lo mide la Tarea 0b | — |
 | (d) Colocar un mueble desde `structure` | sin medir: lo mide la Tarea 0b | — |
