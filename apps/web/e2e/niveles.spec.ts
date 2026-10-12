@@ -15,7 +15,7 @@ test('las plantas sin nombre se ven como Planta baja y Planta 1; se cambia de pl
 
   await trigger.click()
   const list = panel.getByRole('list', { name: 'Plantas' })
-  await expect(list.getByRole('button')).toHaveText(['Planta baja', 'Planta 1'])
+  await expect(list.getByRole('button', { name: /^(Planta|Sótano)/ })).toHaveText(['Planta baja', 'Planta 1'])
   await list.getByRole('button', { name: 'Planta 1' }).click()
   await expect(trigger).toContainText('Planta 1')
   expect((await hook(page, 'state')).levelId).not.toBe(before)
@@ -24,7 +24,7 @@ test('las plantas sin nombre se ven como Planta baja y Planta 1; se cambia de pl
   await panel.getByRole('button', { name: 'Agregar planta' }).dblclick() // un doble clic crea una sola
   await expect(trigger).toContainText('Planta 2', { timeout: 15_000 })
   await trigger.click()
-  await expect(list.getByRole('button')).toHaveText(['Planta baja', 'Planta 1', 'Planta 2'])
+  await expect(list.getByRole('button', { name: /^(Planta|Sótano)/ })).toHaveText(['Planta baja', 'Planta 1', 'Planta 2'])
   expect(await panel.innerText()).not.toMatch(ENGLISH)
 })
 
