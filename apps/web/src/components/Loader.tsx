@@ -6,24 +6,24 @@ import './Loader.css'
 import { MadoriWindow } from './MadoriWindow'
 
 type Props = {
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md'
   /** Texto para lectores de pantalla y, por defecto, también visible bajo la ventana. */
   label?: string
   /** `false` deja el texto solo para lectores de pantalla. */
   showLabel?: boolean
-  /** Ocupa toda la pantalla (página o editor que aún no se mostró). */
-  fullscreen?: boolean
   /** Ventana y texto en una fila (para junto a un botón o dentro de un formulario). */
   inline?: boolean
   className?: string
 }
 
-/** Estado de carga de Madori: el sol sube por la ventana y un anillo de luz se expande. Con "reducir movimiento" queda quieto. */
+/**
+ * Estado de carga compacto de Madori (botones, formularios, listas): la ventana pequeña, el sol sube y un anillo de luz
+ * se expande. Con "reducir movimiento" queda quieto. Las pantallas completas usan `LoaderPortal`.
+ */
 export function Loader({
   size = 'md',
   label = 'Abriendo tu espacio',
   showLabel = true,
-  fullscreen = false,
   inline = false,
   className = '',
 }: Props) {
@@ -31,7 +31,6 @@ export function Loader({
   const classes = [
     'madori-loader',
     `madori-loader--${size}`,
-    fullscreen && 'madori-loader--screen',
     inline && 'madori-loader--inline',
     className,
   ].filter(Boolean)

@@ -1,4 +1,4 @@
-import { WINDOW } from '@/lib/brand'
+import { splitAtO, WINDOW } from '@/lib/brand'
 import { APP_NAME } from '@/lib/ui-text'
 import './Logo.css'
 import { MadoriWindow } from './MadoriWindow'
@@ -10,15 +10,9 @@ type Props = {
   className?: string
 }
 
-/** El nombre se parte en la primera "o", que se dibuja como la ventana. */
-function splitAtO(name: string): [string, string] | null {
-  const i = name.toLowerCase().indexOf('o')
-  return i < 0 ? null : [name.slice(0, i), name.slice(i + 1)]
-}
-
 /**
  * Marca de Madori. Con `showName` es el logotipo (letras en Fraunces y la "o" como ventana con el sol); sin él, el
- * icono circular, que es decorativo. Siempre estático: solo el Loader y la intro se animan.
+ * icono (cuadrado Crema con la ventana), que es decorativo. Siempre estático: solo el Loader y la intro se animan.
  */
 export function Logo({ size, showName = false, className = '' }: Props) {
   const parts = showName ? splitAtO(APP_NAME) : null

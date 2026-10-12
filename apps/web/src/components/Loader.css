@@ -14,15 +14,6 @@
   animation: madori-fade 220ms ease-out both;
 }
 
-/* Pantalla completa: centrado y sobre el mismo fondo claro de la interfaz. */
-.madori-loader--screen {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  min-height: 100dvh;
-  background: #eef2f8;
-}
-
 .madori-loader__win {
   display: block;
   width: auto;
@@ -33,9 +24,6 @@
 }
 .madori-loader--md .madori-loader__win {
   height: 72px;
-}
-.madori-loader--lg .madori-loader__win {
-  height: 112px;
 }
 
 /* En fila: la ventana va a la izquierda y el texto a la derecha. */
@@ -54,9 +42,6 @@
 }
 .madori-loader--sm .madori-loader__label {
   font-size: 0.8125rem;
-}
-.madori-loader--lg .madori-loader__label {
-  font-size: 1rem;
 }
 
 /* Texto solo para lectores de pantalla. */

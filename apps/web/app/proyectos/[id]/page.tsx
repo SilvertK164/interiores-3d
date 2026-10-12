@@ -3,16 +3,14 @@
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { use, useEffect, useRef } from 'react'
-import { Loader } from '@/components/Loader'
+import { LoaderPortal } from '@/components/LoaderPortal'
 import { sessionGate } from '@/lib/session-gate'
 import { useSession } from '@/lib/use-session'
-
-const OPENING = 'Abriendo tu proyecto'
 
 // El editor usa WebGPU y el DOM: nunca se renderiza en el servidor.
 const ProjectEditor = dynamic(() => import('@/editor/ProjectEditor'), {
   ssr: false,
-  loading: () => <Loader fullscreen label={OPENING} size="lg" />,
+  loading: () => <LoaderPortal />,
 })
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +24,6 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   useEffect(() => {
     if (gate === 'login') router.replace('/login')
   }, [gate, router])
-  if (gate !== 'show') return <Loader fullscreen label={OPENING} size="lg" />
+  if (gate !== 'show') return <LoaderPortal />
   return <ProjectEditor projectId={id} />
 }

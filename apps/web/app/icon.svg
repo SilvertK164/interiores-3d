@@ -1,9 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Madori">
   <title>Madori</title>
-  <circle cx="32" cy="32" r="29" fill="#1F5FE0"/>
-  <g transform="translate(15 15) scale(.53)">
-    <circle cx="32" cy="39" r="11.5" fill="none" stroke="#FFB02E" stroke-width="2.2"/>
-    <circle cx="32" cy="39" r="9" fill="#FFB02E"/>
-    <path d="M7 46V32A25 25 0 0 1 57 32V46A12 12 0 0 1 45 58H19A12 12 0 0 1 7 46Z" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linejoin="round"/>
+  <rect width="64" height="64" rx="15" fill="#FFF4E2"/>
+  <g transform="translate(13.7 13.4) scale(.6)">
+    <path d="M7 46V32A25 25 0 0 1 57 32V46A12 12 0 0 1 45 58H19A12 12 0 0 1 7 46Z" fill="none" stroke="#0B1F4D" stroke-width="11" stroke-linejoin="round"/>
+    <circle cx="32" cy="39" r="10" fill="#FFB02E"/>
   </g>
 </svg>

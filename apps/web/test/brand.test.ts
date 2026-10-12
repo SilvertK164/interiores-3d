@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { Loader } from '../src/components/Loader'
 import { Logo } from '../src/components/Logo'
-import { BRAND, WINDOW } from '../src/lib/brand'
+import { BRAND, ICON, WINDOW } from '../src/lib/brand'
 import { APP_NAME } from '../src/lib/ui-text'
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8')
@@ -19,19 +19,30 @@ describe('nombre de la plataforma', () => {
   it('es Madori', () => expect(APP_NAME).toBe('Madori'))
 })
 
-describe('icono (logo.svg y favicon)', () => {
+describe('icono (logo.svg y favicon): ventana Noche y Sol sobre un cuadrado Crema', () => {
+  it('logo.svg y el favicon son el mismo dibujo', () => {
+    expect(svgs['app/icon.svg']).toBe(svgs['public/logo.svg'])
+  })
   for (const [name, svg] of Object.entries(svgs)) {
-    it(`${name} usa Cobalto y Sol, dibuja la ventana y no menciona el nombre anterior`, () => {
-      expect(svg).toContain('#FFB02E')
-      expect(svg).toContain('#1F5FE0')
+    it(`${name} usa Crema de fondo, la ventana en Noche y el sol, sin Cobalto ni círculo de fondo`, () => {
+      expect(svg).toContain(BRAND.crema)
+      expect(svg).toContain(BRAND.noche)
+      expect(svg).toContain(BRAND.sol)
+      expect(svg).not.toMatch(/#1F5FE0/i)
       expect(svg).not.toMatch(/interiores/i)
       expect(svg).toContain('aria-label="Madori"')
       expect(svg).toContain(WINDOW.frame)
     })
-    it(`${name} no lleva degradados ni fondos oscuros`, () => {
-      expect(svg).not.toMatch(/gradient/i)
-      expect(svg).not.toMatch(/#0b1f4d|#000/i)
+    it(`${name} es un cuadrado redondeado, sin anillo y con un único círculo: el sol`, () => {
+      expect(svg).toMatch(new RegExp(`<rect[^>]*rx="${ICON.radius}"[^>]*fill="${BRAND.crema}"`, 'i'))
+      expect(svg).toContain(`transform="${ICON.transform}"`)
+      const circles = svg.match(/<circle[^>]*>/g) ?? []
+      expect(circles).toHaveLength(1)
+      expect(circles[0]).toContain(`r="${ICON.sunRadius}"`)
+      expect(circles[0]).toContain(`fill="${BRAND.sol}"`)
+      expect(svg).not.toMatch(/stroke-width="2\.2"/)
     })
+    it(`${name} no lleva degradados`, () => expect(svg).not.toMatch(/gradient/i))
   }
 })
 
@@ -67,7 +78,7 @@ describe('Logo', () => {
     const html = renderToStaticMarkup(createElement(Logo, { showName: true }))
     expect(html).not.toMatch(/madori-loader|animation|<animate/)
   })
-  it('sin showName es el icono circular y decorativo', () => {
+  it('sin showName es el icono (cuadrado Crema) y decorativo', () => {
     const html = renderToStaticMarkup(createElement(Logo, { size: 40 }))
     expect(html).toContain('src="/logo.svg"')
     expect(html).toContain('width="40"')
@@ -76,7 +87,7 @@ describe('Logo', () => {
   })
 })
 
-describe('Loader', () => {
+describe('Loader (compacto, para botones y acciones)', () => {
   it('anuncia el estado de carga con un texto en castellano configurable', () => {
     const base = renderToStaticMarkup(createElement(Loader))
     expect(base).toContain('role="status"')
@@ -85,13 +96,18 @@ describe('Loader', () => {
       renderToStaticMarkup(createElement(Loader, { label: 'Cargando tus proyectos' })),
     ).toContain('Cargando tus proyectos')
   })
-  it('tiene tres tamaños', () => {
-    for (const size of ['sm', 'md', 'lg'] as const) {
+  it('tiene dos tamaños y ya no tiene versión de pantalla completa (es LoaderPortal)', () => {
+    for (const size of ['sm', 'md'] as const) {
       expect(renderToStaticMarkup(createElement(Loader, { size }))).toContain(
         `madori-loader--${size}`,
       )
       expect(loaderCss).toContain(`.madori-loader--${size}`)
     }
+    expect(loaderCss).not.toContain('--lg')
+    expect(loaderCss).not.toContain('--screen')
+  })
+  it('es solo la ventana: sin letras del logotipo', () => {
+    expect(renderToStaticMarkup(createElement(Loader, { showLabel: false }))).not.toContain('Madori')
   })
   it('su CSS respeta prefers-reduced-motion y deja el sol visible', () => {
     expect(loaderCss).toContain('prefers-reduced-motion')

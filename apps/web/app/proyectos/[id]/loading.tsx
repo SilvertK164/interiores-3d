@@ -1,6 +1,6 @@
-import { Loader } from '@/components/Loader'
+import { LoaderPortal } from '@/components/LoaderPortal'
 
-/** El editor no usa `AppShell` ni sus tokens: el Loader lleva sus propios colores. */
+/** El editor no usa `AppShell` ni sus tokens: el portal lleva sus propios colores. */
 export default function Loading() {
-  return <Loader fullscreen label="Abriendo tu proyecto" size="lg" />
+  return <LoaderPortal />
 }

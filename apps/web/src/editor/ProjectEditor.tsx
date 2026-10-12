@@ -5,7 +5,7 @@ import { CATALOG_ITEMS, Editor, ItemsPanel, type SceneGraph } from '@pascal-app/
 import { builtinPlugin } from '@pascal-app/nodes'
 import { Sofa, Store } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Loader } from '@/components/Loader'
+import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
@@ -112,7 +112,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     [items, commerceItems],
   )
 
-  if (phase.kind === 'loading') return <Loader fullscreen label="Abriendo tu proyecto" size="lg" />
+  if (phase.kind === 'loading') return <LoaderPortal />
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>
 
   return (

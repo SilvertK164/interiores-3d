@@ -4,7 +4,7 @@ import { ArrowRight, FlaskConical, LoaderCircle, ScanSearch, Wrench } from 'luci
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
-import { Loader } from '@/components/Loader'
+import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
 import { analysisToDefinition } from '@/lib/lab/analysis-to-definition'
 import { analyzeRoom } from '@/lib/lab/analyze-room'
@@ -137,7 +137,7 @@ export default function LaboratorioPage() {
 
   const loft = TEMPLATE_DEFINITIONS.find((d) => d.id === 'loft')
 
-  if (loading || !session) return <Loader fullscreen />
+  if (loading || !session) return <LoaderPortal label="Abriendo el laboratorio" />
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">

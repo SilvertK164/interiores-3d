@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { Loader } from '@/components/Loader'
+import { LoaderPortal } from '@/components/LoaderPortal'
+import { APP_NAME } from '@/lib/ui-text'
 import { useSession } from '@/lib/use-session'
 
 export default function Home() {
@@ -11,5 +12,5 @@ export default function Home() {
   useEffect(() => {
     if (!loading) router.replace(session ? '/proyectos' : '/login')
   }, [loading, session, router])
-  return <Loader fullscreen />
+  return <LoaderPortal label={`Abriendo ${APP_NAME}`} />
 }

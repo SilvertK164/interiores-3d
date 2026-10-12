@@ -23,6 +23,25 @@ export const WINDOW = {
   glass: 'M12.5 46V32A19.5 19.5 0 0 1 51.5 32V46A6.5 6.5 0 0 1 45 52.5H19A6.5 6.5 0 0 1 12.5 46Z',
   sun: { cx: 32, cy: 39, r: 9 },
   ring: { r: 11.5, strokeWidth: 2.2 },
+  /** Rayos del sol del portal (Loader de pantalla completa): distancias al centro del sol. */
+  rays: { count: 12, inner: 13.5, outer: 17.5, strokeWidth: 2.6 },
   /** Cuánto baja el sol (unidades de la caja) para quedar oculto bajo el vidrio. */
   hidden: 26,
 } as const
+
+/**
+ * Icono de la aplicación y favicon: cuadrado redondeado Crema con la ventana Noche y el sol, sin anillo. Va sobre
+ * Crema (y no transparente) para que se lea igual en pestañas claras y oscuras. Caja de 64 × 64; `transform` coloca y
+ * reduce la ventana; el sol es algo mayor que el del logotipo para que se vea a 16 px.
+ */
+export const ICON = {
+  radius: 15,
+  transform: 'translate(13.7 13.4) scale(.6)',
+  sunRadius: 10,
+} as const
+
+/** Parte un nombre en su primera "o" (la que se dibuja como ventana). `null` si no tiene ninguna. */
+export function splitAtO(name: string): [string, string] | null {
+  const i = name.toLowerCase().indexOf('o')
+  return i < 0 ? null : [name.slice(0, i), name.slice(i + 1)]
+}

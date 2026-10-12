@@ -1,6 +1,6 @@
-import { Loader } from '@/components/Loader'
+import { LoaderPortal } from '@/components/LoaderPortal'
 
-/** La página del laboratorio solo espera la sesión: el Loader basta, igual que dentro de la página. */
+/** La página del laboratorio solo espera la sesión: el portal basta, igual que dentro de la página. */
 export default function Loading() {
-  return <Loader fullscreen />
+  return <LoaderPortal label="Abriendo el laboratorio" />
 }
