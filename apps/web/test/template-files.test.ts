@@ -16,7 +16,7 @@ describe.each(TEMPLATE_DEFINITIONS.map((d) => [d.id, d] as const))('plantilla %s
     expect(statSync(file(`${id}.jpg`)).size, 'la captura parece vacía').toBeGreaterThan(20_000)
   })
 
-  it('es un SceneEnvelope válido que cabe en 5 MB', () => {
+  it('es un SceneEnvelope válido que cabe en 4 MB', () => {
     const envelope = JSON.parse(text)
     expect(SceneEnvelopeSchema.safeParse(envelope).success).toBe(true)
     expect(text.length).toBeLessThan(SCENE_MAX_BYTES)

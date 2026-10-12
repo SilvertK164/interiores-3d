@@ -11,6 +11,7 @@ export const ERROR_CODES = {
   invalid: 'datos_invalidos',
   conflict: 'version_desactualizada',
   tooLarge: 'escena_demasiado_grande',
+  projectLimit: 'limite_de_proyectos',
   preconditionRequired: 'falta_if_match',
   internal: 'error_interno',
 } as const

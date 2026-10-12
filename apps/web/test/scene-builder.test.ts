@@ -236,7 +236,7 @@ describe('buildScene', () => {
     expect(b.position).toEqual([-2, 0.78, -1])
   })
 
-  it('es determinista y cabe en un SceneEnvelope válido de mucho menos de 5 MB', () => {
+  it('es determinista y cabe en un SceneEnvelope válido de mucho menos de 4 MB', () => {
     expect(JSON.stringify(buildScene(def, ASSETS))).toBe(JSON.stringify(graph))
     const envelope = { schemaVersion: 1, pascal: { core: '1.0.3' }, graph }
     expect(SceneEnvelopeSchema.safeParse(envelope).success).toBe(true)

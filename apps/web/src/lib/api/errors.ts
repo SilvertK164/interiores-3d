@@ -15,7 +15,7 @@ export function friendlyMessage(err: unknown): string {
     case 409:
       return 'Este proyecto cambió desde otra pestaña y tiene una versión más nueva.'
     case 413:
-      return 'La escena supera el límite de 5 MB y no se puede guardar.'
+      return 'La escena supera el límite de 4 MB y no se puede guardar.'
     case 422:
       return err.message
     default:

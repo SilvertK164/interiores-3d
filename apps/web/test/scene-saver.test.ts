@@ -187,7 +187,7 @@ describe('createSceneSaver — cierre de la página, sesión y rechazos', () => 
 
   it('un rechazo definitivo (413, 422, 404) no se reintenta y conserva el mensaje', async () => {
     const seen: [SaverStatus, string | undefined][] = []
-    const message = 'La escena supera el límite de 5 MB y no se puede guardar.'
+    const message = 'La escena supera el límite de 4 MB y no se puede guardar.'
     let calls = 0
     const saver = createSceneSaver<Payload>({
       initialVersion: 1,
@@ -202,6 +202,6 @@ describe('createSceneSaver — cierre de la página, sesión y rechazos', () => 
     await vi.advanceTimersByTimeAsync(60_000)
     expect(calls).toBe(1)
     expect(seen.at(-1)).toEqual(['rejected', message])
-    await expect(saver.save({ n: 2 })).rejects.toThrow('5 MB')
+    await expect(saver.save({ n: 2 })).rejects.toThrow('4 MB')
   })
 })

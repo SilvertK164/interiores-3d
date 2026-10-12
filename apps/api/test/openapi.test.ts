@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import {
   CreateProjectBodySchema,
+  ERROR_CODES,
   ErrorBodySchema,
   ProjectCreatedSchema,
   ProjectDetailSchema,
@@ -54,6 +55,15 @@ describe('openapi.yaml', () => {
     const fromYaml = spec.components.schemas[name] as { properties?: object; required?: string[] }
     expect(Object.keys(fromYaml.properties ?? {}).sort()).toEqual(Object.keys(fromZod.properties ?? {}).sort())
     expect([...(fromYaml.required ?? [])].sort()).toEqual([...(fromZod.required ?? [])].sort())
+  })
+
+  it('ErrorBody enumera todos los códigos de error del contrato', () => {
+    expect([...spec.components.schemas.ErrorBody.properties.error.properties.code.enum].sort()).toEqual(Object.values(ERROR_CODES).sort())
+  })
+
+  it('documenta el tope de proyectos y los límites de la base en las respuestas 422 y 413', () => {
+    expect(spec.components.responses.ValidationError.description).toMatch(/limite_de_proyectos/)
+    expect(spec.components.responses.TooLarge.description).toMatch(/4 MB/)
   })
 
   it('TemplateId usa el mismo patrón que TemplateIdSchema y que la columna template_id', () => {

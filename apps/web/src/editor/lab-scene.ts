@@ -28,7 +28,7 @@ export function buildLabEnvelope(definition: TemplateDefinition, assets: Readonl
   }
   const envelope = SceneEnvelopeSchema.parse({ schemaVersion: SCHEMA_VERSION, pascal: { core: PASCAL_CORE_VERSION }, graph })
   if (new TextEncoder().encode(JSON.stringify(envelope)).length > SCENE_MAX_BYTES) {
-    throw new LabError('La escena supera el límite de 5 MB y no se puede guardar.', 'escena_demasiado_grande')
+    throw new LabError('La escena supera el límite de 4 MB y no se puede guardar.', 'escena_demasiado_grande')
   }
   return envelope
 }

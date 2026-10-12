@@ -226,7 +226,7 @@ describe('PUT /v1/projects/:id/scene', () => {
     expect(res.statusCode).toBe(404)
   })
 
-  it('una escena mayor de 5 MB responde 413 con mensaje en castellano', async () => {
+  it('una escena mayor de 4 MB responde 413 con mensaje en castellano', async () => {
     const p = await createProject()
     const big = { ...emptyEnvelope(), graph: { nodes: { x: 'a'.repeat(SCENE_MAX_BYTES + 10) }, rootNodeIds: [] } }
     const res = await put(p.id, { ...headersA, 'if-match': '1', 'content-type': 'application/json' }, JSON.stringify(big))

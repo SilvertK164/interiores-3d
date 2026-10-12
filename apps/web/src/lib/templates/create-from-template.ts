@@ -35,7 +35,7 @@ async function loadTemplate(templateId: string, fetchImpl: typeof fetch): Promis
   }
   if (!response.ok) throw new TemplateError('No pudimos cargar la plantilla. Inténtalo de nuevo en unos segundos.')
   const text = await response.text()
-  if (new TextEncoder().encode(text).length > SCENE_MAX_BYTES) throw new TemplateError('La plantilla supera el límite de 5 MB.')
+  if (new TextEncoder().encode(text).length > SCENE_MAX_BYTES) throw new TemplateError('La plantilla supera el límite de 4 MB.')
   let json: unknown
   try {
     json = JSON.parse(text)

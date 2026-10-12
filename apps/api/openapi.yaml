@@ -178,7 +178,9 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorBody'
     ValidationError:
-      description: Los datos enviados no cumplen el contrato
+      description: >-
+        Los datos enviados no cumplen el contrato o un límite de la base de datos. Al crear un proyecto, también
+        responde 422 con code limite_de_proyectos cuando la persona ya tiene 50.
       content:
         application/json:
           schema:
@@ -190,7 +192,7 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorBody'
     TooLarge:
-      description: La escena supera los 5 MB
+      description: La escena supera los 4 MB (en la API o en la base de datos)
       content:
         application/json:
           schema:
@@ -319,5 +321,15 @@ components:
           type: object
           required: [code, message]
           properties:
-            code: { type: string }
+            code:
+              type: string
+              enum:
+                - no_autenticado
+                - no_encontrado
+                - datos_invalidos
+                - version_desactualizada
+                - escena_demasiado_grande
+                - limite_de_proyectos
+                - falta_if_match
+                - error_interno
             message: { type: string }

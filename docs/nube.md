@@ -26,7 +26,8 @@ npx --yes supabase@2.120.0 db push
 
 - `login` abre el navegador. `link` y `db push` pueden pedir la contraseña de la base: **la escribe la persona en su terminal**; nunca va en un archivo ni en el chat. (`pnpm supabase …` es el mismo comando, atajo de `package.json`.)
 - Para `prod`, repite `link` y `db push` con su ref cuando vayas a desplegar (paso 6). `link` queda guardado en `supabase/.temp/` (git lo ignora): antes de cada `db push` confirma a qué proyecto estás enlazado.
-- Comprueba con `npx --yes supabase@2.120.0 migration list` (hoy hay dos migraciones en `supabase/migrations/`) y mirando las tablas en el **Table Editor** del panel.
+- Comprueba con `npx --yes supabase@2.120.0 migration list` (hoy hay tres migraciones en `supabase/migrations/`) y mirando las tablas en el **Table Editor** del panel.
+- **Migración 003 (`20261012120000_003_limits.sql`): aplícala a `madori-dev` y a producción ANTES de desplegar la API con el límite de 4 MB.** Añade los límites de la base (escena de 4 MiB como máximo y con la forma del contrato, nombre de proyecto de 1 a 80 caracteres sin caracteres de control, tope de 50 proyectos por persona). Es la misma `db push`; las restricciones se crean `NOT VALID` y se validan solas si las filas existentes las cumplen (si no, la CLI muestra un NOTICE y quedan activas solo para filas nuevas). Después de aplicarla, comprueba en el SQL Editor: `select conname, convalidated from pg_constraint where conname in ('project_scenes_scene_size','project_scenes_scene_shape','projects_name_clean');`.
 - Nada de editar tablas a mano en el panel: todo cambio de esquema es una migración nueva, por PR, y la aplica una sola persona.
 
 ## 3. Ajustes de Auth (en el panel de cada proyecto)
@@ -153,5 +154,5 @@ Son dos pasadas porque la web necesita la URL de la API para compilar y la API n
 ## 10. Límites y riesgos conocidos
 
 - **Planes y cuotas:** no los afirmamos acá. **Revisa los límites vigentes** de Supabase y de Vercel (qué pasa con proyectos inactivos, correos, ancho de banda, funciones) antes de depender de ellos para la demo.
-- **Tamaño del cuerpo:** Vercel rechaza peticiones de más de 4,5 MB a una función (`413 FUNCTION_PAYLOAD_TOO_LARGE`, documentación de Vercel del 2026-10-11) y nuestra API admite escenas de hasta 5 MB. Una escena de entre 4,5 y 5 MB no se podría guardar en Vercel, y el aviso que vería la web («supera el límite de 5 MB») sería impreciso. Falta medir el tamaño de las escenas reales.
+- **Tamaño del cuerpo:** Vercel rechaza peticiones de más de 4,5 MB a una función (`413 FUNCTION_PAYLOAD_TOO_LARGE`, documentación de Vercel del 2026-10-11) y nuestra API y la base admiten escenas de hasta 4 MiB (`SCENE_MAX_BYTES`, bajado desde 5 MiB el 2026-10-12 para quedar por debajo del tope de Vercel). Las plantillas pesan unos 120 KB.
 - **Sin pruebas reales:** nada de lo que depende de las cuentas (Auth, `db push`, Vercel) se ejecutó todavía.

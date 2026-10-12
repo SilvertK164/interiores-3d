@@ -91,4 +91,19 @@ describe('createSupabaseStore contra Supabase dev', () => {
     expect(await store.saveScene(b, project.id, emptyEnvelope(), 1)).toEqual({ kind: 'not_found' })
     expect((await store.list(b)).map((p) => p.id)).not.toContain(project.id)
   })
+
+  it('el tope de proyectos y los checks de la base llegan como AppError 4xx en castellano, no como 500', async () => {
+    const c = await newCtx('limites')
+    const rows = Array.from({ length: 50 }, (_, i) => ({ owner_id: c.userId, name: `Tope ${i}` }))
+    expect((await admin.from('projects').insert(rows)).error).toBeNull()
+    const quota = await store.create(c, { name: 'El 51' }).catch((e) => e)
+    expect(quota).toMatchObject({ status: 422, code: 'limite_de_proyectos' })
+    expect(quota.message).toMatch(/50 proyectos/)
+
+    const first = (await store.list(c))[0] as { id: string }
+    expect((await admin.from('project_scenes').insert({ project_id: first.id, scene: emptyEnvelope(), schema_version: 1 })).error).toBeNull()
+    const big = { ...emptyEnvelope(), graph: { nodes: { x: 'a'.repeat(4 * 1024 * 1024) }, rootNodeIds: [] } }
+    const tooBig = await store.saveScene(c, first.id, big, 1).catch((e) => e)
+    expect(tooBig).toMatchObject({ status: 413, code: 'escena_demasiado_grande' })
+  })
 })
