@@ -142,6 +142,15 @@ export function createE2eHooks(options: E2eOptions = {}) {
     has3d: (id: string) => sceneRegistry.nodes.has(id),
     /** Mueve un nodo (su posición) como lo haría arrastrarlo en cualquiera de las dos vistas. */
     moveNode: (id: string, position: [number, number, number]) => useScene.getState().updateNode(id as never, { position } as never),
+    /** Deja los muebles con las rutas viejas de un proyecto guardado antes (floor-plan.svg borrado); devuelve cuántos tocó. */
+    breakItemAssets: () => {
+      const items = nodes().filter((n) => n.type === 'item') as unknown as { id: string; asset: { id: string } }[]
+      for (const item of items) {
+        const folder = (item.asset as { src: string }).src.split('/')[2]
+        useScene.getState().updateNode(item.id as never, { asset: { ...item.asset, floorPlanUrl: `/items/${folder}/floor-plan.svg` } } as never)
+      }
+      return items.length
+    },
     orbit: (dir: 'cw' | 'ccw') => emitter.emit(dir === 'cw' ? 'camera-controls:orbit-cw' : 'camera-controls:orbit-ccw'),
     /** Agregan una puerta o una ventana en el primer muro y devuelven su id (`null` si no hay muro). */
     addDoor: () => {
