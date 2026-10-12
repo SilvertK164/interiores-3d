@@ -114,7 +114,7 @@ test('un menú del dock enfoca su primera entrada, las flechas mueven el foco y 
   expect((await hook(page, 'state')).tool).toBe('wall')
 })
 
-test('Esc en el diálogo de atajos lo cierra sin desarmar la herramienta de Pascal ', async ({ page }) => {
+test('Esc en el diálogo de atajos lo cierra sin desarmar la herramienta de Pascal y devuelve el foco al botón Más', async ({ page }) => {
   await createProjectViaUi(page, { name: `E2E atajos esc ${Date.now()}`, template: null })
   await dockButton(page, 'Estructura').click()
   await page.getByRole('menuitem', { name: 'Muro', exact: true }).click()
