@@ -1,10 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/navigation'
-import { use, useEffect, useRef } from 'react'
+import { use, useEffect } from 'react'
 import { LoaderPortal } from '@/components/LoaderPortal'
 import { sessionGate } from '@/lib/session-gate'
+import { useLoginRedirect } from '@/lib/use-login-redirect'
 import { useSession } from '@/lib/use-session'
 
 // El editor usa WebGPU y el DOM: nunca se renderiza en el servidor.
@@ -15,15 +15,14 @@ const ProjectEditor = dynamic(() => import('@/editor/ProjectEditor'), {
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const router = useRouter()
-  const { session, loading } = useSession()
+  const toLogin = useLoginRedirect()
+  const { session, loading, hadSession } = useSession()
   // Si la sesión vence con el editor abierto no se desmonta: lo no guardado se perdería (lo explica el aviso del guardador).
-  const hadSession = useRef(false)
-  if (session) hadSession.current = true
-  const gate = sessionGate({ loading, hasSession: Boolean(session), hadSession: hadSession.current })
+  const gate = sessionGate({ loading, hasSession: Boolean(session), hadSession })
+  // Sin sesión desde el principio: a ingresar, y al volver se abre este mismo proyecto (`next`).
   useEffect(() => {
-    if (gate === 'login') router.replace('/login')
-  }, [gate, router])
+    if (gate === 'login') toLogin()
+  }, [gate, toLogin])
   if (gate !== 'show') return <LoaderPortal />
   return <ProjectEditor projectId={id} />
 }

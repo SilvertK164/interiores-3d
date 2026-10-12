@@ -20,6 +20,12 @@
   --color-cream: #fff4e2;
   --color-ok: #0f6b46;
   --color-ok-dot: #1fa971;
+  /* Errores: borde y texto (≈ 6,5:1 sobre blanco), tinta del aviso y su fondo suave. */
+  --color-danger: #b42318;
+  --color-danger-ink: #8f1d1d;
+  --color-danger-wash: #fdecec;
+  /* Sol oscuro: el texto que acompaña a una forma Sol (el medidor de contraseña). El Sol puro nunca es texto. */
+  --color-sun-ink: #7a4a00;
   --shadow-soft: 0 10px 30px rgb(11 31 77 / 0.08);
   --shadow-lift: 0 18px 50px rgb(11 31 77 / 0.14);
   --shadow-brand: 0 8px 20px rgb(31 95 224 / 0.28);
@@ -131,6 +137,13 @@
   }
   &:focus {
     box-shadow: 0 0 0 3px rgb(31 95 224 / 0.35);
+  }
+  /* Campo con un error (aria-invalid): borde rojo, y el anillo de foco también. */
+  &[aria-invalid='true'] {
+    box-shadow: inset 0 0 0 1.5px var(--color-danger);
+  }
+  &[aria-invalid='true']:focus {
+    box-shadow: 0 0 0 3px rgb(180 35 24 / 0.3);
   }
 }
 

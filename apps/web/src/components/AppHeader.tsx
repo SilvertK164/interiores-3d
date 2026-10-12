@@ -1,10 +1,12 @@
 import { FlaskConical, LogOut, Plus, Search } from 'lucide-react'
-import { initialsFromEmail } from '@/lib/ui-text'
+import { initialsFor } from '@/lib/person-name'
 import { BusyLink } from './BusyLink'
 import { Logo } from './Logo'
 
 type Props = {
   email: string | null | undefined
+  /** Nombre que la persona escribió al crear su cuenta (vacío en las cuentas anteriores): sus iniciales van en el avatar. */
+  name?: string | null
   query: string
   onQuery: (value: string) => void
   onNew: () => void
@@ -16,7 +18,7 @@ type Props = {
 const ROUND = 'glass focus-ring grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-ink transition-transform duration-200 ease-out hover:-translate-y-px'
 
 /** Cabecera de "Tus proyectos": marca, buscador de vidrio, nuevo proyecto, laboratorio, avatar y salir. */
-export function AppHeader({ email, query, onQuery, onNew, onSignOut, signingOut = false }: Props) {
+export function AppHeader({ email, name, query, onQuery, onNew, onSignOut, signingOut = false }: Props) {
   return (
     <header className="flex flex-wrap items-center gap-3 desk:flex-nowrap desk:gap-4">
       <Logo showName />
@@ -45,7 +47,7 @@ export function AppHeader({ email, query, onQuery, onNew, onSignOut, signingOut 
         aria-label={email ? `Cuenta de ${email}` : 'Tu cuenta'}
         title={email ?? undefined}
       >
-        {initialsFromEmail(email)}
+        {initialsFor(name, email)}
       </span>
       <button
         aria-busy={signingOut || undefined}

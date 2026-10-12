@@ -1,8 +1,9 @@
 'use client'
 
-import type { ProjectKind } from '@interiores/contract'
-import { Check, House, Sparkles, SquareDashed, Store, X } from 'lucide-react'
+import { Check, Sparkles, SquareDashed, X } from 'lucide-react'
 import { useEffect, useId, useRef } from 'react'
+import type { NewProjectPreset } from '@/lib/new-project-preset'
+import { PROJECT_KINDS } from '@/lib/project-kinds'
 import { templatesForKind } from '@/lib/templates'
 import { useNewProject } from '@/lib/use-new-project'
 import { BusyLink } from './BusyLink'
@@ -12,17 +13,12 @@ import { TemplateFace } from './TemplateFace'
 
 type Props = {
   open: boolean
-  /** Plantilla que llega elegida desde el mosaico (cambia el tipo si hace falta). */
-  presetTemplateId?: string | null
+  /** Cómo abre: con una plantilla del mosaico elegida (cambia el tipo si hace falta), con un tipo marcado o con "En blanco". */
+  preset?: NewProjectPreset | null
   onClose: () => void
   /** El proyecto se creó pero su plantilla no se guardó: la lista debe volver a pedirse. */
   onPartial?: () => void
 }
-
-const KINDS: { value: ProjectKind; label: string; hint: string; Icon: typeof House }[] = [
-  { value: 'vivienda', label: 'Vivienda', hint: 'Departamentos, casas y lofts', Icon: House },
-  { value: 'comercio', label: 'Comercio', hint: 'Tiendas, cafés y supermercados', Icon: Store },
-]
 
 const FOCUS =
   'has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand/45'
@@ -30,7 +26,7 @@ const TILE = `group relative isolate block aspect-[4/3] cursor-pointer overflow-
 const LABEL = 'mb-1.5 ml-1.5 block text-[13px] text-ink-muted'
 
 /** Diálogo accesible (`<dialog>` nativo): Esc cierra, el foco queda atrapado y vuelve a donde estaba. */
-export function NewProjectDialog({ open, presetTemplateId, onClose, onPartial }: Props) {
+export function NewProjectDialog({ open, preset, onClose, onPartial }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const nameRef = useRef<HTMLInputElement>(null)
   const returnFocus = useRef<HTMLElement | null>(null)
@@ -44,13 +40,13 @@ export function NewProjectDialog({ open, presetTemplateId, onClose, onPartial }:
     if (!dialog) return
     if (open && !dialog.open) {
       returnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
-      reset(presetTemplateId)
+      reset(preset)
       dialog.showModal()
       nameRef.current?.focus()
     } else if (!open && dialog.open) {
       dialog.close()
     }
-  }, [open, presetTemplateId, reset])
+  }, [open, preset, reset])
 
   const close = () => {
     if (!np.busy) onClose()
@@ -113,7 +109,7 @@ export function NewProjectDialog({ open, presetTemplateId, onClose, onPartial }:
 
         <fieldset className="grid grid-cols-1 gap-2.5 min-[560px]:grid-cols-2" disabled={locked}>
           <legend className="sr-only">Tipo de proyecto</legend>
-          {KINDS.map(({ value, label, hint, Icon }) => (
+          {PROJECT_KINDS.map(({ value, label, hint, Icon }) => (
             <label
               className={`group flex cursor-pointer items-center gap-3 rounded-[20px] bg-white px-4 py-3 shadow-soft transition-colors duration-200 has-[:checked]:bg-brand has-[:checked]:text-white ${FOCUS}`}
               key={value}

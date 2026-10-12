@@ -11,10 +11,12 @@ export function greetingForHour(hour: number): string {
   return 'Buenas noches'
 }
 
+/** Palabras formadas solo por letras ("Ana-María, Pérez" → ["Ana", "María", "Pérez"]). */
+export const lettersWords = (text: string): string[] => text.split(/[^\p{L}]+/u).filter(Boolean)
+
 /** Palabras con letras de la parte local del correo ("silvert.quispe@x.com" → ["silvert", "quispe"]). */
 function emailWords(email: string | null | undefined): string[] {
-  const local = (email ?? '').split('@')[0] ?? ''
-  return local.split(/[^\p{L}]+/u).filter(Boolean)
+  return lettersWords((email ?? '').split('@')[0] ?? '')
 }
 
 const capitalize = (word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
@@ -26,13 +28,14 @@ export function nameFromEmail(email: string | null | undefined): string {
 }
 
 /** Iniciales del avatar: dos palabras → sus iniciales; una palabra → sus dos primeras letras; sin letras → "?". */
-export function initialsFromEmail(email: string | null | undefined): string {
-  const words = emailWords(email)
-  const [first, second] = words
+export function initialsFromWords(words: string[]): string {
+  const [first, second] = words.map((word) => [...word])
   if (!first) return '?'
-  if (second) return `${first.charAt(0)}${second.charAt(0)}`.toUpperCase()
-  return first.slice(0, 2).toUpperCase()
+  if (second) return `${first[0]}${second[0]}`.toUpperCase()
+  return first.slice(0, 2).join('').toUpperCase()
 }
+
+export const initialsFromEmail = (email: string | null | undefined): string => initialsFromWords(emailWords(email))
 
 const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 const MINUTE = 60_000

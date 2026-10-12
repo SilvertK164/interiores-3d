@@ -16,6 +16,7 @@ import type { RoomAnalysis } from '@/lib/lab/schema'
 import { TEMPLATE_DEFINITIONS } from '@/lib/templates'
 import { type CreateFromTemplateResult, retrySaveTemplate } from '@/lib/templates/create-from-template'
 import type { TemplateDefinition } from '@/lib/templates/types'
+import { useLoginRedirect } from '@/lib/use-login-redirect'
 import { useSession } from '@/lib/use-session'
 import { PiecesTable } from './PiecesTable'
 import { WarningList } from './WarningList'
@@ -37,7 +38,8 @@ function noticeFor(error: unknown): Notice {
 
 export default function LaboratorioPage() {
   const router = useRouter()
-  const { session, loading } = useSession()
+  const toLogin = useLoginRedirect()
+  const { session, loading, hadSession } = useSession()
   const [file, setFile] = useState<File | null>(null)
   const [widthText, setWidthText] = useState('')
   const [serviceUrl, setServiceUrl] = useState(DEFAULT_URL)
@@ -51,8 +53,9 @@ export default function LaboratorioPage() {
   const lock = useRef(false)
 
   useEffect(() => {
-    if (!loading && !session) router.replace('/login')
-  }, [loading, session, router])
+    // Sin sesión desde el principio no hay aviso; si se perdió estando aquí, /login explica que venció.
+    if (!loading && !session) toLogin(hadSession ? { reason: 'sesion' } : {})
+  }, [loading, session, hadSession, toLogin])
   useEffect(() => {
     const saved = readSavedServiceUrl()
     if (saved) setServiceUrl(saved)

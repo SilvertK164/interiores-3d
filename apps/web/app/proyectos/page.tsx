@@ -2,7 +2,6 @@
 
 import type { ProjectSummary } from '@interiores/contract'
 import { Clock, Folder, Search } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { AppHeader } from '@/components/AppHeader'
 import { AppShell } from '@/components/AppShell'
@@ -10,26 +9,30 @@ import { NewProjectDialog } from '@/components/NewProjectDialog'
 import { ProjectsSection } from '@/components/ProjectsSection'
 import { HeaderChipsSkeleton, ProjectsPageSkeleton } from '@/components/Skeleton'
 import { TemplateGallery } from '@/components/TemplateGallery'
+import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
 import { api } from '@/lib/api/instance'
+import { type NewProjectPreset, parseNewProjectParam } from '@/lib/new-project-preset'
+import { greetingName, savedName } from '@/lib/person-name'
 import { filterProjects, filterTemplates } from '@/lib/project-search'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { CHIPS_ROW, GREETING_ROW, PROJECTS_FRAME, SECTION, SECTION_TITLE } from '@/lib/ui-layout'
+import { greetingForHour, pluralProjects, whenLabel } from '@/lib/ui-text'
+import { useLoginRedirect } from '@/lib/use-login-redirect'
 import { useNavigate } from '@/lib/use-navigate'
-import { greetingForHour, nameFromEmail, pluralProjects, whenLabel } from '@/lib/ui-text'
 import { useSession } from '@/lib/use-session'
 
 const CHIP = 'chip glass bg-white/70'
 
 export default function ProjectsPage() {
-  const router = useRouter()
   const nav = useNavigate()
+  const toLogin = useLoginRedirect()
   const [leaving, setLeaving] = useState(false)
-  const { session, loading } = useSession()
+  const { session, loading, hadSession } = useSession()
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
-  const [dialog, setDialog] = useState<{ open: boolean; templateId: string | null }>({ open: false, templateId: null })
+  const [dialog, setDialog] = useState<{ open: boolean; preset: NewProjectPreset | null }>({ open: false, preset: null })
 
   const load = useCallback(() => {
     api.listProjects().then(
@@ -37,17 +40,32 @@ export default function ProjectsPage() {
         setProjects(list)
         setError(null)
       },
-      (e) => setError(friendlyMessage(e)),
+      (e) => {
+        // La API dice que la sesión no sirve: a ingresar, y al volver se retoma esta pantalla.
+        if (e instanceof ApiError && e.status === 401) return toLogin({ reason: 'sesion' })
+        setError(friendlyMessage(e))
+      },
     )
-  }, [])
+  }, [toLogin])
 
   useEffect(() => {
-    if (loading) return
-    if (!session) return router.replace('/login')
+    // Al salir a propósito (`leaving`) la sesión también desaparece, pero eso no es una sesión vencida.
+    if (loading || leaving) return
+    if (!session) return toLogin(hadSession ? { reason: 'sesion' } : {})
     load()
-  }, [loading, session, router, load])
+  }, [loading, leaving, session, hadSession, toLogin, load])
 
-  const openDialog = (templateId: string | null = null) => setDialog({ open: true, templateId })
+  // `?nuevo=vivienda|comercio|blanco` (viene de /bienvenida): abre el diálogo con eso marcado y limpia la URL.
+  const ready = !loading && session !== null
+  useEffect(() => {
+    if (!ready) return
+    const preset = parseNewProjectParam(window.location.search)
+    if (!preset) return
+    setDialog({ open: true, preset })
+    window.history.replaceState(null, '', window.location.pathname)
+  }, [ready])
+
+  const openDialog = (templateId: string | null = null) => setDialog({ open: true, preset: templateId ? { templateId } : null })
   const closeDialog = () => setDialog((d) => ({ ...d, open: false }))
   const signOut = async () => {
     if (leaving || nav.pending) return
@@ -71,7 +89,7 @@ export default function ProjectsPage() {
   // La fecha y la hora solo se usan aquí, después de cargar la sesión (en el navegador): no hay diferencias con el servidor.
   const now = new Date()
   const email = session.user.email
-  const name = nameFromEmail(email)
+  const name = greetingName(session.user)
   const visible = projects ? filterProjects(projects, query) : []
   const templates = filterTemplates(query)
   const lastChange = projects?.length
@@ -83,6 +101,7 @@ export default function ProjectsPage() {
       <div className={PROJECTS_FRAME}>
         <AppHeader
           email={email}
+          name={savedName(session.user)}
           onNew={() => openDialog()}
           onQuery={setQuery}
           onSignOut={signOut}
@@ -151,7 +170,7 @@ export default function ProjectsPage() {
         </section>
       </div>
 
-      <NewProjectDialog onClose={closeDialog} onPartial={load} open={dialog.open} presetTemplateId={dialog.templateId} />
+      <NewProjectDialog onClose={closeDialog} onPartial={load} open={dialog.open} preset={dialog.preset} />
     </AppShell>
   )
 }

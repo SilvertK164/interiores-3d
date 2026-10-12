@@ -4,7 +4,7 @@ import type { ProjectKind } from '@interiores/contract'
 import { type FormEvent, useCallback, useRef, useState } from 'react'
 import { friendlyMessage } from './api/errors'
 import { api } from './api/instance'
-import { templateById, templatesForKind } from './templates'
+import { DEFAULT_KIND, type NewProjectPreset, firstTemplateOf, presetInitialState } from './new-project-preset'
 import {
   type CreateFromTemplateResult,
   createFromTemplate,
@@ -13,9 +13,7 @@ import {
 } from './templates/create-from-template'
 import { useNavigate } from './use-navigate'
 
-const DEFAULT_KIND: ProjectKind = 'comercio'
 const SAVE_FAILED = 'El proyecto se creó, pero no pudimos guardar la plantilla. Puedes reintentar.'
-const firstTemplateOf = (kind: ProjectKind) => templatesForKind(kind)[0]?.id ?? null
 
 /**
  * Estado del diálogo "Nuevo proyecto": nombre, tipo y plantilla, y la creación con su reintento.
@@ -32,13 +30,12 @@ export function useNewProject(onPartial?: () => void) {
   const [error, setError] = useState<string | null>(null)
   const lock = useRef(false)
 
-  /** Deja el formulario como nuevo; con `presetTemplateId` abre ya con esa plantilla (y su tipo) elegida. */
-  const reset = useCallback((presetTemplateId?: string | null) => {
-    const preset = presetTemplateId ? templateById(presetTemplateId) : undefined
-    const nextKind = preset?.kind ?? DEFAULT_KIND
+  /** Deja el formulario como nuevo; con `preset` abre ya con esa plantilla, ese tipo o "En blanco" elegidos. */
+  const reset = useCallback((preset?: NewProjectPreset | null) => {
+    const initial = presetInitialState(preset)
     setNameState('')
-    setKind(nextKind)
-    setTemplateId(preset?.id ?? firstTemplateOf(nextKind))
+    setKind(initial.kind)
+    setTemplateId(initial.templateId)
     setBusy(false)
     setPending(null)
     setNameError(null)
