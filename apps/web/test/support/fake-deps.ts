@@ -104,6 +104,7 @@ export function createFakeDeps() {
     activateCatalogItem: vi.fn(),
     // El mismo objeto en cada llamada: las pruebas miran `deps.useMaterialsModel().select`.
     useMaterialsModel: vi.fn(() => materials),
+    commitFields: vi.fn(),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

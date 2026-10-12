@@ -5,6 +5,7 @@ import { type ShellBridge, createBridge } from './shell/bridge'
 import type { CatalogDeps } from './shell/bridge/catalog'
 import type { CoreDeps, HistoryPort } from './shell/bridge/core'
 import type { LevelsDeps } from './shell/bridge/levels'
+import type { EditDeps } from './shell/bridge/edit'
 import type { MaterialsDeps } from './shell/bridge/materials'
 import type { ModeDeps } from './shell/bridge/mode'
 import type { MaterialItemLike } from './shell/materials-model'
@@ -122,6 +123,16 @@ function materialsDeps(): MaterialsDeps {
   }
 }
 
+type AnyNode = Core.AnyNode
+type AnyNodeId = Core.AnyNodeId
+
+/** Editar con la misma función que usa el inspector de Pascal (`parametric-inspector.tsx`). */
+function editDeps(): EditDeps {
+  return {
+    commitFields: (id, patch) => Pascal.commitParametricNodeFields(id as AnyNodeId, patch as Partial<AnyNode>),
+  }
+}
+
 export function createPascalBridge(): ShellBridge {
   return createBridge({
     ...coreDeps(),
@@ -129,6 +140,7 @@ export function createPascalBridge(): ShellBridge {
     ...levelsDeps(),
     ...catalogDeps(),
     ...materialsDeps(),
+    ...editDeps(),
     // @@deps
   })
 }
