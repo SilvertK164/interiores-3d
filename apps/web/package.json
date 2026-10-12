@@ -13,6 +13,7 @@
     "templates:build": "tsx scripts/build-templates.ts",
     "templates:thumbs": "node scripts/capture-templates.mjs",
     "items:thumbs": "node scripts/item-thumbnails.mjs",
+    "editor:shots": "node scripts/capture-editor.mjs",
     "assets:vendor": "node scripts/vendor-pascal-assets.mjs",
     "e2e": "playwright test"
   },
