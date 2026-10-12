@@ -128,3 +128,14 @@ test('Esc en el diálogo de atajos lo cierra sin desarmar la herramienta de Pasc
   expect((await hook(page, 'state')).tool).toBe('wall')
   await expect(dockButton(page, 'Más')).toBeFocused()
 })
+
+test('Atajos: el botón Cerrar cierra el diálogo y devuelve el foco a Más', async ({ page }) => {
+  await createProjectViaUi(page, { name: `E2E atajos cerrar ${Date.now()}`, template: null })
+  await dockButton(page, 'Más').click()
+  await page.getByRole('button', { name: 'Atajos de teclado' }).click()
+  const shortcuts = page.getByRole('dialog', { name: 'Atajos de teclado' })
+  await expect(shortcuts).toBeVisible()
+  await shortcuts.getByRole('button', { name: 'Cerrar' }).click()
+  await expect(shortcuts).toBeHidden()
+  await expect(dockButton(page, 'Más')).toBeFocused()
+})

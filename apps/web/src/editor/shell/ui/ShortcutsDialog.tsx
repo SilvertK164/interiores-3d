@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef } from 'react'
 
-/** Atajos de teclado en un diálogo nativo (`<dialog>`): Esc cierra, el foco queda atrapado y "Cerrar" usa `method="dialog"`. */
+/** Atajos de teclado en un diálogo nativo (`<dialog>`): Esc cierra, el foco queda atrapado y "Cerrar" lo cierra a mano. */
 export function ShortcutsDialog({
   open,
   shortcuts,
@@ -33,7 +33,7 @@ export function ShortcutsDialog({
       }}
       className="app-dialog max-w-[480px]"
     >
-      <form method="dialog" className="flex flex-col gap-4 p-6">
+      <div className="flex flex-col gap-4 p-6">
         <h2 className="font-display text-xl font-bold tracking-[-0.02em]">Atajos de teclado</h2>
         <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-2 text-[14px]">
           {shortcuts.map((s) => (
@@ -45,10 +45,15 @@ export function ShortcutsDialog({
             </Fragment>
           ))}
         </dl>
-        <button type="submit" className="btn btn-primary focus-ring self-end">
+        <button
+          type="button"
+          // Cierre explícito: no depende de `method="dialog"`, que los atajos globales de Pascal podían interceptar.
+          onClick={() => ref.current?.close()}
+          className="btn btn-primary focus-ring self-end"
+        >
           Cerrar
         </button>
-      </form>
+      </div>
     </dialog>
   )
 }
