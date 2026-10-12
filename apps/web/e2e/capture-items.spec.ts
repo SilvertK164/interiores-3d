@@ -32,3 +32,12 @@ test('capturar las miniaturas de los muebles', async ({ page }) => {
   }
   expect(failed, 'Muebles que no se pudieron fotografiar').toEqual([])
 })
+
+// La hoja de contactos queda en test-results/hoja-miniaturas.png (no se commitea): se mira a ojo antes de dar las miniaturas por buenas.
+test('hoja de contactos de las miniaturas', async ({ page }) => {
+  test.skip(process.env.CAPTURE_ITEMS !== '1', 'Solo con items:thumbs')
+  await page.setViewportSize({ width: 1600, height: 1000 })
+  await page.goto('/dev/miniaturas/hoja')
+  await expect.poll(() => page.evaluate(() => [...document.images].every((image) => image.complete))).toBe(true)
+  await page.screenshot({ path: 'test-results/hoja-miniaturas.png', fullPage: true })
+})

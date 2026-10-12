@@ -44,6 +44,7 @@ try {
   mkdirSync(join(root, 'src/editor'), { recursive: true })
   writeFileSync(join(root, 'src/editor/local-items.json'), `${JSON.stringify(manifest, null, 2)}\n`)
   console.log(`Listo: ${Object.keys(manifest).length} muebles locales de Pascal @ ${COMMIT.slice(0, 7)}`)
+  console.log('Ojo: public/items/*/thumbnail.webp volvió a las miniaturas con fondo negro de Pascal. Corre: pnpm --filter @interiores/web items:thumbs')
 } finally {
   rmSync(tmp, { recursive: true, force: true })
 }

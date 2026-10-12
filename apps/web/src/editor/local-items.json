@@ -398,7 +398,8 @@
     "thumbnail.webp"
   ],
   "shower": [
-    "model.glb"
+    "model.glb",
+    "thumbnail.webp"
   ],
   "shower-angle": [
     "model.glb",
@@ -518,7 +519,8 @@
     "thumbnail.webp"
   ],
   "tub": [
-    "model.glb"
+    "model.glb",
+    "thumbnail.webp"
   ],
   "tv-stand": [
     "model.glb",
