@@ -4,3 +4,5 @@ packages:
   - supabase/tests
 allowBuilds:
   esbuild: true
+patchedDependencies:
+  '@pascal-app/editor@1.0.3': patches/@pascal-app__editor@1.0.3.patch

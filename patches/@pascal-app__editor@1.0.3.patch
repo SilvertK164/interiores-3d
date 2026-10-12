@@ -1,0 +1,66 @@
+diff --git a/src/components/editor/index.tsx b/src/components/editor/index.tsx
+index 157809cdf66e0f6c296d070881c3ff6b9a23b827..5f75c60c1ac33fa59cad8150694b23e3ccfd840f 100644
+--- a/src/components/editor/index.tsx
++++ b/src/components/editor/index.tsx
+@@ -163,9 +163,19 @@ function initializeEditorRuntime(): () => void {
+     outliner.hoveredObjects.length = 0
+   }
+ }
++/** Parche de Madori: qué chrome propio de Pascal se dibuja en el layout v2 (todo visible por omisión). */
++export type EditorChrome = {
++  dock?: boolean
++  inspector?: boolean
++  helpers?: boolean
++  levelSelector?: boolean
++}
++
+ export interface EditorProps {
+   // Layout version — 'v1' (default) or 'v2' (navbar + two-column)
+   layoutVersion?: 'v1' | 'v2'
++  /** Parche de Madori: oculta el dock, el inspector, los ayudantes o el selector de nivel de Pascal (v2). */
++  chrome?: EditorChrome
+ 
+   // UI slots (v1)
+   appMenuButton?: ReactNode
+@@ -1254,6 +1264,7 @@ function PreviewStage({
+ function EditorContent({
+   guardAgainstSceneWipe,
+   layoutVersion = 'v1',
++  chrome = {},
+   appMenuButton,
+   sidebarTop,
+   navbarSlot,
+@@ -1635,22 +1646,26 @@ function EditorContent({
+               navbarSlot={navbarSlot}
+               overlays={
+                 <>
+-                  {!(isCaptureMode || stageOverlay) && <FloatingLevelSelector />}
+-                  {!(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
+-                    <div className="pointer-events-auto">
++                  {chrome.levelSelector !== false && !(isCaptureMode || stageOverlay) && (
++                    <div data-pascal-level-selector>
++                      <FloatingLevelSelector />
++                    </div>
++                  )}
++                  {chrome.dock !== false && !(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
++                    <div className="pointer-events-auto" data-pascal-dock>
+                       <ActionMenu />
+                     </div>
+                   )}
+-                  {!(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
+-                    <div className="pointer-events-auto">
++                  {chrome.inspector !== false && !(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
++                    <div className="pointer-events-auto" data-pascal-inspector>
+                       <PanelManager
+                         inspectorFooter={inspectorFooter}
+                         multiSelectionFooter={multiSelectionFooter}
+                       />
+                     </div>
+                   )}
+-                  {!isCaptureMode && (
+-                    <div className="pointer-events-auto">
++                  {chrome.helpers !== false && !isCaptureMode && (
++                    <div className="pointer-events-auto" data-pascal-helpers>
+                       <HelperManager />
+                     </div>
+                   )}
