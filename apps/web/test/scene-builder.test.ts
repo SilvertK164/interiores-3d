@@ -258,3 +258,23 @@ describe('buildScene', () => {
     expect(() => buildScene(badMaterial, ASSETS)).toThrow('no-es-un-material')
   })
 })
+
+describe('alfombras debajo de todo', () => {
+  it('las alfombras van primero entre los hijos de la planta, antes que muros y muebles (el plano 2D dibuja en ese orden)', () => {
+    const withCarpet = new Map([...ASSETS, ['rectangular-carpet', asset('rectangular-carpet', 'Alfombra rectangular')], ['round-carpet', asset('round-carpet', 'Alfombra redonda')]])
+    const base = def.levels[0] as TemplateDefinition['levels'][number]
+    const carpets: TemplateDefinition = {
+      ...def,
+      levels: [{ ...base, items: [{ asset: 'sofa', at: [1, 1] }, { asset: 'rectangular-carpet', at: [2, 2] }, { asset: 'cash-register', at: [3, 3] }, { asset: 'round-carpet', at: [2, 3] }], shelves: [], cabinets: [], stairs: [] }, ...def.levels.slice(1)],
+    }
+    const { nodes } = buildScene(carpets, withCarpet)
+    const level = Object.values(nodes).find((n) => n.type === 'level') as { children: string[] }
+    const nameOf = (id: string) => (nodes[id as keyof typeof nodes] as { name?: string }).name
+    const names = level.children.map(nameOf)
+    const firstOther = names.findIndex((n) => !/Alfombra/.test(String(n)))
+    expect(names.slice(0, 2).sort()).toEqual(['Alfombra rectangular', 'Alfombra redonda'])
+    expect(firstOther).toBe(2)
+    // El resto conserva su orden relativo.
+    expect(names.filter((n) => !/Alfombra/.test(String(n))).indexOf('Sofá')).toBeLessThan(names.filter((n) => !/Alfombra/.test(String(n))).indexOf('Caja registradora') + 1)
+  })
+})

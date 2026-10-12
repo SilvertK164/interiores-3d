@@ -14,6 +14,7 @@ import type { ModeDeps } from './shell/bridge/mode'
 import type { ViewDeps } from './shell/bridge/view'
 import type { MaterialItemLike } from './shell/materials-model'
 import { DECISIONS } from './shell/decisions'
+import { keepCarpetsUnder } from './carpet-watch'
 import { frameDeps } from './frame-deps'
 import { levelManageDeps } from './level-manage-deps'
 import { nodePresets } from './node-presets'
@@ -72,6 +73,7 @@ function coreDeps(): CoreDeps {
     setHideAbove: (on) => {
       ;(globalThis as { __madoriHideAbove?: boolean }).__madoriHideAbove = on
     },
+    keepCarpetsUnder,
     decoupleViews: () => {
       // Lo leen los parches de Madori de `floorplan-camera-sync.ts` y `floorplan-panel.tsx` (`patches/@pascal-app__editor@1.0.3.patch`).
       ;(globalThis as { __madoriDecoupled?: boolean }).__madoriDecoupled = true

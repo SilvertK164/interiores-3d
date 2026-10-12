@@ -18,6 +18,7 @@ export function localizeCatalogItem<T extends CatalogLike>(item: T, manifest: Lo
     ...item,
     src: `${base}/model.glb`,
     thumbnail: files.includes('thumbnail.webp') ? `${base}/thumbnail.webp` : undefined,
-    floorPlanUrl: files.includes('floor-plan.svg') ? `${base}/floor-plan.svg` : undefined,
+    // La proyección en planta oficial de Pascal es un PNG cenital; el .svg es solo un respaldo hecho a mano.
+    floorPlanUrl: files.includes('floor-plan.png') ? `${base}/floor-plan.png` : files.includes('floor-plan.svg') ? `${base}/floor-plan.svg` : undefined,
   }
 }

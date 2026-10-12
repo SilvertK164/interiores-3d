@@ -1,3 +1,4 @@
+import { CARPET_ASSETS, carpetsFirst } from '../carpet-order'
 import type { SceneGraph } from '@interiores/contract'
 import {
   BuildingNode,
@@ -248,7 +249,10 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
       children.push(id)
     }
 
-    nodes[lid] = LevelNode.parse({ id: lid, parentId: buildingId, level: index, children, ...(level.height ? { height: level.height } : {}) })
+    // El plano 2D de Pascal dibuja en el orden de `children` (sin z-index): las alfombras van primero para quedar debajo de lo demás.
+    const isCarpet = (id: string) => CARPET_ASSETS.has((nodes[id] as { asset?: { id?: string } } | undefined)?.asset?.id ?? '')
+    const ordered = carpetsFirst(children, isCarpet) ?? children
+    nodes[lid] = LevelNode.parse({ id: lid, parentId: buildingId, level: index, children: ordered, ...(level.height ? { height: level.height } : {}) })
   })
 
   nodes[buildingId] = BuildingNode.parse({ id: buildingId, parentId: siteId, children: def.levels.map(levelNodeId) })

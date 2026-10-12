@@ -23,6 +23,8 @@ export type CoreDeps = {
    * recorrer o encuadrar en uno no mueve al otro. Devuelve cómo volver a enlazarlos.
    */
   decoupleViews?(): () => void
+  /** Las alfombras que se coloquen pasan al principio de la planta (debajo de lo demás en el plano 2D); devuelve cómo dejar de vigilar. */
+  keepCarpetsUnder?(): () => void
   setHideAbove?(on: boolean): void
   viewStore?: { read(): ViewMode | null; write(view: ViewMode): void }
 }
@@ -58,6 +60,7 @@ export function createCoreSlice(deps: CoreDeps) {
       if (saved && saved !== deps.editor.getState().viewMode) deps.editor.getState().setViewMode(saved)
       let last = deps.editor.getState().viewMode
       const recouple = deps.decoupleViews?.() ?? (() => {})
+      const stopCarpets = deps.keepCarpetsUnder?.() ?? (() => {})
       const stopKeeper = createLevelKeeper(deps).start()
       const stopView = deps.editor.subscribe(() => {
         const view = deps.editor.getState().viewMode
@@ -69,6 +72,7 @@ export function createCoreSlice(deps: CoreDeps) {
         stopView()
         stopKeeper()
         recouple()
+        stopCarpets()
         showHint()
         undoTheme()
       }

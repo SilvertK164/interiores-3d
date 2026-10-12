@@ -1102,6 +1102,7 @@
      "category": "kitchen",
      "name": "Fridge",
      "thumbnail": "/items/fridge/thumbnail.webp",
+     "floorPlanUrl": "/items/fridge/floor-plan.png",
      "source": "library",
      "src": "/items/fridge/model.glb",
      "dimensions": [
@@ -1171,6 +1172,7 @@
      "category": "kitchen",
      "name": "Stove",
      "thumbnail": "/items/stove/thumbnail.webp",
+     "floorPlanUrl": "/items/stove/floor-plan.png",
      "source": "library",
      "src": "/items/stove/model.glb",
      "dimensions": [
@@ -1228,6 +1230,7 @@
      "category": "kitchen",
      "name": "Hood",
      "thumbnail": "/items/hood/thumbnail.webp",
+     "floorPlanUrl": "/items/hood/floor-plan.png",
      "source": "library",
      "src": "/items/hood/model.glb",
      "dimensions": [
@@ -1298,6 +1301,7 @@
      "category": "furniture",
      "name": "Stool",
      "thumbnail": "/items/stool/thumbnail.webp",
+     "floorPlanUrl": "/items/stool/floor-plan.png",
      "source": "library",
      "src": "/items/stool/model.glb",
      "dimensions": [
@@ -1355,6 +1359,7 @@
      "category": "furniture",
      "name": "Stool",
      "thumbnail": "/items/stool/thumbnail.webp",
+     "floorPlanUrl": "/items/stool/floor-plan.png",
      "source": "library",
      "src": "/items/stool/model.glb",
      "dimensions": [
@@ -1412,6 +1417,7 @@
      "category": "furniture",
      "name": "Stool",
      "thumbnail": "/items/stool/thumbnail.webp",
+     "floorPlanUrl": "/items/stool/floor-plan.png",
      "source": "library",
      "src": "/items/stool/model.glb",
      "dimensions": [
@@ -1469,6 +1475,7 @@
      "category": "furniture",
      "name": "Dining Table",
      "thumbnail": "/items/dining-table/thumbnail.webp",
+     "floorPlanUrl": "/items/dining-table/floor-plan.png",
      "source": "library",
      "src": "/items/dining-table/model.glb",
      "dimensions": [
@@ -1539,6 +1546,7 @@
      "category": "furniture",
      "name": "Dining Chair",
      "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "floorPlanUrl": "/items/dining-chair/floor-plan.png",
      "source": "library",
      "src": "/items/dining-chair/model.glb",
      "dimensions": [
@@ -1606,6 +1614,7 @@
      "category": "furniture",
      "name": "Dining Chair",
      "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "floorPlanUrl": "/items/dining-chair/floor-plan.png",
      "source": "library",
      "src": "/items/dining-chair/model.glb",
      "dimensions": [
@@ -1673,6 +1682,7 @@
      "category": "furniture",
      "name": "Dining Chair",
      "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "floorPlanUrl": "/items/dining-chair/floor-plan.png",
      "source": "library",
      "src": "/items/dining-chair/model.glb",
      "dimensions": [
@@ -1740,6 +1750,7 @@
      "category": "furniture",
      "name": "Dining Chair",
      "thumbnail": "/items/dining-chair/thumbnail.webp",
+     "floorPlanUrl": "/items/dining-chair/floor-plan.png",
      "source": "library",
      "src": "/items/dining-chair/model.glb",
      "dimensions": [
@@ -1807,7 +1818,7 @@
      "category": "furniture",
      "name": "Sofa",
      "thumbnail": "/items/sofa/thumbnail.webp",
-     "floorPlanUrl": "/items/sofa/floor-plan.svg",
+     "floorPlanUrl": "/items/sofa/floor-plan.png",
      "source": "library",
      "src": "/items/sofa/model.glb",
      "dimensions": [
@@ -1865,6 +1876,7 @@
      "category": "furniture",
      "name": "Coffee Table",
      "thumbnail": "/items/coffee-table/thumbnail.webp",
+     "floorPlanUrl": "/items/coffee-table/floor-plan.png",
      "source": "library",
      "src": "/items/coffee-table/model.glb",
      "dimensions": [
@@ -1936,6 +1948,7 @@
      "category": "furniture",
      "name": "Rectangular Carpet",
      "thumbnail": "/items/rectangular-carpet/thumbnail.webp",
+     "floorPlanUrl": "/items/rectangular-carpet/floor-plan.png",
      "source": "library",
      "src": "/items/rectangular-carpet/model.glb",
      "dimensions": [
@@ -2006,6 +2019,7 @@
      "category": "furniture",
      "name": "TV Stand",
      "thumbnail": "/items/tv-stand/thumbnail.webp",
+     "floorPlanUrl": "/items/tv-stand/floor-plan.png",
      "source": "library",
      "src": "/items/tv-stand/model.glb",
      "dimensions": [
@@ -2066,6 +2080,7 @@
      "category": "furniture",
      "name": "Floor Lamp",
      "thumbnail": "/items/floor-lamp/thumbnail.webp",
+     "floorPlanUrl": "/items/floor-lamp/floor-plan.png",
      "source": "library",
      "src": "/items/floor-lamp/model.glb",
      "dimensions": [
@@ -2168,6 +2183,7 @@
      "category": "furniture",
      "name": "Indoor Plant",
      "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "floorPlanUrl": "/items/indoor-plant/floor-plan.png",
      "source": "library",
      "src": "/items/indoor-plant/model.glb",
      "dimensions": [
@@ -2237,6 +2253,7 @@
      "category": "bathroom",
      "name": "Bathtub",
      "thumbnail": "/items/bathtub/thumbnail.webp",
+     "floorPlanUrl": "/items/bathtub/floor-plan.png",
      "source": "library",
      "src": "/items/bathtub/model.glb",
      "dimensions": [
@@ -2304,6 +2321,7 @@
      "category": "bathroom",
      "name": "Toilet",
      "thumbnail": "/items/toilet/thumbnail.webp",
+     "floorPlanUrl": "/items/toilet/floor-plan.png",
      "source": "library",
      "src": "/items/toilet/model.glb",
      "dimensions": [
@@ -2361,6 +2379,7 @@
      "category": "bathroom",
      "name": "Bathroom Sink",
      "thumbnail": "/items/bathroom-sink/thumbnail.webp",
+     "floorPlanUrl": "/items/bathroom-sink/floor-plan.png",
      "source": "library",
      "src": "/items/bathroom-sink/model.glb",
      "dimensions": [
@@ -2430,6 +2449,7 @@
      "category": "furniture",
      "name": "Office Table",
      "thumbnail": "/items/office-table/thumbnail.webp",
+     "floorPlanUrl": "/items/office-table/floor-plan.png",
      "source": "library",
      "src": "/items/office-table/model.glb",
      "dimensions": [
@@ -2501,7 +2521,7 @@
      "category": "furniture",
      "name": "Office Chair",
      "thumbnail": "/items/office-chair/thumbnail.webp",
-     "floorPlanUrl": "/items/office-chair/floor-plan.svg",
+     "floorPlanUrl": "/items/office-chair/floor-plan.png",
      "source": "library",
      "src": "/items/office-chair/model.glb",
      "dimensions": [
@@ -2570,6 +2590,7 @@
      "category": "appliance",
      "name": "Computer",
      "thumbnail": "/items/computer/thumbnail.webp",
+     "floorPlanUrl": "/items/computer/floor-plan.png",
      "source": "library",
      "src": "/items/computer/model.glb",
      "dimensions": [
@@ -2639,6 +2660,7 @@
      "category": "furniture",
      "name": "Indoor Plant",
      "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "floorPlanUrl": "/items/indoor-plant/floor-plan.png",
      "source": "library",
      "src": "/items/indoor-plant/model.glb",
      "dimensions": [
@@ -2708,6 +2730,7 @@
      "category": "furniture",
      "name": "Rectangular Carpet",
      "thumbnail": "/items/rectangular-carpet/thumbnail.webp",
+     "floorPlanUrl": "/items/rectangular-carpet/floor-plan.png",
      "source": "library",
      "src": "/items/rectangular-carpet/model.glb",
      "dimensions": [
@@ -3268,6 +3291,8 @@
     "visible": true,
     "metadata": {},
     "children": [
+     "item_loft_pb_14",
+     "item_loft_pb_25",
      "wall_loft_pb_p_n",
      "wall_loft_pb_p_e",
      "wall_loft_pb_p_s",
@@ -3296,7 +3321,6 @@
      "item_loft_pb_11",
      "item_loft_pb_12",
      "item_loft_pb_13",
-     "item_loft_pb_14",
      "item_loft_pb_15",
      "item_loft_pb_16",
      "item_loft_pb_17",
@@ -3307,7 +3331,6 @@
      "item_loft_pb_22",
      "item_loft_pb_23",
      "item_loft_pb_24",
-     "item_loft_pb_25",
      "shelf_loft_pb_biblioteca_estar",
      "shelf_loft_pb_biblioteca_oeste",
      "shelf_loft_pb_biblioteca_estudio",
@@ -3703,6 +3726,7 @@
      "category": "furniture",
      "name": "Double Bed",
      "thumbnail": "/items/double-bed/thumbnail.webp",
+     "floorPlanUrl": "/items/double-bed/floor-plan.png",
      "source": "library",
      "src": "/items/double-bed/model.glb",
      "dimensions": [
@@ -3771,6 +3795,7 @@
      "category": "furniture",
      "name": "Bedside Table",
      "thumbnail": "/items/bedside-table/thumbnail.webp",
+     "floorPlanUrl": "/items/bedside-table/floor-plan.png",
      "source": "library",
      "src": "/items/bedside-table/model.glb",
      "dimensions": [
@@ -3841,6 +3866,7 @@
      "category": "furniture",
      "name": "Bedside Table",
      "thumbnail": "/items/bedside-table/thumbnail.webp",
+     "floorPlanUrl": "/items/bedside-table/floor-plan.png",
      "source": "library",
      "src": "/items/bedside-table/model.glb",
      "dimensions": [
@@ -3911,6 +3937,7 @@
      "category": "furniture",
      "name": "Dresser",
      "thumbnail": "/items/dresser/thumbnail.webp",
+     "floorPlanUrl": "/items/dresser/floor-plan.png",
      "source": "library",
      "src": "/items/dresser/model.glb",
      "dimensions": [
@@ -3981,6 +4008,7 @@
      "category": "furniture",
      "name": "Rectangular Carpet",
      "thumbnail": "/items/rectangular-carpet/thumbnail.webp",
+     "floorPlanUrl": "/items/rectangular-carpet/floor-plan.png",
      "source": "library",
      "src": "/items/rectangular-carpet/model.glb",
      "dimensions": [
@@ -4051,6 +4079,7 @@
      "category": "furniture",
      "name": "Floor Lamp",
      "thumbnail": "/items/floor-lamp/thumbnail.webp",
+     "floorPlanUrl": "/items/floor-lamp/floor-plan.png",
      "source": "library",
      "src": "/items/floor-lamp/model.glb",
      "dimensions": [
@@ -4153,6 +4182,7 @@
      "category": "furniture",
      "name": "Indoor Plant",
      "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "floorPlanUrl": "/items/indoor-plant/floor-plan.png",
      "source": "library",
      "src": "/items/indoor-plant/model.glb",
      "dimensions": [
@@ -4340,6 +4370,7 @@
     "visible": true,
     "metadata": {},
     "children": [
+     "item_loft_alta_5",
      "wall_loft_alta_a_n",
      "wall_loft_alta_a_e",
      "wall_loft_alta_a_s",
@@ -4351,7 +4382,6 @@
      "item_loft_alta_2",
      "item_loft_alta_3",
      "item_loft_alta_4",
-     "item_loft_alta_5",
      "item_loft_alta_6",
      "item_loft_alta_7",
      "cabinet_loft_alta_placard"
