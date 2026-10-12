@@ -1,4 +1,4 @@
-import { CabinetNode, DoorNode, ItemNode, ShelfNode, StairNode, StairSegmentNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
+import { emitter, CabinetNode, DoorNode, ItemNode, ShelfNode, StairNode, StairSegmentNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
 import { armToolMode, getHistoryCommandState, subscribeCameraPose, useEditor } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import type { PascalChrome } from './chrome'
@@ -92,6 +92,8 @@ export function createE2eHooks(options: E2eOptions = {}) {
     },
     deleteNode: (id: string) => useScene.getState().deleteNode(id as never),
     cameraPose: () => pose,
+    /** Gira la cámara 3D igual que los botones de Pascal (para comprobar que el plano 2D no gira con ella). */
+    orbit: (dir: 'cw' | 'ccw') => emitter.emit(dir === 'cw' ? 'camera-controls:orbit-cw' : 'camera-controls:orbit-ccw'),
     /** Agregan una puerta o una ventana en el primer muro y devuelven su id (`null` si no hay muro). */
     addDoor: () => {
       const wallId = firstOf('wall')

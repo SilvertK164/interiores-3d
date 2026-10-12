@@ -20,6 +20,8 @@ export type CoreDeps = {
   /** Conserva la vista 2D / 3D / Ambas entre recargas (Pascal la pierde: sus paneles la pisan antes de rehidratar). */
   /** Cámara 3D de Pascal: con ella el plano entra recto (norte arriba) al pasar a 2D o a Ambas. */
   camera?: CameraPort
+  /** Pide al plano de Pascal (parche `__madoriPlanNorth`) ignorar el azimut de la cámara 3D; devuelve cómo soltarlo. */
+  lockPlanNorth?(): () => void
   viewStore?: { read(): ViewMode | null; write(view: ViewMode): void }
 }
 
@@ -53,6 +55,7 @@ export function createCoreSlice(deps: CoreDeps) {
       const saved = deps.viewStore?.read()
       if (saved && saved !== deps.editor.getState().viewMode) deps.editor.getState().setViewMode(saved)
       let last = deps.editor.getState().viewMode
+      const unlockNorth = deps.lockPlanNorth?.() ?? (() => {})
       const stopNorth = deps.camera ? createPlanNorth(deps.editor, deps.camera).start() : () => {}
       const stopView = deps.editor.subscribe(() => {
         const view = deps.editor.getState().viewMode
@@ -63,6 +66,7 @@ export function createCoreSlice(deps: CoreDeps) {
       return () => {
         stopView()
         stopNorth()
+        unlockNorth()
         showHint()
         undoTheme()
       }

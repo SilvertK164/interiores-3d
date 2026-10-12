@@ -1,7 +1,34 @@
+diff --git a/src/components/editor/floorplan-panel.tsx b/src/components/editor/floorplan-panel.tsx
+index fc56af07361709346668b929311748651a0d4fab..d59223ce89f903db277e1f5b2af4ebfb8eac5788 100644
+--- a/src/components/editor/floorplan-panel.tsx
++++ b/src/components/editor/floorplan-panel.tsx
+@@ -6607,11 +6607,20 @@ export function FloorplanPanel({
+   )
+ 
+   const receiveFloorplanNavigationPose = useCallback(
+-    (pose: NavigationSyncPose) => {
++    (incomingPose: NavigationSyncPose) => {
+       const previousPose = latestNavigationSyncPoseRef.current
+-      if (previousPose?.source === pose.source && previousPose.revision === pose.revision) {
++      if (
++        previousPose?.source === incomingPose.source &&
++        previousPose.revision === incomingPose.revision
++      ) {
+         return
+       }
++      // Madori: con `__madoriPlanNorth` el plano ignora el azimut de la cámara 3D (norte siempre arriba); sigue su centro y ancho.
++      const pose =
++        incomingPose.source === '3d' &&
++        (globalThis as { __madoriPlanNorth?: boolean }).__madoriPlanNorth
++          ? { ...incomingPose, azimuth: 0 }
++          : incomingPose
+ 
+       latestNavigationSyncPoseRef.current = pose
+ 
 diff --git a/src/components/editor/index.tsx b/src/components/editor/index.tsx
 index 157809cdf66e0f6c296d070881c3ff6b9a23b827..dc9edc3143ccdd93515fa6a85e3ca66b4e720f43 100644
 --- a/src/components/editor/index.tsx
-+++ b/src/components/editor/index.tsx	
++++ b/src/components/editor/index.tsx
 @@ -163,9 +163,21 @@ function initializeEditorRuntime(): () => void {
      outliner.hoveredObjects.length = 0
    }

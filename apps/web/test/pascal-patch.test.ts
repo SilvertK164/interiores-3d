@@ -33,4 +33,10 @@ describe('parche de @pascal-app/editor (propiedad chrome)', () => {
     expect(patch).toContain('src/components/editor/index.tsx')
     for (const attribute of ATTRIBUTES) expect(patch, attribute).toMatch(new RegExp(`^\\+.*${attribute}`, 'm'))
   })
+
+  it('el plano de Pascal ignora el azimut 3D con __madoriPlanNorth (parche en floorplan-panel)', () => {
+    const panel = readFileSync(editorIndex.replace('index.tsx', 'floorplan-panel.tsx'), 'utf8')
+    expect(panel).toContain('__madoriPlanNorth')
+    expect(readFileSync(fromRoot(PATCH_FILE), 'utf8')).toMatch(/^\+.*__madoriPlanNorth/m)
+  })
 })

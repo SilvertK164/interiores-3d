@@ -90,6 +90,13 @@ function coreDeps(): CoreDeps {
     applyTheme: applyEditorTheme,
     viewStore: createViewStorage(),
     camera: cameraPort(),
+    lockPlanNorth: () => {
+      // Lo lee el parche de Madori de `floorplan-panel.tsx` (`patches/@pascal-app__editor@1.0.3.patch`).
+      ;(globalThis as { __madoriPlanNorth?: boolean }).__madoriPlanNorth = true
+      return () => {
+        ;(globalThis as { __madoriPlanNorth?: boolean }).__madoriPlanNorth = false
+      }
+    },
     // `focus([])` oculta el aviso de cámara en inglés (editor/src/store/use-camera-hint-focus.ts); `focus(null)` lo devuelve.
     hideCameraHint: () => {
       Pascal.useCameraHintFocus.getState().focus([])
