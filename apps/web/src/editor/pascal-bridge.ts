@@ -4,6 +4,7 @@ import { type ShellBridge, createBridge } from './shell/bridge'
 import type { CoreDeps, HistoryPort } from './shell/bridge/core'
 import type { ModeDeps } from './shell/bridge/mode'
 import { DECISIONS } from './shell/decisions'
+import { createViewStorage } from './shell/view-storage'
 
 /**
  * Único archivo de `src/editor` que toca los almacenes y funciones de Pascal para el shell: `src/editor/shell/` usa tipos propios
@@ -53,6 +54,7 @@ function coreDeps(): CoreDeps {
     scene: Pascal.useScene,
     history: historyPort(),
     applyTheme: applyEditorTheme,
+    viewStore: createViewStorage(),
     // `focus([])` oculta el aviso de cámara en inglés (editor/src/store/use-camera-hint-focus.ts); `focus(null)` lo devuelve.
     hideCameraHint: () => {
       Pascal.useCameraHintFocus.getState().focus([])

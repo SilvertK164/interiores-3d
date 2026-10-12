@@ -1,4 +1,4 @@
-import type { BridgeSnapshot, EditorLike, HistoryState, SceneLike, StoreLike, ViewerLike } from './types'
+import type { BridgeSnapshot, ViewMode, EditorLike, HistoryState, SceneLike, StoreLike, ViewerLike } from './types'
 
 export type HistoryPort = {
   read(): HistoryState
@@ -16,6 +16,8 @@ export type CoreDeps = {
   applyTheme(): () => void
   /** Oculta el aviso de cámara en inglés de Pascal; devuelve cómo volver a mostrarlo. */
   hideCameraHint(): () => void
+  /** Conserva la vista 2D / 3D / Ambas entre recargas (Pascal la pierde: sus paneles la pisan antes de rehidratar). */
+  viewStore?: { read(): ViewMode | null; write(view: ViewMode): void }
 }
 
 export function createCoreSlice(deps: CoreDeps) {
@@ -45,7 +47,17 @@ export function createCoreSlice(deps: CoreDeps) {
     mountDefaults(): () => void {
       const undoTheme = deps.applyTheme()
       const showHint = deps.hideCameraHint()
+      const saved = deps.viewStore?.read()
+      if (saved && saved !== deps.editor.getState().viewMode) deps.editor.getState().setViewMode(saved)
+      let last = deps.editor.getState().viewMode
+      const stopView = deps.editor.subscribe(() => {
+        const view = deps.editor.getState().viewMode
+        if (view === last) return
+        last = view
+        deps.viewStore?.write(view)
+      })
       return () => {
+        stopView()
         showHint()
         undoTheme()
       }

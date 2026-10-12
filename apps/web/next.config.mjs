@@ -10,6 +10,9 @@ const nextConfig = {
   async rewrites() {
     return { fallback: [{ source: '/material/:path*', destination: 'https://editor.pascal.app/material/:path*' }] }
   },
+  // Solo en las pruebas en navegador: la insignia "N" de desarrollo de Next (abajo a la izquierda) tapa los controles del shell y
+  // bloquea los clics de Playwright. No toca el overlay de errores: un error de ejecución sigue apareciendo y rompe la prueba.
+  devIndicators: process.env.NEXT_PUBLIC_E2E === '1' ? false : undefined,
   env: {
     // Pascal arma las URLs de sus assets con esta base; si queda vacía usa editor.pascal.app.
     NEXT_PUBLIC_ASSETS_CDN_URL:
