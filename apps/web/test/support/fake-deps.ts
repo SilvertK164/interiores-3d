@@ -1,6 +1,14 @@
 import { vi } from 'vitest'
 import type { BridgeDeps } from '../../src/editor/shell/bridge'
 import type { EditorLike, EditorMode, HistoryState, SceneLike, SnapContext, SnapMode, ViewerLike } from '../../src/editor/shell/bridge/types'
+import type { MaterialItemLike } from '../../src/editor/shell/materials-model'
+
+/** Biblioteca de materiales de mentira: un color liso, una madera y un techo. */
+export const FAKE_MATERIALS: MaterialItemLike[] = [
+  { id: 'preset-white', label: 'White', category: 'colors', color: '#e9e9e9' },
+  { id: 'wood-woodfine1', label: 'Wood Fine 1', category: 'wood', surfaces: ['floor', 'wall', 'furniture'], thumbnail: '/material/wood/1.webp' },
+  { id: 'roof-claytiles', label: 'Clay Tiles', category: 'roofing', surfaces: ['roof'] },
+]
 
 export function createFakeStore<S extends object>(initial: S) {
   let state = initial
@@ -79,6 +87,7 @@ export function createFakeDeps() {
   }
   const undoTheme = vi.fn()
   const showHint = vi.fn()
+  const materials = { items: FAKE_MATERIALS, selectedId: null as string | null, select: vi.fn() }
   const deps = {
     editor,
     viewer,
@@ -93,6 +102,8 @@ export function createFakeDeps() {
     cancelActiveTool: vi.fn(),
     createLevel: vi.fn((_input: { buildingId: string; level: number }) => 'level_nuevo'),
     activateCatalogItem: vi.fn(),
+    // El mismo objeto en cada llamada: las pruebas miran `deps.useMaterialsModel().select`.
+    useMaterialsModel: vi.fn(() => materials),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

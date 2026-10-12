@@ -5,7 +5,9 @@ import { type ShellBridge, createBridge } from './shell/bridge'
 import type { CatalogDeps } from './shell/bridge/catalog'
 import type { CoreDeps, HistoryPort } from './shell/bridge/core'
 import type { LevelsDeps } from './shell/bridge/levels'
+import type { MaterialsDeps } from './shell/bridge/materials'
 import type { ModeDeps } from './shell/bridge/mode'
+import type { MaterialItemLike } from './shell/materials-model'
 import { DECISIONS } from './shell/decisions'
 import { createViewStorage } from './shell/view-storage'
 
@@ -95,12 +97,38 @@ function catalogDeps(): CatalogDeps {
   }
 }
 
+/** La biblioteca de materiales de Pascal (solo los suyos; los "míos" y los de la comunidad son de otra función). */
+const MATERIAL_LIBRARY: readonly MaterialItemLike[] = Core.MATERIAL_CATALOG.filter(
+  (item) => (item.source ?? 'pascal') === 'pascal',
+).map((item) => ({
+  id: item.id,
+  label: item.label,
+  category: item.category,
+  surfaces: item.surfaces,
+  thumbnail: item.previewThumbnailUrl,
+  color: item.previewColor,
+}))
+
+function materialsDeps(): MaterialsDeps {
+  return {
+    useMaterialsModel() {
+      const paint = Pascal.useMaterialPaintPanelModel()
+      return {
+        items: MATERIAL_LIBRARY,
+        selectedId: Core.getLibraryMaterialIdFromRef(paint.activePaintMaterial?.materialPreset),
+        select: (id) => paint.selectMaterial(Core.toLibraryMaterialRef(id)),
+      }
+    },
+  }
+}
+
 export function createPascalBridge(): ShellBridge {
   return createBridge({
     ...coreDeps(),
     ...modeDeps(),
     ...levelsDeps(),
     ...catalogDeps(),
+    ...materialsDeps(),
     // @@deps
   })
 }
