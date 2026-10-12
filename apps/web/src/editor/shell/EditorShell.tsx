@@ -10,6 +10,7 @@ import { PropertiesPanel } from './PropertiesPanel'
 import { ShellDock } from './ShellDock'
 import { ShellTopBar } from './ShellTopBar'
 import { ShellUndoRedo } from './ShellUndoRedo'
+import { ShellView } from './ShellView'
 import { BridgeProvider, useShell } from './use-bridge'
 
 function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
@@ -17,12 +18,14 @@ function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
   return (
     <>
       <LeftPanel catalog={catalog} />
-      {mode === 'editar' && (
+      {mode === 'editar' ? (
         <>
           <ShellDock />
           <ShellUndoRedo />
           <PropertiesPanel />
         </>
+      ) : (
+        <ShellView />
       )}
     </>
   )
