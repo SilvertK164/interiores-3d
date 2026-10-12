@@ -6,6 +6,7 @@ import type { ShellBridge } from './bridge'
 import { selectShellState } from './bridge/selectors'
 import type { CatalogItemLike } from './furniture-model'
 import { LeftPanel } from './LeftPanel'
+import { PropertiesPanel } from './PropertiesPanel'
 import { ShellDock } from './ShellDock'
 import { ShellTopBar } from './ShellTopBar'
 import { ShellUndoRedo } from './ShellUndoRedo'
@@ -20,6 +21,7 @@ function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
         <>
           <ShellDock />
           <ShellUndoRedo />
+          <PropertiesPanel />
         </>
       )}
     </>
