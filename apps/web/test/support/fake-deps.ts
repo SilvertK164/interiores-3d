@@ -58,6 +58,10 @@ export function createFakeDeps() {
     setSnappingMode: vi.fn((context: SnapContext, mode: SnapMode) =>
       editor.setState({ snappingModeByContext: { ...editor.getState().snappingModeByContext, [context]: mode } }),
     ),
+    navigationSyncPose: null,
+    publishNavigationSyncPose: vi.fn((pose: Omit<NonNullable<EditorLike['navigationSyncPose']>, 'revision'>) =>
+      editor.setState({ navigationSyncPose: { ...pose, revision: (editor.getState().navigationSyncPose?.revision ?? 0) + 1 } }),
+    ),
     // @@fake-editor
   })
   const viewer = createFakeStore<ViewerLike>({

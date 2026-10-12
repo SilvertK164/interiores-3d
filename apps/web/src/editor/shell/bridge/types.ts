@@ -15,6 +15,14 @@ export type Shading = 'solid' | 'rendered'
 
 export type StoreLike<S> = { getState(): S; subscribe(listener: () => void): () => void }
 
+export type NavigationPoseLike = {
+  source: '2d' | '3d'
+  revision: number
+  target: [number, number, number]
+  azimuth: number
+  viewWidth: number
+}
+
 /** `useEditor` de Pascal (editor/src/store/use-editor.tsx). */
 export type EditorLike = {
   phase: Phase
@@ -38,6 +46,9 @@ export type EditorLike = {
   setToolDefaults(tool: string, defaults: Record<string, unknown> | null): void
   setGridSnapStep(step: number): void
   setSnappingMode(context: SnapContext, mode: SnapMode): void
+  /** Última cámara compartida entre el plano y el 3D (el plano gira con el azimut de la cámara 3D). */
+  navigationSyncPose: NavigationPoseLike | null
+  publishNavigationSyncPose(pose: Omit<NavigationPoseLike, 'revision'>): void
   // @@editor-like
 }
 
