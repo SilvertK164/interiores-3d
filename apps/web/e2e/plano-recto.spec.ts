@@ -107,3 +107,40 @@ test('Ambas: lo que se edita en una vista se ve en la otra', async ({ page }) =>
   await hook(page, 'moveNode', id, [3, 0, 3])
   await expect.poll(spot).not.toEqual(was)
 })
+
+test('Ambas: cada vista se encuadra a la planta completa sin quedar bajo los paneles', async ({ page }) => {
+  test.setTimeout(180_000)
+  await openSplit(page)
+  await page.waitForTimeout(2500)
+  const boxes = await page.evaluate(() => {
+    const r = (el: Element | null | undefined) => {
+      const b = el?.getBoundingClientRect()
+      return b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null
+    }
+    const scene = document.querySelector('[data-floorplan-scene]') as SVGGElement | null
+    // Las paredes y muebles del nivel activo (el fondo y la cuadrícula del plano no cuentan).
+    const content = scene?.querySelector('[data-node-id]')?.parentElement
+    return {
+      svg: r(scene?.ownerSVGElement),
+      content: r(content),
+      left: r(document.querySelector('[data-frame-panel="left"]')),
+      bottom: r(document.querySelector('[data-frame-panel="bottom"]')),
+    }
+  })
+  const { svg, content, left, bottom } = boxes as Record<string, { x: number; y: number; w: number; h: number } | null>
+  expect(svg && content && left && bottom).toBeTruthy()
+  const c = content as { x: number; y: number; w: number; h: number }
+  const l = left as { x: number; y: number; w: number; h: number }
+  const b = bottom as { x: number; y: number; w: number; h: number }
+  const s = svg as { x: number; y: number; w: number; h: number }
+  // Entra completa en el lienzo...
+  expect(c.x).toBeGreaterThanOrEqual(s.x - 1)
+  expect(c.x + c.w).toBeLessThanOrEqual(s.x + s.w + 1)
+  expect(c.y).toBeGreaterThanOrEqual(s.y - 1)
+  expect(c.y + c.h).toBeLessThanOrEqual(s.y + s.h + 1)
+  // ...y ni el panel de plantas ni el dock la tapan.
+  expect(c.x).toBeGreaterThanOrEqual(l.x + l.w - 1)
+  expect(c.y + c.h).toBeLessThanOrEqual(b.y + 1)
+  // Y llena una parte razonable de la zona libre (no queda chica en una esquina).
+  expect(c.w).toBeGreaterThan((s.w - (l.x + l.w - s.x)) * 0.5)
+})

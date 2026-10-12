@@ -172,6 +172,7 @@ export function LevelPanel({
   return (
     <aside
       aria-label="Nivel y ambientes"
+      data-frame-panel="left"
       className={cx(FLOAT, 'absolute left-5 top-[88px] z-10 w-[268px] rounded-[26px] p-3.5')}
     >
       <LevelPicker {...picker} />

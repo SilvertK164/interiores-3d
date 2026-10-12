@@ -69,7 +69,7 @@ export function MaterialsCatalog({
   onPick: (id: string) => void
 }) {
   return (
-    <aside aria-label="Materiales" className={cx(FLOAT, SIDE_PANEL)}>
+    <aside aria-label="Materiales" data-frame-panel="left" className={cx(FLOAT, SIDE_PANEL)}>
       <h2 className="font-display text-[22px] font-semibold leading-none">Materiales</h2>
       <div className="mt-3.5">
         <ChipRow title="Superficie" chips={tabs} active={tab} onPick={onTab} />

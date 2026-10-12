@@ -121,6 +121,7 @@ export function createFakeDeps() {
     deleteNodes: vi.fn(),
     moveCamera: vi.fn(),
     startWalkthrough: vi.fn(() => editor.setState({ isFirstPersonMode: true })),
+    frameViews: vi.fn(),
     updateLevels: vi.fn(),
     duplicateLevel: vi.fn((_id: string): string | null => 'level_copia'),
     deleteLevel: vi.fn(),

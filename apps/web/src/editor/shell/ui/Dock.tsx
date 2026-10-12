@@ -27,6 +27,7 @@ export function Dock({
       <div
         role="toolbar"
         aria-label="Herramientas de edición"
+        data-frame-panel="bottom"
         onKeyDown={(event) => moveFocusOnKey(event, '[data-dock]', 'horizontal')}
         className={cx(FLOAT, 'flex items-center gap-1 rounded-[28px] p-2')}
       >

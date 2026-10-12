@@ -14,6 +14,7 @@ import type { ModeDeps } from './shell/bridge/mode'
 import type { ViewDeps } from './shell/bridge/view'
 import type { MaterialItemLike } from './shell/materials-model'
 import { DECISIONS } from './shell/decisions'
+import { frameDeps } from './frame-deps'
 import { levelManageDeps } from './level-manage-deps'
 import { nodePresets } from './node-presets'
 import { createViewStorage } from './shell/view-storage'
@@ -75,7 +76,8 @@ function coreDeps(): CoreDeps {
       // Lo leen los parches de Madori de `floorplan-camera-sync.ts` y `floorplan-panel.tsx` (`patches/@pascal-app__editor@1.0.3.patch`).
       ;(globalThis as { __madoriDecoupled?: boolean }).__madoriDecoupled = true
       return () => {
-        ;(globalThis as { __madoriDecoupled?: boolean }).__madoriDecoupled = false
+        ;(globalThis as { __madoriDecoupled?: boolean; __madoriPlanFit?: unknown }).__madoriDecoupled = false
+        ;(globalThis as { __madoriPlanFit?: unknown }).__madoriPlanFit = undefined
       }
     },
     // `focus([])` oculta el aviso de cámara en inglés (editor/src/store/use-camera-hint-focus.ts); `focus(null)` lo devuelve.
@@ -228,6 +230,7 @@ export function createPascalBridge(): ShellBridge {
     ...viewDeps(),
     ...nodePresets(),
     ...levelManageDeps(),
+    ...frameDeps(),
     // @@deps
   })
 }

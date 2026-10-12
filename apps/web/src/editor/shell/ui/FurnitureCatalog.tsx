@@ -68,7 +68,7 @@ export function FurnitureCatalog({
   custom?: ReactNode
 }) {
   return (
-    <aside aria-label="Muebles" className={cx(FLOAT, SIDE_PANEL)}>
+    <aside aria-label="Muebles" data-frame-panel="left" className={cx(FLOAT, SIDE_PANEL)}>
       <h2 className="font-display text-[22px] font-semibold leading-none">Muebles</h2>
       <label className="relative mt-3.5 block">
         <span className="sr-only">Buscar muebles</span>

@@ -76,10 +76,67 @@ index 448428e67899e42cc568a41493bf201a4511592e..0574d147319803c83edf9a75c5ba1cb7
 +  )
  }
 diff --git a/src/components/editor/floorplan-panel.tsx b/src/components/editor/floorplan-panel.tsx
-index fc56af07361709346668b929311748651a0d4fab..d4b44401b64db9c52f7c141d32c96bdc32968a88 100644
+index fc56af07361709346668b929311748651a0d4fab..c841bd94e2bd109399a9ff98d05b563dac1f2f03 100644
 --- a/src/components/editor/floorplan-panel.tsx
 +++ b/src/components/editor/floorplan-panel.tsx
-@@ -7801,8 +7801,14 @@ export function FloorplanPanel({
+@@ -6129,7 +6129,46 @@ export function FloorplanPanel({
+     [svgAspectRatio],
+   )
+ 
++  // Madori: `madori:plan-fit` pide volver al encuadre automático (que `__madoriPlanFit` calcula sobre la planta activa y su zona libre).
++  const [madoriFitVersion, setMadoriFitVersion] = useState(0)
++  useEffect(() => {
++    const refit = () => {
++      hasUserAdjustedViewportRef.current = false
++      setViewport(null)
++      setMadoriFitVersion((version) => version + 1)
++    }
++    window.addEventListener('madori:plan-fit', refit)
++    return () => window.removeEventListener('madori:plan-fit', refit)
++  }, [])
++
+   const fittedViewport = useMemo(() => {
++    const madoriFit = (
++      globalThis as {
++        __madoriPlanFit?: (
++          content: { minX: number; minY: number; maxX: number; maxY: number },
++          surface: { width: number; height: number },
++        ) => FloorplanViewport | null
++      }
++    ).__madoriPlanFit
++    if (madoriFit && measuredSceneBBox && measuredSceneBBox.width > 0 && measuredSceneBBox.height > 0) {
++      const { x, y, width: w, height: h } = measuredSceneBBox
++      const corners = [
++        rotateSvgPoint({ x, y }, floorplanSceneRotationDeg),
++        rotateSvgPoint({ x: x + w, y }, floorplanSceneRotationDeg),
++        rotateSvgPoint({ x, y: y + h }, floorplanSceneRotationDeg),
++        rotateSvgPoint({ x: x + w, y: y + h }, floorplanSceneRotationDeg),
++      ]
++      const fitted = madoriFit(
++        {
++          minX: Math.min(...corners.map((c) => c.x)),
++          minY: Math.min(...corners.map((c) => c.y)),
++          maxX: Math.max(...corners.map((c) => c.x)),
++          maxY: Math.max(...corners.map((c) => c.y)),
++        },
++        surfaceSize,
++      )
++      if (fitted) return fitted
++    }
+     let minX = Number.POSITIVE_INFINITY
+     let maxX = Number.NEGATIVE_INFINITY
+     let minY = Number.POSITIVE_INFINITY
+@@ -6183,7 +6222,8 @@ export function FloorplanPanel({
+       centerY,
+       width,
+     }
+-  }, [floorplanSceneRotationDeg, measuredSceneBBox, svgAspectRatio, visibleSitePolygon])
++    // biome-ignore lint/correctness/useExhaustiveDependencies: `madoriFitVersion` fuerza el recálculo cuando Madori cambia los márgenes.
++  }, [floorplanSceneRotationDeg, madoriFitVersion, measuredSceneBBox, surfaceSize, svgAspectRatio, visibleSitePolygon])
+   latestFittedViewportRef.current = fittedViewport
+ 
+   // Measure the content-only subtree after its geometry settles. ViewBox-only
+@@ -7801,8 +7841,14 @@ export function FloorplanPanel({
        smoothFloorplanNavigationView(localCenter, nextRotationDeg, viewport.width)
        publishFloorplanNavigationPose(localCenter, nextRotationDeg, viewport.width)
      }
@@ -96,7 +153,7 @@ index fc56af07361709346668b929311748651a0d4fab..d4b44401b64db9c52f7c141d32c96bdc
      document.addEventListener('keydown', onKeyDown)
      document.addEventListener('keyup', onKeyUp)
      window.addEventListener('blur', onBlur)
-@@ -11376,7 +11382,7 @@ export function FloorplanPanel({
+@@ -11376,7 +11422,7 @@ export function FloorplanPanel({
  
          {levelNode?.type !== 'level' && !hasAmbientBuildingLevel ? (
            <div className="flex h-full items-center justify-center px-6 text-center text-muted-foreground text-sm">

@@ -22,6 +22,7 @@ export function ViewPanel({
   return (
     <aside
       aria-label="Vista 3D"
+      data-frame-panel="right"
       className={cx(FLOAT, 'absolute right-5 top-[88px] z-10 w-[316px] rounded-[26px] p-4')}
     >
       <h2 className="font-display text-[19px] font-semibold leading-none">Vista 3D</h2>

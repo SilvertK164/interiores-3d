@@ -21,7 +21,7 @@ export function TopBar({
   right: ReactNode
 }) {
   return (
-    <header className="pointer-events-none absolute inset-x-5 top-5 z-20 grid grid-cols-[1fr_auto_1fr] items-start">
+    <header data-frame-panel="top" className="pointer-events-none absolute inset-x-5 top-5 z-20 grid grid-cols-[1fr_auto_1fr] items-start">
       <div
         className={cx(
           FLOAT,

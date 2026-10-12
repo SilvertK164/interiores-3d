@@ -129,6 +129,7 @@ export function PropertiesCard({
   return (
     <aside
       aria-label="Propiedades"
+      data-frame-panel="right"
       className={cx(
         FLOAT,
         'shell-scroll absolute right-5 top-[88px] z-10 max-h-[calc(100dvh-200px)] w-[316px] overflow-y-auto rounded-[26px] p-4',

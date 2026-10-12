@@ -13,7 +13,14 @@ import { ShellTopBar } from './ShellTopBar'
 import { ShellUndoRedo } from './ShellUndoRedo'
 import { ShellView } from './ShellView'
 import { WalkthroughHint } from './WalkthroughHint'
+import { useFrameViews } from './use-frame-views'
 import { BridgeProvider, useShell } from './use-bridge'
+
+/** Encuadra las vistas; vive dentro del proveedor del puente. */
+function FrameViews() {
+  useFrameViews()
+  return null
+}
 
 function ShellBody({ catalog }: { catalog: readonly CatalogItemLike[] }) {
   const { mode, firstPerson } = useShell((s) => {
@@ -76,6 +83,7 @@ export function EditorShell({
   return (
     <BridgeProvider bridge={bridge}>
       <div data-editor-shell className="editor-shell pointer-events-none absolute inset-0 z-40 overflow-hidden">
+        <FrameViews />
         <ShellTopBar name={projectName} saveStatus={saveStatus} onBack={onBack} backBusy={backBusy} />
         <ShellBody catalog={catalog} />
       </div>

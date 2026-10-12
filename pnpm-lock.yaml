@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@pascal-app/editor@1.0.3': 698bd37361f3d929f0c182982a41f367f230b3b47b5949163566619228a8958e
+  '@pascal-app/editor@1.0.3': 99360aadc4ba41ed055dcd141856b7e8107e4c109742cfcfd62d67f4361a1054
   '@pascal-app/viewer@1.0.3': fc43c9f70838106416bc547634dfe0ccac2a52a49e41a4e31c45b5ac447e63b1
   '@react-three/drei@10.7.9': ba5a1d496a731ad8f5ce1d4663f4b163ec57134a66c729b4b850074bb8139979
 
@@ -73,10 +73,10 @@ importers:
         version: 1.0.3(@react-three/drei@10.7.9(patch_hash=ba5a1d496a731ad8f5ce1d4663f4b163ec57134a66c729b4b850074bb8139979)(@react-three/fiber@9.8.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1))(@types/react@19.3.0)(@types/three@0.186.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1))(@react-three/fiber@9.8.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1))(@types/react@19.3.0)(react@19.3.0)(three@0.186.1)(use-sync-external-store@1.7.0(react@19.3.0))
       '@pascal-app/editor':
         specifier: 1.0.3
-        version: 1.0.3(patch_hash=698bd37361f3d929f0c182982a41f367f230b3b47b5949163566619228a8958e)(cad21c54ecbce8b0f19744e9c4f3c3bc)
+        version: 1.0.3(patch_hash=99360aadc4ba41ed055dcd141856b7e8107e4c109742cfcfd62d67f4361a1054)(cad21c54ecbce8b0f19744e9c4f3c3bc)
       '@pascal-app/nodes':
         specifier: 1.0.3
-        version: 1.0.3(184182450625b61868a53ae36ffe7732)
+        version: 1.0.3(434f52d2e08f06b0b1688c9ad516b106)
       '@pascal-app/viewer':
         specifier: 1.0.3
         version: 1.0.3(patch_hash=fc43c9f70838106416bc547634dfe0ccac2a52a49e41a4e31c45b5ac447e63b1)(4c4f4146fe6daa3a91d019e8bcfcf8ec)
@@ -3101,7 +3101,7 @@ snapshots:
       - immer
       - use-sync-external-store
 
-  '@pascal-app/editor@1.0.3(patch_hash=698bd37361f3d929f0c182982a41f367f230b3b47b5949163566619228a8958e)(cad21c54ecbce8b0f19744e9c4f3c3bc)':
+  '@pascal-app/editor@1.0.3(patch_hash=99360aadc4ba41ed055dcd141856b7e8107e4c109742cfcfd62d67f4361a1054)(cad21c54ecbce8b0f19744e9c4f3c3bc)':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)
@@ -3162,10 +3162,10 @@ snapshots:
     optionalDependencies:
       react: 19.3.0
 
-  '@pascal-app/nodes@1.0.3(184182450625b61868a53ae36ffe7732)':
+  '@pascal-app/nodes@1.0.3(434f52d2e08f06b0b1688c9ad516b106)':
     dependencies:
       '@pascal-app/core': 1.0.3(@react-three/drei@10.7.9(patch_hash=ba5a1d496a731ad8f5ce1d4663f4b163ec57134a66c729b4b850074bb8139979)(@react-three/fiber@9.8.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1))(@types/react@19.3.0)(@types/three@0.186.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1))(@react-three/fiber@9.8.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1))(@types/react@19.3.0)(react@19.3.0)(three@0.186.1)(use-sync-external-store@1.7.0(react@19.3.0))
-      '@pascal-app/editor': 1.0.3(patch_hash=698bd37361f3d929f0c182982a41f367f230b3b47b5949163566619228a8958e)(cad21c54ecbce8b0f19744e9c4f3c3bc)
+      '@pascal-app/editor': 1.0.3(patch_hash=99360aadc4ba41ed055dcd141856b7e8107e4c109742cfcfd62d67f4361a1054)(cad21c54ecbce8b0f19744e9c4f3c3bc)
       '@pascal-app/viewer': 1.0.3(patch_hash=fc43c9f70838106416bc547634dfe0ccac2a52a49e41a4e31c45b5ac447e63b1)(4c4f4146fe6daa3a91d019e8bcfcf8ec)
       '@react-three/drei': 10.7.9(patch_hash=ba5a1d496a731ad8f5ce1d4663f4b163ec57134a66c729b4b850074bb8139979)(@react-three/fiber@9.8.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1))(@types/react@19.3.0)(@types/three@0.186.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1)
       '@react-three/fiber': 9.8.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.186.1)
