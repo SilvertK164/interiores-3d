@@ -25,9 +25,10 @@ export function ShortcutsDialog({
       aria-label="Atajos de teclado"
       onClose={onClose}
       onKeyDown={(event) => {
-        // Pascal también escucha Esc y el cierre nativo no llega: el diálogo se cierra aquí.
+        // Pascal también escucha Esc: se frena aquí para que no desarme la herramienta, y el diálogo se cierra a mano.
         if (event.key !== 'Escape') return
         event.preventDefault()
+        event.stopPropagation()
         ref.current?.close()
       }}
       className="app-dialog max-w-[480px]"

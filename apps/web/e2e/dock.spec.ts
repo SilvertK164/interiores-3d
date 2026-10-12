@@ -113,3 +113,17 @@ test('un menú del dock enfoca su primera entrada, las flechas mueven el foco y 
   // Escape cerró el menú sin cancelar la herramienta que ya estaba armada.
   expect((await hook(page, 'state')).tool).toBe('wall')
 })
+
+test('Esc en el diálogo de atajos lo cierra sin desarmar la herramienta de Pascal ', async ({ page }) => {
+  await createProjectViaUi(page, { name: `E2E atajos esc ${Date.now()}`, template: null })
+  await dockButton(page, 'Estructura').click()
+  await page.getByRole('menuitem', { name: 'Muro', exact: true }).click()
+  await expect.poll(async () => (await hook(page, 'state')).tool, { timeout: 15_000 }).toBe('wall')
+  await dockButton(page, 'Más').click()
+  await page.getByRole('button', { name: 'Atajos de teclado' }).click()
+  const shortcuts = page.getByRole('dialog', { name: 'Atajos de teclado' })
+  await expect(shortcuts).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(shortcuts).toBeHidden()
+  expect((await hook(page, 'state')).tool).toBe('wall')
+})
