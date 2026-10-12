@@ -77,7 +77,7 @@ test('en Ver el dock no está en pantalla y Editar lo devuelve', async ({ page }
   await expect(dock(page)).toBeVisible()
 })
 
-test('Más: cuadrícula y ajuste cambian lo de Pascal, Eliminar arma el borrado, Atajos abre su diálogo y los botones Pronto no hacen nada', async ({ page }) => {
+test('Más: cuadrícula y ajuste cambian lo de Pascal, Eliminar arma el borrado, Atajos abre su diálogo y ya no hay botones Pronto (solo lo que funciona, con Exportar plano)', async ({ page }) => {
   await createProjectViaUi(page, { name: `E2E mas ${Date.now()}`, template: null })
   const more = page.getByRole('dialog', { name: 'Más opciones' })
   await dockButton(page, 'Más').click()
@@ -86,9 +86,9 @@ test('Más: cuadrícula y ajuste cambian lo de Pascal, Eliminar arma el borrado,
   await expect.poll(async () => (await hook(page, 'state')).gridSnapStep).toBe(0.25)
   await more.getByRole('button', { name: 'Ángulos' }).click()
   await expect.poll(async () => (await hook(page, 'state')).snapWall).toBe('angles')
-  for (const name of ['Compartir', 'Renderizar']) await expect(more.getByRole('button', { name })).toBeDisabled()
+  for (const name of ['Compartir', 'Renderizar']) await expect(more.getByRole('button', { name })).toHaveCount(0)
   await expect(more.getByRole('button', { name: 'Exportar plano' })).toBeEnabled()
-  await expect(more.getByText('Pronto')).toHaveCount(2)
+  await expect(more.getByText('Pronto')).toHaveCount(0)
 
   await more.getByRole('button', { name: 'Atajos de teclado' }).click()
   const shortcuts = page.getByRole('dialog', { name: 'Atajos de teclado' })

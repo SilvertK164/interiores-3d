@@ -19,13 +19,13 @@ const pressedLabels = (markup: string) =>
 describe('MoreMenu', () => {
   const markup = render(<MoreMenu onClose={noop} onExportPlan={noop} onShortcuts={noop} />)
 
-  it('ofrece eliminar, cuadrícula, ajustes, atajos, Exportar plano y los dos botones Pronto deshabilitados', () => {
+  it('ofrece eliminar, cuadrícula, ajustes, atajos y Exportar plano, y nada más: sin Compartir, Renderizar ni "Pronto"', () => {
     const text = textOf(markup)
-    for (const label of ['Eliminar elementos', 'Cuadrícula', 'Ajuste de muros', 'Ajuste de muebles', 'Atajos de teclado', 'Próximamente', 'Compartir', 'Renderizar', 'Exportar plano']) {
+    for (const label of ['Eliminar elementos', 'Cuadrícula', 'Ajuste de muros', 'Ajuste de muebles', 'Atajos de teclado', 'Exportar plano']) {
       expect(text, label).toContain(label)
     }
-    expect(markup.match(/Pronto/g)).toHaveLength(2)
-    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(2)
+    for (const gone of ['Compartir', 'Renderizar', 'Próximamente', 'Pronto']) expect(text, gone).not.toContain(gone)
+    expect(markup.match(/<button[^>]*disabled=""/g)).toBeNull()
     expect(markup).toContain('role="dialog"')
     expect(markup).toContain('aria-label="Más opciones"')
   })

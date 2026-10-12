@@ -1,15 +1,13 @@
 'use client'
 
-import { FileDown, Keyboard, type LucideIcon, Share2, Sparkles, Trash2 } from 'lucide-react'
+import { FileDown, Keyboard, Trash2 } from 'lucide-react'
 import { type KeyboardEvent, useEffect, useRef } from 'react'
 import { cx } from '@/lib/cx'
 import type { SnapMode } from './bridge/types'
-import { GRID_STEPS, ITEM_SNAP, SOON_ITEMS, WALL_SNAP } from './more-model'
+import { GRID_STEPS, ITEM_SNAP, WALL_SNAP } from './more-model'
 import { ChipRow, FLOAT } from './ui/primitives'
-import { SoonButton } from './ui/status'
 import { useBridge, useShell } from './use-bridge'
 
-const SOON_ICONS: Record<string, LucideIcon> = { share: Share2, render: Sparkles }
 const ROW =
   'focus-ring flex h-11 w-full cursor-pointer items-center gap-3 rounded-[14px] px-2.5 text-left text-[15px] transition-colors duration-150 ease-out'
 const GRID_CHIPS = GRID_STEPS.map((s) => ({ value: String(s.value), label: s.label }))
@@ -23,7 +21,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-/** Panel del botón "Más": borrar, cuadrícula y ajustes de Pascal, atajos, Exportar plano y lo que llega en una próxima versión. */
+/** Panel del botón "Más": borrar, cuadrícula y ajustes de Pascal, atajos y Exportar plano. */
 export function MoreMenu({ onClose, onShortcuts, onExportPlan }: { onClose: () => void; onShortcuts: () => void; onExportPlan: () => void }) {
   const bridge = useBridge()
   const { mode, gridStep, snapWall, snapItem } = useShell((s) => ({
@@ -79,13 +77,6 @@ export function MoreMenu({ onClose, onShortcuts, onExportPlan }: { onClose: () =
         <FileDown aria-hidden="true" className="size-5 shrink-0 text-ink-muted" strokeWidth={1.9} />
         Exportar plano
       </button>
-      <Section title="Próximamente">
-        <div className="flex flex-wrap gap-x-3 gap-y-4 pt-2">
-          {SOON_ITEMS.map((item) => (
-            <SoonButton key={item.id} icon={SOON_ICONS[item.id] ?? Sparkles} label={item.label} />
-          ))}
-        </div>
-      </Section>
     </div>
   )
 }

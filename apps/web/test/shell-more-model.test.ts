@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { GRID_STEPS, ITEM_SNAP, SHORTCUTS, SOON_ITEMS, WALL_SNAP } from '../src/editor/shell/more-model'
+import { GRID_STEPS, ITEM_SNAP, SHORTCUTS, WALL_SNAP } from '../src/editor/shell/more-model'
 
 const ENGLISH = /\b(select|delete|undo|redo|wall|zone|grid|snap|measure|furniture|save|cancel)\b/i
 
@@ -18,9 +18,5 @@ describe('menú Más', () => {
     expect(new Set(SHORTCUTS.map((s) => s.keys)).size).toBe(SHORTCUTS.length)
     for (const s of SHORTCUTS) expect(s.label, s.keys).not.toMatch(ENGLISH)
     expect(SHORTCUTS.map((s) => s.keys)).toContain('Supr')
-  })
-
-  it('Compartir y Renderizar son los botones "Pronto"; Exportar plano ya es real (spec 4, criterio 2)', () => {
-    expect(SOON_ITEMS.map((i) => i.label)).toEqual(['Compartir', 'Renderizar'])
   })
 })
