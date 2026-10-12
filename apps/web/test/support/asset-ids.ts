@@ -7,6 +7,18 @@ const source = readFileSync(
   'utf8',
 )
 
+/** Los mismos ítems con su nombre (en inglés) y medidas: sirve para comprobar que los nombres propios no son los de Pascal. */
+export function availableAssets(): { id: string; name: string; dimensions: [number, number, number] }[] {
+  const ids = availableAssetIds()
+  return source.split('\n  {\n').flatMap((block) => {
+    const id = /\bid: '([^']+)'/.exec(block)?.[1]
+    const name = /\bname: '([^']+)'/.exec(block)?.[1]
+    const dims = /dimensions: \[([^\]]+)\]/.exec(block)?.[1]?.split(',').map(Number)
+    if (!(id && name && dims && dims.length === 3 && ids.has(id))) return []
+    return [{ id, name, dimensions: dims as [number, number, number] }]
+  })
+}
+
 /** Ids de piezas que una plantilla puede usar: el catálogo oficial de Pascal con modelo local. */
 export function availableAssetIds(): Set<string> {
   const ids = new Set<string>()
