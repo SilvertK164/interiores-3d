@@ -436,7 +436,9 @@ components:
     CatalogOption:
       type: object
       additionalProperties: false
-      description: Lo único que el servicio sabe de cada pieza (sin rutas ni medidas)
+      description: >-
+        Lo único que el servicio sabe de cada pieza (sin rutas ni medidas). Los textos no pueden llevar dobles corchetes,
+        porque el catálogo viaja al modelo entre las etiquetas [[CATALOG_START]] y [[CATALOG_END]].
       required: [id, name, category]
       properties:
         id: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$' }

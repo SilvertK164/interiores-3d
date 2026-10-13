@@ -28,6 +28,8 @@ export const errors = {
   // Análisis de fotos (POST /v1/analyze-room): lo que se le dice a la persona, sin nombres del proveedor ni de la configuración.
   analysisUnavailable: () =>
     new AppError(503, ERROR_CODES.analysisUnavailable, 'El análisis de fotos no está disponible por ahora. Inténtalo más tarde.'),
+  analysisFailed: () =>
+    new AppError(502, ERROR_CODES.analysisFailed, 'No pudimos analizar la foto en este momento. Inténtalo de nuevo en unos minutos.'),
   invalidCatalog: () =>
     new AppError(422, ERROR_CODES.invalidCatalog, 'La lista de muebles del catálogo no es válida. Recarga la página e inténtalo de nuevo.'),
   unreadableImage: () =>

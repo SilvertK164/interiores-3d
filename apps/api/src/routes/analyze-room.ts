@@ -1,5 +1,6 @@
 import { ANALYZE_BODY_MAX_BYTES, type AnalyzeRoomBody, AnalyzeRoomBodySchema } from '@interiores/contract'
 import type { FastifyPluginAsync } from 'fastify'
+import { type AnalysisDeps, analyzeRoom, decodeImage } from '../analyze-room/index.js'
 import { errors } from '../errors.js'
 
 /**
@@ -19,13 +20,19 @@ export function parseAnalyzeBody(data: unknown): AnalyzeRoomBody {
 }
 
 /**
+ * `POST /v1/analyze-room` (la sesión la exige el hook de /v1). El orden importa: primero se valida el pedido (lo inválido no
+ * cuesta nada), luego se comprueba que haya proveedor configurado y recién después se llama al modelo.
+ *
  * El cuerpo lleva la foto en base64, así que esta ruta admite más que el tope de 4 MiB de las escenas, y si se pasa el error
  * habla de la foto y no de «la escena» (`config.oversize`, ver build-app.ts).
  */
-export const analyzeRoomRoutes: FastifyPluginAsync = async (app) => {
-  app.post('/analyze-room', { bodyLimit: ANALYZE_BODY_MAX_BYTES, config: { oversize: 'image' } }, async (req) => {
-    parseAnalyzeBody(req.body)
-    // El proveedor de visión se conecta en la fase siguiente: hasta entonces el servicio responde que no está disponible.
-    throw errors.analysisUnavailable()
-  })
-}
+export const analyzeRoomRoutes =
+  (analysis: AnalysisDeps | undefined): FastifyPluginAsync =>
+  async (app) => {
+    app.post('/analyze-room', { bodyLimit: ANALYZE_BODY_MAX_BYTES, config: { oversize: 'image' } }, async (req) => {
+      const body = parseAnalyzeBody(req.body)
+      decodeImage(body.image, body.mime)
+      if (!analysis?.provider) throw errors.analysisUnavailable()
+      return analyzeRoom({ provider: analysis.provider, body, log: req.log })
+    })
+  }

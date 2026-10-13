@@ -1,3 +1,4 @@
+import { createAnalysisDeps } from './analysis-deps.js'
 import { supabaseAuthVerifier } from './auth.js'
 import { LOGGER_REDACT, buildApp } from './build-app.js'
 import { loadConfig } from './config.js'
@@ -10,6 +11,7 @@ const app = buildApp(
     auth: supabaseAuthVerifier(config.supabaseUrl, config.supabaseAnonKey),
     store: createSupabaseStore(config.supabaseUrl, config.supabaseAnonKey),
     corsOrigins: config.corsOrigins,
+    analysis: createAnalysisDeps(config),
   },
   { logger: { level: config.logLevel, redact: LOGGER_REDACT } },
 )

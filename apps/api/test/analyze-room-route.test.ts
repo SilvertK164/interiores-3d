@@ -1,8 +1,8 @@
-import { ANALYZE_BODY_MAX_BYTES, ANALYZE_IMAGE_MAX_BASE64_CHARS } from '@interiores/contract'
+import { ANALYZE_BODY_MAX_BYTES, ANALYZE_IMAGE_MAX_BASE64_CHARS, ANALYZE_IMAGE_MAX_BYTES } from '@interiores/contract'
 import { describe, expect, it } from 'vitest'
 import type { AuthVerifier } from '../src/auth.js'
 import { buildApp } from '../src/build-app.js'
-import { CATALOG, analyzeBody } from './support/images.js'
+import { CATALOG, JPEG, PNG, WEBP, analyzeBody, b64 } from './support/images.js'
 import { createMemoryStore } from './support/memory-store.js'
 
 const auth: AuthVerifier = async (token) => (token === 'token-a' ? { id: 'user-a', token } : null)
@@ -38,8 +38,9 @@ describe('POST /v1/analyze-room: el pedido', () => {
   })
 
   it('acepta las tres fotos del formato permitido y un ancho conocido', async () => {
-    for (const mime of ['image/jpeg', 'image/png', 'image/webp']) {
-      expect((await post(analyzeBody({ mime, knownWidthM: 4.5 }))).statusCode, mime).not.toBe(422)
+    const photos: [string, Buffer][] = [['image/jpeg', JPEG], ['image/png', PNG], ['image/webp', WEBP]]
+    for (const [mime, bytes] of photos) {
+      expect((await post(analyzeBody({ image: b64(bytes), mime, knownWidthM: 4.5 }))).statusCode, mime).toBe(503)
     }
   })
 
@@ -110,12 +111,13 @@ describe('POST /v1/analyze-room: tamaños', () => {
 
   it('el pedido más grande que permite el contrato (foto de 3 MB y catálogo) no se corta por el tope de 4 MiB de las escenas', async () => {
     const heavyCatalog = Array.from({ length: 100 }, (_, i) => ({ id: `pieza-${i}`, name: 'Pieza '.repeat(10).trim(), category: 'categoria', tags: ['uno', 'dos', 'tres'] }))
-    const payload = JSON.stringify(analyzeBody({ image: 'A'.repeat(ANALYZE_IMAGE_MAX_BASE64_CHARS), catalog: heavyCatalog }))
+    const photo = b64(Buffer.concat([JPEG, Buffer.alloc(ANALYZE_IMAGE_MAX_BYTES - JPEG.length)]))
+    expect(photo.length).toBe(ANALYZE_IMAGE_MAX_BASE64_CHARS)
+    const payload = JSON.stringify(analyzeBody({ image: photo, catalog: heavyCatalog }))
     expect(payload.length).toBeGreaterThan(4 * 1024 * 1024)
     expect(payload.length).toBeLessThan(ANALYZE_BODY_MAX_BYTES)
     const res = await app.inject({ method: 'POST', url: '/v1/analyze-room', headers: { ...headers, 'content-type': 'application/json' }, payload })
-    expect(res.statusCode).not.toBe(413)
-    expect(res.statusCode).not.toBe(422)
+    expect(res.statusCode).toBe(503) // llegó entera hasta el análisis, que todavía no tiene proveedor en esta prueba
   })
 
   it('el tope por pedido de las escenas (4 MiB) sigue valiendo para las demás rutas', async () => {

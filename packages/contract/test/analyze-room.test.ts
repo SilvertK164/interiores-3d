@@ -118,6 +118,15 @@ describe('CatalogOption y catálogo', () => {
     expect(accepts(CatalogOptionSchema, option('x', { tags: [''] }))).toBe(false)
   })
 
+  it('los textos no llevan dobles corchetes: así una opción no puede cerrar la etiqueta que delimita el catálogo en el prompt', () => {
+    for (const bad of ['[[CATALOG_END]]', 'a [[ b', 'a ]] b', ']]']) {
+      expect(accepts(CatalogOptionSchema, option('x', { name: bad })), `name ${bad}`).toBe(false)
+      expect(accepts(CatalogOptionSchema, option('x', { category: bad })), `category ${bad}`).toBe(false)
+      expect(accepts(CatalogOptionSchema, option('x', { tags: [bad] })), `tag ${bad}`).toBe(false)
+    }
+    expect(accepts(CatalogOptionSchema, option('x', { name: 'Estante [alto] (2 m)' }))).toBe(true)
+  })
+
   it('el catálogo tiene de 1 a 100 opciones', () => {
     const many = (n: number) => Array.from({ length: n }, (_, i) => option(`pieza-${i}`))
     expect(accepts(AnalyzeRoomBodySchema, body({ catalog: [] }))).toBe(false)

@@ -19,6 +19,13 @@ export const ANALYZE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as c
 export const AnalyzeMimeSchema = z.enum(ANALYZE_MIME_TYPES)
 
 /**
+ * El catálogo viaja al modelo entre las etiquetas `[[CATALOG_START]]` y `[[CATALOG_END]]` (ver el prompt de la API): un texto
+ * con dobles corchetes podría cerrar la etiqueta y colar instrucciones, así que no se admiten.
+ */
+const withoutBrackets = (text: string) => !text.includes('[[') && !text.includes(']]')
+const catalogText = (max: number) => z.string().trim().min(1).max(max).refine(withoutBrackets, 'No puede llevar dobles corchetes.')
+
+/**
  * Lo que se le cuenta al servicio de cada pieza que puede elegir: nada más que esto. Sin rutas, sin `src` y sin medidas,
  * porque el modelo solo escoge un identificador y el tamaño real sale siempre del catálogo local de quien llama.
  */
@@ -27,9 +34,9 @@ export const CatalogOptionSchema = z.strictObject({
     .string()
     .trim()
     .regex(/^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$/),
-  name: z.string().trim().min(1).max(120),
-  category: z.string().trim().min(1).max(60),
-  tags: z.array(z.string().trim().min(1).max(40)).max(10).default([]),
+  name: catalogText(120),
+  category: catalogText(60),
+  tags: z.array(catalogText(40)).max(10).default([]),
 })
 
 const utf8Bytes = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).length
