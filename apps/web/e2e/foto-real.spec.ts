@@ -31,7 +31,7 @@ test('foto real: el plano que devuelve Gemini y su escena en 3D', async ({ page 
   if (res.status() !== 200) return
 
   await expect(page.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible({ timeout: 30_000 })
-  await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+  await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
   await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
   await ready(page)
   await page.waitForTimeout(8000) // texturas, modelos y que la cámara llegue a la pose de la foto

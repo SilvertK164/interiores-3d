@@ -21,7 +21,7 @@ type Props = {
   pending: CreateFromTemplateResult | null
   onSubmit: (event: FormEvent) => void
   onExample: () => void
-  /** El ejemplo está cargado: se muestra su foto en lugar de la zona para subir la propia. */
+  /** El ejemplo está cargado: se muestra su foto en lugar de la zona para subir la propia (y el ancho conocido no se usa). */
   fromExample: boolean
   /** Quita el ejemplo para volver a pedir la foto de la persona. */
   onLeaveExample: () => void
@@ -30,7 +30,7 @@ type Props = {
 
 const CARD = 'glass flex flex-col gap-4 rounded-[28px] p-5 sm:p-6'
 
-/** Primera tarjeta: la foto (con vista previa; con el ejemplo, la foto de ejemplo), el ancho conocido del muro del fondo, el aviso de privacidad y los dos botones de análisis. */
+/** Primera tarjeta: la foto (con vista previa; con el ejemplo, la foto de ejemplo), el ancho conocido del muro del fondo, el aviso de privacidad y los dos botones de análisis. «Probar con un ejemplo» solo carga su foto; «Analizar foto» es lo que analiza, con el ejemplo o con la propia. */
 export function PhotoCard({ file, onFile, widthText, onWidth, busy, notice, pending, onSubmit, onExample, fromExample, onLeaveExample, onRetry }: Props) {
   const analyzing = busy === 'analizando'
   return (
@@ -45,7 +45,7 @@ export function PhotoCard({ file, onFile, widthText, onWidth, busy, notice, pend
         <input
           autoComplete="off"
           className="field"
-          disabled={busy !== null}
+          disabled={busy !== null || fromExample}
           inputMode="decimal"
           onChange={(event) => onWidth(event.target.value)}
           placeholder="4,5"

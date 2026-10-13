@@ -62,12 +62,12 @@ const EXAMPLE_POSE = { position: [0, 1.55, 3.45], target: [0, 0.75, -1.05] }
 const CORNER_POSE = { position: [2.2, 1.55, 1.7], target: [-1.379, 0.75, -1.027] }
 
 test.describe('la cámara 3D abre en el punto de vista de la foto', () => {
-  test('«Abrir en el editor»: en el extremo del salón donde se tomó la foto, mirando hacia el fondo, y el encuadre automático no la pisa', async ({ page }) => {
+  test('«Crear escena y abrir en el editor»: en el extremo del salón donde se tomó la foto, mirando hacia el fondo, y el encuadre automático no la pisa', async ({ page }) => {
     test.setTimeout(240_000)
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.route(ANALYZE_URL, answerWith(HALL_ANALYSIS))
     await analyzePhoto(page)
-    await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
 
@@ -101,7 +101,7 @@ test.describe('la cámara 3D abre en el punto de vista de la foto', () => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.route(ANALYZE_URL, answerWith(CORNER_ANALYSIS))
     await analyzePhoto(page)
-    await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
     // La foto estaba en (5,4; 4,4) de un ambiente de 5 × 4 m: la cámara queda en (4,7; 3,7) del plano, a 0,3 m de los muros sur y este, y mira hacia (0,5; 0,5).
@@ -116,7 +116,7 @@ test.describe('la cámara 3D abre en el punto de vista de la foto', () => {
     await page.screenshot({ path: `${SHOTS}/camara-esquina-1280.png` })
   })
 
-  test('«Probar con un ejemplo» abre con la misma cámara, sin llamar a la API', async ({ page }) => {
+  test('el ejemplo (Probar con un ejemplo, Analizar foto y Crear escena) abre con la misma cámara, sin llamar a la API', async ({ page }) => {
     test.setTimeout(240_000)
     let calledApi = false
     await page.setViewportSize({ width: 1280, height: 800 })
@@ -126,6 +126,8 @@ test.describe('la cámara 3D abre en el punto de vista de la foto', () => {
     })
     await page.goto('/escena-desde-foto')
     await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
+    await page.getByRole('button', { name: 'Analizar foto' }).click()
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
     const pose = await expectPhotoPose(page, EXAMPLE_POSE)
@@ -144,7 +146,7 @@ test.describe('la cámara 3D abre en el punto de vista de la foto', () => {
     await page.addInitScript(() => window.localStorage.setItem('madori-editor-view', '2d'))
     await page.route(ANALYZE_URL, answerWith(HALL_ANALYSIS))
     await analyzePhoto(page)
-    await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
     await expectPhotoPose(page, HALL_POSE)
@@ -162,7 +164,7 @@ test.describe('la cámara 3D abre en el punto de vista de la foto', () => {
     })
     await page.route(ANALYZE_URL, answerWith(HALL_ANALYSIS))
     await analyzePhoto(page)
-    await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     await expect(page.getByText('El proyecto se creó, pero no pudimos guardar la escena')).toBeVisible({ timeout: 60_000 })
     await page.getByRole('button', { name: 'Reintentar guardar la escena' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })

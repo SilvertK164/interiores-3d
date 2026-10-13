@@ -7,7 +7,7 @@ import { PROJECT_URL } from './support/projects'
 import { viewButton } from './support/shell'
 
 // «Escena desde una foto» de punta a punta con el plano de un salón largo y angosto (3,2 × 7 m) que «devuelve Gemini» (POST /v1/analyze-room
-// simulado, con los errores típicos de una foto: el sofá de espaldas a la tele, el mueble de TV despegado del muro): «Abrir en el editor» genera el
+// simulado, con los errores típicos de una foto: el sofá de espaldas a la tele, el mueble de TV despegado del muro): «Crear escena y abrir en el editor» genera el
 // proyecto con el ambiente del tamaño del plano, sus muros, la puerta y la ventana en los muros que dijo Gemini y las piezas ya acomodadas, y el editor
 // lo muestra en 3D. Las capturas (a 1280 px) quedan en test-results/escena-desde-foto/ para mirarlas; lo que se comprueba aquí son las reglas (cuántos
 // nodos hay, dónde queda cada pieza, hacia dónde mira y a qué altura, y que ninguna cruza un muro), no los píxeles.
@@ -44,7 +44,7 @@ test('abrir en el editor genera el salón de 3,2 × 7 m con sus muros, aberturas
   await expect(rowOf('Mueble de TV')).toContainText('contra el muro norte')
   await expect(rowOf('Televisor')).toContainText('sobre «Mueble de TV»')
 
-  await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+  await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
   await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
   await ready(page)
   await expect.poll(async () => (await counts(page)).zone, { timeout: 60_000 }).toBe(1)

@@ -161,7 +161,7 @@ test.describe('diseño de /escena-desde-foto', () => {
       await page.getByRole('button', { name: 'Analizar foto' }).click()
       await expect(page.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible({ timeout: 30_000 })
       await expect(page.getByText('9 piezas')).toBeVisible()
-      await expect(page.getByRole('button', { name: 'Abrir en el editor' })).toBeVisible()
+      await expect(page.getByRole('button', { name: 'Crear escena y abrir en el editor' })).toBeVisible()
       expect(await overflow(page)).toBeLessThanOrEqual(0)
       expect(await smallTargets(page)).toEqual([])
       await page.screenshot({ path: `${SHOTS}/${screen.name}-3-resultado.png`, fullPage: true })

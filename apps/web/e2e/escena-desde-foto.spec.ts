@@ -106,27 +106,38 @@ test.describe('escena desde una foto', () => {
     await expect(page.getByRole('alert').filter({ hasText: 'No hay conexión' })).toBeVisible()
   })
 
-  test('«Abrir en el editor» crea el proyecto «Desde una foto · fecha y hora» y abre el editor con el ambiente y los muebles', async ({ page }) => {
+  test('«Crear escena y abrir en el editor» crea el proyecto «Desde una foto · fecha y hora» y abre el editor con el ambiente y los muebles', async ({ page }) => {
     test.setTimeout(180_000)
     await page.route(ANALYZE_URL, answerWith(SAMPLE_ANALYSIS))
     await analyzePhoto(page)
     const created = page.waitForRequest((request) => request.method() === 'POST' && /\/v1\/projects$/.test(request.url()))
-    await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     expect((await created).postDataJSON().name).toMatch(/^Desde una foto · \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/)
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
     await expectSceneOf(page, SAMPLE_ANALYSIS)
   })
 
-  test('«Probar con un ejemplo» no llama a la API y abre un proyecto real en el editor, con el salón de 3,6 × 7,5 m y sus 14 muebles', async ({ page }) => {
+  test('el ejemplo: «Probar con un ejemplo» solo carga la foto; «Analizar foto» muestra la revisión sin llamar a la API y «Crear escena y abrir en el editor» abre un proyecto real con el salón de 3,6 × 7,5 m y sus 14 muebles', async ({ page }) => {
     test.setTimeout(180_000)
     let calledApi = false
     await page.route(ANALYZE_URL, (route) => {
       calledApi = true
       return route.abort()
     })
+    let created = 0
+    page.on('request', (request) => {
+      if (request.method() === 'POST' && /\/v1\/projects$/.test(request.url())) created++
+    })
     await page.goto('/escena-desde-foto')
     await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
+    await expect(page.getByText('Foto de ejemplo', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Crear escena y abrir en el editor' })).toHaveCount(0)
+    await page.getByRole('button', { name: 'Analizar foto' }).click()
+    await expect(page.getByRole('heading', { name: 'Revisa la escena antes de crearla' })).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByTestId('scene-plan')).toBeVisible()
+    expect(created, 'hasta aquí no se creó ningún proyecto').toBe(0)
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
     await expectSceneOf(page, EXAMPLE_ANALYSIS)
