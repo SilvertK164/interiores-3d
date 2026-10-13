@@ -1,5 +1,5 @@
-import { ANALYSES_PER_HOUR } from '@interiores/contract'
 import { nameEs } from '@/lib/catalog-es'
+import { ANALYSIS_TEXT } from '@/lib/lab/analysis-text'
 import { type ClusterPiece, analysisToCluster } from '@/lib/lab/analysis-to-cluster'
 import type { RoomAnalysis } from '@/lib/lab/schema'
 import type { CatalogItemLike } from './furniture-model'
@@ -10,8 +10,8 @@ export const TEXT = {
   subtitle: 'Sube la foto de un ambiente y te proponemos qué muebles del catálogo hay y dónde. Tú eliges cuáles agregar a tu proyecto.',
   close: 'Cerrar',
   photo: 'Foto del ambiente (JPG, PNG o WebP)',
-  privacy: 'Tu foto se envía a Google (Gemini) para reconocer los muebles y no la guardamos. En el nivel gratuito, Google puede usar las fotos para mejorar sus productos: evita las privadas o con personas.',
-  limit: `Puedes analizar hasta ${ANALYSES_PER_HOUR} fotos por hora.`,
+  privacy: ANALYSIS_TEXT.privacy,
+  limit: ANALYSIS_TEXT.limit,
   width: 'Ancho del ambiente, en metros (opcional)',
   widthPlaceholder: '4,5',
   widthHint: 'Si lo sabes, la distancia entre los muebles se ajusta a ese ancho; si no, supondremos 4 metros.',

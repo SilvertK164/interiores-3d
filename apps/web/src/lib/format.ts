@@ -16,3 +16,13 @@ export function formatSize(width: number, depth: number): string {
 export function formatArea(squareMeters: number): string {
   return `${AREA.format(Number.isFinite(squareMeters) ? squareMeters : 0)} m²`
 }
+
+const FILE_SIZE = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false })
+
+/** "512 B", "1,5 KB", "2,4 MB": el peso de un archivo para la vista previa de una foto (coma decimal; 1 KB = 1024 bytes). */
+export function formatFileSize(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B'
+  if (bytes < 1024) return `${Math.round(bytes)} B`
+  if (bytes < 1024 * 1024) return `${FILE_SIZE.format(bytes / 1024)} KB`
+  return `${FILE_SIZE.format(bytes / (1024 * 1024))} MB`
+}

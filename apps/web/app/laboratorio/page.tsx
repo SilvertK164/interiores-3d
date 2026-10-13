@@ -1,9 +1,9 @@
 'use client'
 
-import { ArrowRight, FlaskConical, LoaderCircle, ScanSearch, Wrench } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { FlaskConical } from 'lucide-react'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
+import { AppHeader } from '@/components/AppHeader'
+import { AppShell } from '@/components/AppShell'
 import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
 import type { AnalysisCandidate } from '@/lib/lab/analysis-catalog'
@@ -13,31 +13,33 @@ import { labProjectName, parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError, LabNotImplementedError } from '@/lib/lab/lab-error'
 import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
+import { savedName } from '@/lib/person-name'
 import { TEMPLATE_DEFINITIONS } from '@/lib/templates'
 import { type CreateFromTemplateResult, retrySaveTemplate } from '@/lib/templates/create-from-template'
 import type { TemplateDefinition } from '@/lib/templates/types'
 import { useLoginRedirect } from '@/lib/use-login-redirect'
+import { useNavigate } from '@/lib/use-navigate'
 import { useSession } from '@/lib/use-session'
-import { PiecesTable } from './PiecesTable'
-import { WarningList } from './WarningList'
+import { useSignOut } from '@/lib/use-sign-out'
+import { EditorPathTool } from './EditorPathTool'
+import type { Notice, NoticePlace } from './LabNotice'
+import { type Busy, PhotoCard } from './PhotoCard'
+import { ResultsCard } from './ResultsCard'
 
-const PRIMARY = 'inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-60'
-const SECONDARY = 'inline-flex items-center gap-2 rounded-md bg-secondary px-4 py-2 disabled:opacity-60'
-const FIELD = 'rounded-md bg-secondary px-3 py-2'
 const SAVE_FAILED = 'El proyecto se creó, pero no pudimos guardar la escena. Puedes reintentar.'
-
-type Notice = { kind: 'info' | 'error'; text: string }
-type Busy = 'analizando' | 'abriendo' | null
+const FRAME = 'mx-auto flex min-h-dvh max-w-[1100px] flex-col gap-5 px-[clamp(20px,4vw,56px)] pb-12 pt-[18px]'
 
 /** El aviso para la pantalla; del error inesperado, el detalle técnico queda en la consola del navegador. */
-function noticeFor(error: unknown): Notice {
+function noticeFor(error: unknown, place: NoticePlace): Notice {
   if (!(error instanceof LabError)) console.error('[laboratorio]', error)
-  return { kind: error instanceof LabNotImplementedError ? 'info' : 'error', text: describeLabError(error) }
+  return { kind: error instanceof LabNotImplementedError ? 'info' : 'error', text: describeLabError(error), place }
 }
 
+/** «Escena desde una foto»: del análisis de una foto al proyecto en el editor. Es la página del Laboratorio de Victoria. */
 export default function LaboratorioPage() {
-  const router = useRouter()
+  const nav = useNavigate()
   const toLogin = useLoginRedirect()
+  const { leaving, signingOut, signOut } = useSignOut()
   const { session, loading, hadSession } = useSession()
   const [file, setFile] = useState<File | null>(null)
   const [widthText, setWidthText] = useState('')
@@ -53,9 +55,10 @@ export default function LaboratorioPage() {
   const lock = useRef(false)
 
   useEffect(() => {
-    // Sin sesión desde el principio no hay aviso; si se perdió estando aquí, /login explica que venció.
-    if (!loading && !session) toLogin(hadSession ? { reason: 'sesion' } : {})
-  }, [loading, session, hadSession, toLogin])
+    // Sin sesión desde el principio no hay aviso; si se perdió estando aquí, /login explica que venció. Salir a propósito no es perderla.
+    if (loading || leaving) return
+    if (!session) toLogin(hadSession ? { reason: 'sesion' } : {})
+  }, [loading, leaving, session, hadSession, toLogin])
 
   function start(next: Exclude<Busy, null>): boolean {
     if (lock.current) return false
@@ -78,10 +81,10 @@ export default function LaboratorioPage() {
     return loaded
   }
 
-  async function analyze(e: FormEvent) {
-    e.preventDefault()
+  async function analyze(event: FormEvent) {
+    event.preventDefault()
     if (lock.current) return
-    if (!file) return setNotice({ kind: 'error', text: 'Elige primero la foto del ambiente.' })
+    if (!file) return setNotice({ kind: 'error', text: 'Elige primero la foto del ambiente.', place: 'form' })
     start('analizando')
     try {
       const knownWidthM = parseKnownWidth(widthText)
@@ -89,35 +92,35 @@ export default function LaboratorioPage() {
       setFromExample(false)
       setModelWarnings([])
     } catch (error) {
-      setNotice(noticeFor(error))
+      setNotice(noticeFor(error, 'form'))
     } finally {
       release()
     }
   }
 
   /** Arma la definición (con `build`), la guarda como proyecto nuevo y abre el editor. Pascal se carga recién aquí. */
-  async function openInEditor(build: (warn: (message: string) => void) => TemplateDefinition, label?: string) {
+  async function openInEditor(build: (warn: (message: string) => void) => TemplateDefinition, place: NoticePlace, label?: string) {
     if (!start('abriendo')) return
     const warnings: string[] = []
-    let leaving = false
+    let going = false
     try {
       const definition = build((message) => warnings.push(message))
       const { openDefinitionAsProject } = await import('@/editor/lab-scene')
       const result = await openDefinitionAsProject(definition, {
         api,
         name: labProjectName(new Date(), label),
-        navigate: router.push,
+        navigate: (href) => nav.go(href),
       })
-      if (result.saved) leaving = true // el candado sigue puesto: la página se reemplaza por el editor
+      if (result.saved) going = true // el candado sigue puesto: la página se reemplaza por el editor
       else {
         setPending(result)
-        setNotice({ kind: 'error', text: SAVE_FAILED })
+        setNotice({ kind: 'error', text: SAVE_FAILED, place })
       }
     } catch (error) {
-      setNotice(noticeFor(error))
+      setNotice(noticeFor(error, place))
     } finally {
       setModelWarnings(warnings)
-      if (!leaving) release()
+      if (!going) release()
     }
   }
 
@@ -129,140 +132,81 @@ export default function LaboratorioPage() {
     try {
       await loadCandidates()
     } catch (error) {
-      return setNotice(noticeFor(error))
+      return setNotice(noticeFor(error, 'form'))
     } finally {
       release()
     }
     setAnalysis(SAMPLE_ANALYSIS)
     setFromExample(true)
-    void openInEditor(modelAnalysis(SAMPLE_ANALYSIS))
+    void openInEditor(modelAnalysis(SAMPLE_ANALYSIS), 'results')
   }
 
   async function retry() {
+    const place = notice?.place ?? 'results'
     if (!pending || !start('abriendo')) return
     const result = await retrySaveTemplate(api, pending)
-    if (result.saved) return router.push(`/proyectos/${result.project.id}`)
+    if (result.saved) return nav.go(`/proyectos/${result.project.id}`)
     setPending(result)
-    setNotice(noticeFor(result.error))
+    setNotice(noticeFor(result.error, place))
     release()
   }
 
-  const loft = TEMPLATE_DEFINITIONS.find((d) => d.id === 'loft')
+  const loft = TEMPLATE_DEFINITIONS.find((definition) => definition.id === 'loft')
 
   if (loading || !session) return <LoaderPortal label="Abriendo el laboratorio" />
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-semibold">
-            <FlaskConical aria-hidden size={24} />
+    <AppShell>
+      <div className={FRAME}>
+        <AppHeader current="laboratorio" email={session.user.email} name={savedName(session.user)} onSignOut={signOut} signingOut={signingOut} />
+
+        <div className="flex flex-col gap-2 pt-3">
+          <span className="chip glass w-fit text-ink-muted">
+            <FlaskConical aria-hidden size={14} />
             Laboratorio de Victoria
-          </h1>
-          <p className="text-muted-foreground">Modelado a partir de fotos con Pascal</p>
-        </div>
-        <Link className="text-sm underline" href="/proyectos">
-          Mis proyectos
-        </Link>
-      </header>
-
-      <p className="text-sm text-muted-foreground">
-        Sube la foto de un ambiente y el análisis propone qué muebles hay y dónde. Aquí ves lo que devuelve y, con «Abrir en el editor», lo llevas a un
-        proyecto nuevo.
-      </p>
-
-      <form className="flex flex-col gap-4" onSubmit={analyze}>
-        <label className="flex flex-col gap-1 text-sm">
-          Foto del ambiente (JPG, PNG o WebP)
-          <input accept="image/jpeg,image/png,image/webp" className={FIELD} onChange={(e) => setFile(e.target.files?.[0] ?? null)} type="file" />
-          <span className="text-xs text-muted-foreground">
-            Tu foto se envía a Google (Gemini) para reconocer los muebles y no la guardamos. En el nivel gratuito, Google puede usar las fotos para
-            mejorar sus productos: evita las privadas o con personas.
           </span>
-        </label>
-        <div className="flex flex-wrap gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            Ancho conocido del ambiente, en metros (opcional)
-            <input className={FIELD} inputMode="decimal" onChange={(e) => setWidthText(e.target.value)} placeholder="4,5" value={widthText} />
-          </label>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <button aria-busy={busy === 'analizando'} className={PRIMARY} disabled={busy !== null} type="submit">
-            {busy === 'analizando' ? <LoaderCircle aria-hidden className="animate-spin" size={16} /> : <ScanSearch aria-hidden size={16} />}
-            {busy === 'analizando' ? 'Analizando…' : 'Analizar foto'}
-          </button>
-          <button className={SECONDARY} disabled={busy !== null} onClick={() => void tryExample()} type="button">
-            Probar con un ejemplo (sin servicio)
-          </button>
-        </div>
-      </form>
-
-      {notice && (
-        <p
-          className={`whitespace-pre-line text-sm ${notice.kind === 'error' ? 'text-destructive' : 'rounded-xl bg-secondary px-4 py-3'}`}
-          role={notice.kind === 'error' ? 'alert' : 'status'}
-        >
-          {notice.text}
-        </p>
-      )}
-      {pending && (
-        <div className="flex gap-3">
-          <button className={PRIMARY} disabled={busy !== null} onClick={retry} type="button">
-            Reintentar guardar la escena
-          </button>
-          <Link className={SECONDARY} href={`/proyectos/${pending.project.id}`}>
-            Abrir el proyecto vacío
-          </Link>
-        </div>
-      )}
-
-      {analysis && (
-        <section aria-labelledby="resultado" className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold" id="resultado">
-            Resultado del análisis
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {fromExample ? 'Análisis de ejemplo: no viene de una foto.' : 'Respuesta del análisis de tu foto.'}{' '}
-            {analysis.calibration.status === 'user_provided' && analysis.calibration.width_m !== null
-              ? `Ancho conocido: ${new Intl.NumberFormat('es', { maximumFractionDigits: 2 }).format(analysis.calibration.width_m)} m.`
-              : 'Sin ancho conocido: las medidas son proporciones del ambiente.'}
+          <h1 className="m-0 font-display text-[clamp(28px,3.6vw,44px)] font-bold leading-[1.05] tracking-[-0.035em]">Escena desde una foto</h1>
+          <p className="m-0 max-w-[58ch] text-[15px] text-ink-muted">
+            Sube la foto de un ambiente y te proponemos qué muebles del catálogo hay y dónde. Después la llevas a un proyecto nuevo y sigues editando.
           </p>
-          <WarningList title="Avisos del servicio" warnings={analysis.warnings} />
-          <WarningList title="Avisos del modelado" warnings={modelWarnings} />
-          <PiecesTable candidates={candidates} furniture={analysis.furniture} />
-          <details className="rounded-xl bg-secondary px-4 py-3 text-sm" open>
-            <summary className="cursor-pointer font-medium">JSON crudo</summary>
-            <pre className="mt-2 max-h-72 overflow-auto text-xs" data-testid="raw-json">
-              {JSON.stringify(analysis, null, 2)}
-            </pre>
-          </details>
-          <div className="flex flex-col items-start gap-2">
-            <button className={PRIMARY} disabled={busy !== null} onClick={() => void openInEditor(modelAnalysis(analysis))} type="button">
-              {busy === 'abriendo' ? <LoaderCircle aria-hidden className="animate-spin" size={16} /> : <ArrowRight aria-hidden size={16} />}
-              Abrir en el editor
-            </button>
-            <p className="text-xs text-muted-foreground">Crea el proyecto «Laboratorio · fecha y hora» en tu cuenta y lo abre en el editor.</p>
-          </div>
-        </section>
-      )}
+        </div>
 
-      {loft && (
-        <details className="rounded-xl bg-secondary px-4 py-3 text-sm">
-          <summary className="flex cursor-pointer items-center gap-2 font-medium">
-            <Wrench aria-hidden size={16} />
-            Comprobar que el camino al editor funciona (sin análisis)
-          </summary>
-          <div className="mt-3 flex flex-col items-start gap-2">
-            <p className="text-muted-foreground">
-              Abre la plantilla Loft como proyecto nuevo, por el mismo camino que usa el laboratorio (cuenta, guardado y editor). Si esto funciona, cualquier
-              definición válida también.
-            </p>
-            <button className={SECONDARY} disabled={busy !== null} onClick={() => void openInEditor(() => loft, 'prueba Loft')} type="button">
-              Abrir el Loft como prueba
-            </button>
-          </div>
-        </details>
-      )}
-    </main>
+        <div className="grid items-start gap-5 desk:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
+          <PhotoCard
+            busy={busy}
+            file={file}
+            notice={notice}
+            onExample={() => void tryExample()}
+            onFile={setFile}
+            onRetry={() => void retry()}
+            onSubmit={analyze}
+            onWidth={setWidthText}
+            pending={pending}
+            widthText={widthText}
+          />
+          <ResultsCard
+            analysis={analysis}
+            busy={busy}
+            candidates={candidates}
+            fromExample={fromExample}
+            modelWarnings={modelWarnings}
+            notice={notice}
+            onOpen={() => analysis && void openInEditor(modelAnalysis(analysis), 'results')}
+            onRetry={() => void retry()}
+            pending={pending}
+          />
+        </div>
+
+        {loft && (
+          <EditorPathTool
+            busy={busy}
+            notice={notice}
+            onOpenLoft={() => void openInEditor(() => loft, 'tool', 'prueba Loft')}
+            onRetry={() => void retry()}
+            pending={pending}
+          />
+        )}
+      </div>
+    </AppShell>
   )
 }

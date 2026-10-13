@@ -6,9 +6,9 @@ Hola Victoria. Madori ya está en línea: https://madori-web-opal.vercel.app
 
 1. **Cuenta:** entra, elige la pestaña de registro y crea la tuya (tu nombre, tu correo y una contraseña de 8 o más caracteres). No hay correo que confirmar. Ves solo tus proyectos.
 2. **Pruébalo:** crea un proyecto desde una plantilla, muévete en 2D y 3D, y mira «Escena desde una foto» en Mis proyectos: es tu espacio, el Laboratorio.
-3. **Tu parte:** `analysisToDefinition` (en `apps/web/src/lib/lab/analysis-to-definition.ts`) está en blanco a propósito. Ahí exploras cómo llevar lo que detecta TP3 a una escena de Pascal. Sin prisa ni orden: es tu espacio.
+3. **Tu parte:** `analysisToDefinition` (en `apps/web/src/lib/lab/analysis-to-definition.ts`) está en blanco a propósito. Ahí exploras cómo llevar lo que detecta el análisis de la foto (tu lógica de TP3, ahora en nuestra API) a una escena de Pascal. Sin prisa ni orden: es tu espacio.
 4. **Cómo me pasas lo tuyo:** clona el repo, crea `lab/<tema>` desde `feature/editor-shell`, y abre el PR con esa rama como base. Yo lo reviso; tú revisas los míos.
-5. **Guías:** `docs/colaboracion.md` (ramas y PR) y `lab/README.md` (cómo correr TP3 y probar).
+5. **Guías:** `docs/colaboracion.md` (ramas y PR) y `lab/README.md` (cómo probar el análisis; correr TP3 en tu máquina es opcional).
 
 Para trabajar en tu máquina sin Docker te paso por un canal privado las dos variables de la base en la nube (nunca por GitHub). Con Docker corres `pnpm db:seed` y tienes cuentas locales listas.
 
@@ -16,7 +16,7 @@ Para trabajar en tu máquina sin Docker te paso por un canal privado las dos var
 
 Trabajas en Madori, el diseñador de interiores 2D+3D de Silvert Quispe y Victoria Villalba (TP final IISAIA, FIUBA). Monorepo pnpm: `apps/web` (Next 16 + editor Pascal 1.0.3 parcheado), `apps/api` (Fastify), `packages/contract` (zod), `supabase/`. Lee primero `CLAUDE.md`, `docs/ESTADO.md`, `docs/colaboracion.md` y `lab/README.md`. Todo en castellano con tuteo, sin emojis (íconos solo de `lucide-react`), commits `tipo(área): descripción`, sin atribuciones, archivos < 300 líneas, versiones exactas.
 
-**Tu zona es el laboratorio de Victoria** (`lab/`, `apps/web/src/lib/lab/`, `apps/web/app/laboratorio/`). La función `analysisToDefinition(analysis: RoomAnalysis, { knownWidthM, warn }) → TemplateDefinition` está en blanco a propósito: es su espacio de exploración, no una tarea con fecha. Implementa solo lo que Victoria pida. La plomería ya está hecha y probada (foto → servicio TP3 → página `/laboratorio` → `openDefinitionAsProject` en `src/editor/lab-scene.ts`). «Probar con un ejemplo» funciona sin TP3 (`sample-analysis.ts`).
+**Tu zona es el laboratorio de Victoria** (`lab/`, `apps/web/src/lib/lab/`, `apps/web/app/laboratorio/`). La función `analysisToDefinition(analysis: RoomAnalysis, { knownWidthM, warn }) → TemplateDefinition` está en blanco a propósito: es su espacio de exploración, no una tarea con fecha. Implementa solo lo que Victoria pida. La plomería ya está hecha y probada (foto → `POST /v1/analyze-room` de nuestra API → página `/laboratorio` → `openDefinitionAsProject` en `src/editor/lab-scene.ts`). «Probar con un ejemplo» funciona sin TP3 (`sample-analysis.ts`).
 
 **Reglas de arquitectura:** solo `apps/web/src/editor/` importa `@pascal-app/*`, `three` y `@react-three/*` (lo vigila `tests/boundaries.test.ts`). Una plantilla es una `TemplateDefinition` pura (`src/lib/templates/types.ts`): niveles, muros, aberturas, ambientes, muebles por id del catálogo de Pascal, materiales `library:<id>` y estantes/gabinetes paramétricos. Mira `src/lib/templates/` para ejemplos. No inventes nombres de la API de Pascal: confírmalos en `node_modules/@pascal-app/*` y anótalos en `docs/pascal-notes.md`. Muebles realistas del catálogo oficial, no estilo juego.
 

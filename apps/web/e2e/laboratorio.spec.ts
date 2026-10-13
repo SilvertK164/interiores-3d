@@ -22,7 +22,7 @@ test.describe('laboratorio', () => {
     })
     await analyzePhoto(page, '4,5')
 
-    await expect(page.getByRole('heading', { name: 'Resultado del análisis' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible()
     await expect(page.getByRole('listitem').filter({ hasText: SAMPLE_ANALYSIS.warnings[0] as string })).toBeVisible()
 
     const table = page.getByRole('table', { name: 'Piezas detectadas' })
@@ -33,7 +33,7 @@ test.describe('laboratorio', () => {
     }
     await expect(table.getByRole('cell', { name: '20 %', exact: true })).toBeVisible() // la confianza baja del ejemplo
 
-    expect(JSON.parse(await page.getByTestId('raw-json').innerText())).toEqual(SAMPLE_ANALYSIS)
+    expect(JSON.parse((await page.getByTestId('raw-json').textContent()) ?? '')).toEqual(SAMPLE_ANALYSIS)
 
     // El pedido llevó la sesión, la foto reducida (JPEG en base64), el ancho con punto decimal y el catálogo sin rutas.
     expect(sent?.authorization).toMatch(/^Bearer /)
@@ -60,7 +60,7 @@ test.describe('laboratorio', () => {
     const message = page.getByRole('alert').filter({ hasText: 'no está disponible' })
     await expect(message).toContainText('El análisis de fotos no está disponible por ahora')
     await expect(message).not.toContainText('GEMINI')
-    await expect(page.getByRole('heading', { name: 'Resultado del análisis' })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'Muebles encontrados' })).toHaveCount(0)
   })
 
   test('si ya se pidieron 10 análisis en la hora, la página lo dice (429)', async ({ page }) => {
@@ -81,19 +81,19 @@ test.describe('laboratorio', () => {
     await page.getByRole('button', { name: 'Abrir en el editor' }).click()
 
     await expect(page.getByText(MODELING_BLANK)).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Laboratorio de Victoria' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Escena desde una foto' })).toBeVisible()
     await expect(page).toHaveURL(/\/laboratorio$/)
     await expect(page.getByRole('button', { name: 'Abrir en el editor' })).toBeEnabled()
   })
 
-  test('«Probar con un ejemplo (sin servicio)» no llama a la API, muestra el ejemplo y explica que el modelado está en blanco', async ({ page }) => {
+  test('«Probar con un ejemplo» no llama a la API, muestra el ejemplo y explica que el modelado está en blanco', async ({ page }) => {
     let calledApi = false
     await page.route(ANALYZE_URL, (route) => {
       calledApi = true
       return route.abort()
     })
     await page.goto('/laboratorio')
-    await page.getByRole('button', { name: 'Probar con un ejemplo (sin servicio)' }).click()
+    await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
 
     await expect(page.getByText(MODELING_BLANK)).toBeVisible()
     await expect(page.getByText('Análisis de ejemplo: no viene de una foto.')).toBeVisible()
@@ -144,7 +144,7 @@ test.describe('laboratorio', () => {
   test.fixme('con el modelado en marcha, «Probar con un ejemplo» abre el editor con un ambiente y sus piezas', async ({ page }) => {
     test.setTimeout(180_000)
     await page.goto('/laboratorio')
-    await page.getByRole('button', { name: 'Probar con un ejemplo (sin servicio)' }).click()
+    await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
 

@@ -17,21 +17,40 @@ const chunk = (type: string, data: Buffer) => {
   return Buffer.concat([length, body, crc])
 }
 
-/** PNG de un solo color con las medidas que se pidan, armado a mano: una foto válida sin guardar archivos binarios en el repo. */
-export function solidPng(width: number, height: number, rgb: [number, number, number] = [200, 180, 150]): Buffer {
+/** Un PNG RGB de ese tamaño a partir de sus filas ya armadas (cada una con su byte de filtro 0 al principio). */
+function pngFrom(width: number, height: number, rows: Buffer): Buffer {
   const header = Buffer.alloc(13)
   header.writeUInt32BE(width, 0)
   header.writeUInt32BE(height, 4)
   header[8] = 8 // bits por canal
   header[9] = 2 // color verdadero (RGB)
-  const row = Buffer.concat([Buffer.from([0]), Buffer.from(Array.from({ length: width }, () => rgb).flat())]) // filtro 0 + los píxeles
-  const rows = Buffer.concat(Array.from({ length: height }, () => row))
   return Buffer.concat([
     Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
     chunk('IHDR', header),
     chunk('IDAT', deflateSync(rows)),
     chunk('IEND', Buffer.alloc(0)),
   ])
+}
+
+/** PNG de un solo color con las medidas que se pidan, armado a mano: una foto válida sin guardar archivos binarios en el repo. */
+export function solidPng(width: number, height: number, rgb: [number, number, number] = [200, 180, 150]): Buffer {
+  const row = Buffer.concat([Buffer.from([0]), Buffer.from(Array.from({ length: width }, () => rgb).flat())])
+  return pngFrom(width, height, Buffer.concat(Array.from({ length: height }, () => row)))
+}
+
+/** PNG con un degradado: una «foto» con algo que mirar, para las capturas de la vista previa. */
+export function gradientPng(width: number, height: number): Buffer {
+  const stride = width * 3 + 1
+  const rows = Buffer.alloc(stride * height)
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const at = y * stride + 1 + x * 3
+      rows[at] = 90 + Math.round((x / width) * 120)
+      rows[at + 1] = 120 + Math.round((y / height) * 90)
+      rows[at + 2] = 170 - Math.round((x / width) * 60)
+    }
+  }
+  return pngFrom(width, height, rows)
 }
 
 /** PNG de 2 × 2 píxeles: lo mínimo para tener una foto válida. */
