@@ -190,4 +190,23 @@ test.describe('muebles desde una foto', () => {
     await expect(dockButton(page, 'Más')).toBeFocused()
     expect(await items(page)).toBe(0)
   })
+
+  test('«Probar con un ejemplo» muestra la lista sin llamar a la API y agrega las piezas al proyecto', async ({ page }) => {
+    test.setTimeout(180_000)
+    let called = false
+    await page.route(ANALYZE_URL, (route) => {
+      called = true
+      return route.abort()
+    })
+    await createBlankProject(page, 'foto-ejemplo')
+    const before = await items(page)
+    const dialog = await openFromMore(page)
+    await dialog.getByRole('button', { name: 'Probar con un ejemplo' }).click()
+    await expect(dialog.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible({ timeout: 30_000 })
+    await expect(dialog.getByRole('checkbox')).toHaveCount(8)
+    await dialog.getByRole('button', { name: /Agregar al proyecto/ }).click()
+    await expect(dialog).toBeHidden({ timeout: 30_000 })
+    await expect.poll(() => items(page), { timeout: 30_000 }).toBe(before + 8)
+    expect(called).toBe(false)
+  })
 })

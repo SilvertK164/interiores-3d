@@ -1,6 +1,6 @@
 'use client'
 
-import { Info, Plus, ScanSearch, X } from 'lucide-react'
+import { Info, Plus, ScanSearch, Sparkles, X } from 'lucide-react'
 import { type RefObject, useEffect, useId, useMemo, useReducer, useRef } from 'react'
 import { Loader } from '@/components/Loader'
 import { cx } from '@/lib/cx'
@@ -9,6 +9,7 @@ import { buildAnalysisCatalog } from '@/lib/lab/analysis-catalog'
 import { describeLabError } from '@/lib/lab/describe-error'
 import { parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError } from '@/lib/lab/lab-error'
+import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { CatalogItemLike } from './furniture-model'
 import { TEXT, canAdd, canAnalyze, checkedRows, detectedRows, initialState, photoReducer, selectionSummary } from './photo-furniture-model'
 import { CHECK_ROW } from './ui/PlanOptions'
@@ -64,6 +65,12 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
     if (state.step === 'results') heading.current?.focus()
     else if (state.step === 'form') dialogRef.current?.querySelector<HTMLElement>('input[type="file"]')?.focus()
   }, [open, state.step])
+
+  /** Un análisis fijo (sin Gemini, sin cuota): sirve para probar o mostrar el flujo si el servicio no responde. */
+  const tryExample = () => {
+    if (busy.current) return
+    dispatch({ type: 'analyzed', ...detectedRows(SAMPLE_ANALYSIS, (id) => local.pieces.get(id)) })
+  }
 
   const analyze = async () => {
     if (busy.current || !state.file) return
@@ -243,7 +250,12 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
               </button>
             </>
           ) : (
-            // Mientras analiza no se deshabilita: un botón deshabilitado suelta el foco (`analyze` ya ignora el segundo clic).
+            <>
+            <button className="btn btn-ghost focus-ring" disabled={analyzing} onClick={tryExample} type="button">
+              <Sparkles aria-hidden="true" className="size-[18px]" strokeWidth={2} />
+              {TEXT.example}
+            </button>
+            {/* Mientras analiza no se deshabilita: un botón deshabilitado suelta el foco (`analyze` ya ignora el segundo clic). */}
             <button
               aria-busy={analyzing}
               aria-disabled={analyzing}
@@ -255,6 +267,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
               <ScanSearch aria-hidden="true" className="size-[18px]" strokeWidth={2} />
               {TEXT.analyze}
             </button>
+            </>
           )}
         </footer>
       </div>

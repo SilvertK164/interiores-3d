@@ -16,6 +16,7 @@ export const TEXT = {
   widthPlaceholder: '4,5',
   widthHint: 'Si lo sabes, mide el muro del fondo (el que ves de frente) de lado a lado: así las medidas de los muebles salen más precisas.',
   analyze: 'Analizar foto',
+  example: 'Probar con un ejemplo',
   analyzing: 'Analizando tu foto…',
   found: 'Muebles encontrados',
   foundHint: 'Quita la marca de los que no quieras. Al agregarlos quedan seleccionados juntos: puedes moverlos, girarlos o borrarlos a la vez.',
