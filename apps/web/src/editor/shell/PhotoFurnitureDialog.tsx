@@ -1,6 +1,6 @@
 'use client'
 
-import { Info, Plus, ScanSearch, X } from 'lucide-react'
+import { Info, Plus, ScanSearch, Sparkles, X } from 'lucide-react'
 import { type RefObject, useEffect, useId, useMemo, useReducer, useRef } from 'react'
 import { Loader } from '@/components/Loader'
 import { cx } from '@/lib/cx'
@@ -9,6 +9,7 @@ import { buildAnalysisCatalog } from '@/lib/lab/analysis-catalog'
 import { describeLabError } from '@/lib/lab/describe-error'
 import { parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError } from '@/lib/lab/lab-error'
+import { EXAMPLE_ANALYSIS, EXAMPLE_PHOTO } from '@/lib/lab/sample-analysis'
 import type { CatalogItemLike } from './furniture-model'
 import { TEXT, canAdd, canAnalyze, checkedRows, detectedRows, initialState, photoReducer, selectionSummary } from './photo-furniture-model'
 import { CHECK_ROW } from './ui/PlanOptions'
@@ -65,6 +66,12 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
     else if (state.step === 'form') dialogRef.current?.querySelector<HTMLElement>('input[type="file"]')?.focus()
   }, [open, state.step])
 
+  /** Un análisis fijo con su foto (sin Gemini, sin cuota): sirve para probar o mostrar el flujo completo si el servicio no responde. */
+  const tryExample = () => {
+    if (busy.current) return
+    dispatch({ type: 'analyzed', ...detectedRows(EXAMPLE_ANALYSIS, (id) => local.pieces.get(id)), example: true })
+  }
+
   const analyze = async () => {
     if (busy.current || !state.file) return
     busy.current = true
@@ -74,7 +81,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
       const knownWidthM = parseKnownWidth(state.widthText)
       dispatch({ type: 'analyzing' })
       const analysis = await api.analyzeRoom(state.file, { knownWidthM, catalog: local.candidates })
-      if (mine === run.current) dispatch({ type: 'analyzed', ...detectedRows(analysis, (id) => local.pieces.get(id), knownWidthM) })
+      if (mine === run.current) dispatch({ type: 'analyzed', ...detectedRows(analysis, (id) => local.pieces.get(id)) })
     } catch (error) {
       if (!(error instanceof LabError)) console.error('[muebles desde una foto]', error)
       if (mine === run.current) dispatch({ type: 'failed', message: describeLabError(error) })
@@ -144,6 +151,13 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
 
         {results ? (
           <section aria-labelledby={`${ids}-found`} className="flex flex-col gap-3">
+            {state.example && (
+              <figure className="m-0 flex items-center gap-3">
+                {/* biome-ignore lint/performance/noImgElement: foto de ejemplo propia de 1600 px, ya reducida; aquí va en miniatura. */}
+                <img alt={EXAMPLE_PHOTO.alt} className="block h-auto w-32 shrink-0 rounded-[12px] shadow-[inset_0_0_0_1px_rgb(11_31_77/0.06)]" height={1070} src={EXAMPLE_PHOTO.src} width={1600} />
+                <figcaption className={HINT}>{EXAMPLE_PHOTO.label}: el análisis es de ejemplo, no se llamó al servicio.</figcaption>
+              </figure>
+            )}
             <div>
               <h3 className="text-[15px] font-semibold outline-none" id={`${ids}-found`} ref={heading} tabIndex={-1}>
                 {TEXT.found}
@@ -243,7 +257,12 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
               </button>
             </>
           ) : (
-            // Mientras analiza no se deshabilita: un botón deshabilitado suelta el foco (`analyze` ya ignora el segundo clic).
+            <>
+            <button className="btn btn-ghost focus-ring" disabled={analyzing} onClick={tryExample} type="button">
+              <Sparkles aria-hidden="true" className="size-[18px]" strokeWidth={2} />
+              {TEXT.example}
+            </button>
+            {/* Mientras analiza no se deshabilita: un botón deshabilitado suelta el foco (`analyze` ya ignora el segundo clic). */}
             <button
               aria-busy={analyzing}
               aria-disabled={analyzing}
@@ -255,6 +274,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
               <ScanSearch aria-hidden="true" className="size-[18px]" strokeWidth={2} />
               {TEXT.analyze}
             </button>
+            </>
           )}
         </footer>
       </div>

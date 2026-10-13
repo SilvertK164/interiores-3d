@@ -7,15 +7,13 @@ import { LOGGER_REDACT, buildApp } from '../src/build-app.js'
 import { CATALOG, JPEG, PNG, analyzeBody, b64 } from './support/images.js'
 import { createMemoryStore } from './support/memory-store.js'
 import { unlimitedUsage } from './support/memory-usage.js'
+import { PLAN } from './support/plan.js'
 
 const auth: AuthVerifier = async (token) => (token === 'token-a' ? { id: 'user-a', token } : null)
 const headers = { authorization: 'Bearer token-a' }
 const TECHNICAL = /base64|mime|json|api\b|gemini|token|clave|key|zod|schema|payload/i
 
-const RESULT = {
-  furniture: [{ asset_id: 'sofa', x: 0.5, y: 0.6, width: 0.3, depth: 0.12, rotation_deg: 0, confidence: 0.8 }],
-  warnings: ['oclusión parcial'],
-}
+const RESULT = PLAN
 
 type App = ReturnType<typeof buildApp>
 const appWith = (provider: VisionProvider | null, options: Parameters<typeof buildApp>[1] = {}) =>
@@ -23,19 +21,21 @@ const appWith = (provider: VisionProvider | null, options: Parameters<typeof bui
 const send = (app: App, payload: unknown) => app.inject({ method: 'POST', url: '/v1/analyze-room', headers, payload: payload as object })
 
 describe('POST /v1/analyze-room: con el proveedor de visión', () => {
-  it('devuelve los muebles, los avisos y la calibración, y le pasa al proveedor lo que recibió', async () => {
+  it('devuelve el plano del ambiente y le pasa al proveedor lo que recibió, con el ancho conocido', async () => {
     const provider = vi.fn<VisionProvider>(async () => RESULT)
     const res = await send(appWith(provider), analyzeBody({ knownWidthM: 4.5 }))
     expect(res.statusCode).toBe(200)
-    expect(res.json()).toEqual({ ...RESULT, calibration: { status: 'user_provided', width_m: 4.5 } })
+    expect(res.json()).toEqual(RESULT)
     expect(RoomAnalysisSchema.safeParse(res.json()).success).toBe(true)
     expect(provider).toHaveBeenCalledTimes(1)
-    expect(provider).toHaveBeenCalledWith({ image: b64(JPEG), mime: 'image/jpeg', catalog: CATALOG })
+    expect(provider).toHaveBeenCalledWith({ image: b64(JPEG), mime: 'image/jpeg', catalog: CATALOG, knownWidthM: 4.5 })
   })
 
-  it('sin ancho conocido responde sin calibrar', async () => {
-    const res = await send(appWith(async () => RESULT), analyzeBody())
-    expect(res.json().calibration).toEqual({ status: 'uncalibrated', width_m: null })
+  it('sin ancho conocido el proveedor no recibe ninguno, y la respuesta ya no lleva calibración', async () => {
+    const provider = vi.fn<VisionProvider>(async () => RESULT)
+    const res = await send(appWith(provider), analyzeBody())
+    expect(res.json()).not.toHaveProperty('calibration')
+    expect(provider.mock.calls[0]?.[0]).not.toHaveProperty('knownWidthM')
   })
 
   it('una foto cuyo contenido no es el formato indicado responde 422 y no llega al proveedor', async () => {

@@ -4,8 +4,8 @@ Dos videos de presentación hechos con [HyperFrames](https://github.com/heygen-c
 
 | Video | Duración | Comando | Salida |
 |---|---|---|---|
-| Teaser (1920x1080, 30 fps) | 37,5 s | `npm run teaser` | `out/teaser.mp4` |
-| Explicativo (1920x1080, 30 fps) | 2 min 51 s | `npm run explicativo` | `out/explicativo.mp4` |
+| Teaser (1920x1080, 30 fps) | 30,5 s | `npm run teaser` | `out/teaser.mp4` |
+| Explicativo (1920x1080, 30 fps) | 2 min 58 s | `npm run explicativo` | `out/explicativo.mp4` |
 
 El guion completo (escena por escena: tiempo, texto, fuente de la imagen y transición) está en [`guion.md`](guion.md). Los videos **no tienen voz en off ni música**: el texto en pantalla hace de subtítulos. No se usa ningún servicio en la nube ni clave de API.
 
@@ -26,7 +26,7 @@ npm run preview      # estudio de HyperFrames con el teaser (http://localhost:30
 npm run preview:explicativo
 npm run check        # lint + validación en navegador de ambas composiciones
 npm run teaser       # renderiza out/teaser.mp4 (~30 s)
-npm run explicativo  # renderiza out/explicativo.mp4 (~4 min)
+npm run explicativo  # renderiza out/explicativo.mp4 (varios minutos)
 ```
 
 Cada comando corre antes `npm run prep`: genera los HTML (`src/generar.mjs`) y copia fuentes, GSAP y las imágenes reales a `teaser/` y `explicativo/` (esas copias y `out/` están en `.gitignore`; los `.mp4` nunca se versionan).
@@ -37,6 +37,7 @@ Para ver fotogramas sueltos sin renderizar: `npx hyperframes snapshot teaser --a
 
 - `src/teaser.mjs`, `src/explicativo.mjs`: **las escenas** (texto, imagen, duración y transición). Es lo único que se edita para cambiar el contenido.
 - `src/escenas.mjs`, `src/arq.mjs`, `src/piezas.mjs`, `src/estilos.mjs`: tipos de escena, diagrama de arquitectura animado, logotipo y marca.
+- `src/escenas2.mjs`, `src/maquetas.mjs`, `src/estilos2.mjs` (13 de octubre de 2026): escenas de «Escena desde una foto», «Exportar plano», «Imagen 3D» y el despliegue. Son **maquetas** en HTML/CSS/SVG con los textos y colores reales de la interfaz (no capturas); la imagen 3D usa la miniatura de la plantilla Loft.
 - `src/generar.mjs`: escribe `teaser/index.html`, `explicativo/index.html` y `guion.md`. Después de tocar `src/`, correr `npm run generar`.
 - `fonts/` (Fraunces, Bricolage Grotesque y DM Sans, licencia OFL, de `@fontsource-variable`) y `vendor/gsap.min.js`: versionados y autoalojados para que el render no dependa de internet.
 

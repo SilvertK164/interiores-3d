@@ -65,18 +65,49 @@ export async function analyzePhoto(page: Page, width = '') {
 }
 
 /**
- * Una respuesta del análisis con cuatro piezas del catálogo (para las pruebas en 3D): el sofá y la mesa en el centro, el mueble de TV
- * contra el muro del fondo y la biblioteca contra el este (pegados a los muros, donde más fácil sería cruzarlos). El sofá, de espaldas a quien mira.
+ * El plano del salón largo y angosto (3,2 × 7 m) que «devuelve Gemini», con los errores típicos de una foto para que el acomodador trabaje: la
+ * foto está tomada desde el extremo sur mirando al norte; la tele sobre su mueble contra el muro del fondo (el mueble despegado 14 cm), el sofá
+ * frente a ella pero de espaldas (mirando al sur), la mesa de centro sobre la alfombra, una planta a la izquierda y un sillón contra el muro este,
+ * bajo la ventana de la derecha. Una puerta en el muro oeste, cerca de la cámara.
  */
-export const FOUR_PIECES_ANALYSIS = {
+export const HALL_ANALYSIS = {
+  room: { width_m: 3.2, depth_m: 7 },
+  camera: { x_m: 1.6, z_m: 6.8, look_at: { x_m: 1.6, z_m: 0 } },
+  openings: [
+    { type: 'window', wall: 'e', at_m: 2, width_m: 1.4 },
+    { type: 'door', wall: 'w', at_m: 1, width_m: 0.9 },
+  ],
   furniture: [
-    { asset_id: 'sofa', x: 0.5, y: 0.82, width: 0.5, depth: 0.3, rotation_deg: 180, confidence: 0.92 },
-    { asset_id: 'coffee-table', x: 0.5, y: 0.55, width: 0.4, depth: 0.25, rotation_deg: 0, confidence: 0.88 },
-    { asset_id: 'tv-stand', x: 0.5, y: 0.03, width: 0.4, depth: 0.1, rotation_deg: 0, confidence: 0.9 },
-    { asset_id: 'bookshelf', x: 0.99, y: 0.45, width: 0.25, depth: 0.08, rotation_deg: 90, confidence: 0.81 },
+    { asset_id: 'tv-stand', x_m: 1.6, z_m: 0.45, facing_deg: 0, against_wall: 'n', on_top_of: null, confidence: 0.9 },
+    { asset_id: 'television', x_m: 1.6, z_m: 0.45, facing_deg: 0, against_wall: null, on_top_of: 0, confidence: 0.95 },
+    { asset_id: 'rectangular-carpet', x_m: 1.6, z_m: 3, facing_deg: 0, against_wall: null, on_top_of: null, confidence: 0.85 },
+    { asset_id: 'coffee-table', x_m: 1.6, z_m: 3, facing_deg: 0, against_wall: null, on_top_of: null, confidence: 0.9 },
+    { asset_id: 'sofa', x_m: 1.6, z_m: 4.9, facing_deg: 0, against_wall: null, on_top_of: null, confidence: 0.92 },
+    { asset_id: 'indoor-plant', x_m: 0.55, z_m: 1.4, facing_deg: 0, against_wall: null, on_top_of: null, confidence: 0.7 },
+    { asset_id: 'livingroom-chair', x_m: 2.7, z_m: 1.7, facing_deg: 90, against_wall: 'e', on_top_of: null, confidence: 0.8 },
+  ],
+  warnings: ['Los cuadros de la pared no están en el catálogo: no se agregaron.'],
+}
+
+/** Una foto tomada desde la esquina sureste mirando en diagonal hacia el noroeste: la cámara queda pegada a dos muros (fuera del rectángulo por 0,4 m). */
+export const CORNER_ANALYSIS = {
+  room: { width_m: 5, depth_m: 4 },
+  camera: { x_m: 5.4, z_m: 4.4, look_at: { x_m: 0.5, z_m: 0.5 }, fov_deg: 70 },
+  openings: [{ type: 'window', wall: 'n', at_m: 2.5, width_m: 1.6 }],
+  furniture: [
+    { asset_id: 'sofa', x_m: 2.5, z_m: 0.65, facing_deg: 0, against_wall: 'n', on_top_of: null, confidence: 0.9 },
+    { asset_id: 'coffee-table', x_m: 2.5, z_m: 2.2, facing_deg: 0, against_wall: null, on_top_of: null, confidence: 0.85 },
   ],
   warnings: [],
-  calibration: { status: 'uncalibrated', width_m: null },
+}
+
+/** Un plano sin ningún mueble del catálogo (solo el ambiente y su aviso). */
+export const EMPTY_ANALYSIS = {
+  room: { width_m: 4, depth_m: 3 },
+  camera: { x_m: 2, z_m: 2.8, look_at: { x_m: 2, z_m: 0 } },
+  openings: [],
+  furniture: [],
+  warnings: ['No se ve ningún mueble.'],
 }
 
 export const answerWith = (analysis: unknown) => (route: Route) =>
@@ -92,7 +123,7 @@ export type AnalyzeRequest = {
   image: string
   mime: string
   knownWidthM?: number
-  catalog: { id: string; name: string; category: string; tags: string[] }[]
+  catalog: { id: string; name: string; category: string; tags: string[]; dimensions_m?: number[] }[]
 }
 
 /** Lo que mandó la página: el cuerpo JSON y el encabezado de sesión. */

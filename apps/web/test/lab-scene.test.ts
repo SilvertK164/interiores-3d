@@ -76,7 +76,7 @@ describe('buildLabEnvelope', () => {
   })
 })
 
-// Es el ejemplo mínimo de lab/README.md: si esta prueba deja de pasar, el README necesita una actualización.
+// Una definición mínima: lo menos que `openDefinitionAsProject` necesita para dibujar una escena.
 describe('una definición mínima (un ambiente, una puerta y una pieza)', () => {
   const minimal: TemplateDefinition = {
     id: 'ejemplo',

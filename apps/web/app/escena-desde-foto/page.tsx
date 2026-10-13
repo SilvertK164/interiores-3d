@@ -6,14 +6,14 @@ import { AppShell } from '@/components/AppShell'
 import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
 import type { AnalysisCandidate } from '@/lib/lab/analysis-catalog'
-import { analysisToDefinition } from '@/lib/lab/analysis-to-definition'
 import { describeLabError } from '@/lib/lab/describe-error'
 import { labProjectName, parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError } from '@/lib/lab/lab-error'
 import { showEditorPathTool } from '@/lib/lab/lab-view'
-import { type CameraPose, photoSceneCamera } from '@/lib/lab/photo-camera'
+import type { CameraPose } from '@/lib/lab/photo-camera'
 import { savePhotoCamera } from '@/lib/lab/photo-camera-handoff'
-import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
+import { type PhotoScene, photoScene } from '@/lib/lab/photo-scene'
+import { EXAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
 import { savedName } from '@/lib/person-name'
 import { TEMPLATE_DEFINITIONS } from '@/lib/templates'
@@ -28,9 +28,12 @@ import type { Notice, NoticePlace } from './LabNotice'
 import { type Busy, PhotoCard } from './PhotoCard'
 import { ResultsCard } from './ResultsCard'
 
+/** Lo que dura la espera del ejemplo (no llama a la API): lo justo para que se vea el paso de «Analizando». */
+const EXAMPLE_WAIT_MS = 1000
 const SAVE_FAILED = 'El proyecto se creó, pero no pudimos guardar la escena. Puedes reintentar.'
 /** Lo que `openInEditor` abre: la definición y, si viene de una foto, la cámara 3D con que debe abrir el editor (en las coordenadas de su escena). */
 type Built = { definition: TemplateDefinition; camera?: CameraPose }
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 const FRAME = 'mx-auto flex min-h-dvh max-w-[1100px] flex-col gap-5 px-[clamp(20px,4vw,56px)] pb-12 pt-[18px]'
 
 /** El aviso para la pantalla; del error inesperado, el detalle técnico queda en la consola del navegador. */
@@ -50,8 +53,9 @@ export default function EscenaDesdeFotoPage() {
   const [analysis, setAnalysis] = useState<RoomAnalysis | null>(null)
   // Las piezas del catálogo que se le ofrecieron al análisis: con ellas se escriben los nombres de la tabla.
   const [candidates, setCandidates] = useState<AnalysisCandidate[]>([])
+  // La escena que sale del análisis (definición, cámara, avisos y vista previa): se arma al analizar y es la que se crea al final.
+  const [scene, setScene] = useState<PhotoScene | null>(null)
   const [fromExample, setFromExample] = useState(false)
-  const [modelWarnings, setModelWarnings] = useState<string[]>([])
   const [notice, setNotice] = useState<Notice | null>(null)
   const [pending, setPending] = useState<CreateFromTemplateResult | null>(null)
   const [busy, setBusy] = useState<Busy>(null)
@@ -79,24 +83,26 @@ export default function EscenaDesdeFotoPage() {
     setBusy(null)
   }
 
-  /** Las piezas del catálogo local que se le ofrecen al análisis. Pascal se carga recién aquí (o al abrir el editor), nunca antes. */
-  async function loadCandidates(): Promise<AnalysisCandidate[]> {
+  /** El catálogo local: las piezas que se le ofrecen al análisis y con las que se resuelve su respuesta. Pascal se carga recién aquí (o al abrir el editor), nunca antes. */
+  async function loadCatalog() {
     const { analysisCatalog } = await import('@/editor/lab-scene')
-    const { candidates: loaded } = await analysisCatalog()
-    setCandidates(loaded)
-    return loaded
+    const catalog = await analysisCatalog()
+    setCandidates(catalog.candidates)
+    return catalog
   }
 
+  /** Analiza la foto (o, con el ejemplo, espera un instante y trae su plano, sin llamar a la API) y arma la escena para revisarla. Todavía no crea nada. */
   async function analyze(event: FormEvent) {
     event.preventDefault()
     if (lock.current) return
-    if (!file) return setNotice({ text: 'Elige primero la foto del ambiente.', place: 'form' })
+    if (!(fromExample || file)) return setNotice({ text: 'Elige primero la foto del ambiente.', place: 'form' })
     start('analizando')
     try {
-      const knownWidthM = parseKnownWidth(widthText)
-      setAnalysis(await api.analyzeRoom(file, { knownWidthM, catalog: await loadCandidates() }))
-      setFromExample(false)
-      setModelWarnings([])
+      const knownWidthM = fromExample ? undefined : parseKnownWidth(widthText)
+      const [catalog] = await Promise.all([loadCatalog(), fromExample ? wait(EXAMPLE_WAIT_MS) : undefined])
+      const found = fromExample || !file ? EXAMPLE_ANALYSIS : await api.analyzeRoom(file, { knownWidthM, catalog: catalog.candidates })
+      setScene(photoScene(found, (id) => catalog.pieces.get(id)))
+      setAnalysis(found)
     } catch (error) {
       setNotice(noticeFor(error, 'form'))
     } finally {
@@ -104,13 +110,11 @@ export default function EscenaDesdeFotoPage() {
     }
   }
 
-  /** Arma la definición (con `build`), la guarda como proyecto nuevo y abre el editor. Pascal se carga recién aquí. */
-  async function openInEditor(build: (warn: (message: string) => void) => Built | Promise<Built>, place: NoticePlace, label?: string) {
+  /** Guarda la definición como proyecto nuevo y abre el editor. Pascal se carga recién aquí. */
+  async function openInEditor({ definition, camera }: Built, place: NoticePlace, label?: string) {
     if (!start('abriendo')) return
-    const warnings: string[] = []
     let going = false
     try {
-      const { definition, camera } = await build((message) => warnings.push(message))
       const { openDefinitionAsProject } = await import('@/editor/lab-scene')
       const result = await openDefinitionAsProject(definition, {
         api,
@@ -127,35 +131,29 @@ export default function EscenaDesdeFotoPage() {
     } catch (error) {
       setNotice(noticeFor(error, place))
     } finally {
-      setModelWarnings(warnings)
       if (!going) release()
     }
   }
 
-  /**
-   * El ambiente de la foto: las piezas se resuelven contra el catálogo local, que se carga recién aquí (Pascal no se importa antes).
-   * El editor abre con la cámara 3D en el punto de vista de la foto (`photoSceneCamera`).
-   */
-  const modelAnalysis = (current: RoomAnalysis) => async (warn: (message: string) => void): Promise<Built> => {
-    const { analysisCatalog } = await import('@/editor/lab-scene')
-    const { pieces } = await analysisCatalog()
-    const knownWidthM = parseKnownWidth(widthText)
-    const definition = analysisToDefinition(current, (id) => pieces.get(id), { knownWidthM, warn })
-    return { definition, camera: photoSceneCamera(knownWidthM, definition) }
+  /** «Probar con un ejemplo» solo carga la foto de ejemplo en «Tu foto»: el análisis, la revisión y la creación vienen después, igual que con una foto subida. */
+  function tryExample() {
+    if (lock.current) return
+    clearResults()
+    setFromExample(true)
+    setWidthText('')
   }
 
-  async function tryExample() {
-    if (!start('analizando')) return
-    try {
-      await loadCandidates()
-    } catch (error) {
-      return setNotice(noticeFor(error, 'form'))
-    } finally {
-      release()
-    }
-    setAnalysis(SAMPLE_ANALYSIS)
-    setFromExample(true)
-    void openInEditor(modelAnalysis(SAMPLE_ANALYSIS), 'results')
+  /** Quita el ejemplo (su foto y su plano) para volver a pedir la foto de la persona. */
+  function leaveExample() {
+    clearResults()
+    setFromExample(false)
+  }
+
+  function clearResults() {
+    setAnalysis(null)
+    setScene(null)
+    setNotice(null)
+    setPending(null)
   }
 
   async function retry() {
@@ -195,7 +193,9 @@ export default function EscenaDesdeFotoPage() {
             busy={busy}
             file={file}
             notice={notice}
-            onExample={() => void tryExample()}
+            fromExample={fromExample}
+            onExample={tryExample}
+            onLeaveExample={leaveExample}
             onFile={setFile}
             onRetry={() => void retry()}
             onSubmit={analyze}
@@ -208,11 +208,11 @@ export default function EscenaDesdeFotoPage() {
             busy={busy}
             candidates={candidates}
             fromExample={fromExample}
-            modelWarnings={modelWarnings}
             notice={notice}
-            onOpen={() => analysis && void openInEditor(modelAnalysis(analysis), 'results')}
+            onOpen={() => scene && void openInEditor(scene, 'results')}
             onRetry={() => void retry()}
             pending={pending}
+            scene={scene}
           />
         </div>
 
@@ -220,7 +220,7 @@ export default function EscenaDesdeFotoPage() {
           <EditorPathTool
             busy={busy}
             notice={notice}
-            onOpenLoft={() => void openInEditor(() => ({ definition: loft }), 'tool', 'prueba Loft')}
+            onOpenLoft={() => void openInEditor({ definition: loft }, 'tool', 'prueba Loft')}
             onRetry={() => void retry()}
             pending={pending}
           />

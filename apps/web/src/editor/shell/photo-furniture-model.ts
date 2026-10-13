@@ -14,8 +14,9 @@ export const TEXT = {
   limit: ANALYSIS_TEXT.limit,
   width: 'Ancho del ambiente, en metros (opcional)',
   widthPlaceholder: '4,5',
-  widthHint: 'Si lo sabes, la distancia entre los muebles se ajusta a ese ancho; si no, supondremos 4 metros.',
+  widthHint: 'Si lo sabes, mide el muro del fondo (el que ves de frente) de lado a lado: así las medidas de los muebles salen más precisas.',
   analyze: 'Analizar foto',
+  example: 'Probar con un ejemplo',
   analyzing: 'Analizando tu foto…',
   found: 'Muebles encontrados',
   foundHint: 'Quita la marca de los que no quieras. Al agregarlos quedan seleccionados juntos: puedes moverlos, girarlos o borrarlos a la vez.',
@@ -35,22 +36,30 @@ export type PhotoRow = {
   name: string
   confidence: number
   checked: boolean
+  /** La clave de la fila sobre la que está apoyada (una tele sobre su mueble), o `null` si está en el piso. */
+  supportKey: string | null
 }
 
 /**
- * Las filas que lista el diálogo y los avisos que las acompañan: los del análisis primero y después lo que el editor dejó afuera
- * (confianza baja, un id que el catálogo local no tiene). Cada detección pasa por `analysisToCluster` por separado, así que
- * conserva su orden y se sabe cuál es cuál; todas arrancan marcadas.
+ * Las filas que lista el diálogo y los avisos que las acompañan: los del análisis primero y después lo que el editor corrigió o dejó afuera
+ * (confianza baja, un id que el catálogo local no tiene, lo que se movió para que quepa y no se pise). El plano completo pasa por
+ * `analysisToCluster` una sola vez (lo apoyado necesita su soporte); cada pieza conserva su lugar en el análisis (`source`) y todas
+ * arrancan marcadas.
  */
-export function detectedRows(
-  analysis: RoomAnalysis,
-  resolve: (assetId: string) => CatalogItemLike | undefined,
-  knownWidthM: number | null,
-): { rows: PhotoRow[]; warnings: string[] } {
+export function detectedRows(analysis: RoomAnalysis, resolve: (assetId: string) => CatalogItemLike | undefined): { rows: PhotoRow[]; warnings: string[] } {
   const omitted: string[] = []
-  const rows = analysis.furniture.flatMap((detected, index): PhotoRow[] => {
-    const [piece] = analysisToCluster({ ...analysis, furniture: [detected] }, resolve, { knownWidthM, warn: (message) => omitted.push(message) })
-    return piece ? [{ key: `${index}-${detected.asset_id}`, piece, name: nameEs(piece.asset.id, piece.asset.name), confidence: detected.confidence, checked: true }] : []
+  const pieces = analysisToCluster(analysis, resolve, { warn: (message) => omitted.push(message) })
+  const keyOf = (piece: ClusterPiece<CatalogItemLike>) => `${piece.source}-${piece.asset.id}`
+  const rows = pieces.map((piece): PhotoRow => {
+    const support = piece.supportedBy === null ? undefined : pieces[piece.supportedBy]
+    return {
+      key: keyOf(piece),
+      piece,
+      name: nameEs(piece.asset.id, piece.asset.name),
+      confidence: analysis.furniture[piece.source]?.confidence ?? 0,
+      checked: true,
+      supportKey: support ? keyOf(support) : null,
+    }
   })
   return { rows, warnings: [...analysis.warnings, ...omitted] }
 }
@@ -63,20 +72,49 @@ export type PhotoState = {
   error: string | null
   rows: PhotoRow[]
   warnings: string[]
+  /** La lista viene de «Probar con un ejemplo»: el diálogo muestra la foto de ejemplo junto a ella. */
+  example: boolean
 }
 
-export const initialState = (): PhotoState => ({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [] })
+export const initialState = (): PhotoState => ({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [], example: false })
 
 export type PhotoAction =
   | { type: 'open' }
   | { type: 'file'; file: File | null }
   | { type: 'width'; value: string }
   | { type: 'analyzing' }
-  | { type: 'analyzed'; rows: PhotoRow[]; warnings: string[] }
+  | { type: 'analyzed'; rows: PhotoRow[]; warnings: string[]; example?: boolean }
   /** Con `stay` el error se muestra sin salir de la lista (por ejemplo, al agregar). */
   | { type: 'failed'; message: string; stay?: boolean }
   | { type: 'toggle'; key: string }
   | { type: 'back' }
+
+/**
+ * Marca o desmarca una fila junto con lo que depende de ella: al quitar un soporte se quita lo que estaba apoyado sobre él, y al marcar
+ * lo apoyado se marca su soporte (así no queda una tele flotando donde estaba su mueble).
+ */
+function toggleRow(rows: readonly PhotoRow[], key: string): PhotoRow[] {
+  const target = rows.find((row) => row.key === key)
+  if (!target) return [...rows]
+  const turnOn = !target.checked
+  const byKey = new Map(rows.map((row) => [row.key, row]))
+  const touched = new Set<string>()
+  if (turnOn) {
+    for (let row: PhotoRow | undefined = target; row && !touched.has(row.key); row = row.supportKey ? byKey.get(row.supportKey) : undefined) touched.add(row.key)
+  } else {
+    touched.add(key)
+    for (let grew = true; grew; ) {
+      grew = false
+      for (const row of rows) {
+        if (row.supportKey !== null && touched.has(row.supportKey) && !touched.has(row.key)) {
+          touched.add(row.key)
+          grew = true
+        }
+      }
+    }
+  }
+  return rows.map((row) => (touched.has(row.key) ? { ...row, checked: turnOn } : row))
+}
 
 export function photoReducer(state: PhotoState, action: PhotoAction): PhotoState {
   switch (action.type) {
@@ -89,13 +127,13 @@ export function photoReducer(state: PhotoState, action: PhotoAction): PhotoState
     case 'analyzing':
       return { ...state, step: 'analyzing', error: null }
     case 'analyzed':
-      return { ...state, step: 'results', error: null, rows: action.rows, warnings: action.warnings }
+      return { ...state, step: 'results', error: null, rows: action.rows, warnings: action.warnings, example: action.example ?? false }
     case 'failed':
       return action.stay ? { ...state, error: action.message } : { ...state, step: 'form', error: action.message }
     case 'toggle':
-      return { ...state, rows: state.rows.map((row) => (row.key === action.key ? { ...row, checked: !row.checked } : row)) }
+      return { ...state, rows: toggleRow(state.rows, action.key) }
     case 'back':
-      return { ...state, step: 'form', error: null, rows: [], warnings: [] }
+      return { ...state, step: 'form', error: null, rows: [], warnings: [], example: false }
   }
 }
 

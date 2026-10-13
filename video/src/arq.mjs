@@ -15,7 +15,7 @@ const E = [
   { id: 'e2', p: [940, 330, 1130, 330], at: 6.6, lab: ['REST + JWT', 966, 268] },
   { id: 'e3', p: [1430, 360, 1640, 360], at: 9.6, lab: ['con RLS', 1486, 298] },
   { id: 'e4', p: [660, 240, 660, 195, 1765, 195, 1765, 240], at: 10.6, lab: ['Auth: ingresar y crear cuenta', 1100, 150] },
-  { id: 'e5', p: [940, 700, 1640, 700], at: 12.4, lab: ['foto del plano', 1400, 640] },
+  { id: 'e5', p: [1430, 430, 1535, 430, 1535, 770, 1640, 770], at: 12.4, lab: ['foto → Gemini', 1310, 690] },
   { id: 'e6', p: [660, 805, 660, 740], at: 7.6, d: 1 },
   { id: 'e7', p: [1280, 805, 1280, 470], at: 8.0, d: 1, lab: ['mismo contrato', 1296, 560] },
 ];
@@ -35,9 +35,9 @@ export const arq = (sc) => {
     ${box('web', '', '<small>apps/web · en Vercel</small><b>Next 16 + React 19 + Tailwind 4</b><span>Pantallas, acceso y autoguardado</span>')}
     ${box('pas', 'in', '<b>Editor Pascal 1.0.3</b><span>con 2 parches de pnpm; solo vive en src/editor/</span>')}
     ${box('shl', 'in', '<b>Shell propio de Madori</b><span>Ver, Editar, 2D, 3D, plantas, muebles</span>')}
-    ${box('api', '', '<small>apps/api</small><b>API Fastify</b><span>openapi.yaml verificado</span>')}
+    ${box('api', '', '<small>apps/api</small><b>API Fastify</b><span>En Vercel, con openapi.yaml</span>')}
     ${box('sb', 'sb', '<small>Supabase</small><b>Postgres + RLS</b><span>Auth con correo y contraseña. Migraciones en git</span>')}
-    ${box('lab', '', '<small>Lab de Victoria (TP3)</small><b>FastAPI + Gemini</b><span>Modelado desde fotos</span>')}
+    ${box('lab', '', '<small>Google</small><b>Gemini</b><span>Reconoce los muebles de la foto</span>')}
     ${box('con', '', '<small>packages/contract</small><b>Esquemas zod compartidos</b><span>Una sola definición para la web y la API</span>')}
     <svg style="position:absolute;left:0;top:0" width="1920" height="1080">${E.map(
       (e) =>

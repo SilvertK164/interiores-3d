@@ -17,12 +17,14 @@ type Props = {
   error: AuthNotice | null
   onSubmit: (values: { email: string; password: string }) => void
   onAction: (kind: AuthAction['kind']) => void
+  /** "¿Olvidaste tu contraseña?": quien lo usa abre el formulario de recuperación. */
+  onForgot: () => void
   /** Se llega desde "Ingresar con esa cuenta": el correo ya está, el foco va directo a la contraseña. */
   focusPassword?: boolean
 }
 
 /** Formulario de la pestaña "Ingresar": correo y contraseña, validación en línea y el error del servidor sobre el botón. */
-export function LoginForm({ email, onEmail, locked, notice, error, onSubmit, onAction, focusPassword = false }: Props) {
+export function LoginForm({ email, onEmail, locked, notice, error, onSubmit, onAction, onForgot, focusPassword = false }: Props) {
   const ids = useId()
   const bannerId = `${ids}-error`
   const form = useAuthForm('login', { email, onEmail }, error)
@@ -73,6 +75,14 @@ export function LoginForm({ email, onEmail, locked, notice, error, onSubmit, onA
         type="password"
         value={form.values.password}
       />
+      <button
+        className="focus-ring -my-1 min-h-11 cursor-pointer self-end rounded-full px-3 text-[13px] font-medium text-brand transition-colors duration-150 ease-out hover:bg-brand-mist"
+        disabled={locked}
+        onClick={onForgot}
+        type="button"
+      >
+        ¿Olvidaste tu contraseña?
+      </button>
       {error && <AuthBanner id={bannerId} notice={error} onAction={onAction} />}
       <button aria-busy={locked || undefined} className="btn btn-primary h-12" disabled={locked} ref={form.submitRef} type="submit">
         Ingresar

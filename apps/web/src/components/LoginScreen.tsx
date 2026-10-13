@@ -11,6 +11,7 @@ import { useNavigate } from '@/lib/use-navigate'
 import { AppShell } from './AppShell'
 import { AuthBackdrop } from './AuthBackdrop'
 import { AuthTabs } from './AuthTabs'
+import { ForgotPasswordForm } from './ForgotPasswordForm'
 import { LoginForm } from './LoginForm'
 import { Logo } from './Logo'
 import { RegisterForm } from './RegisterForm'
@@ -35,6 +36,8 @@ export function LoginScreen({ initialMode, reason, next }: Props) {
   const [error, setError] = useState<AuthNotice | null>(null)
   const [busy, setBusy] = useState(false)
   const [focusPassword, setFocusPassword] = useState(false)
+  // "¿Olvidaste tu contraseña?": `ask` pide el correo y `sent` muestra el aviso de siempre (nunca se sabe si el correo existe).
+  const [recovery, setRecovery] = useState<'off' | 'ask' | 'sent'>('off')
   // Candado síncrono: el estado de React llega tarde y un doble clic enviaría dos pedidos.
   const lock = useRef(false)
   const locked = busy || nav.pending
@@ -64,6 +67,30 @@ export function LoginScreen({ initialMode, reason, next }: Props) {
       finish()
     } catch (err) {
       finish(describeAuthError(err, 'login'))
+    }
+  }
+
+  function changeRecovery(next: 'off' | 'ask') {
+    setRecovery(next)
+    setError(null)
+    setFocusPassword(false)
+  }
+
+  async function requestReset(address: string) {
+    if (lock.current) return
+    lock.current = true
+    setBusy(true)
+    setError(null)
+    try {
+      const { error: authError } = await supabaseBrowser().auth.resetPasswordForEmail(address, { redirectTo: `${window.location.origin}/nueva-contrasena` })
+      if (authError) throw authError
+      setRecovery('sent')
+      finish()
+    } catch (err) {
+      const notice = describeAuthError(err, 'reset')
+      // Lo que delataría si el correo existe llega aquí como aviso (no error): se trata igual que un envío correcto.
+      if (notice.tone === 'info') setRecovery('sent')
+      finish(notice.tone === 'info' ? undefined : notice)
     }
   }
 
@@ -108,22 +135,35 @@ export function LoginScreen({ initialMode, reason, next }: Props) {
 
         <div className="flex flex-col justify-center gap-3 px-5 py-6 desk:px-[34px] desk:py-2.5">
           <Logo showName />
-          <AuthTabs disabled={locked} mode={mode} onChange={changeMode}>
-            {mode === 'login' ? (
-              <LoginForm
-                email={email}
-                error={error}
-                focusPassword={focusPassword}
-                locked={locked}
-                notice={reason === 'sesion' ? SESSION_EXPIRED_NOTICE : null}
-                onAction={onAction}
-                onEmail={setEmail}
-                onSubmit={login}
-              />
-            ) : (
-              <RegisterForm email={email} error={error} locked={locked} onAction={onAction} onEmail={setEmail} onSubmit={register} />
-            )}
-          </AuthTabs>
+          {recovery !== 'off' ? (
+            <ForgotPasswordForm
+              email={email}
+              error={error}
+              locked={locked}
+              onBack={() => changeRecovery('off')}
+              onEmail={setEmail}
+              onSubmit={requestReset}
+              sent={recovery === 'sent'}
+            />
+          ) : (
+            <AuthTabs disabled={locked} mode={mode} onChange={changeMode}>
+              {mode === 'login' ? (
+                <LoginForm
+                  email={email}
+                  error={error}
+                  focusPassword={focusPassword}
+                  locked={locked}
+                  notice={reason === 'sesion' ? SESSION_EXPIRED_NOTICE : null}
+                  onAction={onAction}
+                  onEmail={setEmail}
+                  onForgot={() => changeRecovery('ask')}
+                  onSubmit={login}
+                />
+              ) : (
+                <RegisterForm email={email} error={error} locked={locked} onAction={onAction} onEmail={setEmail} onSubmit={register} />
+              )}
+            </AuthTabs>
+          )}
         </div>
       </main>
     </AppShell>

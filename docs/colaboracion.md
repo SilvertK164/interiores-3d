@@ -6,8 +6,7 @@ Una guía de convivencia entre Silvert y Victoria, no un reglamento: se ajusta e
 
 | Persona | Suele ocuparse de |
 |---|---|
-| Silvert | La infraestructura (base de datos, API y despliegue) y el editor |
-| Victoria | El laboratorio (`lab/`): el espacio de Victoria para explorar el modelado a partir de fotos |
+| Silvert y Victoria | Todo el proyecto, entre los dos: cada cambio lo hace uno y lo revisa el otro |
 
 Los dos revisan los PR del otro, así cada cambio lo mira alguien que no lo escribió.
 
@@ -15,7 +14,7 @@ Los dos revisan los PR del otro, así cada cambio lo mira alguien que no lo escr
 
 - `main`: la rama estable; no se trabaja directo en ella.
 - `feature/<tema>`: producto (editor, API, plantillas, interfaz).
-- `lab/<tema>`: el laboratorio de Victoria, por ejemplo `lab/mapeo-de-piezas`.
+- `lab/<tema>`: las mejoras de Victoria a «Escena desde una foto», por ejemplo `lab/mapeo-de-piezas`.
 - Cada rama parte de la rama base que indique su PR (mientras el PR #1 siga sin fusionarse, no siempre es `main`).
 
 ## Pull requests con revisión cruzada
@@ -39,9 +38,9 @@ Conviene hacerlo antes de abrir un PR y cada vez que la rama base reciba cambios
 
 ## Claves y datos privados
 
-- Ninguna clave va al repositorio: `.env*` y `lab/.env.local` están en `.gitignore`; solo se versionan los modelos `.env.example` y `.env.cloud.example`, sin valores. Las claves de la base en la nube se comparten por un canal privado, nunca por el repositorio ni por el chat de GitHub ([`nube.md`](nube.md), sección 4).
+- Ninguna clave va al repositorio: `.env*` está en `.gitignore`; solo se versionan los modelos `.env.example` y `.env.cloud.example`, sin valores. Las claves de la base en la nube se comparten por un canal privado, nunca por el repositorio ni por el chat de GitHub ([`nube.md`](nube.md), sección 4).
 - Si una clave se sube por accidente, se revoca en el panel de quien la emitió (por ejemplo Google AI Studio) y se avisa al otro.
-- Las fotos privadas tampoco se suben a `lab/resultados/`: alcanza con describirlas.
+- Las fotos privadas tampoco se suben al repositorio: alcanza con describirlas.
 
 ## Dónde está cada cosa
 
@@ -53,7 +52,7 @@ Conviene hacerlo antes de abrir un PR y cada vez que la rama base reciba cambios
 | API y contrato | `apps/api/`, `packages/contract/` |
 | Base de datos | `supabase/` |
 | Plantillas de ambientes | `apps/web/src/lib/templates/` |
-| Laboratorio de Victoria | `lab/` (guía en `lab/README.md`), `apps/web/src/lib/lab/`, `apps/web/app/escena-desde-foto/` |
+| Escena desde una foto (Victoria) | `apps/web/src/lib/lab/`, `apps/web/app/escena-desde-foto/`, `apps/api/src/analyze-room/` |
 
 ## Cuentas de prueba locales
 

@@ -6,6 +6,7 @@ import { buildApp } from '../src/build-app.js'
 import { CATALOG, JPEG, analyzeBody, b64 } from './support/images.js'
 import { createMemoryStore } from './support/memory-store.js'
 import { createMemoryUsage } from './support/memory-usage.js'
+import { EMPTY_PLAN } from './support/plan.js'
 
 const auth: AuthVerifier = async (token) => {
   if (token === 'token-a') return { id: 'user-a', token }
@@ -14,7 +15,7 @@ const auth: AuthVerifier = async (token) => {
 }
 const headersA = { authorization: 'Bearer token-a' }
 const headersB = { authorization: 'Bearer token-b' }
-const RESULT = { furniture: [], warnings: [] }
+const RESULT = EMPTY_PLAN
 
 function setup(provider: VisionProvider | null = async () => RESULT, usage = createMemoryUsage()) {
   const app = buildApp({ auth, store: createMemoryStore(), analysis: { provider, usage } })

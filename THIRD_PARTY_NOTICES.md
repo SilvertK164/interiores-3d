@@ -18,3 +18,6 @@ Los estantes (`ShelfNode`) y los gabinetes (`CabinetNode`) de las plantillas son
 
 ## PDF.js — Apache License 2.0
 `apps/web/public/pdfjs/` (`pdf.min.mjs` y `pdf.worker.min.mjs`): PDF.js 6.4.299 (paquete `pdfjs-dist`), © Mozilla and individual contributors. Dibuja la vista previa del diálogo "Exportar plano". La licencia viaja con los archivos (`LICENSE.txt`; origen y huellas en `FUENTES.txt`).
+
+## Foto de ejemplo del salón (botones «Probar con un ejemplo») — origen y licencia por confirmar
+`apps/web/public/examples/salon.jpg`: Foto de ejemplo del salón: imagen aportada por Silvert Quispe para la demostración; origen y licencia por confirmar antes de publicar. Se redujo a 1600 px de lado mayor (JPEG, calidad 82) y se muestra junto a `EXAMPLE_ANALYSIS` (`apps/web/src/lib/lab/sample-analysis.ts`).

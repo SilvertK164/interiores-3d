@@ -1,84 +1,54 @@
-import { nameEs } from '../catalog-es'
+import { round3 } from './layout-geometry'
+import { solveLayout } from './layout-solver'
+import type { SolverAsset } from './layout-types'
 import type { RoomAnalysis } from './schema'
 
-/** Ancho del ambiente de la foto cuando la persona no lo sabe, en metros. */
-export const DEFAULT_ROOM_WIDTH_M = 4
-/** Fondo del ambiente de la foto como proporción de su ancho (los ambientes de una foto suelen ser más anchos que hondos). */
-export const ROOM_DEPTH_RATIO = 0.75
-/** Por debajo de esta confianza el análisis no está seguro de que la pieza esté en la foto: se descarta (con aviso). */
-export const MIN_CONFIDENCE = 0.3
-
-/** Lo único que se le pide a una pieza local: su id y su nombre (para escribir los avisos). */
-export type ClusterAssetLike = { id: string; name?: string }
+/** Lo único que se le pide a una pieza local: su id, su nombre (para escribir los avisos) y su tamaño real `[ancho, alto, fondo]`. */
+export type ClusterAssetLike = SolverAsset
 
 /**
- * Una pieza del conjunto: el mueble del catálogo local (con su tamaño real), su centro `at = [x, z]` en metros relativo al
- * centro del ambiente de la foto (+x a la derecha, +z hacia abajo, igual que el plano de Pascal) y su `rotY` de Pascal.
+ * Una pieza del conjunto: el mueble del catálogo local (con su tamaño real), su centro `at = [x, z]` en metros relativo al centro del
+ * ambiente de la foto (+x al este y +z al sur, igual que el plano de Pascal), su `rotY` de Pascal y `y`, la altura de su base sobre el
+ * piso (0 en el piso; la de su soporte si está apoyada: una tele sobre su mueble). `source` es su posición en `analysis.furniture` (con
+ * ella se liga la pieza con su fila en el diálogo) y `supportedBy`, la posición (en este conjunto) de la pieza que la sostiene, o `null`.
  */
-export type ClusterPiece<T extends ClusterAssetLike = ClusterAssetLike> = { asset: T; at: [number, number]; rotY: number }
+export type ClusterPiece<T extends ClusterAssetLike = ClusterAssetLike> = {
+  asset: T
+  source: number
+  at: [number, number]
+  rotY: number
+  y: number
+  supportedBy: number | null
+}
 
 export type AnalysisToClusterOptions = {
-  /** Ancho del ambiente en metros si la persona lo escribió; vacío, `null` o inválido = 4 m. */
-  knownWidthM?: number | null
-  /** Para contarle a la persona lo que se dejó afuera (confianza baja o una pieza que el catálogo local no tiene). */
+  /** Para contarle a la persona lo que se corrigió o se dejó afuera (confianza baja, una pieza que el catálogo local no tiene, lo que se movió). */
   warn?: (message: string) => void
 }
 
 /**
- * Las medidas del ambiente de la foto en metros: `knownWidthM` si es un número mayor que 0 y, si no, `DEFAULT_ROOM_WIDTH_M`, con el
- * fondo en `ROOM_DEPTH_RATIO` de ese ancho. Es el único lugar donde se decide: lo usan este conversor y `photoToDefinition`.
- */
-export function roomSize(knownWidthM?: number | null): { width: number; depth: number } {
-  const width = Number.isFinite(knownWidthM) && (knownWidthM as number) > 0 ? (knownWidthM as number) : DEFAULT_ROOM_WIDTH_M
-  return { width, depth: width * ROOM_DEPTH_RATIO }
-}
-
-/** Al milímetro, y nunca `-0`: un `-0` suelto no es igual a `0` para `toEqual` ni para quien compare con `Object.is`. */
-const round3 = (n: number) => Math.round(n * 1000) / 1000 + 0
-
-/**
- * El giro del análisis es horario visto desde arriba; el `rotY` de Pascal (el de three.js) es antihorario, así que lleva el signo
- * opuesto. Pascal dibuja el giro de una guía en el plano con `-rotationY` (`getGuideSvgRotation`, `floorplan-panel.tsx`): ahí el
- * giro horario es el positivo. Con `rotY = 0` el frente de la pieza mira a +z (hacia abajo en el plano, hacia quien mira la foto).
- * Se reduce a [-π, π] y nunca devuelve `-0`.
- */
-function rotYFromClockwiseDegrees(degrees: number): number {
-  let rad = (-degrees * Math.PI) / 180
-  if (rad > Math.PI) rad -= 2 * Math.PI
-  else if (rad < -Math.PI) rad += 2 * Math.PI
-  return rad + 0
-}
-
-/**
- * Convierte lo que detectó el análisis en un conjunto de muebles del catálogo local: un mini ambiente de `knownWidthM ?? 4` m de ancho
- * y 75 % de fondo, con `x` e `y` (proporciones del ambiente de la foto) llevadas a metros desde su centro. El tamaño de cada
- * pieza es SIEMPRE el real del catálogo: el `width` y `depth` que estima Gemini no se usan. Se descartan, con aviso (`warn`), las
- * piezas de confianza menor que `MIN_CONFIDENCE` y las que `resolve` no conoce; nunca se las reemplaza por otra pieza. Las
- * repetidas (cuatro sillas) son piezas distintas. Mantiene el orden del análisis.
+ * Convierte el plano de la foto en un conjunto de muebles del catálogo local: lo acomoda con `solveLayout` (nada fuera del ambiente ni
+ * solapado, lo que va contra un muro mira hacia adentro, los asientos miran a su foco, lo apoyado sube a la altura real de su soporte) y
+ * lleva cada posición en metros a coordenadas relativas al centro del ambiente de la foto, sin inventar ninguna medida: el ambiente es el
+ * que estimó Gemini. El tamaño de cada pieza es SIEMPRE el real del catálogo. Se descartan, con aviso (`warn`), las piezas de confianza
+ * menor que 0,3 y las que `resolve` no conoce (y lo apoyado sobre ellas); nunca se las reemplaza por otra pieza. Las repetidas (cuatro
+ * sillas) son piezas distintas. Mantiene el orden del plano.
  */
 export function analysisToCluster<T extends ClusterAssetLike>(
   analysis: RoomAnalysis,
   resolve: (assetId: string) => T | undefined,
   opts: AnalysisToClusterOptions = {},
 ): ClusterPiece<T>[] {
-  const { width: roomWidth, depth: roomDepth } = roomSize(opts.knownWidthM)
-  const pieces: ClusterPiece<T>[] = []
-  for (const detected of analysis.furniture) {
-    const asset = resolve(detected.asset_id)
-    if (!asset) {
-      opts.warn?.(`El análisis propuso «${detected.asset_id}», que no está en el catálogo de este editor: no se agregó.`)
-      continue
-    }
-    if (detected.confidence < MIN_CONFIDENCE) {
-      const percent = Math.round(detected.confidence * 100)
-      opts.warn?.(`Se omitió «${nameEs(asset.id, asset.name ?? asset.id)}»: el análisis no está seguro de que esté en la foto (confianza de ${percent} %).`)
-      continue
-    }
-    pieces.push({
-      asset,
-      at: [round3((detected.x - 0.5) * roomWidth), round3((detected.y - 0.5) * roomDepth)],
-      rotY: rotYFromClockwiseDegrees(detected.rotation_deg),
-    })
-  }
-  return pieces
+  const plan = solveLayout(analysis, resolve)
+  for (const message of plan.warnings) opts.warn?.(message)
+  const centerX = plan.room.width / 2
+  const centerZ = plan.room.depth / 2
+  return plan.pieces.map((piece) => ({
+    asset: piece.asset,
+    source: piece.source,
+    at: [round3(piece.x - centerX), round3(piece.z - centerZ)],
+    rotY: piece.rotY,
+    y: piece.y,
+    supportedBy: piece.supportedBy,
+  }))
 }

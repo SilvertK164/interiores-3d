@@ -24,7 +24,7 @@ import { type ReducedPhoto, reducePhoto } from './photo'
 
 const KEEPALIVE_MAX_BYTES = 60_000
 /** La API espera hasta 25 s a Gemini y la función de Vercel dura 30: si en 40 s no hubo respuesta, algo se colgó. */
-const ANALYZE_TIMEOUT_MS = 40_000
+const ANALYZE_TIMEOUT_MS = 62_000
 
 export class ApiError extends Error {
   constructor(

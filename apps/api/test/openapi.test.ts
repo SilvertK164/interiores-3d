@@ -4,21 +4,30 @@ import {
   ANALYSES_PER_HOUR,
   ANALYZE_CATALOG_MAX_ITEMS,
   ANALYZE_IMAGE_MAX_BASE64_CHARS,
+  ANALYZE_MAX_FURNITURE,
+  ANALYZE_MAX_OPENINGS,
   AnalyzeRoomBodySchema,
-  CalibrationSchema,
+  CAMERA_FOV_MAX_DEG,
+  CAMERA_FOV_MIN_DEG,
   CatalogOptionSchema,
   CreateProjectBodySchema,
   DetectedFurnitureSchema,
   ERROR_CODES,
   ErrorBodySchema,
+  PhotoCameraSchema,
   ProjectCreatedSchema,
   ProjectDetailSchema,
   ProjectSummarySchema,
+  ROOM_MAX_M,
+  ROOM_MIN_M,
   RoomAnalysisSchema,
+  RoomOpeningSchema,
+  RoomSizeSchema,
   SceneEnvelopeSchema,
   SceneSavedSchema,
   TemplateIdSchema,
   UpdateProjectBodySchema,
+  WALL_SIDES,
 } from '@interiores/contract'
 import { Validator } from '@seriousme/openapi-schema-validator'
 import { describe, expect, it } from 'vitest'
@@ -61,7 +70,9 @@ describe('openapi.yaml', () => {
     ['CatalogOption', CatalogOptionSchema],
     ['RoomAnalysis', RoomAnalysisSchema],
     ['DetectedFurniture', DetectedFurnitureSchema],
-    ['Calibration', CalibrationSchema],
+    ['RoomSize', RoomSizeSchema],
+    ['PhotoCamera', PhotoCameraSchema],
+    ['RoomOpening', RoomOpeningSchema],
   ]
 
   it.each(pairs)('%s coincide con su esquema zod (propiedades y obligatorias)', (name, schema) => {
@@ -105,6 +116,25 @@ describe('openapi.yaml', () => {
     expect(body.properties.catalog.maxItems).toBe(ANALYZE_CATALOG_MAX_ITEMS)
     expect(body.properties.knownWidthM).toMatchObject({ exclusiveMinimum: 0, maximum: 100 })
     expect(spec.components.schemas.CatalogOption.additionalProperties).toBe(false)
+  })
+
+  it('la respuesta del análisis es el plano: ambiente, cámara, aberturas, muebles y avisos, sin la calibración anterior', () => {
+    const { schemas } = spec.components
+    expect(schemas.Calibration).toBeUndefined()
+    expect(Object.keys(schemas.RoomAnalysis.properties)).toEqual(['room', 'camera', 'openings', 'furniture', 'warnings'])
+    expect(schemas.RoomAnalysis.properties.furniture.maxItems).toBe(ANALYZE_MAX_FURNITURE)
+    expect(schemas.RoomAnalysis.properties.openings.maxItems).toBe(ANALYZE_MAX_OPENINGS)
+    expect(schemas.RoomSize.properties.width_m).toMatchObject({ minimum: ROOM_MIN_M, maximum: ROOM_MAX_M })
+    expect(schemas.PhotoCamera.properties.fov_deg).toMatchObject({ minimum: CAMERA_FOV_MIN_DEG, maximum: CAMERA_FOV_MAX_DEG })
+    expect(schemas.PhotoCamera.properties.look_at.required).toEqual(['x_m', 'z_m'])
+    expect(schemas.RoomOpening.properties.wall.enum).toEqual([...WALL_SIDES])
+    expect(schemas.DetectedFurniture.properties.against_wall.oneOf).toEqual([{ type: 'string', enum: [...WALL_SIDES] }, { type: 'null' }])
+    expect(schemas.DetectedFurniture.properties.on_top_of.oneOf[1]).toEqual({ type: 'null' })
+  })
+
+  it('las piezas del catálogo pueden llevar sus medidas reales en metros: dimensions_m = [ancho, alto, fondo]', () => {
+    expect(spec.components.schemas.CatalogOption.properties.dimensions_m).toMatchObject({ type: 'array', minItems: 3, maxItems: 3 })
+    expect(spec.components.schemas.CatalogOption.required).not.toContain('dimensions_m')
   })
 
   it('las respuestas del análisis explican cada falla en castellano', () => {

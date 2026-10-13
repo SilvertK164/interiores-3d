@@ -1,8 +1,11 @@
 import type { AnalyzeMime, CatalogOption } from '@interiores/contract'
 import type { Ctx } from '../store.js'
 
-/** Lo que se le pide al modelo de visión: la foto en base64, su formato y las piezas entre las que puede elegir. */
-export type VisionRequest = { image: string; mime: AnalyzeMime; catalog: CatalogOption[] }
+/**
+ * Lo que se le pide al modelo de visión: la foto en base64, su formato, las piezas entre las que puede elegir (con sus medidas
+ * reales) y, si la persona lo sabe, lo que mide el muro del fondo de lado a lado, en metros.
+ */
+export type VisionRequest = { image: string; mime: AnalyzeMime; catalog: CatalogOption[]; knownWidthM?: number }
 
 /** Llama al modelo de visión y devuelve el JSON que contestó, sin validarlo (eso lo hace `analyzeRoom`). Lanza `ProviderError`. */
 export type VisionProvider = (request: VisionRequest) => Promise<unknown>

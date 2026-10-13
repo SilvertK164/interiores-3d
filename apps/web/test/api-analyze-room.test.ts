@@ -8,7 +8,7 @@ import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
 const photo = () => new File([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], 'sala.png', { type: 'image/png' })
 const CATALOG: AnalysisCandidate[] = [
-  { id: 'sofa', name: 'Sofá', category: 'seating', tags: ['living-room', 'couch'] },
+  { id: 'sofa', name: 'Sofá', category: 'seating', tags: ['living-room', 'couch'], dimensions_m: [2.06, 0.74, 1.01] },
   { id: 'coffee-table', name: 'Mesa de centro', category: 'tables', tags: ['living-room'] },
 ]
 const REDUCED = { image: '/9j/4AAQSkZJRgABAQAAAQABAAD/2Q==', mime: 'image/jpeg' as const }
@@ -45,12 +45,27 @@ describe('api.analyzeRoom: el pedido', () => {
     }
   })
 
-  it('el catálogo viaja sin rutas ni nada fuera de id, nombre, categoría y etiquetas', async () => {
+  it('el catálogo viaja sin rutas ni nada fuera de id, nombre, categoría, etiquetas y medidas reales', async () => {
     const { client, sent } = setup()
     const dirty = CATALOG.map((option) => ({ ...option, src: '/items/x/model.glb' })) as unknown as AnalysisCandidate[]
     await expect(client.analyzeRoom(photo(), { catalog: dirty })).rejects.toMatchObject({ code: 'catalogo_invalido' })
     await client.analyzeRoom(photo(), { catalog: CATALOG })
-    for (const option of sent().catalog as object[]) expect(Object.keys(option).sort()).toEqual(['category', 'id', 'name', 'tags'])
+    const [sofa, table] = sent().catalog as object[]
+    expect(Object.keys(sofa as object).sort()).toEqual(['category', 'dimensions_m', 'id', 'name', 'tags'])
+    expect(Object.keys(table as object).sort()).toEqual(['category', 'id', 'name', 'tags'])
+  })
+
+  it('las medidas reales de cada pieza llegan a la API como dimensions_m = [ancho, alto, fondo] en metros', async () => {
+    const { client, sent } = setup()
+    await client.analyzeRoom(photo(), { catalog: CATALOG })
+    expect(sent().catalog[0].dimensions_m).toEqual([2.06, 0.74, 1.01])
+  })
+
+  it('unas medidas que no son tres números positivos no salen del navegador', async () => {
+    const { client, fetchImpl } = setup()
+    const bad = [{ ...CATALOG[0], dimensions_m: [0, 1, 1] }] as unknown as AnalysisCandidate[]
+    await expect(client.analyzeRoom(photo(), { catalog: bad })).rejects.toMatchObject({ code: 'catalogo_invalido' })
+    expect(fetchImpl).not.toHaveBeenCalled()
   })
 
   it('sin piezas que ofrecer (o con un catálogo inválido) avisa antes de reducir la foto y de llamar a la red', async () => {

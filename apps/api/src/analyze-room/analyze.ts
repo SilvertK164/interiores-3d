@@ -1,18 +1,9 @@
-import { type AnalyzeRoomBody, DetectedFurnitureSchema, type RoomAnalysis, RoomAnalysisSchema } from '@interiores/contract'
-import { z } from 'zod'
+import { type AnalyzeRoomBody, type RoomAnalysis, RoomAnalysisSchema } from '@interiores/contract'
 import { errors } from '../errors.js'
 import { ProviderError, type VisionProvider } from './types.js'
 
-/** Un mueble por pieza visible: pasar de esto es un modelo desbocado, no una sala. */
-const MAX_FURNITURE = 100
 const MAX_WARNINGS = 20
 const WARNING_MAX_CHARS = 300
-
-/** Lo que tiene que contestar el modelo: los muebles con los rangos del contrato y avisos (lo demás se descarta). */
-const ProviderResultSchema = z.object({
-  furniture: z.array(DetectedFurnitureSchema).max(MAX_FURNITURE),
-  warnings: z.array(z.string()).default([]),
-})
 
 /** Lo único que se le pide al registro: avisar del motivo de una falla, sin su contenido. */
 export type AnalysisLog = { warn(fields: { reason: string }, message: string): void }
@@ -26,11 +17,22 @@ const cleanWarnings = (warnings: string[]) =>
     .filter((text) => text !== '')
     .slice(0, MAX_WARNINGS)
 
+/** Un modelo que no escribe los avisos (la lista vacía) no invalida el plano: se completa antes de validar. */
+const withWarnings = (raw: unknown): unknown =>
+  typeof raw === 'object' && raw !== null && !Array.isArray(raw) ? { ...raw, warnings: (raw as { warnings?: unknown }).warnings ?? [] } : raw
+
 /**
- * Pide el análisis al proveedor y entrega lo que promete el contrato. Cualquier falla (el proveedor, una respuesta con otra
- * forma, un número fuera de rango, un `asset_id` que no estaba en el catálogo recibido) es el mismo 502 `analisis_fallido`;
- * el motivo, una palabra de un vocabulario cerrado, va al registro. Ni el mensaje de un error ajeno ni la respuesta del
- * modelo se registran ni se repiten: podrían traer la foto o el prompt.
+ * El campo que no cumplió el contrato, como motivo para el registro (`invalid_result:furniture.3.x_m`). La ruta sale solo de los
+ * nombres de nuestro esquema y de índices numéricos: nunca trae el contenido de la respuesta.
+ */
+const invalidReason = (path: readonly PropertyKey[]) => (path.length === 0 ? 'invalid_result' : `invalid_result:${path.map(String).join('.')}`)
+
+/**
+ * Pide el análisis al proveedor y entrega lo que promete el contrato: el plano del ambiente visto desde arriba. Cualquier falla (el
+ * proveedor, una respuesta con otra forma, un número fuera de rango, una cámara lejos del ambiente, un `on_top_of` que apunta a la
+ * nada o forma un ciclo, un `asset_id` que no estaba en el catálogo recibido) es el mismo 502 `analisis_fallido`; el motivo, una
+ * palabra de un vocabulario cerrado, va al registro. Ni el mensaje de un error ajeno ni la respuesta del modelo se registran ni se
+ * repiten: podrían traer la foto o el prompt.
  */
 export async function analyzeRoom(input: { provider: VisionProvider; body: AnalyzeRoomBody; log?: AnalysisLog }): Promise<RoomAnalysis> {
   const { provider, body, log } = input
@@ -41,20 +43,15 @@ export async function analyzeRoom(input: { provider: VisionProvider; body: Analy
 
   let raw: unknown
   try {
-    raw = await provider({ image: body.image, mime: body.mime, catalog: body.catalog })
+    raw = await provider({ image: body.image, mime: body.mime, catalog: body.catalog, ...(body.knownWidthM === undefined ? {} : { knownWidthM: body.knownWidthM }) })
   } catch (error) {
     throw fail(error instanceof ProviderError ? error.reason : 'unexpected')
   }
 
-  const parsed = ProviderResultSchema.safeParse(raw)
-  if (!parsed.success) throw fail('invalid_result')
+  const parsed = RoomAnalysisSchema.safeParse(withWarnings(raw))
+  if (!parsed.success) throw fail(invalidReason(parsed.error.issues[0]?.path ?? []))
   const allowed = new Set(body.catalog.map((option) => option.id))
   if (parsed.data.furniture.some((piece) => !allowed.has(piece.asset_id))) throw fail('unknown_asset_id')
 
-  return RoomAnalysisSchema.parse({
-    furniture: parsed.data.furniture,
-    warnings: cleanWarnings(parsed.data.warnings),
-    calibration:
-      body.knownWidthM === undefined ? { status: 'uncalibrated', width_m: null } : { status: 'user_provided', width_m: body.knownWidthM },
-  })
+  return { ...parsed.data, warnings: cleanWarnings(parsed.data.warnings) }
 }

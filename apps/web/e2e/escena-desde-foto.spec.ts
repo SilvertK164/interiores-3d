@@ -1,25 +1,32 @@
 import { type Page, expect, test } from '@playwright/test'
-import { MIN_CONFIDENCE } from '../src/lib/lab/analysis-to-cluster'
-import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
+import { MIN_CONFIDENCE } from '../src/lib/lab/layout-constants'
+import { EXAMPLE_ANALYSIS, SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
+import type { RoomAnalysis } from '../src/lib/lab/schema'
 import { counts, ready, templateCounts } from './support/editor'
 import { hook } from './support/hooks'
 import { PROJECT_URL } from './support/projects'
 import { ANALYZE_URL, analyzePhoto, answerWith, failWith, sentBy } from './support/analysis'
 
-// Las piezas del ejemplo con confianza suficiente: la planta (20 %) se descarta con aviso.
-const EXAMPLE_PIECES = SAMPLE_ANALYSIS.furniture.filter((piece) => piece.confidence >= MIN_CONFIDENCE).length
+// Las piezas de un plano con confianza suficiente (las demás se descartan con aviso).
+const pieceCount = (analysis: RoomAnalysis) => analysis.furniture.filter((piece) => piece.confidence >= MIN_CONFIDENCE).length
 
-/** La escena de «Escena desde una foto» con el análisis de ejemplo: un ambiente de 4 × 3 m con piso, cielo, cuatro muros, puerta, ventana y los muebles dentro. */
-async function expectExampleScene(page: Page) {
+/**
+ * La escena de «Escena desde una foto» con un plano: un ambiente del tamaño del plano con piso, cielo, cuatro muros, sus aberturas y los muebles dentro.
+ * La escena queda centrada en el origen: el ambiente va de -ancho/2 a ancho/2 en x y de -fondo/2 a fondo/2 en z; ningún mueble pisa un muro (la cara está a
+ * 0,1 m del borde) y solo la tele, sobre su mueble, no está en el piso (0,35 m).
+ */
+async function expectSceneOf(page: Page, analysis: RoomAnalysis) {
+  const pieces = pieceCount(analysis)
+  const doors = analysis.openings.filter((opening) => opening.type === 'door').length
+  const windows = analysis.openings.filter((opening) => opening.type === 'window').length
   await expect.poll(async () => (await counts(page)).zone, { timeout: 60_000 }).toBe(1)
-  expect(await counts(page)).toMatchObject({ zone: 1, slab: 1, ceiling: 1, wall: 4, door: 1, window: 1, item: EXAMPLE_PIECES })
-  // La escena queda centrada en el origen: el ambiente va de -2 a 2 en x y de -1,5 a 1,5 en z, y ningún mueble flota ni pisa un muro.
-  const items = (await hook(page, 'nodesOf', 'item')) as { position: [number, number, number] }[]
-  expect(items).toHaveLength(EXAMPLE_PIECES)
-  for (const { position } of items) {
-    expect(Math.abs(position[0])).toBeLessThanOrEqual(2 - 0.2 + 0.01)
-    expect(Math.abs(position[2])).toBeLessThanOrEqual(1.5 - 0.2 + 0.01)
-    expect(position[1]).toBe(0)
+  expect(await counts(page)).toMatchObject({ zone: 1, slab: 1, ceiling: 1, wall: 4, door: doors, window: windows, item: pieces })
+  const items = (await hook(page, 'nodesOf', 'item')) as { asset: { id: string }; position: [number, number, number] }[]
+  expect(items).toHaveLength(pieces)
+  for (const { asset, position } of items) {
+    expect(Math.abs(position[0]), asset.id).toBeLessThanOrEqual(analysis.room.width_m / 2 - 0.1 + 0.01)
+    expect(Math.abs(position[2]), asset.id).toBeLessThanOrEqual(analysis.room.depth_m / 2 - 0.1 + 0.01)
+    expect(position[1], asset.id).toBe(asset.id === 'television' ? 0.35 : 0)
   }
 }
 
@@ -35,13 +42,25 @@ test.describe('escena desde una foto', () => {
     await expect(page.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible()
     await expect(page.getByRole('listitem').filter({ hasText: SAMPLE_ANALYSIS.warnings[0] as string })).toBeVisible()
 
+    // El ambiente en metros, desde dónde se tomó la foto y las aberturas.
+    await expect(page.getByTestId('room-summary')).toHaveText('Ambiente de 5 × 4,4 m (ancho × fondo)')
+    await expect(page.getByText('Foto tomada a 2,5 m del muro oeste y 4,3 m del muro norte, mirando hacia el norte.')).toBeVisible()
+    await expect(page.getByText('Aberturas: ventana en el muro este, puerta en el muro sur.')).toBeVisible()
+
     const table = page.getByRole('table', { name: 'Piezas detectadas' })
     await expect(table.getByRole('row')).toHaveCount(SAMPLE_ANALYSIS.furniture.length + 1) // + la fila de títulos
     // El nombre sale del catálogo que se le envió al análisis (las tablas en castellano), no del id que devuelve.
-    for (const label of ['Sofá', 'Mesa de centro', 'Silla de comedor', 'Biblioteca', 'Cama doble', 'Planta de interior', 'Televisor']) {
-      await expect(table.getByRole('rowheader', { name: label })).toBeVisible()
+    for (const label of ['Mueble de TV', 'Televisor', 'Alfombra rectangular', 'Mesa de centro', 'Sofá', 'Sillón', 'Biblioteca', 'Lámpara de pie', 'Planta de interior']) {
+      await expect(table.getByRole('rowheader', { name: label })).toBeVisible() // la de confianza baja lleva además «Confianza baja»
     }
     await expect(table.getByRole('cell', { name: '20 %', exact: true })).toBeVisible() // la confianza baja del ejemplo
+    // La posición en metros y hacia dónde mira cada pieza, en castellano.
+    const rowOf = (label: string) => table.getByRole('row').filter({ has: page.getByRole('rowheader', { name: label, exact: true }) })
+    await expect(rowOf('Sofá')).toContainText('2,5 m del muro oeste')
+    await expect(rowOf('Sofá')).toContainText('mira al norte')
+    await expect(rowOf('Sofá')).toContainText('contra el muro sur')
+    await expect(rowOf('Televisor')).toContainText('sobre «Mueble de TV»')
+    await expect(rowOf('Sillón')).toContainText('mira al oeste')
 
     expect(JSON.parse((await page.getByTestId('raw-json').textContent()) ?? '')).toEqual(SAMPLE_ANALYSIS)
 
@@ -51,6 +70,8 @@ test.describe('escena desde una foto', () => {
     expect(sent?.body.image.startsWith('/9j/')).toBe(true)
     expect(sent?.body.knownWidthM).toBe(4.5)
     expect(sent?.body.catalog.map((option) => option.id)).toContain('sofa')
+    // Cada pieza del catálogo viaja con sus medidas reales en metros [ancho, alto, fondo]: el análisis las usa de regla para estimar el ambiente.
+    expect(sent?.body.catalog.find((option) => option.id === 'sofa')?.dimensions_m).toEqual([2.06, 0.74, 1.01])
     expect(JSON.stringify(sent?.body)).not.toMatch(/model.glb|items/)
   })
 
@@ -85,30 +106,41 @@ test.describe('escena desde una foto', () => {
     await expect(page.getByRole('alert').filter({ hasText: 'No hay conexión' })).toBeVisible()
   })
 
-  test('«Abrir en el editor» crea el proyecto «Desde una foto · fecha y hora» y abre el editor con el ambiente y los muebles', async ({ page }) => {
+  test('«Crear escena y abrir en el editor» crea el proyecto «Desde una foto · fecha y hora» y abre el editor con el ambiente y los muebles', async ({ page }) => {
     test.setTimeout(180_000)
     await page.route(ANALYZE_URL, answerWith(SAMPLE_ANALYSIS))
     await analyzePhoto(page)
     const created = page.waitForRequest((request) => request.method() === 'POST' && /\/v1\/projects$/.test(request.url()))
-    await page.getByRole('button', { name: 'Abrir en el editor' }).click()
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     expect((await created).postDataJSON().name).toMatch(/^Desde una foto · \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/)
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
-    await expectExampleScene(page)
+    await expectSceneOf(page, SAMPLE_ANALYSIS)
   })
 
-  test('«Probar con un ejemplo» no llama a la API y abre un proyecto real en el editor, con el ambiente y los muebles del ejemplo', async ({ page }) => {
+  test('el ejemplo: «Probar con un ejemplo» solo carga la foto; «Analizar foto» muestra la revisión sin llamar a la API y «Crear escena y abrir en el editor» abre un proyecto real con el salón de 3,6 × 7,5 m y sus 14 muebles', async ({ page }) => {
     test.setTimeout(180_000)
     let calledApi = false
     await page.route(ANALYZE_URL, (route) => {
       calledApi = true
       return route.abort()
     })
+    let created = 0
+    page.on('request', (request) => {
+      if (request.method() === 'POST' && /\/v1\/projects$/.test(request.url())) created++
+    })
     await page.goto('/escena-desde-foto')
     await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
+    await expect(page.getByText('Foto de ejemplo', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Crear escena y abrir en el editor' })).toHaveCount(0)
+    await page.getByRole('button', { name: 'Analizar foto' }).click()
+    await expect(page.getByRole('heading', { name: 'Revisa la escena antes de crearla' })).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByTestId('scene-plan')).toBeVisible()
+    expect(created, 'hasta aquí no se creó ningún proyecto').toBe(0)
+    await page.getByRole('button', { name: 'Crear escena y abrir en el editor' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
-    await expectExampleScene(page)
+    await expectSceneOf(page, EXAMPLE_ANALYSIS)
     expect(calledApi).toBe(false)
   })
 
