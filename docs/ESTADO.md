@@ -1,6 +1,6 @@
 # Estado del proyecto — leer esto primero
 
-> Última actualización: 2026-10-12. Si algo de acá contradice otro documento, **manda este** y el otro se corrige.
+> Última actualización: 2026-10-13. Si algo de acá contradice otro documento, **manda este** y el otro se corrige.
 > Etiquetas: **[verificado]** comprobado en código, npm o docs oficiales · **[inferencia]** estimación o propuesta · **[por probar]** falta correrlo.
 
 ## Qué es
@@ -69,6 +69,11 @@ Diseñador de interiores **2D + 3D para viviendas y comercios**, con plantillas.
 - **Recorrer** empieza dentro del ambiente más grande, con ayuda en castellano; medido: avanza, choca con muros, la puerta cerrada bloquea y abierta se atraviesa, sube la escalera.
 - **Plano 2D con la proyección real de los muebles** (PNG oficial de Pascal, 4,6 MB) y alfombras debajo.
 - **Diferido:** Recorrer con puntero bloqueado solo se prueba a mano en ventana real (`E2E_HEADED=1`); el aviso "1 Issue" de Next no se pudo reproducir en headless.
+
+## Muebles desde una foto (2026-10-13, rama `feature/editor-shell`)
+- **Hecho:** Editar → Más → «Muebles desde una foto». La persona sube la foto (y el ancho del ambiente si lo sabe), TP3 propone qué muebles del catálogo local hay y dónde, y «Agregar al proyecto» inserta ese conjunto en la planta activa **en un solo paso del historial** (un Deshacer los quita todos), centrado en el ambiente elegido o en la planta, y los deja **seleccionados juntos** (Pascal 1.0.3 no tiene nodo grupo, se usa su multiselección). Código puro en `src/lib/lab/` (`analysis-catalog`, `analysis-to-cluster`), `bridge.cluster.insert` en el puente y diálogo en `shell/`; probado con TP3 simulado en `e2e/muebles-desde-foto.spec.ts`. Detalle en [`lab/README.md`](../lab/README.md) y `apps/web/CLAUDE.md`.
+- **Contrato nuevo con TP3 (decidido):** TP3 elige piezas del catálogo local y no siete tipos fijos: el pedido suma `catalog_json` (id, nombre en castellano, categoría y etiquetas, sin rutas) y cada pieza devuelta trae `asset_id`. **El editor y TP3 se actualizan juntos** (con un TP3 viejo la página avisa «versión anterior»). `analysisToDefinition` sigue en blanco (es el espacio de Victoria).
+- **Pendiente / afuera:** probar con Gemini real y una foto no sensible (solo se probó con TP3 simulado); el estante paramétrico `param:bookshelf` no es candidato (el insertor solo crea piezas del catálogo); el conjunto no se agrupa en un grupo de sesión de Pascal (`Ctrl+G`, se pierde al recargar); nada se apila sobre mesas (todo va al piso).
 
 ## Deuda técnica diferida (revisión final del spec 1)
 - auth.ts convierte cualquier error de getUser (incluida una caída de Supabase Auth) en 401 "sesión vencida"; distinguir 401/403 de errores de red (→ 503).

@@ -88,6 +88,7 @@ test('Más: cuadrícula y ajuste cambian lo de Pascal, Eliminar arma el borrado,
   await expect.poll(async () => (await hook(page, 'state')).snapWall).toBe('angles')
   for (const name of ['Compartir', 'Renderizar']) await expect(more.getByRole('button', { name })).toHaveCount(0)
   await expect(more.getByRole('button', { name: 'Exportar plano' })).toBeEnabled()
+  await expect(more.getByRole('button', { name: 'Muebles desde una foto' })).toBeEnabled()
   await expect(more.getByText('Pronto')).toHaveCount(0)
 
   await more.getByRole('button', { name: 'Atajos de teclado' }).click()

@@ -116,6 +116,17 @@ La respuesta trae `furniture[]` con `asset_id` (un id de la lista enviada), `x`,
 
 Quién arma qué: `apps/web/src/lib/lab/analysis-catalog.ts` (`buildAnalysisCatalog`, código puro) elige entre las piezas locales las que una persona reconoce en una foto (mobiliario y decoración que se apoyan en el piso: nada de instalaciones, piezas de pared o techo ni lo que va sobre una mesa) y escribe el nombre en castellano con las tablas de `catalog-es`. La página del laboratorio y «Muebles desde una foto» del editor usan **la misma lista**. Si Pascal suma una pieza, no es candidata hasta agregarla a `RECOGNIZABLE` en ese archivo. El tamaño de cada pieza es **siempre el real del catálogo**: el `width` y `depth` de Gemini no se usan.
 
+## Muebles desde una foto (en el editor)
+
+Es el uso de este contrato dentro del editor, sin pasar por el laboratorio: en un proyecto abierto, **Editar → Más → «Muebles desde una foto»**. La persona sube la foto (y, si lo sabe, el ancho del ambiente), TP3 propone qué muebles del catálogo hay y dónde, y con **«Agregar al proyecto»** esa mini escena (un conjunto de piezas) se inserta en la planta activa:
+
+- **Un solo paso del historial:** un Deshacer quita todas las piezas juntas.
+- **Quedan seleccionadas todas juntas** (Pascal 1.0.3 no tiene nodo grupo: se usa su multiselección, que las mueve, gira o borra a la vez).
+- **Dónde caen:** el centro del conjunto va al centro del ambiente elegido (el centroide de su área) o, si no hay, al centro de la planta activa (la caja que envuelve sus muros y ambientes; el origen si está vacía).
+- **Cómo se ubican** (`analysisToCluster`, código puro en `apps/web/src/lib/lab/analysis-to-cluster.ts`): la foto se toma como un ambiente de `ancho conocido ?? 4 m` de ancho y 75 % de fondo; `x` e `y` pasan a metros desde su centro (+x a la derecha, +z hacia abajo). El tamaño es siempre el real del catálogo. El giro horario de TP3 es el `rotY` de Pascal con el signo opuesto (`rotY = -rotation_deg`; con `rotY = 0` el frente mira a +z, hacia quien mira la foto: si una pieza queda mirando al revés, se gira con R). Se descartan, con aviso en el diálogo, las piezas de confianza menor que 0,3 y los `asset_id` que el catálogo local no tiene; nunca se reemplazan por otra pieza.
+- **Límites:** todo se apoya en el piso (nada sobre mesas) y las piezas pueden solaparse; no se agregan piezas de pared ni de techo; sin el estante paramétrico (`param:bookshelf`).
+- **Código:** `shell/PhotoFurnitureDialog.tsx` y `photo-furniture-model.ts` (diálogo y su estado), `shell/bridge/cluster.ts` (`bridge.cluster.insert(pieces, levelId?)`: lo único que el diálogo sabe de Pascal) y `src/editor/cluster-deps.ts` (el único enlace real con `@pascal-app/core`). Pruebas: `test/lab-analysis-*.test.ts`, `shell-bridge-cluster.test.ts`, `shell-photo-furniture-*.test.ts*` y `e2e/muebles-desde-foto.spec.ts` (con TP3 simulado, sin clave ni cuota).
+
 ## Qué hay listo y qué puedes explorar
 
 ### Ya está armado
@@ -123,6 +134,7 @@ Quién arma qué: `apps/web/src/lib/lab/analysis-catalog.ts` (`buildAnalysisCata
 | Pieza | Dónde | Para qué |
 |---|---|---|
 | Catálogo para el análisis | `apps/web/src/lib/lab/analysis-catalog.ts` | Las piezas candidatas (`catalog_json`) y el mapa id → pieza local |
+| Conjunto de muebles | `apps/web/src/lib/lab/analysis-to-cluster.ts` | Del análisis de TP3 a piezas del catálogo con su posición y giro (lo usa «Muebles desde una foto») |
 | Cliente de TP3 | `apps/web/src/lib/lab/analyze-room.ts`, `schema.ts` | Envía la foto y el catálogo, valida la respuesta y traduce cada error a castellano llano |
 | Página del laboratorio | `apps/web/app/laboratorio/` | Foto + ancho conocido + dirección de TP3; avisos, tabla de piezas y JSON crudo |
 | Análisis de ejemplo | `apps/web/src/lib/lab/sample-analysis.ts` | El mismo que usan el botón de ejemplo y las pruebas |
