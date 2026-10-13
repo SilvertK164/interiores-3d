@@ -5,7 +5,6 @@
 
 const PASCAL_BUCKET = 'https://byrpxoiotywskoojsrzd.supabase.co'
 const CDNS = ['https://cdn.jsdelivr.net', 'https://www.gstatic.com']
-const LAB_DEFAULT = 'http://localhost:8000'
 
 /** `https://host` de una URL, o null si no es una URL (así una variable mal escrita no rompe el build). */
 export function originOf(value) {
@@ -20,9 +19,7 @@ export function originOf(value) {
 const ENFORCED_CSP = "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'"
 
 function fullCsp(env) {
-  const own = [env.NEXT_PUBLIC_API_URL, env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_LAB_PHOTO_URL ?? LAB_DEFAULT]
-    .map(originOf)
-    .filter(Boolean)
+  const own = [env.NEXT_PUBLIC_API_URL, env.NEXT_PUBLIC_SUPABASE_URL].map(originOf).filter(Boolean)
   const connect = [...new Set(["'self'", 'blob:', 'data:', ...own, PASCAL_BUCKET, ...CDNS])]
   return [
     "default-src 'self'",

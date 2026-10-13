@@ -50,7 +50,7 @@ function catalogAssets(): Promise<ReadonlyMap<string, AssetLike>> {
 let analysis: Promise<AnalysisCatalog<AssetLike>> | undefined
 
 /**
- * Lo que se le ofrece a TP3 al analizar una foto y con lo que se resuelve su respuesta: las piezas reconocibles del catálogo
+ * Lo que se le ofrece al análisis al analizar una foto y con lo que se resuelve su respuesta: las piezas reconocibles del catálogo
  * local (`buildAnalysisCatalog`). Es la misma lista que usa «Muebles desde una foto» en el editor; la página del laboratorio
  * la pide acá para no importar Pascal.
  */

@@ -4,12 +4,12 @@ import type { DetectedFurniture } from '@/lib/lab/schema'
 const percent = (value: number) => `${Math.round(value * 100)} %`
 
 /**
- * Las piezas que detectó TP3, tal cual las devuelve (proporciones del ambiente), sin interpretarlas. El nombre sale del catálogo
- * que se le envió (`candidates`); si TP3 devolviera un id que no está, se muestra tal cual y se aclara.
+ * Las piezas que detectó el análisis, tal cual las devuelve (proporciones del ambiente), sin interpretarlas. El nombre sale del catálogo
+ * que se le envió (`candidates`); si el análisis devolviera un id que no está, se muestra tal cual y se aclara.
  */
 export function PiecesTable({ furniture, candidates }: { furniture: DetectedFurniture[]; candidates: readonly AnalysisCandidate[] }) {
   if (furniture.length === 0) {
-    return <p className="text-sm text-muted-foreground">TP3 no detectó ningún mueble en esta foto.</p>
+    return <p className="text-sm text-muted-foreground">No se detectó ningún mueble del catálogo en esta foto.</p>
   }
   const rows = furniture.map((piece, index) => ({ piece, key: `${index}-${piece.asset_id}` }))
   return (

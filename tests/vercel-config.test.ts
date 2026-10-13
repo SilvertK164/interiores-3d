@@ -53,7 +53,7 @@ describe('apps/api/vercel.json (función de Vercel con Root Directory apps/api)'
     expect(existsSync(join(repo, 'apps/api/api/index.ts'))).toBe(true)
     expect(functions['api/index.ts']?.maxDuration).toBe(30)
     const source = read('apps/api/src/analyze-room/gemini.ts')
-    const timeout = Number(new RegExp('GEMINI_TIMEOUT_MS = ([0-9_]+)').exec(source)?.[1]?.replaceAll('_', ''))
+    const timeout = Number(/GEMINI_TIMEOUT_MS = ([0-9_]+)/.exec(source)?.[1]?.replaceAll('_', ''))
     expect(timeout).toBeGreaterThan(0)
     expect(timeout).toBeLessThan((functions['api/index.ts']?.maxDuration as number) * 1000)
   })

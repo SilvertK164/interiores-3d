@@ -8,9 +8,8 @@ import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
 import type { AnalysisCandidate } from '@/lib/lab/analysis-catalog'
 import { analysisToDefinition } from '@/lib/lab/analysis-to-definition'
-import { analyzeRoom } from '@/lib/lab/analyze-room'
 import { describeLabError } from '@/lib/lab/describe-error'
-import { DEFAULT_SERVICE_URL, labProjectName, normalizeServiceUrl, parseKnownWidth, readSavedServiceUrl, saveServiceUrl } from '@/lib/lab/form-helpers'
+import { labProjectName, parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError, LabNotImplementedError } from '@/lib/lab/lab-error'
 import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
@@ -42,9 +41,8 @@ export default function LaboratorioPage() {
   const { session, loading, hadSession } = useSession()
   const [file, setFile] = useState<File | null>(null)
   const [widthText, setWidthText] = useState('')
-  const [serviceUrl, setServiceUrl] = useState(DEFAULT_SERVICE_URL)
   const [analysis, setAnalysis] = useState<RoomAnalysis | null>(null)
-  // Las piezas del catálogo que se le ofrecieron a TP3: con ellas se escriben los nombres de la tabla.
+  // Las piezas del catálogo que se le ofrecieron al análisis: con ellas se escriben los nombres de la tabla.
   const [candidates, setCandidates] = useState<AnalysisCandidate[]>([])
   const [fromExample, setFromExample] = useState(false)
   const [modelWarnings, setModelWarnings] = useState<string[]>([])
@@ -58,10 +56,6 @@ export default function LaboratorioPage() {
     // Sin sesión desde el principio no hay aviso; si se perdió estando aquí, /login explica que venció.
     if (!loading && !session) toLogin(hadSession ? { reason: 'sesion' } : {})
   }, [loading, session, hadSession, toLogin])
-  useEffect(() => {
-    const saved = readSavedServiceUrl()
-    if (saved) setServiceUrl(saved)
-  }, [])
 
   function start(next: Exclude<Busy, null>): boolean {
     if (lock.current) return false
@@ -76,7 +70,7 @@ export default function LaboratorioPage() {
     setBusy(null)
   }
 
-  /** Las piezas del catálogo local que se le ofrecen a TP3. Pascal se carga recién aquí (o al abrir el editor), nunca antes. */
+  /** Las piezas del catálogo local que se le ofrecen al análisis. Pascal se carga recién aquí (o al abrir el editor), nunca antes. */
   async function loadCandidates(): Promise<AnalysisCandidate[]> {
     const { analysisCatalog } = await import('@/editor/lab-scene')
     const { candidates: loaded } = await analysisCatalog()
@@ -90,10 +84,8 @@ export default function LaboratorioPage() {
     if (!file) return setNotice({ kind: 'error', text: 'Elige primero la foto del ambiente.' })
     start('analizando')
     try {
-      const baseUrl = normalizeServiceUrl(serviceUrl)
       const knownWidthM = parseKnownWidth(widthText)
-      saveServiceUrl(baseUrl)
-      setAnalysis(await analyzeRoom(file, { baseUrl, knownWidthM, catalog: await loadCandidates() }))
+      setAnalysis(await api.analyzeRoom(file, { knownWidthM, catalog: await loadCandidates() }))
       setFromExample(false)
       setModelWarnings([])
     } catch (error) {
@@ -175,8 +167,8 @@ export default function LaboratorioPage() {
       </header>
 
       <p className="text-sm text-muted-foreground">
-        Sube la foto de un ambiente y el servicio de TP3 propone qué muebles hay y dónde. Aquí ves lo que devuelve y, con «Abrir en el editor», lo llevas a un
-        proyecto nuevo. Los pasos para tener TP3 corriendo están en lab/README.md.
+        Sube la foto de un ambiente y el análisis propone qué muebles hay y dónde. Aquí ves lo que devuelve y, con «Abrir en el editor», lo llevas a un
+        proyecto nuevo.
       </p>
 
       <form className="flex flex-col gap-4" onSubmit={analyze}>
@@ -184,18 +176,14 @@ export default function LaboratorioPage() {
           Foto del ambiente (JPG, PNG o WebP)
           <input accept="image/jpeg,image/png,image/webp" className={FIELD} onChange={(e) => setFile(e.target.files?.[0] ?? null)} type="file" />
           <span className="text-xs text-muted-foreground">
-            La foto va a tu servicio de TP3 y de ahí a Gemini (Google AI Studio). En el nivel gratuito Google puede usar el contenido para mejorar sus
-            productos: conviene evitar fotos privadas.
+            Tu foto se envía a Google (Gemini) para reconocer los muebles y no la guardamos. En el nivel gratuito, Google puede usar las fotos para
+            mejorar sus productos: evita las privadas o con personas.
           </span>
         </label>
         <div className="flex flex-wrap gap-4">
           <label className="flex flex-col gap-1 text-sm">
             Ancho conocido del ambiente, en metros (opcional)
             <input className={FIELD} inputMode="decimal" onChange={(e) => setWidthText(e.target.value)} placeholder="4,5" value={widthText} />
-          </label>
-          <label className="flex min-w-64 flex-1 flex-col gap-1 text-sm">
-            Dirección del servicio de TP3
-            <input autoComplete="off" className={FIELD} inputMode="url" onChange={(e) => setServiceUrl(e.target.value)} spellCheck={false} value={serviceUrl} />
           </label>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -234,7 +222,7 @@ export default function LaboratorioPage() {
             Resultado del análisis
           </h2>
           <p className="text-sm text-muted-foreground">
-            {fromExample ? 'Análisis de ejemplo: no viene de TP3.' : 'Respuesta del servicio de TP3.'}{' '}
+            {fromExample ? 'Análisis de ejemplo: no viene de una foto.' : 'Respuesta del análisis de tu foto.'}{' '}
             {analysis.calibration.status === 'user_provided' && analysis.calibration.width_m !== null
               ? `Ancho conocido: ${new Intl.NumberFormat('es', { maximumFractionDigits: 2 }).format(analysis.calibration.width_m)} m.`
               : 'Sin ancho conocido: las medidas son proporciones del ambiente.'}

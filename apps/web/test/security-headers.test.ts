@@ -42,6 +42,13 @@ describe('cabeceras de seguridad de la web', () => {
     expect(connect).not.toMatch(/(^| )https:( |$)/)
   })
 
+  it('la web ya no se conecta a ningún servicio de TP3: ni localhost:8000 ni NEXT_PUBLIC_LAB_PHOTO_URL (el análisis pasa por la API)', () => {
+    const connect = /connect-src ([^;]*)/.exec(h['Content-Security-Policy-Report-Only'] ?? '')?.[1] ?? ''
+    expect(connect).not.toMatch(/localhost|127\.0\.0\.1|:8000/)
+    const withLab = byKey(buildSecurityHeaders({ ...env, NEXT_PUBLIC_LAB_PHOTO_URL: 'https://tp3.example.com' }, true))
+    expect(withLab['Content-Security-Policy-Report-Only']).not.toContain('tp3.example.com')
+  })
+
   it('en desarrollo solo manda lo inofensivo (Next necesita eval y websockets)', () => {
     const dev = byKey(buildSecurityHeaders(env, false))
     expect(dev['X-Content-Type-Options']).toBe('nosniff')

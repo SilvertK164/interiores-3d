@@ -1,7 +1,7 @@
 import type { RoomAnalysis } from './schema'
 
 /**
- * Un análisis fijo con el mismo formato que devuelve TP3: siete piezas distintas del catálogo local (cada `asset_id` es una
+ * Un análisis fijo con el mismo formato que devuelve la API (`POST /v1/analyze-room`): siete piezas distintas del catálogo local (cada `asset_id` es una
  * candidata de `analysis-catalog.ts`), una de ellas con confianza baja (la planta) y un aviso. Sirve para probar el modelado y
  * «Muebles desde una foto» sin servicio, sin clave de Gemini y sin cuota, y es el mismo que usan las pruebas.
  */

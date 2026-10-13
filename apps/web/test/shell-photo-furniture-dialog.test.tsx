@@ -44,20 +44,28 @@ describe('diálogo "Muebles desde una foto"', () => {
     for (const svg of markup.match(/<svg[^>]*>/g) ?? []) expect(svg).toContain('aria-hidden="true"')
   })
 
-  it('pide la foto (JPG, PNG o WebP), el ancho opcional y la dirección del servicio de TP3, cada campo con su etiqueta', () => {
+  it('pide la foto (JPG, PNG o WebP) y el ancho opcional, cada campo con su etiqueta, y ya no pide ninguna dirección de servicio', () => {
     const text = textOf(markup)
     expect(text).toContain('Foto del ambiente (JPG, PNG o WebP)')
     expect(text).toContain('Ancho del ambiente, en metros (opcional)')
-    expect(text).toContain('Dirección del servicio de TP3')
+    expect(text).not.toMatch(/TP3|servicio|localhost|8000|Dirección/)
     expect(markup).toMatch(/<input[^>]*accept="image\/jpeg,image\/png,image\/webp"[^>]*type="file"|<input[^>]*type="file"[^>]*accept="image\/jpeg,image\/png,image\/webp"/)
     expect(markup).toMatch(/<input[^>]*inputMode="decimal"/)
-    expect(markup).toMatch(/<input[^>]*value="http:\/\/localhost:8000"/)
+    expect(markup).not.toMatch(/<input[^>]*inputMode="url"/)
     // cada campo está dentro de su <label>
-    expect(markup.match(/<label/g)?.length).toBe(3)
+    expect(markup.match(/<label/g)?.length).toBe(2)
   })
 
-  it('avisa que la foto viaja a TP3 y a Gemini, para que se evite una foto privada', () => {
-    expect(textOf(markup)).toMatch(/TP3 y de ahí a Gemini/)
+  it('muestra el aviso de privacidad: la foto viaja a Google (Gemini), no se guarda y Google puede usarla para mejorar sus productos', () => {
+    const text = textOf(markup)
+    expect(text).toMatch(/Google \(Gemini\)/)
+    expect(text).toMatch(/no la guardamos/)
+    expect(text).toMatch(/Google puede usar las fotos para mejorar sus productos/)
+    expect(text).toMatch(/evita las privadas/)
+  })
+
+  it('dice cuántos análisis se pueden pedir por hora', () => {
+    expect(textOf(markup)).toContain('Puedes analizar hasta 10 fotos por hora.')
   })
 
   it('empieza en el formulario: «Analizar foto» está deshabilitado hasta elegir la foto y «Agregar al proyecto» todavía no aparece', () => {

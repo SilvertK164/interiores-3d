@@ -1,0 +1,74 @@
+import { crc32, deflateSync } from 'node:zlib'
+import type { Request, Route } from '@playwright/test'
+
+// La API llama a Gemini desde el servidor. Las pruebas simulan la respuesta de POST /v1/analyze-room con page.route: no necesitan
+// clave de Gemini, ni cuota, ni gastar los 10 análisis por hora de la cuenta de prueba. El pedido lleva JSON y Authorization, así
+// que el navegador manda antes un OPTIONS (CORS) que atienden la API local o el propio Playwright; la respuesta simulada solo
+// necesita la cabecera de CORS.
+export const ANALYZE_URL = '**/v1/analyze-room'
+export const CORS = { 'access-control-allow-origin': '*' }
+
+const chunk = (type: string, data: Buffer) => {
+  const length = Buffer.alloc(4)
+  length.writeUInt32BE(data.length)
+  const body = Buffer.concat([Buffer.from(type, 'ascii'), data])
+  const crc = Buffer.alloc(4)
+  crc.writeUInt32BE(crc32(body))
+  return Buffer.concat([length, body, crc])
+}
+
+/** PNG de un solo color con las medidas que se pidan, armado a mano: una foto válida sin guardar archivos binarios en el repo. */
+export function solidPng(width: number, height: number, rgb: [number, number, number] = [200, 180, 150]): Buffer {
+  const header = Buffer.alloc(13)
+  header.writeUInt32BE(width, 0)
+  header.writeUInt32BE(height, 4)
+  header[8] = 8 // bits por canal
+  header[9] = 2 // color verdadero (RGB)
+  const row = Buffer.concat([Buffer.from([0]), Buffer.from(Array.from({ length: width }, () => rgb).flat())]) // filtro 0 + los píxeles
+  const rows = Buffer.concat(Array.from({ length: height }, () => row))
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', header),
+    chunk('IDAT', deflateSync(rows)),
+    chunk('IEND', Buffer.alloc(0)),
+  ])
+}
+
+/** PNG de 2 × 2 píxeles: lo mínimo para tener una foto válida. */
+export const tinyPng = (): Buffer => solidPng(2, 2)
+
+export const answerWith = (analysis: unknown) => (route: Route) =>
+  route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: JSON.stringify(analysis) })
+
+/** Una respuesta de error con el cuerpo `{ error: { code, message } }` de la API. */
+export const failWith =
+  (status: number, code: string, message = 'texto técnico que la página no debe mostrar') =>
+  (route: Route) =>
+    route.fulfill({ status, contentType: 'application/json', headers: CORS, body: JSON.stringify({ error: { code, message } }) })
+
+export type AnalyzeRequest = {
+  image: string
+  mime: string
+  knownWidthM?: number
+  catalog: { id: string; name: string; category: string; tags: string[] }[]
+}
+
+/** Lo que mandó la página: el cuerpo JSON y el encabezado de sesión. */
+export function sentBy(request: Request): { body: AnalyzeRequest; authorization: string | undefined } {
+  return { body: request.postDataJSON() as AnalyzeRequest, authorization: request.headers().authorization }
+}
+
+/** Las medidas de un JPEG en base64, leídas de su marcador de tamaño (SOF). */
+export function jpegSize(base64: string): { width: number; height: number } {
+  const bytes = Buffer.from(base64, 'base64')
+  let offset = 2
+  while (offset + 9 < bytes.length) {
+    if (bytes[offset] !== 0xff) throw new Error('JPEG con un marcador inesperado')
+    const marker = bytes[offset + 1] as number
+    const length = bytes.readUInt16BE(offset + 2)
+    const isFrame = marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc
+    if (isFrame) return { height: bytes.readUInt16BE(offset + 5), width: bytes.readUInt16BE(offset + 7) }
+    offset += 2 + length
+  }
+  throw new Error('no se encontró el tamaño del JPEG')
+}

@@ -4,9 +4,9 @@ import { counts } from './support/editor'
 import { hook } from './support/hooks'
 import { createBlankProject } from './support/projects'
 import { dockButton, undoRedo } from './support/shell'
-import { CORS, answerWith, tinyPng } from './support/tp3'
+import { ANALYZE_URL, answerWith, failWith, jpegSize, sentBy, solidPng, tinyPng } from './support/analysis'
 
-// TP3 se simula con page.route (ver support/tp3.ts): no hace falta el servicio, ni clave de Gemini, ni cuota.
+// El análisis se simula con page.route sobre POST /v1/analyze-room (ver support/analysis.ts): no hace falta clave de Gemini ni cuota.
 const photoDialog = (page: Page) => page.getByRole('dialog', { name: 'Muebles desde una foto' })
 const items = async (page: Page) => (await counts(page)).item ?? 0
 
@@ -25,11 +25,11 @@ async function analyze(dialog: Locator) {
 }
 
 test.describe('muebles desde una foto', () => {
-  test('agrega a la planta activa las piezas que propone TP3 (las que quedan marcadas), las deja seleccionadas juntas y un solo Deshacer las quita todas', async ({ page }) => {
+  test('agrega a la planta activa las piezas que propone el análisis (las que quedan marcadas), las deja seleccionadas juntas y un solo Deshacer las quita todas', async ({ page }) => {
     test.setTimeout(180_000)
-    let sent = ''
-    await page.route('**/api/analyze-room', (route) => {
-      sent = route.request().postDataBuffer()?.toString('latin1') ?? ''
+    let sent: ReturnType<typeof sentBy> | undefined
+    await page.route(ANALYZE_URL, (route) => {
+      sent = sentBy(route.request())
       return answerWith(SAMPLE_ANALYSIS)(route)
     })
     await createBlankProject(page, 'foto')
@@ -72,11 +72,13 @@ test.describe('muebles desde una foto', () => {
     expect([...state.selectedIds].sort()).toEqual(added.map((n) => n.id).sort())
     expect(state).toMatchObject({ mode: 'select', zoneId: null })
 
-    // El pedido a TP3 llevó la foto y el catálogo (sin rutas).
-    expect(sent).toContain('name="image"; filename="sala.png"')
-    expect(sent).toContain('name="catalog_json"')
-    expect(sent).toContain('"id":"sofa"')
-    expect(sent).not.toMatch(/model\.glb|\/items\//)
+    // El pedido llevó la sesión, la foto reducida (un JPEG en base64) y el catálogo, sin rutas.
+    expect(sent?.authorization).toMatch(/^Bearer /)
+    expect(sent?.body.mime).toBe('image/jpeg')
+    expect(sent?.body.image.startsWith('/9j/')).toBe(true)
+    expect(sent?.body).not.toHaveProperty('knownWidthM')
+    expect(sent?.body.catalog.map((option) => option.id)).toContain('sofa')
+    expect(JSON.stringify(sent?.body)).not.toMatch(/model\.glb|\/items\//)
 
     // UN solo Deshacer las quita todas; Rehacer las devuelve.
     await undoRedo(page).undo.click()
@@ -85,32 +87,26 @@ test.describe('muebles desde una foto', () => {
     await expect.poll(() => items(page)).toBe(before + 5)
   })
 
-  test('si TP3 falla, el diálogo lo explica en castellano y se puede volver a intentar sin perder lo escrito', async ({ page }) => {
+  test('si el análisis falla, el diálogo lo explica en castellano y se puede volver a intentar sin perder lo escrito', async ({ page }) => {
     test.setTimeout(120_000)
-    await page.route('**/api/analyze-room', (route) =>
-      route.fulfill({
-        status: 503,
-        contentType: 'application/json',
-        headers: CORS,
-        body: JSON.stringify({ error: { code: 'provider_not_configured', message: 'falta GEMINI_API_KEY' } }),
-      }),
-    )
+    await page.route(ANALYZE_URL, failWith(503, 'analisis_no_disponible', 'falta GEMINI_API_KEY'))
     await createBlankProject(page, 'foto-error')
     const dialog = await openFromMore(page)
     await dialog.getByLabel('Ancho del ambiente').fill('4,5')
     await analyze(dialog)
 
-    await expect(dialog.getByRole('alert')).toContainText('no tiene la clave de Gemini')
+    await expect(dialog.getByRole('alert')).toContainText('El análisis de fotos no está disponible por ahora')
+    await expect(dialog.getByRole('alert')).not.toContainText('GEMINI')
     await expect(dialog.getByRole('button', { name: 'Agregar al proyecto' })).toHaveCount(0)
     await expect(dialog.getByLabel('Ancho del ambiente')).toHaveValue('4,5')
     await expect(dialog.getByRole('button', { name: 'Analizar foto' })).toBeEnabled()
     expect(await items(page)).toBe(0)
   })
 
-  test('si TP3 no reconoce ningún mueble del catálogo, lo dice y no deja agregar nada; un ancho inválido se avisa antes de llamar a TP3', async ({ page }) => {
+  test('si el análisis no reconoce ningún mueble del catálogo, lo dice y no deja agregar nada; un ancho inválido se avisa antes de llamar a la API', async ({ page }) => {
     test.setTimeout(120_000)
     let calls = 0
-    await page.route('**/api/analyze-room', (route) => {
+    await page.route(ANALYZE_URL, (route) => {
       calls++
       return answerWith({ furniture: [], warnings: ['No se ve ningún mueble.'], calibration: { status: 'uncalibrated', width_m: null } })(route)
     })
@@ -129,6 +125,46 @@ test.describe('muebles desde una foto', () => {
     await expect(dialog.getByRole('button', { name: 'Agregar al proyecto' })).toBeDisabled()
     await dialog.getByRole('button', { name: 'Cambiar la foto' }).click()
     await expect(dialog.getByLabel('Foto del ambiente')).toBeVisible()
+    expect(await items(page)).toBe(0)
+  })
+
+  test('muestra el aviso de privacidad, ya no pide ninguna dirección y reduce la foto (lado mayor 1600 px, JPEG) antes de enviarla', async ({ page }) => {
+    test.setTimeout(120_000)
+    let sent: ReturnType<typeof sentBy> | undefined
+    await page.route(ANALYZE_URL, (route) => {
+      sent = sentBy(route.request())
+      return answerWith(SAMPLE_ANALYSIS)(route)
+    })
+    await createBlankProject(page, 'foto-reducida')
+    const dialog = await openFromMore(page)
+
+    await expect(dialog.getByText(/Google puede usar las fotos para mejorar sus productos/)).toBeVisible()
+    await expect(dialog.getByText('Puedes analizar hasta 10 fotos por hora.')).toBeVisible()
+    await expect(dialog.getByLabel(/Dirección del servicio/)).toHaveCount(0)
+    await expect(dialog.getByText(/TP3/)).toHaveCount(0)
+
+    const photo = solidPng(3200, 2000)
+    await dialog.getByLabel('Foto del ambiente').setInputFiles({ name: 'sala-grande.png', mimeType: 'image/png', buffer: photo })
+    await dialog.getByLabel('Ancho del ambiente').fill('4,5')
+    await dialog.getByRole('button', { name: 'Analizar foto' }).click()
+    await expect(dialog.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible({ timeout: 30_000 })
+
+    expect(sent?.body.mime).toBe('image/jpeg')
+    expect(sent?.body.knownWidthM).toBe(4.5)
+    expect(jpegSize(sent?.body.image as string)).toEqual({ width: 1600, height: 1000 })
+    expect(Buffer.from(sent?.body.image as string, 'base64').length).toBeLessThan(3 * 1024 * 1024)
+  })
+
+  test('si ya se pidieron 10 análisis en la hora, el diálogo lo dice en castellano y se puede volver a intentar', async ({ page }) => {
+    test.setTimeout(120_000)
+    await page.route(ANALYZE_URL, failWith(429, 'limite_de_analisis'))
+    await createBlankProject(page, 'foto-limite')
+    const dialog = await openFromMore(page)
+    await analyze(dialog)
+
+    // El editor corre WebGL por software y la foto se reduce en el mismo hilo: se le da más aire que los 5 s de siempre.
+    await expect(dialog.getByRole('alert')).toHaveText('Llegaste al límite de 10 análisis por hora. Inténtalo más tarde.', { timeout: 30_000 })
+    await expect(dialog.getByRole('button', { name: 'Analizar foto' })).toBeEnabled()
     expect(await items(page)).toBe(0)
   })
 

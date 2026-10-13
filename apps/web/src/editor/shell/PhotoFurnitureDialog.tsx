@@ -1,13 +1,13 @@
 'use client'
 
-import { Plus, ScanSearch, X } from 'lucide-react'
+import { Info, Plus, ScanSearch, X } from 'lucide-react'
 import { type RefObject, useEffect, useId, useMemo, useReducer, useRef } from 'react'
 import { Loader } from '@/components/Loader'
 import { cx } from '@/lib/cx'
+import { api } from '@/lib/api/instance'
 import { buildAnalysisCatalog } from '@/lib/lab/analysis-catalog'
-import { analyzeRoom } from '@/lib/lab/analyze-room'
 import { describeLabError } from '@/lib/lab/describe-error'
-import { DEFAULT_SERVICE_URL, normalizeServiceUrl, parseKnownWidth, readSavedServiceUrl, saveServiceUrl } from '@/lib/lab/form-helpers'
+import { parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError } from '@/lib/lab/lab-error'
 import type { CatalogItemLike } from './furniture-model'
 import { TEXT, canAdd, canAnalyze, checkedRows, detectedRows, initialState, photoReducer, selectionSummary } from './photo-furniture-model'
@@ -16,7 +16,7 @@ import { useBridge } from './use-bridge'
 
 type Props = {
   open: boolean
-  /** Las piezas del catálogo local (con sus rutas locales): de ahí salen las que se le ofrecen a TP3 y lo que se agrega. */
+  /** Las piezas del catálogo local (con sus rutas locales): de ahí salen las que se le ofrecen al análisis y lo que se agrega. */
   catalog: readonly CatalogItemLike[]
   /** El botón que abrió el diálogo: el foco vuelve ahí al cerrar. */
   opener: RefObject<HTMLElement | null>
@@ -27,9 +27,9 @@ const LABEL = 'flex flex-col gap-1.5 text-[14px] font-medium text-ink'
 const HINT = 'text-[12px] font-normal leading-snug text-ink-muted'
 
 /**
- * «Muebles desde una foto»: la persona sube la foto de un ambiente, TP3 propone qué muebles del catálogo hay y dónde, y «Agregar
+ * «Muebles desde una foto»: la persona sube la foto de un ambiente, el análisis (`api.analyzeRoom`) propone qué muebles del catálogo hay y dónde, y «Agregar
  * al proyecto» los inserta en la planta activa en un solo paso del historial, todos seleccionados juntos. Habla con Pascal solo
- * por `bridge.cluster`. Esc cierra; si TP3 contesta después de cerrar, la respuesta se ignora.
+ * por `bridge.cluster`. Esc cierra; si el análisis contesta después de cerrar, la respuesta se ignora.
  */
 export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) {
   const bridge = useBridge()
@@ -40,7 +40,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
   /** Cada análisis y cada cierre suben el número: una respuesta de un número viejo ya no cuenta. */
   const run = useRef(0)
   const busy = useRef(false)
-  const [state, dispatch] = useReducer(photoReducer, DEFAULT_SERVICE_URL, initialState)
+  const [state, dispatch] = useReducer(photoReducer, undefined, initialState)
   const local = useMemo(() => buildAnalysisCatalog(catalog), [catalog])
   const analyzing = state.step === 'analyzing'
   const results = state.step === 'results'
@@ -52,7 +52,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
     if (!dialog) return
     if (open && !dialog.open) {
       previous.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
-      dispatch({ type: 'open', serviceUrl: readSavedServiceUrl() ?? DEFAULT_SERVICE_URL })
+      dispatch({ type: 'open' })
       dialog.showModal()
       dialog.querySelector<HTMLElement>('input[type="file"]')?.focus()
     } else if (!open && dialog.open) dialog.close()
@@ -70,12 +70,10 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
     busy.current = true
     const mine = ++run.current
     try {
-      // Lo escrito se revisa antes de esperar a TP3: un ancho o una dirección inválidos se avisan sin llamar a la red.
-      const baseUrl = normalizeServiceUrl(state.serviceUrl)
+      // El ancho escrito se revisa antes de esperar al análisis: uno inválido se avisa sin llamar a la red.
       const knownWidthM = parseKnownWidth(state.widthText)
-      saveServiceUrl(baseUrl)
       dispatch({ type: 'analyzing' })
-      const analysis = await analyzeRoom(state.file, { baseUrl, knownWidthM, catalog: local.candidates })
+      const analysis = await api.analyzeRoom(state.file, { knownWidthM, catalog: local.candidates })
       if (mine === run.current) dispatch({ type: 'analyzed', ...detectedRows(analysis, (id) => local.pieces.get(id), knownWidthM) })
     } catch (error) {
       if (!(error instanceof LabError)) console.error('[muebles desde una foto]', error)
@@ -108,7 +106,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
         dialogRef.current?.close()
       }}
       onClose={() => {
-        // Lo que TP3 conteste después ya no cuenta, y un análisis nuevo no espera al viejo.
+        // Lo que el análisis conteste después ya no cuenta, y uno nuevo no espera al viejo.
         run.current++
         busy.current = false
         ;(opener.current ?? previous.current)?.focus()
@@ -196,12 +194,12 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
               {TEXT.photo}
               <input
                 accept="image/jpeg,image/png,image/webp"
+                aria-describedby={`${ids}-privacy`}
                 className="focus-ring w-full cursor-pointer rounded-full bg-white/75 text-[14px] text-ink-muted shadow-[inset_0_0_0_1px_rgb(11_31_77/0.06)] file:mr-3 file:h-12 file:cursor-pointer file:border-0 file:bg-ink/6 file:px-5 file:text-[14px] file:font-medium file:text-ink disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={analyzing}
                 onChange={(event) => dispatch({ type: 'file', file: event.target.files?.[0] ?? null })}
                 type="file"
               />
-              <span className={HINT}>{TEXT.privacy}</span>
             </label>
             <label className={LABEL}>
               {TEXT.width}
@@ -216,18 +214,13 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
               />
               <span className={HINT}>{TEXT.widthHint}</span>
             </label>
-            <label className={LABEL}>
-              {TEXT.service}
-              <input
-                autoComplete="off"
-                className="field"
-                disabled={analyzing}
-                inputMode="url"
-                onChange={(event) => dispatch({ type: 'url', value: event.target.value })}
-                spellCheck={false}
-                value={state.serviceUrl}
-              />
-            </label>
+            <div className="flex flex-col gap-2">
+              <p className="m-0 flex items-start gap-2 rounded-[16px] bg-ink/5 px-4 py-3 text-[12px] leading-snug text-ink-muted" id={`${ids}-privacy`}>
+                <Info aria-hidden="true" className="mt-px size-4 shrink-0" strokeWidth={2} />
+                <span>{TEXT.privacy}</span>
+              </p>
+              <p className={`m-0 ${HINT}`}>{TEXT.limit}</p>
+            </div>
           </form>
         )}
 

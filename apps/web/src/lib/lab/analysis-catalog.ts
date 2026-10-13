@@ -1,22 +1,23 @@
+import { ANALYZE_CATALOG_MAX_BYTES, ANALYZE_CATALOG_MAX_ITEMS, type CatalogOption } from '@interiores/contract'
 import { nameEs } from '../catalog-es'
 
-/** Límites de TP3 para `catalog_json` (`MAX_CATALOG_ITEMS` y `MAX_CATALOG_BYTES` de TP3/backend/main.py). */
-export const MAX_CATALOG_ITEMS = 100
-export const MAX_CATALOG_BYTES = 64 * 1024
+/** Límites del catálogo que acepta la API (`packages/contract`): hasta 100 opciones y 64 KB de JSON. */
+export const MAX_CATALOG_ITEMS = ANALYZE_CATALOG_MAX_ITEMS
+export const MAX_CATALOG_BYTES = ANALYZE_CATALOG_MAX_BYTES
 
 /**
- * Lo que se le cuenta a TP3 de cada pieza que puede elegir: nada más que esto. Sin rutas, sin `src` y sin medidas, porque TP3 (y
- * Gemini) solo escogen un identificador y el tamaño real sale siempre del catálogo local. TP3 rechaza cualquier campo de más.
+ * Lo que se le cuenta al análisis de cada pieza que puede elegir: nada más que esto. Sin rutas, sin `src` y sin medidas, porque
+ * el modelo solo escoge un identificador y el tamaño real sale siempre del catálogo local. La API rechaza cualquier campo de más.
  */
-export type AnalysisCandidate = { id: string; name: string; category: string; tags: string[] }
+export type AnalysisCandidate = CatalogOption
 
 /** Lo mínimo que se pide de una pieza local (el `CatalogItem` de Pascal ya localizado trae esto y mucho más). */
 export type LocalPieceLike = { id: string; name: string; attachTo?: string; tool?: string }
 
 export type AnalysisCatalog<T extends LocalPieceLike> = {
-  /** Lo que viaja a TP3 en `catalog_json`. */
+  /** Lo que viaja al análisis en `catalog` (POST /v1/analyze-room). */
   candidates: AnalysisCandidate[]
-  /** id → pieza local de cada candidata: con esto se resuelve lo que TP3 devuelve (solo ids de la lista enviada). */
+  /** id → pieza local de cada candidata: con esto se resuelve lo que devuelve el análisis (solo ids de la lista enviada). */
   pieces: ReadonlyMap<string, T>
 }
 
@@ -74,12 +75,12 @@ const RECOGNIZABLE: Readonly<Record<string, Meta>> = {
 /** Los ids que pueden ser candidatos, en el orden en que se ofrecen. */
 export const RECOGNIZABLE_IDS: readonly string[] = Object.keys(RECOGNIZABLE)
 
-/** El JSON exacto que viaja en `catalog_json`: compacto y con las tildes tal cual (TP3 mide sus bytes en UTF-8). */
+/** El JSON del catálogo tal como lo mide la API: compacto y con las tildes tal cual (sus 64 KB son bytes en UTF-8). */
 export const serializeCandidates = (candidates: readonly AnalysisCandidate[]): string => JSON.stringify(candidates)
 
 const encodedSize = (candidates: readonly AnalysisCandidate[]) => new TextEncoder().encode(serializeCandidates(candidates)).length
 
-/** Recorta la lista a lo que TP3 acepta (hasta 100 opciones y 64 KB), conservando el orden: solo se pierde la cola. */
+/** Recorta la lista a lo que acepta la API (hasta 100 opciones y 64 KB), conservando el orden: solo se pierde la cola. */
 export function fitToLimits(candidates: readonly AnalysisCandidate[]): AnalysisCandidate[] {
   const kept: AnalysisCandidate[] = []
   for (const candidate of candidates) {
@@ -90,10 +91,10 @@ export function fitToLimits(candidates: readonly AnalysisCandidate[]): AnalysisC
 }
 
 /**
- * Arma lo que TP3 necesita para elegir piezas: los candidatos (id, nombre en castellano, categoría y etiquetas) y el mapa
+ * Arma lo que el análisis necesita para elegir piezas: los candidatos (id, nombre en castellano, categoría y etiquetas) y el mapa
  * id → pieza local con el que luego se resuelve cada `asset_id` devuelto. Solo son candidatas las piezas reconocibles que de
  * verdad están en `items` (el catálogo local), sin las que se cuelgan de pared o techo ni las de herramienta propia; si un id
- * viene repetido gana la primera. Siempre sale en el mismo orden, y dentro de los límites de TP3.
+ * viene repetido gana la primera. Siempre sale en el mismo orden, y dentro de los límites de la API.
  */
 export function buildAnalysisCatalog<T extends LocalPieceLike>(items: readonly T[]): AnalysisCatalog<T> {
   const byId = new Map<string, T>()
@@ -112,7 +113,7 @@ export function buildAnalysisCatalog<T extends LocalPieceLike>(items: readonly T
   return { candidates, pieces }
 }
 
-/** Nombre en castellano de una pieza que propuso TP3; si no es del catálogo enviado lo dice, con el id tal cual. */
+/** Nombre en castellano de una pieza que propuso el análisis; si no es del catálogo enviado lo dice, con el id tal cual. */
 export function pieceLabel(assetId: string, candidates: readonly AnalysisCandidate[]): string {
   return candidates.find((c) => c.id === assetId)?.name ?? `${assetId} (no está en el catálogo)`
 }

@@ -33,8 +33,6 @@ const LOCAL: Record<string, { id: string; name: string }> = {
   'dining-chair': { id: 'dining-chair', name: 'Dining chair' },
 }
 const resolve = (id: string) => LOCAL[id]
-const URL = 'http://localhost:8000'
-
 describe('detectedRows (lo que el diálogo lista tras analizar)', () => {
   it('una fila por pieza, todas marcadas, con el nombre en castellano, la confianza y el lugar que le toca', () => {
     const { rows, warnings } = detectedRows(analysisOf([detected({ x: 1, y: 1, confidence: 0.92 }), detected({ asset_id: 'dining-chair', confidence: 0.5 })]), resolve, null)
@@ -58,7 +56,7 @@ describe('detectedRows (lo que el diálogo lista tras analizar)', () => {
     expect(new Set(rows.map((r) => r.key)).size).toBe(2)
   })
 
-  it('lo que se descarta (confianza baja o un id que el catálogo no tiene) sale como aviso, después de los avisos de TP3', () => {
+  it('lo que se descarta (confianza baja o un id que el catálogo no tiene) sale como aviso, después de los avisos del servicio', () => {
     const { rows, warnings } = detectedRows(
       analysisOf([detected({ asset_id: 'inventada' }), detected({ confidence: 0.1 }), detected({ asset_id: 'dining-chair' })], ['La silla está tapada.']),
       resolve,
@@ -71,55 +69,54 @@ describe('detectedRows (lo que el diálogo lista tras analizar)', () => {
     expect(warnings[2]).toContain('Sofá')
   })
 
-  it('sin muebles: ninguna fila, pero los avisos de TP3 se conservan', () => {
+  it('sin muebles: ninguna fila, pero los avisos del servicio se conservan', () => {
     expect(detectedRows(analysisOf([], ['No se ve ningún mueble.']), resolve, null)).toEqual({ rows: [], warnings: ['No se ve ningún mueble.'] })
   })
 })
 
 describe('photoReducer', () => {
   const analyzed = (rows = detectedRows(analysisOf([detected(), detected({ asset_id: 'dining-chair' })]), resolve, null).rows): PhotoState => ({
-    ...initialState(URL),
+    ...initialState(),
     file: photo(),
     step: 'results',
     rows,
     warnings: ['Un aviso'],
   })
 
-  it('empieza en el formulario, sin foto, con la dirección que se le da y sin errores', () => {
-    expect(initialState(URL)).toEqual({ step: 'form', file: null, widthText: '', serviceUrl: URL, error: null, rows: [], warnings: [] })
+  it('empieza en el formulario, sin foto y sin errores', () => {
+    expect(initialState()).toEqual({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [] })
   })
 
-  it('al abrir se parte de cero, con la dirección guardada', () => {
+  it('al abrir se parte de cero', () => {
     const dirty = { ...analyzed(), widthText: '4', error: 'x' }
-    expect(photoReducer(dirty, { type: 'open', serviceUrl: 'http://127.0.0.1:8000' })).toEqual(initialState('http://127.0.0.1:8000'))
+    expect(photoReducer(dirty, { type: 'open' })).toEqual(initialState())
   })
 
-  it('elegir la foto, escribir el ancho y la dirección se guarda; elegir otra foto borra el error', () => {
-    let state = photoReducer(initialState(URL), { type: 'failed', message: 'no se pudo' })
+  it('elegir la foto y escribir el ancho se guarda; elegir otra foto borra el error', () => {
+    let state = photoReducer(initialState(), { type: 'failed', message: 'no se pudo' })
     state = photoReducer(state, { type: 'file', file: photo() })
     expect(state.file?.name).toBe('sala.png')
     expect(state.error).toBeNull()
     state = photoReducer(state, { type: 'width', value: '4,5' })
-    state = photoReducer(state, { type: 'url', value: 'http://otro:8000' })
-    expect(state).toMatchObject({ widthText: '4,5', serviceUrl: 'http://otro:8000' })
+    expect(state).toMatchObject({ widthText: '4,5', error: null })
   })
 
   it('analizar pasa a «analizando» y borra el error anterior', () => {
-    const state = photoReducer({ ...initialState(URL), error: 'viejo', file: photo() }, { type: 'analyzing' })
+    const state = photoReducer({ ...initialState(), error: 'viejo', file: photo() }, { type: 'analyzing' })
     expect(state).toMatchObject({ step: 'analyzing', error: null })
   })
 
   it('al terminar muestra las filas (todas marcadas) y los avisos', () => {
     const { rows } = detectedRows(analysisOf([detected()]), resolve, null)
-    const state = photoReducer({ ...initialState(URL), step: 'analyzing', file: photo() }, { type: 'analyzed', rows, warnings: ['Aviso'] })
+    const state = photoReducer({ ...initialState(), step: 'analyzing', file: photo() }, { type: 'analyzed', rows, warnings: ['Aviso'] })
     expect(state).toMatchObject({ step: 'results', error: null, warnings: ['Aviso'] })
     expect(state.rows.every((r) => r.checked)).toBe(true)
   })
 
   it('si falla vuelve al formulario con el mensaje, sin tocar lo que escribió la persona', () => {
-    const before = { ...initialState(URL), step: 'analyzing' as const, file: photo(), widthText: '3' }
-    const state = photoReducer(before, { type: 'failed', message: 'TP3 no está corriendo.' })
-    expect(state).toMatchObject({ step: 'form', error: 'TP3 no está corriendo.', widthText: '3' })
+    const before = { ...initialState(), step: 'analyzing' as const, file: photo(), widthText: '3' }
+    const state = photoReducer(before, { type: 'failed', message: 'No hay conexión.' })
+    expect(state).toMatchObject({ step: 'form', error: 'No hay conexión.', widthText: '3' })
     expect(state.file).toBe(before.file)
   })
 
@@ -147,7 +144,7 @@ describe('photoReducer', () => {
 })
 
 describe('qué se puede hacer', () => {
-  const base = initialState(URL)
+  const base = initialState()
   const file = photo()
 
   it('analizar pide una foto y no se puede mientras ya se analiza', () => {

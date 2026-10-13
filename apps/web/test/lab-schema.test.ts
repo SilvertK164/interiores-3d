@@ -7,8 +7,8 @@ import { availableAssets } from './support/asset-ids'
 const piece = { asset_id: 'sofa', x: 0.5, y: 0.6, width: 0.3, depth: 0.12, rotation_deg: 0, confidence: 0.8 }
 const response = { furniture: [piece], warnings: ['oclusión parcial'], calibration: { status: 'uncalibrated', width_m: null } }
 
-describe('RoomAnalysisSchema (la respuesta de TP3)', () => {
-  it('acepta la respuesta tal como la arma el backend de TP3', () => {
+describe('RoomAnalysisSchema (la respuesta de POST /v1/analyze-room, definida en el contrato)', () => {
+  it('acepta la respuesta tal como la arma la API', () => {
     expect(RoomAnalysisSchema.parse(response)).toEqual(response)
   })
 
@@ -61,11 +61,11 @@ describe('RoomAnalysisSchema (la respuesta de TP3)', () => {
 describe('SAMPLE_ANALYSIS (el análisis de ejemplo)', () => {
   const { pieces } = buildAnalysisCatalog(availableAssets().map((a) => ({ id: a.id, name: a.name })))
 
-  it('cumple el esquema de TP3', () => {
+  it('cumple el esquema del contrato', () => {
     expect(RoomAnalysisSchema.safeParse(SAMPLE_ANALYSIS).success).toBe(true)
   })
 
-  it('trae siete piezas distintas, todas del catálogo que se le ofrece a TP3 (ninguna inventada)', () => {
+  it('trae siete piezas distintas, todas del catálogo que se le ofrece al análisis (ninguna inventada)', () => {
     const ids = SAMPLE_ANALYSIS.furniture.map((f) => f.asset_id)
     expect(new Set(ids).size).toBe(7)
     for (const id of ids) expect(pieces.has(id), id).toBe(true)

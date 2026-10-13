@@ -1,3 +1,4 @@
+import { ANALYZE_CATALOG_MAX_BYTES, ANALYZE_CATALOG_MAX_ITEMS, AnalysisCatalogSchema } from '@interiores/contract'
 import { describe, expect, it } from 'vitest'
 import { CATALOG_ES, nameEs } from '../src/lib/catalog-es'
 import {
@@ -12,8 +13,8 @@ import {
 } from '../src/lib/lab/analysis-catalog'
 import { availableAssets } from './support/asset-ids'
 
-// Las reglas con las que TP3 valida cada opción de `catalog_json` (TP3/backend/main.py, `CatalogOption`).
-const TP3_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$/
+// Las reglas con las que la API valida cada opción del catálogo (`CatalogOptionSchema` del contrato, portado de TP3).
+const API_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$/
 const bytes = (text: string) => new TextEncoder().encode(text).length
 const local = (id: string, extra: Record<string, unknown> = {}) => ({ id, name: `${id} (en inglés)`, ...extra })
 
@@ -90,12 +91,16 @@ describe('buildAnalysisCatalog: con el catálogo real de Pascal', () => {
     expect(candidates.length).toBeGreaterThanOrEqual(30)
   })
 
-  it('cumple todas las reglas que TP3 valida, y cabe en sus límites', () => {
+  it('cumple el contrato de la API (POST /v1/analyze-room), y cabe en sus límites', () => {
+    expect(MAX_CATALOG_ITEMS).toBe(ANALYZE_CATALOG_MAX_ITEMS)
+    expect(MAX_CATALOG_BYTES).toBe(ANALYZE_CATALOG_MAX_BYTES)
+    const parsed = AnalysisCatalogSchema.safeParse(candidates)
+    expect(parsed.success, JSON.stringify(parsed.error?.issues)).toBe(true)
     expect(candidates.length).toBeLessThanOrEqual(MAX_CATALOG_ITEMS)
     expect(bytes(serializeCandidates(candidates))).toBeLessThanOrEqual(MAX_CATALOG_BYTES)
     expect(new Set(candidates.map((c) => c.id)).size).toBe(candidates.length)
     for (const c of candidates) {
-      expect(c.id, c.id).toMatch(TP3_ID)
+      expect(c.id, c.id).toMatch(API_ID)
       expect(c.name.trim().length, c.id).toBeGreaterThan(0)
       expect(c.name.length, c.id).toBeLessThanOrEqual(120)
       expect(c.category.length, c.id).toBeGreaterThan(0)

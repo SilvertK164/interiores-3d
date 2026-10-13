@@ -1,3 +1,4 @@
+import { ANALYSES_PER_HOUR } from '@interiores/contract'
 import { nameEs } from '@/lib/catalog-es'
 import { type ClusterPiece, analysisToCluster } from '@/lib/lab/analysis-to-cluster'
 import type { RoomAnalysis } from '@/lib/lab/schema'
@@ -9,11 +10,11 @@ export const TEXT = {
   subtitle: 'Sube la foto de un ambiente y te proponemos qué muebles del catálogo hay y dónde. Tú eliges cuáles agregar a tu proyecto.',
   close: 'Cerrar',
   photo: 'Foto del ambiente (JPG, PNG o WebP)',
-  privacy: 'La foto va al servicio de TP3 y de ahí a Gemini (Google AI Studio): conviene evitar fotos privadas.',
+  privacy: 'Tu foto se envía a Google (Gemini) para reconocer los muebles y no la guardamos. En el nivel gratuito, Google puede usar las fotos para mejorar sus productos: evita las privadas o con personas.',
+  limit: `Puedes analizar hasta ${ANALYSES_PER_HOUR} fotos por hora.`,
   width: 'Ancho del ambiente, en metros (opcional)',
   widthPlaceholder: '4,5',
   widthHint: 'Si lo sabes, la distancia entre los muebles se ajusta a ese ancho; si no, supondremos 4 metros.',
-  service: 'Dirección del servicio de TP3',
   analyze: 'Analizar foto',
   analyzing: 'Analizando tu foto…',
   found: 'Muebles encontrados',
@@ -37,7 +38,7 @@ export type PhotoRow = {
 }
 
 /**
- * Las filas que lista el diálogo y los avisos que las acompañan: los de TP3 primero y después lo que el editor dejó afuera
+ * Las filas que lista el diálogo y los avisos que las acompañan: los del análisis primero y después lo que el editor dejó afuera
  * (confianza baja, un id que el catálogo local no tiene). Cada detección pasa por `analysisToCluster` por separado, así que
  * conserva su orden y se sabe cuál es cuál; todas arrancan marcadas.
  */
@@ -55,23 +56,21 @@ export function detectedRows(
 }
 
 export type PhotoState = {
-  /** `form` pide la foto; `analyzing` espera a TP3; `results` lista lo que encontró. */
+  /** `form` pide la foto; `analyzing` espera al análisis; `results` lista lo que encontró. */
   step: 'form' | 'analyzing' | 'results'
   file: File | null
   widthText: string
-  serviceUrl: string
   error: string | null
   rows: PhotoRow[]
   warnings: string[]
 }
 
-export const initialState = (serviceUrl: string): PhotoState => ({ step: 'form', file: null, widthText: '', serviceUrl, error: null, rows: [], warnings: [] })
+export const initialState = (): PhotoState => ({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [] })
 
 export type PhotoAction =
-  | { type: 'open'; serviceUrl: string }
+  | { type: 'open' }
   | { type: 'file'; file: File | null }
   | { type: 'width'; value: string }
-  | { type: 'url'; value: string }
   | { type: 'analyzing' }
   | { type: 'analyzed'; rows: PhotoRow[]; warnings: string[] }
   /** Con `stay` el error se muestra sin salir de la lista (por ejemplo, al agregar). */
@@ -82,13 +81,11 @@ export type PhotoAction =
 export function photoReducer(state: PhotoState, action: PhotoAction): PhotoState {
   switch (action.type) {
     case 'open':
-      return initialState(action.serviceUrl)
+      return initialState()
     case 'file':
       return { ...state, file: action.file, error: null }
     case 'width':
       return { ...state, widthText: action.value }
-    case 'url':
-      return { ...state, serviceUrl: action.value }
     case 'analyzing':
       return { ...state, step: 'analyzing', error: null }
     case 'analyzed':

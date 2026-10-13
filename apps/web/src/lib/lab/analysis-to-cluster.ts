@@ -5,7 +5,7 @@ import type { RoomAnalysis } from './schema'
 export const DEFAULT_ROOM_WIDTH_M = 4
 /** Fondo del ambiente de la foto como proporción de su ancho (los ambientes de una foto suelen ser más anchos que hondos). */
 export const ROOM_DEPTH_RATIO = 0.75
-/** Por debajo de esta confianza TP3 no está seguro de que la pieza esté en la foto: se descarta (con aviso). */
+/** Por debajo de esta confianza el análisis no está seguro de que la pieza esté en la foto: se descarta (con aviso). */
 export const MIN_CONFIDENCE = 0.3
 
 /** Lo único que se le pide a una pieza local: su id y su nombre (para escribir los avisos). */
@@ -28,7 +28,7 @@ export type AnalysisToClusterOptions = {
 const round3 = (n: number) => Math.round(n * 1000) / 1000 + 0
 
 /**
- * El giro de TP3 es horario visto desde arriba; el `rotY` de Pascal (el de three.js) es antihorario, así que lleva el signo
+ * El giro del análisis es horario visto desde arriba; el `rotY` de Pascal (el de three.js) es antihorario, así que lleva el signo
  * opuesto. Pascal dibuja el giro de una guía en el plano con `-rotationY` (`getGuideSvgRotation`, `floorplan-panel.tsx`): ahí el
  * giro horario es el positivo. Con `rotY = 0` el frente de la pieza mira a +z (hacia abajo en el plano, hacia quien mira la foto).
  * Se reduce a [-π, π] y nunca devuelve `-0`.
@@ -41,7 +41,7 @@ function rotYFromClockwiseDegrees(degrees: number): number {
 }
 
 /**
- * Convierte lo que TP3 detectó en un conjunto de muebles del catálogo local: un mini ambiente de `knownWidthM ?? 4` m de ancho
+ * Convierte lo que detectó el análisis en un conjunto de muebles del catálogo local: un mini ambiente de `knownWidthM ?? 4` m de ancho
  * y 75 % de fondo, con `x` e `y` (proporciones del ambiente de la foto) llevadas a metros desde su centro. El tamaño de cada
  * pieza es SIEMPRE el real del catálogo: el `width` y `depth` que estima Gemini no se usan. Se descartan, con aviso (`warn`), las
  * piezas de confianza menor que `MIN_CONFIDENCE` y las que `resolve` no conoce; nunca se las reemplaza por otra pieza. Las
@@ -58,12 +58,12 @@ export function analysisToCluster<T extends ClusterAssetLike>(
   for (const detected of analysis.furniture) {
     const asset = resolve(detected.asset_id)
     if (!asset) {
-      opts.warn?.(`TP3 propuso «${detected.asset_id}», que no está en el catálogo de este editor: no se agregó.`)
+      opts.warn?.(`El análisis propuso «${detected.asset_id}», que no está en el catálogo de este editor: no se agregó.`)
       continue
     }
     if (detected.confidence < MIN_CONFIDENCE) {
       const percent = Math.round(detected.confidence * 100)
-      opts.warn?.(`Se omitió «${nameEs(asset.id, asset.name ?? asset.id)}»: TP3 no está seguro de que esté en la foto (confianza de ${percent} %).`)
+      opts.warn?.(`Se omitió «${nameEs(asset.id, asset.name ?? asset.id)}»: el análisis no está seguro de que esté en la foto (confianza de ${percent} %).`)
       continue
     }
     pieces.push({
