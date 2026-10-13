@@ -19,6 +19,11 @@ describe('createAnalysisDeps', () => {
     expect(createAnalysisDeps(config()).provider).toBeNull()
   })
 
+  it('siempre trae el registro de intentos por persona, con o sin clave (así el tope no depende de la configuración)', () => {
+    expect(createAnalysisDeps(config()).usage.consume).toBeTypeOf('function')
+    expect(createAnalysisDeps(config({ geminiApiKey: 'clave-de-prueba' })).usage.consume).toBeTypeOf('function')
+  })
+
   it('con clave arma el proveedor de Gemini con el modelo configurado y la clave en la cabecera', async () => {
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '{"furniture":[],"warnings":[]}' }] } }] }), { status: 200 }))
     const { provider } = createAnalysisDeps(config({ geminiApiKey: 'clave-de-prueba', visionModel: 'gemini-otro' }), fetchImpl as unknown as typeof fetch)

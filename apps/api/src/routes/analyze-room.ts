@@ -2,6 +2,7 @@ import { ANALYZE_BODY_MAX_BYTES, type AnalyzeRoomBody, AnalyzeRoomBodySchema } f
 import type { FastifyPluginAsync } from 'fastify'
 import { type AnalysisDeps, analyzeRoom, decodeImage } from '../analyze-room/index.js'
 import { errors } from '../errors.js'
+import { ctxOf } from './projects.js'
 
 /**
  * Valida el cuerpo contra el contrato y traduce la primera falla a su error en castellano: el catálogo, la foto (tamaño o
@@ -20,8 +21,9 @@ export function parseAnalyzeBody(data: unknown): AnalyzeRoomBody {
 }
 
 /**
- * `POST /v1/analyze-room` (la sesión la exige el hook de /v1). El orden importa: primero se valida el pedido (lo inválido no
- * cuesta nada), luego se comprueba que haya proveedor configurado y recién después se llama al modelo.
+ * `POST /v1/analyze-room` (la sesión la exige el hook de /v1). El orden importa: primero se valida el pedido y se comprueba que
+ * haya proveedor (lo inválido y lo no disponible no gastan cupo), después se registra el intento de la persona (429 si ya usó
+ * sus 10 de la hora) y recién entonces se llama al modelo.
  *
  * El cuerpo lleva la foto en base64, así que esta ruta admite más que el tope de 4 MiB de las escenas, y si se pasa el error
  * habla de la foto y no de «la escena» (`config.oversize`, ver build-app.ts).
@@ -33,6 +35,7 @@ export const analyzeRoomRoutes =
       const body = parseAnalyzeBody(req.body)
       decodeImage(body.image, body.mime)
       if (!analysis?.provider) throw errors.analysisUnavailable()
+      await analysis.usage.consume(ctxOf(req))
       return analyzeRoom({ provider: analysis.provider, body, log: req.log })
     })
   }

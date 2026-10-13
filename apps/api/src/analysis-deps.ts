@@ -1,4 +1,5 @@
 import { type AnalysisDeps, createGeminiProvider } from './analyze-room/index.js'
+import { createSupabaseUsage } from './analysis-usage.js'
 import type { Config } from './config.js'
 
 /**
@@ -8,5 +9,6 @@ import type { Config } from './config.js'
 export function createAnalysisDeps(config: Config, fetchImpl?: typeof fetch): AnalysisDeps {
   return {
     provider: config.geminiApiKey ? createGeminiProvider({ apiKey: config.geminiApiKey, model: config.visionModel, fetchImpl }) : null,
+    usage: createSupabaseUsage(config.supabaseUrl, config.supabaseAnonKey),
   }
 }

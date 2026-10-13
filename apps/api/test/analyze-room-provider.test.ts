@@ -6,6 +6,7 @@ import type { AuthVerifier } from '../src/auth.js'
 import { LOGGER_REDACT, buildApp } from '../src/build-app.js'
 import { CATALOG, JPEG, PNG, analyzeBody, b64 } from './support/images.js'
 import { createMemoryStore } from './support/memory-store.js'
+import { unlimitedUsage } from './support/memory-usage.js'
 
 const auth: AuthVerifier = async (token) => (token === 'token-a' ? { id: 'user-a', token } : null)
 const headers = { authorization: 'Bearer token-a' }
@@ -18,7 +19,7 @@ const RESULT = {
 
 type App = ReturnType<typeof buildApp>
 const appWith = (provider: VisionProvider | null, options: Parameters<typeof buildApp>[1] = {}) =>
-  buildApp({ auth, store: createMemoryStore(), analysis: { provider } }, options)
+  buildApp({ auth, store: createMemoryStore(), analysis: { provider, usage: unlimitedUsage } }, options)
 const send = (app: App, payload: unknown) => app.inject({ method: 'POST', url: '/v1/analyze-room', headers, payload: payload as object })
 
 describe('POST /v1/analyze-room: con el proveedor de visión', () => {

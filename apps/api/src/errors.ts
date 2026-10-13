@@ -1,4 +1,4 @@
-import { ANALYZE_IMAGE_MAX_BYTES, ERROR_CODES, type ErrorBody } from '@interiores/contract'
+import { ANALYSES_PER_HOUR, ANALYZE_IMAGE_MAX_BYTES, ERROR_CODES, type ErrorBody } from '@interiores/contract'
 
 export class AppError extends Error {
   constructor(
@@ -30,6 +30,8 @@ export const errors = {
     new AppError(503, ERROR_CODES.analysisUnavailable, 'El análisis de fotos no está disponible por ahora. Inténtalo más tarde.'),
   analysisFailed: () =>
     new AppError(502, ERROR_CODES.analysisFailed, 'No pudimos analizar la foto en este momento. Inténtalo de nuevo en unos minutos.'),
+  analysisLimit: () =>
+    new AppError(429, ERROR_CODES.analysisLimit, `Llegaste al límite de ${ANALYSES_PER_HOUR} análisis por hora. Inténtalo más tarde.`),
   invalidCatalog: () =>
     new AppError(422, ERROR_CODES.invalidCatalog, 'La lista de muebles del catálogo no es válida. Recarga la página e inténtalo de nuevo.'),
   unreadableImage: () =>
