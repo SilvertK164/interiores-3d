@@ -5,15 +5,15 @@ import { CATALOG_ITEMS, Editor, ItemsPanel, type SceneGraph } from '@pascal-app/
 import { builtinPlugin } from '@pascal-app/nodes'
 import { Sofa, Store } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
-import { type LocalItemsManifest, localizeCatalogItem } from './catalog'
+import { localizeCatalog } from './catalog-assets'
 import { buildCommerceItems } from './commerce-catalog'
 import { installE2eHooks } from './e2e-hooks'
-import manifest from './local-items.json'
 import { SaveBanner } from './SaveBanner'
 import { type SaveOutcome, type SaverStatus, type SceneSaver, createSceneSaver } from './scene-saver'
 
@@ -43,10 +43,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     else await s.save(scene)
   }, [])
 
-  const items = useMemo(
-    () => CATALOG_ITEMS.flatMap((i) => localizeCatalogItem(i, manifest as LocalItemsManifest) ?? []),
-    [],
-  )
+  const items = useMemo(() => localizeCatalog(CATALOG_ITEMS), [])
   const commerceItems = useMemo(() => buildCommerceItems(items), [items])
 
   useEffect(() => {
@@ -115,7 +112,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     [items, commerceItems],
   )
 
-  if (phase.kind === 'loading') return <p className="p-6 text-muted-foreground">Abriendo tu proyecto…</p>
+  if (phase.kind === 'loading') return <LoaderPortal />
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>
 
   return (

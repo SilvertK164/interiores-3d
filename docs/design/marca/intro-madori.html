@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Madori — intro del logotipo</title>
+<!-- Única dependencia externa: Google Fonts (Fraunces 700 con SOFT al máximo y DM Sans). Sin red cae a una serif del sistema. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,700,100&family=DM+Sans:wght@500&display=swap" rel="stylesheet">
+<style>
+  /* Paleta: Cobalto #1F5FE0 · Noche #0B1F4D · Sol #FFB02E · Cielo #CFE0FF · Crema #FFF4E2 */
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    display: grid;
+    place-items: center;
+    background: #fff4e2;
+    color: #0b1f4d;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { display: flex; flex-direction: column; align-items: center; gap: 1.1rem; padding: 2rem 1rem; }
+
+  /* Logotipo: mismas reglas que src/components/Logo.css (la ventana mide lo mismo que la "o" real de Fraunces) */
+  .wordmark {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: clamp(64px, 15vw, 150px);
+    font-weight: 700;
+    font-variation-settings: 'SOFT' 100;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+  .win {
+    display: inline-block;
+    height: calc(0.468em + 1.7px);
+    width: calc(0.48em + 3px);
+    margin: 0 -0.01em 0 0.008em;
+    vertical-align: -0.014em;
+    overflow: visible;
+  }
+  .tag { font-size: clamp(14px, 2.2vw, 20px); font-weight: 500; color: #3a4458; letter-spacing: 0.01em; }
+
+  button {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    margin-top: 0.6rem; padding: 0.6rem 1.1rem;
+    border: 0; border-radius: 999px; cursor: pointer;
+    background: rgb(11 31 77 / 0.08); color: #0b1f4d;
+    font: 500 0.9rem 'DM Sans', system-ui, sans-serif;
+    transition: background-color 160ms ease-out;
+  }
+  button:hover { background: rgb(11 31 77 / 0.14); }
+  button:focus-visible { outline: 3px solid rgb(31 95 224 / 0.45); outline-offset: 2px; }
+
+  /* Estado inicial (antes de reproducir) */
+  .ltr { display: inline-block; opacity: 0; transform: translateY(0.28em); }
+  .frame { stroke-dasharray: 100; stroke-dashoffset: 100; }
+  .sun, .ring, .leaf { transform-box: fill-box; }
+  .sun { transform: translateY(26px); }
+  .ring { transform-origin: center; opacity: 0; }
+  .leaf.l { transform-origin: left center; }
+  .leaf.r { transform-origin: right center; }
+  .tag { opacity: 0; }
+
+  /* Secuencia (≈ 3,4 s): letras → trazo del marco → hojas que se abren → sol que sale → anillo → frase */
+  .play .ltr { animation: ltr 0.55s ease-out forwards; animation-delay: calc(var(--i) * 0.07s); }
+  .play .frame { animation: draw 0.9s 0.55s ease-out forwards, solid 0s 1.45s forwards; }
+  .play .leaf { animation: open 0.8s 1.55s cubic-bezier(0.6, 0, 0.2, 1) forwards, gone 0s 2.35s forwards; }
+  .play .sun { animation: rise 1s 1.95s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .play .ring { animation: halo 1.2s 2.75s ease-out forwards; }
+  .play .tag { animation: ltr 0.6s 2.9s ease-out forwards; }
+
+  @keyframes ltr { to { opacity: 1; transform: none; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  /* Al terminar el trazo se quita el guion: así no queda la costura donde empieza y termina el camino. */
+  @keyframes solid { to { stroke-dasharray: none; } }
+  /* Las hojas abiertas (ancho 0) se ocultan: un rectángulo sin ancho aún deja una línea fina. */
+  @keyframes gone { to { visibility: hidden; } }
+  @keyframes open { to { transform: scaleX(0); } }
+  @keyframes rise { to { transform: translateY(0); } }
+  @keyframes halo {
+    0% { opacity: 0; transform: scale(0.9); }
+    45% { opacity: 0.85; transform: scale(1.35); }
+    100% { opacity: 0.55; transform: scale(1); }
+  }
+
+  /* Sin movimiento: todo en su estado final y sin botón para repetir */
+  @media (prefers-reduced-motion: reduce) {
+    .ltr, .tag { opacity: 1; transform: none; }
+    .frame { stroke-dasharray: none; stroke-dashoffset: 0; }
+    .sun { transform: none; }
+    .ring { opacity: 0.55; }
+    .leaf { visibility: hidden; }
+    .play .ltr, .play .frame, .play .leaf, .play .sun, .play .ring, .play .tag { animation: none; }
+    button { display: none; }
+  }
+</style>
+</head>
+<body>
+<main id="stage" class="play">
+  <h1 class="wordmark" role="img" aria-label="Madori"><span aria-hidden="true"><span class="ltr" style="--i:0">M</span><span class="ltr" style="--i:1">a</span><span class="ltr" style="--i:2">d</span></span><svg class="win ltr" style="--i:3" preserveAspectRatio="none" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <defs><clipPath id="glass"><path d="M12.5 46V32A19.5 19.5 0 0 1 51.5 32V46A6.5 6.5 0 0 1 45 52.5H19A6.5 6.5 0 0 1 12.5 46Z"/></clipPath></defs>
+      <g clip-path="url(#glass)">
+        <g class="sun" fill="#FFB02E">
+          <circle class="ring" cx="32" cy="39" r="11.5" fill="none" stroke="#FFB02E" stroke-width="2.2"/>
+          <circle cx="32" cy="39" r="9"/>
+        </g>
+        <!-- Hojas de la ventana: cubren el vidrio y se abren hacia los lados -->
+        <rect class="leaf l" x="12" y="10" width="20.5" height="46" fill="#0B1F4D"/>
+        <rect class="leaf r" x="31.5" y="10" width="20.5" height="46" fill="#0B1F4D"/>
+      </g>
+      <path class="frame" pathLength="100" d="M7 46V32A25 25 0 0 1 57 32V46A12 12 0 0 1 45 58H19A12 12 0 0 1 7 46Z" fill="none" stroke="#0B1F4D" stroke-width="11" stroke-linejoin="round"/>
+    </svg><span aria-hidden="true"><span class="ltr" style="--i:4">r</span><span class="ltr" style="--i:5">i</span></span>
+  </h1>
+  <p class="tag">Diseño de interiores 2D y 3D</p>
+  <button id="repeat" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    Repetir
+  </button>
+</main>
+<script>
+  // Repetir: quita la clase, fuerza el recálculo de estilos y la vuelve a poner para reiniciar todas las animaciones.
+  const stage = document.getElementById('stage')
+  document.getElementById('repeat').addEventListener('click', () => {
+    stage.classList.remove('play')
+    void stage.offsetWidth
+    stage.classList.add('play')
+  })
+</script>
+</body>
+</html>

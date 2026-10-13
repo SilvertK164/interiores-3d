@@ -1,0 +1,31 @@
+/*
+ * Logotipo de Madori: letras en Fraunces 700 (suavidad al máximo) y la "o" es una ventana del mismo color que las letras,
+ * sin relleno. La variable --font-fraunces la define AppShell con next/font; fuera de él cae a una serif del sistema.
+ * Colores en hex a propósito: la marca no cambia con los tokens de la interfaz.
+ */
+.madori-logo {
+  display: inline-block;
+  color: #0b1f4d;
+  font-family: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-variation-settings: 'SOFT' 100;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/*
+ * La ventana ocupa el lugar de la "o". Alto, ancho y base se midieron contra la "o" real de Fraunces (tinta de cada
+ * una) a 28, 62 y 150 px: coinciden a ±1 px. Alto y ancho son lineales en la fuente (la "o" cambia de proporción con
+ * el tamaño óptico), por eso llevan una parte fija en px; el ancho es ~5 % mayor que el alto (el SVG se estira).
+ * La base baja un poco para igualar el rebase de las letras redondas.
+ */
+.madori-logo__o {
+  display: inline-block;
+  height: calc(0.468em + 1.7px);
+  width: calc(0.48em + 3px);
+  /* Espacio óptico: el hueco de tinta con la d y con la r queda igual al de las letras reales. */
+  margin: 0 -0.01em 0 0.008em;
+  vertical-align: -0.014em;
+  overflow: visible;
+}

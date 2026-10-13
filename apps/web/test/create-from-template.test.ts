@@ -38,6 +38,8 @@ describe('createFromTemplate', () => {
     const result = await createFromTemplate(api, { name: 'Mi tienda', kind: 'comercio', templateId: 'concept-store' }, fetchImpl)
     expect(order).toEqual(['pedir', 'crear'])
     expect(api.saveScene).toHaveBeenCalledWith(ID, envelope, 1)
+    // El proyecto recuerda de qué plantilla nació (la lista de proyectos muestra su imagen).
+    expect(api.createProject).toHaveBeenCalledWith({ name: 'Mi tienda', kind: 'comercio', templateId: 'concept-store' })
     expect(result).toMatchObject({ project: created, saved: true })
   })
 
@@ -48,6 +50,9 @@ describe('createFromTemplate', () => {
     expect(fetchImpl).not.toHaveBeenCalled()
     expect(api.saveScene).not.toHaveBeenCalled()
     expect(result).toMatchObject({ saved: true, envelope: null })
+    // En blanco: el cuerpo no lleva templateId (la API lo rechaza si va null).
+    expect(api.createProject).toHaveBeenCalledWith({ name: 'En blanco', kind: 'vivienda' })
+    expect(api.createProject.mock.calls[0]?.[0]).not.toHaveProperty('templateId')
   })
 
   it('si la plantilla no carga NO crea el proyecto', async () => {

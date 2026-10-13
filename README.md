@@ -1,10 +1,11 @@
-# Interiores — diseñador de interiores 2D y 3D
+# Madori — diseñador de interiores 2D y 3D
 
 TP final de IISAIA (FIUBA) de **Silvert Quispe** y **Victoria Villalba**. Diseña viviendas y comercios en un editor 2D/3D, guarda cada proyecto en tu cuenta y lo vuelve a abrir desde cualquier navegador.
 
 - **Repositorio:** https://github.com/SilvertK164/interiores-3d
-- **Despliegue en Vercel + Supabase en la nube:** pendiente (Tarea 6 del plan); por ahora todo corre en local.
+- **Nube (Supabase + Vercel) y trabajar sin Docker:** preparado y **sin probar** (faltan las cuentas); guía en [`docs/nube.md`](docs/nube.md). Por ahora todo corre en local.
 - **Estado y decisiones vivas:** [`docs/ESTADO.md`](docs/ESTADO.md)
+- **Laboratorio de Victoria y colaboración:** [`lab/README.md`](lab/README.md) (modelado a partir de fotos con Pascal, paso a paso) · [`docs/colaboracion.md`](docs/colaboracion.md) (ramas, PR y revisión cruzada)
 
 ## Cómo correrlo
 

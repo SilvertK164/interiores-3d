@@ -18,4 +18,9 @@ describe('loadConfig', () => {
   it('sin CORS_ORIGINS no habilita ningún origen', () => {
     expect(loadConfig(base).corsOrigins).toEqual([])
   })
+
+  it('quita espacios, barras finales y entradas vacías de los orígenes (el navegador envía el origen sin barra)', () => {
+    const cfg = loadConfig({ ...base, CORS_ORIGINS: ' https://web.vercel.app/ ,http://localhost:3000//,, ' })
+    expect(cfg.corsOrigins).toEqual(['https://web.vercel.app', 'http://localhost:3000'])
+  })
 })

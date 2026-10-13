@@ -1,0 +1,130 @@
+/*
+ * Loader de Madori. Todo con prefijo `madori-` y colores en hex: funciona igual dentro y fuera de `.app-shell`
+ * (el editor de /proyectos/[id] no lo usa y no tiene sus tokens). La ventana es transparente; solo el sol lleva color.
+ */
+.madori-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  color: #0b1f4d;
+  font-family: inherit;
+  line-height: 1.3;
+  text-align: center;
+  animation: madori-fade 220ms ease-out both;
+}
+
+.madori-loader__win {
+  display: block;
+  width: auto;
+  overflow: visible;
+}
+.madori-loader--sm .madori-loader__win {
+  height: 36px;
+}
+.madori-loader--md .madori-loader__win {
+  height: 72px;
+}
+
+/* En fila: la ventana va a la izquierda y el texto a la derecha. */
+.madori-loader--inline {
+  flex-direction: row;
+  gap: 0.5rem;
+  text-align: left;
+}
+.madori-loader--inline .madori-loader__win {
+  height: 28px;
+}
+
+.madori-loader__label {
+  color: #3a4458;
+  font-size: 0.875rem;
+}
+.madori-loader--sm .madori-loader__label {
+  font-size: 0.8125rem;
+}
+
+/* Texto solo para lectores de pantalla. */
+.madori-loader__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.madori-loader .madori-w-frame {
+  stroke: #0b1f4d;
+}
+.madori-loader .madori-w-sun {
+  fill: #ffb02e;
+  animation: madori-sun 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.madori-loader .madori-w-ring {
+  stroke: #ffb02e;
+  /* La opacidad la manejan la animación y el modo sin movimiento: aquí el trazo es pleno. */
+  stroke-opacity: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: madori-ring 3.2s ease-out infinite;
+}
+
+/* El sol sube, se queda un momento arriba y vuelve a bajar. */
+@keyframes madori-sun {
+  0% {
+    transform: translateY(26px);
+  }
+  38%,
+  62% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(26px);
+  }
+}
+
+/* El anillo aparece cuando el sol llega arriba, se expande y se desvanece. */
+@keyframes madori-ring {
+  0%,
+  36% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  40% {
+    opacity: 0.75;
+    transform: scale(0.9);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes madori-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sin movimiento: ventana quieta con el sol arriba y su anillo fijo. */
+@media (prefers-reduced-motion: reduce) {
+  .madori-loader,
+  .madori-loader .madori-w-sun,
+  .madori-loader .madori-w-ring {
+    animation: none;
+  }
+  .madori-loader .madori-w-sun {
+    transform: none;
+  }
+  .madori-loader .madori-w-ring {
+    opacity: 0.55;
+    transform: none;
+  }
+}

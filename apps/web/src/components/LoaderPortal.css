@@ -1,0 +1,244 @@
+/*
+ * Loader de pantalla completa de Madori: el portal que se achica y suelta las letras. Ciclo de 6,4 s en bucle:
+ *   0-34 %   el portal, grande y en el centro: se dibuja el marco, sale el sol con rebote, giran y laten los rayos y
+ *            se expande un anillo.
+ *   34-50 %  el portal se achica hasta ser la "o" y las letras salen desde detrás del marco (cada una con su
+ *            distancia y su retraso, con rebote).
+ *   50-84 %  el logotipo completo, con una ondita de las letras y el sol quieto.
+ *   84-100 % las letras vuelven a entrar al portal, que se hace grande; el sol se pone y empieza otra vez.
+ * El vidrio se pinta con el color del fondo (--madori-bg) para que las letras queden ocultas mientras están dentro.
+ *
+ * El estado SIN animar es el logotipo completo (letras visibles, ventana en su sitio, sol quieto, rayos apagados):
+ * las animaciones solo parten de ahí, así que con "reducir movimiento" basta con quitarlas.
+ * Todo con prefijo `madori-` y colores en hex: el editor de /proyectos/[id] no usa `.app-shell` ni sus tokens.
+ */
+.madori-portal {
+  --madori-cycle: 6.4s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--madori-bg, #eef2f8);
+  color: #0b1f4d;
+  /* Mismo logotipo en cualquier pantalla: 96 px en un escritorio de 900 px de alto y menos en las pequeñas. */
+  font-size: clamp(56px, 10.7vmin, 96px);
+}
+
+.madori-portal__word {
+  /*
+   * Respaldos del primer render (antes de medir): LoaderPortal.tsx los reemplaza por px medidos (centro de la ventana
+   * respecto al de la palabra y escala hasta el tamaño del portal). Aproximan la "o" de Fraunces 700 a 96 px.
+   */
+  --dx: -0.6em;
+  --dy: -0.12em;
+  --S: 5.4;
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  font-family: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  /* Solo aparece el logotipo: el fondo no parpadea cuando una carga relevo a otra (loading.tsx, página, editor). */
+  animation: madori-portal-fade 220ms ease-out both;
+}
+
+/* La ventana ocupa el lugar de la "o"; por encima de las letras, que salen desde detrás del marco. */
+.madori-portal__slot {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  height: 1.02ex;
+  margin: 0 0.02em;
+}
+
+.madori-portal__win {
+  display: block;
+  width: auto;
+  height: 100%;
+  overflow: visible;
+  animation: madori-portal-win var(--madori-cycle) cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.madori-portal__letter {
+  display: inline-block;
+  animation: madori-portal-letter var(--madori-cycle) cubic-bezier(0.5, 0, 0.75, 0) infinite backwards;
+  animation-delay: var(--ld, 0s);
+}
+.madori-portal__letter > span {
+  display: inline-block;
+  animation: madori-portal-wave var(--madori-cycle) ease-in-out infinite;
+  animation-delay: var(--ld, 0s);
+}
+
+/* Vidrio: el color del fondo, para tapar las letras mientras están dentro del portal. */
+.madori-portal .madori-w-glass {
+  fill: var(--madori-bg, #eef2f8);
+}
+.madori-portal .madori-w-sun {
+  animation: madori-portal-sun var(--madori-cycle) cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+}
+.madori-portal .madori-w-rays {
+  opacity: 0;
+  /* Los rayos son simétricos: su centro es el del sol, sin repetir sus coordenadas aquí. */
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    madori-portal-rays var(--madori-cycle) ease-in-out infinite,
+    madori-portal-spin 12s linear infinite;
+}
+.madori-portal .madori-w-ring {
+  stroke-opacity: 1;
+  opacity: 0.55;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: madori-portal-ring var(--madori-cycle) ease-out infinite;
+}
+.madori-portal .madori-w-frame {
+  stroke-dasharray: 100;
+  animation: madori-portal-draw var(--madori-cycle) ease-out infinite;
+}
+
+@keyframes madori-portal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* El portal grande y centrado (dx, dy y S los mide LoaderPortal) se achica hasta la "o" y vuelve a crecer. */
+@keyframes madori-portal-win {
+  0%,
+  34% {
+    transform: translate(var(--dx), var(--dy)) scale(var(--S));
+  }
+  50%,
+  84% {
+    transform: none;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(var(--S));
+  }
+}
+
+/* Salen desde la ventana con rebote, se quedan, y vuelven a entrar. */
+@keyframes madori-portal-letter {
+  0%,
+  36% {
+    opacity: 0;
+    transform: translateX(var(--d)) scale(0.3);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  50%,
+  84% {
+    opacity: 1;
+    transform: none;
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: translateX(var(--d)) scale(0.3);
+  }
+}
+
+/* Ondita de las letras cuando el logotipo está completo. */
+@keyframes madori-portal-wave {
+  0%,
+  56%,
+  72%,
+  100% {
+    transform: none;
+  }
+  64% {
+    transform: translateY(-0.07em);
+  }
+}
+
+/* El sol sube con rebote, se queda y se pone (26 = cuánto baja para quedar oculto bajo el vidrio). */
+@keyframes madori-portal-sun {
+  0% {
+    transform: translateY(26px);
+  }
+  12% {
+    transform: translateY(-2.5px);
+  }
+  20%,
+  86% {
+    transform: translateY(0);
+  }
+  98%,
+  100% {
+    transform: translateY(26px);
+  }
+}
+
+@keyframes madori-portal-rays {
+  0% {
+    opacity: 0;
+  }
+  12%,
+  38% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes madori-portal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes madori-portal-ring {
+  0%,
+  16% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  20% {
+    opacity: 0.85;
+    transform: scale(0.9);
+  }
+  44%,
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* El marco se dibuja de a poco; las puntas redondas tapan la costura donde empieza y termina el trazo. */
+@keyframes madori-portal-draw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  11%,
+  92% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* Sin movimiento: directamente el logotipo completo, con el sol visible y su anillo fijo. */
+@media (prefers-reduced-motion: reduce) {
+  .madori-portal__word,
+  .madori-portal__win,
+  .madori-portal__letter,
+  .madori-portal__letter > span,
+  .madori-portal .madori-w-sun,
+  .madori-portal .madori-w-rays,
+  .madori-portal .madori-w-ring,
+  .madori-portal .madori-w-frame {
+    animation: none;
+  }
+}

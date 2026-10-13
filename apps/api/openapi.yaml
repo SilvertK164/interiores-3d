@@ -41,6 +41,9 @@ paths:
     post:
       operationId: createProject
       summary: Crea un proyecto con su escena vacía
+      description: >-
+        Si se envía templateId, la API solo recuerda de qué plantilla nació el proyecto (para mostrar su captura);
+        la escena de la plantilla la guarda quien crea el proyecto con PUT /v1/projects/{id}/scene.
       requestBody:
         required: true
         content:
@@ -209,20 +212,29 @@ components:
     ProjectKind:
       type: string
       enum: [vivienda, comercio]
+    TemplateId:
+      type: string
+      pattern: '^[a-z0-9-]{1,40}$'
+      description: Id de la plantilla de la que nació el proyecto (el mismo patrón que valida la columna template_id)
     ProjectSummary:
       type: object
-      required: [id, name, kind, updatedAt]
+      required: [id, name, kind, templateId, updatedAt]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
         kind:
           oneOf:
             - $ref: '#/components/schemas/ProjectKind'
+            - type: 'null'
+        templateId:
+          description: null si el proyecto nació en blanco o es anterior a las plantillas
+          oneOf:
+            - $ref: '#/components/schemas/TemplateId'
             - type: 'null'
         updatedAt: { type: string, format: date-time }
     ProjectCreated:
       type: object
-      required: [id, name, kind, version]
+      required: [id, name, kind, templateId, version]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -230,16 +242,26 @@ components:
           oneOf:
             - $ref: '#/components/schemas/ProjectKind'
             - type: 'null'
+        templateId:
+          description: null si el proyecto nació en blanco
+          oneOf:
+            - $ref: '#/components/schemas/TemplateId'
+            - type: 'null'
         version: { type: integer, const: 1 }
     ProjectDetail:
       type: object
-      required: [id, name, kind, updatedAt, scene, version]
+      required: [id, name, kind, templateId, updatedAt, scene, version]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
         kind:
           oneOf:
             - $ref: '#/components/schemas/ProjectKind'
+            - type: 'null'
+        templateId:
+          description: null si el proyecto nació en blanco o es anterior a las plantillas
+          oneOf:
+            - $ref: '#/components/schemas/TemplateId'
             - type: 'null'
         updatedAt: { type: string, format: date-time }
         scene:
@@ -252,6 +274,8 @@ components:
         name: { type: string, minLength: 1, maxLength: 80 }
         kind:
           $ref: '#/components/schemas/ProjectKind'
+        templateId:
+          $ref: '#/components/schemas/TemplateId'
     UpdateProjectBody:
       type: object
       minProperties: 1

@@ -1,18 +1,6 @@
-import { readFileSync } from 'node:fs'
 import { type Page, expect, test } from '@playwright/test'
-
-type Counts = Record<string, number>
-const counts = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __e2e: { counts(): Record<string, number> } }).__e2e.counts())
-const ready = (page: Page) =>
-  page.waitForFunction(() => (window as unknown as { __e2e?: { ready(): boolean } }).__e2e?.ready())
-
-function expected(id: string): Counts {
-  const json = JSON.parse(readFileSync(`public/templates/${id}.json`, 'utf8'))
-  const total: Counts = {}
-  for (const n of Object.values(json.graph.nodes) as { type: string }[]) total[n.type] = (total[n.type] ?? 0) + 1
-  return total
-}
+import { counts, ready, templateCounts as expected } from './support/editor'
+import { PROJECT_URL, createProjectViaUi, openNewProjectDialog } from './support/projects'
 
 /** Espera a que la red se calme (modelos y texturas) y da una pausa corta: el editor sigue pidiendo cosas un instante después. */
 async function settle(page: Page) {
@@ -30,13 +18,7 @@ function watchAssetFailures(page: Page): string[] {
 }
 
 async function createFrom(page: Page, kind: 'vivienda' | 'comercio', templateName: string) {
-  await page.goto('/proyectos')
-  await page.getByLabel('Nombre del proyecto').fill(`E2E ${templateName} ${Date.now()}`)
-  await page.getByLabel('Tipo').selectOption(kind)
-  await page.getByRole('radio', { name: new RegExp(templateName) }).check({ force: true })
-  await page.getByRole('button', { name: 'Crear proyecto' }).click()
-  await page.waitForURL(/\/proyectos\/[0-9a-f-]{36}$/, { timeout: 60_000 })
-  await ready(page)
+  await createProjectViaUi(page, { name: `E2E ${templateName} ${Date.now()}`, kind, template: templateName })
 }
 
 test('crear desde "Concept store" y recargar deja los mismos niveles, ambientes y piezas, sin texturas rotas', async ({ page }) => {
@@ -80,17 +62,19 @@ test('las cuatro plantillas se abren sin errores ni texturas rotas y dejan una c
 test('un doble clic en "Crear proyecto" crea un solo proyecto', async ({ page }) => {
   const name = `E2E doble ${Date.now()}`
   await page.goto('/proyectos')
-  await page.getByLabel('Nombre del proyecto').fill(name)
-  await page.getByRole('button', { name: 'Crear proyecto' }).dblclick()
-  await page.waitForURL(/\/proyectos\/[0-9a-f-]{36}$/, { timeout: 60_000 })
+  const dialog = await openNewProjectDialog(page)
+  await dialog.getByLabel('Nombre del proyecto').fill(name)
+  await dialog.getByRole('button', { name: 'Crear proyecto' }).dblclick()
+  await page.waitForURL(PROJECT_URL, { timeout: 60_000 })
   await page.goto('/proyectos')
   await expect(page.getByRole('link', { name: new RegExp(name) })).toHaveCount(1)
 })
 
 test('un nombre de solo espacios muestra un aviso claro y no crea nada', async ({ page }) => {
   await page.goto('/proyectos')
-  await page.getByLabel('Nombre del proyecto').fill('     ')
-  await page.getByRole('button', { name: 'Crear proyecto' }).click()
-  await expect(page.getByText('Escribe un nombre para tu proyecto.')).toBeVisible()
+  const dialog = await openNewProjectDialog(page)
+  await dialog.getByLabel('Nombre del proyecto').fill('     ')
+  await dialog.getByRole('button', { name: 'Crear proyecto' }).click()
+  await expect(dialog.getByText('Escribe un nombre para tu proyecto.')).toBeVisible()
   await expect(page).toHaveURL(/\/proyectos$/)
 })

@@ -17,7 +17,12 @@
     "db:start": "npx --yes supabase@2.120.0 start",
     "db:stop": "npx --yes supabase@2.120.0 stop",
     "db:reset": "npx --yes supabase@2.120.0 db reset",
-    "db:env": "node scripts/local-env.mjs"
+    "db:env": "node scripts/local-env.mjs",
+    "db:env:cloud": "node scripts/cloud-env.mjs",
+    "db:seed": "node scripts/seed-users.mjs",
+    "lab:setup": "node scripts/lab-setup.mjs",
+    "lab:tp3": "node scripts/lab-tp3.mjs",
+    "lab:tp3:test": "node scripts/lab-tp3-test.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

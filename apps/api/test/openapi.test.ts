@@ -8,6 +8,7 @@ import {
   ProjectSummarySchema,
   SceneEnvelopeSchema,
   SceneSavedSchema,
+  TemplateIdSchema,
   UpdateProjectBodySchema,
 } from '@interiores/contract'
 import { Validator } from '@seriousme/openapi-schema-validator'
@@ -53,5 +54,20 @@ describe('openapi.yaml', () => {
     const fromYaml = spec.components.schemas[name] as { properties?: object; required?: string[] }
     expect(Object.keys(fromYaml.properties ?? {}).sort()).toEqual(Object.keys(fromZod.properties ?? {}).sort())
     expect([...(fromYaml.required ?? [])].sort()).toEqual([...(fromZod.required ?? [])].sort())
+  })
+
+  it('TemplateId usa el mismo patrón que TemplateIdSchema y que la columna template_id', () => {
+    const fromZod = z.toJSONSchema(TemplateIdSchema) as { type?: string; pattern?: string }
+    expect(fromZod.pattern).toBe('^[a-z0-9-]{1,40}$')
+    expect(spec.components.schemas.TemplateId).toMatchObject({ type: 'string', pattern: fromZod.pattern })
+  })
+
+  it('templateId es anulable en las respuestas y, al crear, opcional y sin null', () => {
+    const schemas = spec.components.schemas
+    for (const name of ['ProjectSummary', 'ProjectCreated', 'ProjectDetail']) {
+      expect(schemas[name].properties.templateId.oneOf, name).toEqual([{ $ref: '#/components/schemas/TemplateId' }, { type: 'null' }])
+    }
+    expect(schemas.CreateProjectBody.properties.templateId).toEqual({ $ref: '#/components/schemas/TemplateId' })
+    expect(schemas.CreateProjectBody.required).toEqual(['name'])
   })
 })

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Madori">
+  <title>Madori</title>
+  <rect width="64" height="64" rx="15" fill="#FFF4E2"/>
+  <g transform="translate(13.7 13.4) scale(.6)">
+    <path d="M7 46V32A25 25 0 0 1 57 32V46A12 12 0 0 1 45 58H19A12 12 0 0 1 7 46Z" fill="none" stroke="#0B1F4D" stroke-width="11" stroke-linejoin="round"/>
+    <circle cx="32" cy="39" r="10" fill="#FFB02E"/>
+  </g>
+</svg>

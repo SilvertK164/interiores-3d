@@ -1,0 +1,46 @@
+/*
+ * Esqueletos de carga: bloques planos que pulsan con la opacidad (sin degradados ni barrido de brillo).
+ * Colores en hex/rgb y clases con prefijo `madori-` (no dependen de los tokens de `.app-shell`).
+ */
+.madori-skeleton {
+  display: block;
+  border-radius: 0.75rem;
+  background: rgb(11 31 77 / 0.08);
+  animation: madori-pulse 1.6s ease-in-out infinite;
+}
+
+/* Sobre una imagen o una tarjeta ya coloreada: un velo claro en vez del tono oscuro. */
+.madori-skeleton--light {
+  background: rgb(255 255 255 / 0.6);
+}
+
+@keyframes madori-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* La imagen real aparece con un fundido corto cuando termina de cargar. */
+.madori-img-in {
+  animation: madori-img-in 220ms ease-out;
+}
+
+@keyframes madori-img-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .madori-skeleton,
+  .madori-img-in {
+    animation: none;
+  }
+}

@@ -22,7 +22,7 @@ beforeEach(() => {
 
 async function createProject(headers = headersA, payload: object = { name: 'Casa Alvear', kind: 'vivienda' }) {
   const res = await app.inject({ method: 'POST', url: '/v1/projects', headers, payload })
-  return res.json() as { id: string; name: string; kind: string | null; version: number }
+  return res.json() as { id: string; name: string; kind: string | null; templateId: string | null; version: number }
 }
 
 describe('GET /health', () => {
@@ -63,6 +63,26 @@ describe('proyectos', () => {
     expect(res.json()).toMatchObject({ name: 'Local Centro', kind: 'comercio', version: 1 })
   })
 
+  it('POST con templateId crea el proyecto recordando la plantilla de la que nació', async () => {
+    const res = await app.inject({ method: 'POST', url: '/v1/projects', headers: headersA, payload: { name: 'Mi tienda', kind: 'comercio', templateId: 'concept-store' } })
+    expect(res.statusCode).toBe(201)
+    expect(res.json()).toMatchObject({ name: 'Mi tienda', kind: 'comercio', templateId: 'concept-store', version: 1 })
+  })
+
+  it('POST sin templateId (proyecto en blanco) devuelve templateId null', async () => {
+    const res = await app.inject({ method: 'POST', url: '/v1/projects', headers: headersA, payload: { name: 'En blanco', kind: 'vivienda' } })
+    expect(res.statusCode).toBe(201)
+    expect(res.json().templateId).toBeNull()
+  })
+
+  it.each(['', 'Concept Store', 'concept_store', 'a'.repeat(41), 7])('POST con el templateId %j inválido responde 422 nombrando el campo', async (templateId) => {
+    const res = await app.inject({ method: 'POST', url: '/v1/projects', headers: headersA, payload: { name: 'x', templateId } })
+    expect(res.statusCode).toBe(422)
+    expect(res.json().error.code).toBe('datos_invalidos')
+    expect(res.json().error.message).toContain('templateId')
+    expect(await store.list({ userId: 'user-a', token: 'token-a' })).toEqual([])
+  })
+
   it('POST con nombre vacío responde 422 en castellano', async () => {
     const res = await app.inject({ method: 'POST', url: '/v1/projects', headers: headersA, payload: { name: '   ' } })
     expect(res.statusCode).toBe(422)
@@ -92,6 +112,23 @@ describe('proyectos', () => {
     expect(res.json()).toMatchObject({ id: p.id, version: 1, scene: emptyEnvelope() })
   })
 
+  it('GET (lista y por id) devuelve la plantilla de origen, y null si el proyecto nació en blanco', async () => {
+    const fromTemplate = await createProject(headersA, { name: 'Café', kind: 'comercio', templateId: 'cafe' })
+    store.tick()
+    const blank = await createProject(headersA, { name: 'En blanco' })
+
+    const list = await app.inject({ method: 'GET', url: '/v1/projects', headers: headersA })
+    expect(list.json().map((p: { id: string; templateId: string | null }) => [p.id, p.templateId])).toEqual([
+      [blank.id, null],
+      [fromTemplate.id, 'cafe'],
+    ])
+
+    const detail = await app.inject({ method: 'GET', url: `/v1/projects/${fromTemplate.id}`, headers: headersA })
+    expect(detail.json()).toMatchObject({ id: fromTemplate.id, templateId: 'cafe' })
+    const blankDetail = await app.inject({ method: 'GET', url: `/v1/projects/${blank.id}`, headers: headersA })
+    expect(blankDetail.json().templateId).toBeNull()
+  })
+
   it('GET del proyecto de otra persona responde 404, nunca 403', async () => {
     const p = await createProject()
     const res = await app.inject({ method: 'GET', url: `/v1/projects/${p.id}`, headers: headersB })
@@ -111,6 +148,15 @@ describe('proyectos', () => {
     const res = await app.inject({ method: 'PATCH', url: `/v1/projects/${p.id}`, headers: headersA, payload: { name: 'Renombrado' } })
     expect(res.statusCode).toBe(200)
     expect(res.json()).toMatchObject({ id: p.id, name: 'Renombrado' })
+  })
+
+  it('PATCH conserva la plantilla de origen y no deja cambiarla', async () => {
+    const p = await createProject(headersA, { name: 'Súper', kind: 'comercio', templateId: 'supermercado' })
+    const renamed = await app.inject({ method: 'PATCH', url: `/v1/projects/${p.id}`, headers: headersA, payload: { name: 'Súper Centro' } })
+    expect(renamed.json()).toMatchObject({ name: 'Súper Centro', templateId: 'supermercado' })
+    const tried = await app.inject({ method: 'PATCH', url: `/v1/projects/${p.id}`, headers: headersA, payload: { name: 'Súper Norte', templateId: 'cafe' } })
+    expect(tried.statusCode).toBe(200)
+    expect(tried.json()).toMatchObject({ name: 'Súper Norte', templateId: 'supermercado' })
   })
 
   it('PATCH sin campos responde 422 y ajeno responde 404', async () => {

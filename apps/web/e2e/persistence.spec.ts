@@ -1,17 +1,12 @@
 import { type Page, expect, test } from '@playwright/test'
+import { createProjectViaUi } from './support/projects'
 import { createAccount, signInViaUi } from './support/user'
 
 const wallCount = (page: Page) => page.evaluate(() => (window as unknown as { __e2e: { wallCount(): number } }).__e2e.wallCount())
 const addWall = (page: Page) => page.evaluate(() => (window as unknown as { __e2e: { addWall(): void } }).__e2e.addWall())
 
-async function openNewProject(page: Page, name: string): Promise<string> {
-  await page.goto('/proyectos')
-  await page.getByLabel('Nombre del proyecto').fill(name)
-  await page.getByRole('button', { name: 'Crear proyecto' }).click()
-  await page.waitForURL(/\/proyectos\/[0-9a-f-]{36}$/)
-  await page.waitForFunction(() => (window as unknown as { __e2e?: { ready(): boolean } }).__e2e?.ready())
-  return page.url()
-}
+// Proyecto en blanco por la interfaz: aquí solo importa el editor y el guardado, no la plantilla.
+const openNewProject = (page: Page, name: string) => createProjectViaUi(page, { name, template: null })
 
 test('un muro dibujado sobrevive a recargar (criterio 3)', async ({ page }) => {
   const url = await openNewProject(page, `E2E persistencia ${Date.now()}`)

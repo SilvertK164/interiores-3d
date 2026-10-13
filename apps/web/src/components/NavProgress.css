@@ -1,0 +1,55 @@
+/*
+ * Barra de navegación: 3 px, cobalto liso, pegada arriba. Colores en hex y clases con prefijo `madori-` para que sirva
+ * también en el editor (que no usa `.app-shell`). Pendiente: avanza despacio hasta el 90 %; completa: llega al 100 % y se
+ * desvanece. Aparece tras ~150 ms, así una navegación rápida no la hace parpadear.
+ */
+.madori-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 2147483000;
+  height: 3px;
+  background: #1f5fe0;
+  opacity: 0;
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.madori-nav[data-state='pending'] {
+  animation: madori-nav-crawl 10s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+
+.madori-nav[data-state='done'] {
+  transform: scaleX(1);
+  transition:
+    transform 160ms ease-out,
+    opacity 260ms ease-out 160ms;
+}
+
+@keyframes madori-nav-crawl {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.02);
+  }
+  1.5% {
+    opacity: 1;
+    transform: scaleX(0.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(0.9);
+  }
+}
+
+/* Sin movimiento: una barra completa que aparece tras el mismo instante y se apaga sin desvanecerse. */
+@media (prefers-reduced-motion: reduce) {
+  .madori-nav[data-state='pending'] {
+    animation: none;
+    opacity: 1;
+    transform: scaleX(1);
+    transition: opacity 0s 150ms;
+  }
+  .madori-nav[data-state='done'] {
+    transition: none;
+  }
+}

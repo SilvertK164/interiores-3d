@@ -10,6 +10,7 @@ coverage/
 .env
 .env.*
 !.env.example
+!.env.cloud.example
 .claude/settings.local.json
 supabase/.temp/
 
@@ -17,6 +18,10 @@ supabase/.temp/
 .playwright-mcp/
 .worktrees/
 *.log
+
+# laboratorio: el TP3 de Victoria descargado por `pnpm lab:setup` (con su entorno de Python) y su clave de Gemini
+lab/vendor/
+lab/.env.local
 
 # diseño local en Pencil (no se versiona) y miniaturas derivadas de los activos de Pascal
 *.pen
