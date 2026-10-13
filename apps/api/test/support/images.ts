@@ -5,9 +5,10 @@ export const WEBP = Buffer.from([0x52, 0x49, 0x46, 0x46, 0x1a, 0x00, 0x00, 0x00,
 
 export const b64 = (bytes: Buffer): string => bytes.toString('base64')
 
+/** El catálogo del pedido: cada pieza con su id, su nombre y sus medidas reales en metros `[ancho, alto, fondo]`. */
 export const CATALOG = [
-  { id: 'sofa', name: 'Sofá', category: 'seating', tags: ['living-room', 'couch'] },
-  { id: 'coffee-table', name: 'Mesa de centro', category: 'tables', tags: ['living-room'] },
+  { id: 'sofa', name: 'Sofá', category: 'seating', tags: ['living-room', 'couch'], dimensions_m: [2.06, 0.74, 1.01] as [number, number, number] },
+  { id: 'coffee-table', name: 'Mesa de centro', category: 'tables', tags: ['living-room'], dimensions_m: [1.72, 0.3, 1.04] as [number, number, number] },
 ]
 
 /** Un cuerpo válido de `POST /v1/analyze-room`; `extra` pisa o agrega campos. */

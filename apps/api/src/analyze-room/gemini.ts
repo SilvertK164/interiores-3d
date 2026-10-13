@@ -1,5 +1,5 @@
-import type { CatalogOption } from '@interiores/contract'
 import { buildPrompt } from './prompt.js'
+import { responseSchemaFor } from './response-schema.js'
 import { ProviderError, type VisionProvider } from './types.js'
 
 export const DEFAULT_VISION_MODEL = 'gemini-3.5-flash'
@@ -22,35 +22,8 @@ const ATTEMPT_MS = 15_000
 export const GEMINI_MAX_OUTPUT_TOKENS = 8192
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
-const FURNITURE_KEYS = ['asset_id', 'x', 'y', 'width', 'depth', 'rotation_deg', 'confidence'] as const
 
-/** El esquema de la respuesta: cada mueble elige su `asset_id` entre las opciones recibidas (enumeradas) y todo es obligatorio. */
-export function responseSchemaFor(catalog: readonly CatalogOption[]) {
-  const number = { type: 'NUMBER' } as const
-  return {
-    type: 'OBJECT',
-    properties: {
-      furniture: {
-        type: 'ARRAY',
-        items: {
-          type: 'OBJECT',
-          properties: {
-            asset_id: { type: 'STRING', enum: catalog.map((option) => option.id) },
-            x: number,
-            y: number,
-            width: number,
-            depth: number,
-            rotation_deg: number,
-            confidence: number,
-          },
-          required: [...FURNITURE_KEYS],
-        },
-      },
-      warnings: { type: 'ARRAY', items: { type: 'STRING' } },
-    },
-    required: ['furniture', 'warnings'],
-  } as const
-}
+export { responseSchemaFor }
 
 export type GeminiOptions = {
   /** Va solo en la cabecera `x-goog-api-key`: nunca en la URL ni en un mensaje. */
@@ -106,9 +79,9 @@ function createModelProvider(options: GeminiOptions, model: string, timeoutMs: n
   const doFetch = options.fetchImpl ?? ((...args: Parameters<typeof fetch>) => fetch(...args))
   const url = `${ENDPOINT}/${encodeURIComponent(model)}:generateContent`
 
-  return async ({ image, mime, catalog }) => {
+  return async ({ image, mime, catalog, knownWidthM }) => {
     const body = {
-      contents: [{ parts: [{ text: buildPrompt(catalog) }, { inlineData: { mimeType: mime, data: image } }] }],
+      contents: [{ parts: [{ text: buildPrompt(catalog, knownWidthM) }, { inlineData: { mimeType: mime, data: image } }] }],
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: responseSchemaFor(catalog),

@@ -22,17 +22,38 @@ const local = (id: string, extra: Record<string, unknown> = {}) => ({ id, name: 
 const REAL = availableAssets().map((a) => ({ id: a.id, name: a.name, dimensions: a.dimensions }))
 
 describe('buildAnalysisCatalog: los candidatos', () => {
-  it('cada candidato lleva solo id, nombre en castellano, categoría y etiquetas (sin rutas ni medidas)', () => {
+  it('cada candidato lleva solo id, nombre en castellano, categoría, etiquetas y sus medidas reales en metros (sin rutas)', () => {
     const { candidates } = buildAnalysisCatalog([local('sofa', { src: '/items/sofa/model.glb', thumbnail: '/items/sofa/thumbnail.webp', dimensions: [2, 1, 1] })])
     expect(candidates).toHaveLength(1)
     const sofa = candidates[0] as AnalysisCandidate
-    expect(Object.keys(sofa).sort()).toEqual(['category', 'id', 'name', 'tags'])
+    expect(Object.keys(sofa).sort()).toEqual(['category', 'dimensions_m', 'id', 'name', 'tags'])
     expect(sofa.id).toBe('sofa')
     expect(sofa.name).toBe(nameEs('sofa', 'x'))
     expect(sofa.name).toBe('Sofá')
     expect(sofa.category).not.toBe('')
     expect(sofa.tags.length).toBeGreaterThan(0)
-    expect(JSON.stringify(candidates)).not.toMatch(/src|thumbnail|\/items\/|https?:|\.glb|dimensions/)
+    expect(sofa.dimensions_m).toEqual([2, 1, 1])
+    expect(JSON.stringify(candidates)).not.toMatch(/src|thumbnail|\/items\/|https?:|\.glb|"dimensions"/)
+  })
+
+  it('las medidas [ancho, alto, fondo] se redondean al centímetro', () => {
+    const { candidates } = buildAnalysisCatalog([local('sofa', { dimensions: [2.0612, 0.7449, 1.0151] })])
+    expect(candidates[0]?.dimensions_m).toEqual([2.06, 0.74, 1.02])
+  })
+
+  it('una pieza sin medidas válidas (faltan, no son tres números positivos o pasan de 20 m) no lleva dimensions_m, pero tampoco se descarta', () => {
+    const bad: unknown[] = [undefined, [], [1, 1], [1, 1, 1, 1], [0, 1, 1], [1, -1, 1], ['1', 1, 1], [1, 1, Number.NaN], [1, 1, 21], 'grande']
+    for (const dimensions of bad) {
+      const { candidates } = buildAnalysisCatalog([local('sofa', { dimensions })])
+      expect(candidates, JSON.stringify(dimensions)).toHaveLength(1)
+      expect(candidates[0], JSON.stringify(dimensions)).not.toHaveProperty('dimensions_m')
+    }
+  })
+
+  it('una medida que el redondeo dejaría en 0 se conserva con su valor mínimo (el contrato pide más de 0)', () => {
+    const { candidates } = buildAnalysisCatalog([local('sofa', { dimensions: [2, 0.004, 1] })])
+    expect(AnalysisCatalogSchema.safeParse(candidates).success).toBe(true)
+    expect(candidates[0]?.dimensions_m?.every((side) => side > 0)).toBe(true)
   })
 
   it('solo ofrece mobiliario y decoración reconocibles: deja fuera instalaciones, piezas de pared o techo y las que tienen herramienta propia', () => {
@@ -119,6 +140,20 @@ describe('buildAnalysisCatalog: con el catálogo real de Pascal', () => {
   it('el mapa tiene una pieza local por cada candidato', () => {
     expect(pieces.size).toBe(candidates.length)
   })
+
+  it('cada candidato trae las medidas reales de su pieza (las mismas que usa el editor), en metros', () => {
+    for (const c of candidates) {
+      const real = REAL.find((piece) => piece.id === c.id)
+      expect(c.dimensions_m, c.id).toBeDefined()
+      expect(c.dimensions_m, c.id).toEqual((real?.dimensions ?? []).map((side) => Math.round(side * 100) / 100))
+    }
+    expect(candidates.find((c) => c.id === 'sofa')?.dimensions_m).toEqual([2.06, 0.74, 1.01])
+    expect(candidates.find((c) => c.id === 'television')?.dimensions_m).toEqual([1.62, 1.07, 0.38])
+  })
+
+  it('con las medidas, el catálogo real sigue cabiendo en los 64 KB con mucho margen', () => {
+    expect(bytes(serializeCandidates(candidates))).toBeLessThan(MAX_CATALOG_BYTES / 2)
+  })
 })
 
 describe('fitToLimits', () => {
@@ -148,9 +183,9 @@ describe('fitToLimits', () => {
 })
 
 describe('serializeCandidates', () => {
-  it('es el JSON compacto de la lista, con las tildes tal cual', () => {
-    const list: AnalysisCandidate[] = [{ id: 'sofa', name: 'Sofá', category: 'seating', tags: ['couch'] }]
-    expect(serializeCandidates(list)).toBe('[{"id":"sofa","name":"Sofá","category":"seating","tags":["couch"]}]')
+  it('es el JSON compacto de la lista, con las tildes y las medidas tal cual', () => {
+    const list: AnalysisCandidate[] = [{ id: 'sofa', name: 'Sofá', category: 'seating', tags: ['couch'], dimensions_m: [2.06, 0.74, 1.01] }]
+    expect(serializeCandidates(list)).toBe('[{"id":"sofa","name":"Sofá","category":"seating","tags":["couch"],"dimensions_m":[2.06,0.74,1.01]}]')
     expect(JSON.parse(serializeCandidates(list))).toEqual(list)
   })
 })

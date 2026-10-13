@@ -9,13 +9,11 @@ import {
 import { buildPrompt } from '../../src/analyze-room/prompt.js'
 import { ProviderError, type VisionRequest } from '../../src/analyze-room/types.js'
 import { CATALOG, JPEG, PNG, b64 } from '../support/images.js'
+import { PLAN } from '../support/plan.js'
 
 const KEY = 'AIzaSyEJEMPLO-clave-que-no-debe-aparecer-jamas'
 const REQUEST: VisionRequest = { image: b64(PNG), mime: 'image/png', catalog: CATALOG }
-const RESULT = {
-  furniture: [{ asset_id: 'sofa', x: 0.5, y: 0.6, width: 0.3, depth: 0.12, rotation_deg: 0, confidence: 0.8 }],
-  warnings: ['oclusión parcial'],
-}
+const RESULT = PLAN
 const envelope = (text: string, candidate: Record<string, unknown> = {}) => ({
   candidates: [{ content: { role: 'model', parts: [{ text }] }, finishReason: 'STOP', ...candidate }],
 })
@@ -74,21 +72,28 @@ describe('createGeminiProvider: el pedido', () => {
     expect(parts[1]).toEqual({ inlineData: { mimeType: 'image/png', data: b64(PNG) } })
   })
 
+  it('si la persona indicó el ancho del muro del fondo, el prompt se lo dice al modelo', async () => {
+    const { calls, fetchImpl } = stub(() => reply(200, envelope(JSON.stringify(RESULT))))
+    await createGeminiProvider({ apiKey: KEY, fetchImpl })({ ...REQUEST, knownWidthM: 3.2 })
+    expect(sent(calls).contents[0].parts[0]).toEqual({ text: buildPrompt(CATALOG, 3.2) })
+    expect(sent(calls).contents[0].parts[0].text).toContain('3.2 m')
+  })
+
   it('pide JSON con un esquema de respuesta que enumera los asset_id del catálogo recibido', async () => {
     const { calls, fetchImpl } = stub(() => reply(200, envelope(JSON.stringify(RESULT))))
     await createGeminiProvider({ apiKey: KEY, fetchImpl })(REQUEST)
     const config = sent(calls).generationConfig
     expect(config.responseMimeType).toBe('application/json')
     expect(config.temperature).toBe(0.1)
+    expect(config.thinkingConfig).toEqual({ thinkingLevel: 'low' })
     expect(config.maxOutputTokens).toBe(GEMINI_MAX_OUTPUT_TOKENS)
     const furniture = config.responseSchema.properties.furniture.items
     expect(furniture.properties.asset_id).toEqual({ type: 'STRING', enum: ['sofa', 'coffee-table'] })
     expect(furniture.properties).not.toHaveProperty('type')
-    expect(furniture.required).toEqual(['asset_id', 'x', 'y', 'width', 'depth', 'rotation_deg', 'confidence'])
-    expect(config.responseSchema.required).toEqual(['furniture', 'warnings'])
+    expect(config.responseSchema).toEqual(responseSchemaFor(CATALOG))
   })
 
-  it('maxOutputTokens deja espacio de sobra para el razonamiento del modelo y la lista de muebles (más que los 2000 de TP3)', () => {
+  it('maxOutputTokens deja espacio de sobra para el razonamiento del modelo y el plano (más que los 2000 de TP3)', () => {
     expect(GEMINI_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(8192)
   })
 
@@ -96,6 +101,74 @@ describe('createGeminiProvider: el pedido', () => {
     const schema = responseSchemaFor([CATALOG[1] as (typeof CATALOG)[number]])
     expect(schema.properties.furniture.items.properties.asset_id.enum).toEqual(['coffee-table'])
   })
+})
+
+describe('responseSchemaFor: el plano que debe devolver el modelo', () => {
+  const schema = responseSchemaFor(CATALOG)
+
+  it('lo pide en el orden en que razona: el ambiente, la cámara, las aberturas, los muebles y los avisos (y todo es obligatorio)', () => {
+    expect(schema.type).toBe('OBJECT')
+    expect(schema.propertyOrdering).toEqual(['room', 'camera', 'openings', 'furniture', 'warnings'])
+    expect(Object.keys(schema.properties)).toEqual(['room', 'camera', 'openings', 'furniture', 'warnings'])
+    expect(schema.required).toEqual(['room', 'camera', 'openings', 'furniture', 'warnings'])
+  })
+
+  it('el ambiente trae su ancho y su fondo en metros', () => {
+    expect(schema.properties.room.required).toEqual(['width_m', 'depth_m'])
+    expect(schema.properties.room.properties.width_m.type).toBe('NUMBER')
+  })
+
+  it('la cámara trae su posición y el punto al que mira; el campo de visión es opcional', () => {
+    const camera = schema.properties.camera
+    expect(camera.required).toEqual(['x_m', 'z_m', 'look_at'])
+    expect(camera.properties.look_at.required).toEqual(['x_m', 'z_m'])
+    expect(Object.keys(camera.properties)).toContain('fov_deg')
+    expect(camera.required).not.toContain('fov_deg')
+  })
+
+  it('cada abertura es una puerta o una ventana, en un muro n, s, e u w, con su posición y su ancho', () => {
+    const opening = schema.properties.openings.items
+    expect(opening.properties.type).toMatchObject({ type: 'STRING', enum: ['door', 'window'] })
+    expect(opening.properties.wall).toMatchObject({ type: 'STRING', enum: ['n', 's', 'e', 'w'] })
+    expect(opening.required).toEqual(['type', 'wall', 'at_m', 'width_m'])
+  })
+
+  it('cada mueble lleva su asset_id (enumerado), su centro en metros, hacia dónde mira, contra qué muro está, sobre qué está apoyado y la confianza', () => {
+    const piece = schema.properties.furniture.items
+    expect(piece.required).toEqual(['asset_id', 'x_m', 'z_m', 'facing_deg', 'against_wall', 'on_top_of', 'confidence'])
+    expect(Object.keys(piece.properties)).toEqual(piece.required)
+    expect(piece.properties.asset_id.enum).toEqual(['sofa', 'coffee-table'])
+  })
+
+  it('against_wall es un muro o nulo y on_top_of un entero o nulo (nulo = no está contra un muro / está en el piso)', () => {
+    const { against_wall, on_top_of } = schema.properties.furniture.items.properties
+    expect(against_wall).toMatchObject({ type: 'STRING', enum: ['n', 's', 'e', 'w'], nullable: true })
+    expect(on_top_of).toMatchObject({ type: 'INTEGER', nullable: true })
+  })
+
+  it('el orden de las propiedades de cada objeto también se pide explícito (el JSON sale en el orden en que el modelo razona)', () => {
+    expect(schema.properties.room.propertyOrdering).toEqual(['width_m', 'depth_m'])
+    expect(schema.properties.camera.propertyOrdering).toEqual(['x_m', 'z_m', 'look_at', 'fov_deg'])
+    expect(schema.properties.openings.items.propertyOrdering).toEqual(['type', 'wall', 'at_m', 'width_m'])
+    expect(schema.properties.furniture.items.propertyOrdering).toEqual(schema.properties.furniture.items.required)
+  })
+
+  it('las propiedades llevan una descripción corta de su unidad y su sentido (el modelo la lee)', () => {
+    const { facing_deg, on_top_of } = schema.properties.furniture.items.properties
+    expect(facing_deg.description).toMatch(/0 = mira al sur/)
+    expect(on_top_of.description).toMatch(/índice/i)
+    expect(schema.properties.openings.items.properties.at_m.description).toMatch(/CENTRO/)
+    expect(schema.properties.camera.properties.look_at.description).toMatch(/centro de la foto/)
+  })
+
+  it('un plano de ejemplo del contrato tiene exactamente las claves que pide el esquema', () => {
+    expect(Object.keys(PLAN)).toEqual(schema.required)
+    expect(Object.keys(PLAN.furniture[0] ?? {})).toEqual(schema.properties.furniture.items.required)
+    expect(Object.keys(PLAN.openings[0] ?? {})).toEqual(schema.properties.openings.items.required)
+  })
+})
+
+describe('createGeminiProvider: los plazos', () => {
 
   it('espera como máximo 55 segundos en total y le pasa a fetch una señal de aborto', async () => {
     expect(GEMINI_TIMEOUT_MS).toBe(55_000)

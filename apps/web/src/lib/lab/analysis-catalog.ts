@@ -1,4 +1,4 @@
-import { ANALYZE_CATALOG_MAX_BYTES, ANALYZE_CATALOG_MAX_ITEMS, type CatalogOption } from '@interiores/contract'
+import { ANALYZE_CATALOG_MAX_BYTES, ANALYZE_CATALOG_MAX_ITEMS, type CatalogOption, CatalogOptionSchema } from '@interiores/contract'
 import { nameEs } from '../catalog-es'
 
 /** Límites del catálogo que acepta la API (`packages/contract`): hasta 100 opciones y 64 KB de JSON. */
@@ -6,13 +6,15 @@ export const MAX_CATALOG_ITEMS = ANALYZE_CATALOG_MAX_ITEMS
 export const MAX_CATALOG_BYTES = ANALYZE_CATALOG_MAX_BYTES
 
 /**
- * Lo que se le cuenta al análisis de cada pieza que puede elegir: nada más que esto. Sin rutas, sin `src` y sin medidas, porque
- * el modelo solo escoge un identificador y el tamaño real sale siempre del catálogo local. La API rechaza cualquier campo de más.
+ * Lo que se le cuenta al análisis de cada pieza que puede elegir: nada más que esto. Sin rutas ni `src`: el modelo solo escoge un
+ * identificador. Las medidas reales en metros (`dimensions_m = [ancho, alto, fondo]`, las del catálogo local) le sirven de regla para
+ * estimar el tamaño del ambiente y no superponer muebles; el tamaño con el que se dibuja la pieza sale siempre del catálogo local.
+ * La API rechaza cualquier campo de más.
  */
 export type AnalysisCandidate = CatalogOption
 
 /** Lo mínimo que se pide de una pieza local (el `CatalogItem` de Pascal ya localizado trae esto y mucho más). */
-export type LocalPieceLike = { id: string; name: string; attachTo?: string; tool?: string }
+export type LocalPieceLike = { id: string; name: string; attachTo?: string; tool?: string; dimensions?: readonly number[] }
 
 export type AnalysisCatalog<T extends LocalPieceLike> = {
   /** Lo que viaja al análisis en `catalog` (POST /v1/analyze-room). */
@@ -72,6 +74,20 @@ const RECOGNIZABLE: Readonly<Record<string, Meta>> = {
   'shower-square': { category: 'bathroom', tags: ['bathroom', 'shower', 'square-shower'] },
 }
 
+/** La menor medida que se manda: el contrato pide más de 0 y el redondeo al centímetro podría dejar en 0 una pieza muy delgada (una alfombra). */
+const MIN_SIDE_M = 0.01
+
+/**
+ * Las medidas reales `[ancho, alto, fondo]` de una pieza local en metros, redondeadas al centímetro. Si no son tres números positivos
+ * que acepte el contrato (`CatalogOptionSchema`), no se mandan: la pieza sigue siendo candidata, solo que sin esa ayuda.
+ */
+function realDimensions(dimensions: readonly number[] | undefined): CatalogOption['dimensions_m'] {
+  if (!Array.isArray(dimensions)) return undefined
+  const rounded = dimensions.map((side) => (typeof side === 'number' && Number.isFinite(side) && side > 0 ? Math.max(MIN_SIDE_M, Math.round(side * 100) / 100) : side))
+  const parsed = CatalogOptionSchema.shape.dimensions_m.safeParse(rounded)
+  return parsed.success ? parsed.data : undefined
+}
+
 /** Los ids que pueden ser candidatos, en el orden en que se ofrecen. */
 export const RECOGNIZABLE_IDS: readonly string[] = Object.keys(RECOGNIZABLE)
 
@@ -91,7 +107,7 @@ export function fitToLimits(candidates: readonly AnalysisCandidate[]): AnalysisC
 }
 
 /**
- * Arma lo que el análisis necesita para elegir piezas: los candidatos (id, nombre en castellano, categoría y etiquetas) y el mapa
+ * Arma lo que el análisis necesita para elegir piezas: los candidatos (id, nombre en castellano, categoría, etiquetas y medidas reales) y el mapa
  * id → pieza local con el que luego se resuelve cada `asset_id` devuelto. Solo son candidatas las piezas reconocibles que de
  * verdad están en `items` (el catálogo local), sin las que se cuelgan de pared o techo ni las de herramienta propia; si un id
  * viene repetido gana la primera. Siempre sale en el mismo orden, y dentro de los límites de la API.
@@ -105,7 +121,9 @@ export function buildAnalysisCatalog<T extends LocalPieceLike>(items: readonly T
     RECOGNIZABLE_IDS.flatMap((id) => {
       const item = byId.get(id)
       const meta = RECOGNIZABLE[id]
-      return item && meta ? [{ id, name: nameEs(id, item.name), category: meta.category, tags: [...meta.tags] }] : []
+      if (!(item && meta)) return []
+      const dimensions_m = realDimensions(item.dimensions)
+      return [{ id, name: nameEs(id, item.name), category: meta.category, tags: [...meta.tags], ...(dimensions_m ? { dimensions_m } : {}) }]
     }),
   )
   const pieces = new Map<string, T>()
