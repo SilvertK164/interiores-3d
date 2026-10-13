@@ -17,6 +17,7 @@ import { fromEnvelope, toEnvelope } from './adapter'
 import { localizeCatalog } from './catalog-assets'
 import { HIDDEN_CHROME, type PascalChrome } from './chrome'
 import { installE2eHooks } from './e2e-hooks'
+import { onThumbnailCapture } from './export/pascal-image'
 import { createPascalBridge } from './pascal-bridge'
 import { createSaveHandler } from './save-handler'
 import { SaveBanner } from './SaveBanner'
@@ -132,6 +133,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         guardAgainstSceneWipe
         layoutVersion="v2"
         onLoad={onLoad}
+        onThumbnailCapture={onThumbnailCapture}
         onSave={onSave}
         projectId={projectId}
       />

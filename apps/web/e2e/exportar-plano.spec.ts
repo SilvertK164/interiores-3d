@@ -67,7 +67,7 @@ test('en Ver el botón Exportar plano abre el mismo diálogo y el foco vuelve a 
   await openTemplate(page, 'loft')
   await modeButton(page, 'Ver').click()
   await expect(page.getByRole('complementary', { name: 'Vista 3D' })).toBeVisible()
-  for (const name of ['Compartir', 'Renderizar']) await expect(page.getByRole('button', { name })).toBeDisabled()
+  for (const name of ['Compartir', 'Renderizar']) await expect(page.getByRole('button', { name })).toHaveCount(0)
   const button = page.getByRole('button', { name: 'Exportar plano', exact: true })
   await button.click()
   const dialog = exportDialog(page)

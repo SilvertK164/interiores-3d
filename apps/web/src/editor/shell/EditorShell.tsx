@@ -23,7 +23,7 @@ function FrameViews() {
   return null
 }
 
-function ShellBody({ catalog, onExportPlan }: { catalog: readonly CatalogItemLike[]; onExportPlan: (opener: HTMLElement | null) => void }) {
+function ShellBody({ catalog, onExportPlan, projectName }: { catalog: readonly CatalogItemLike[]; onExportPlan: (opener: HTMLElement | null) => void; projectName: string }) {
   const { mode, firstPerson } = useShell((s) => {
     const state = selectShellState(s)
     return { mode: state.mode, firstPerson: state.firstPerson }
@@ -39,7 +39,7 @@ function ShellBody({ catalog, onExportPlan }: { catalog: readonly CatalogItemLik
           <PropertiesPanel />
         </>
       ) : (
-        <ShellView onExportPlan={onExportPlan} />
+        <ShellView onExportPlan={onExportPlan} projectName={projectName} />
       )}
     </>
   )
@@ -95,7 +95,7 @@ export function EditorShell({
       <div data-editor-shell className="editor-shell pointer-events-none absolute inset-0 z-40 overflow-hidden">
         <FrameViews />
         <ShellTopBar name={projectName} saveStatus={saveStatus} onBack={onBack} backBusy={backBusy} />
-        <ShellBody catalog={catalog} onExportPlan={openExport} />
+        <ShellBody catalog={catalog} onExportPlan={openExport} projectName={projectName} />
         <ExportPlanDialog author={author} onClose={() => setExportOpen(false)} open={exportOpen} opener={exportOpener} projectName={projectName} />
       </div>
     </BridgeProvider>

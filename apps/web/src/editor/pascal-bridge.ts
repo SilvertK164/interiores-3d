@@ -16,6 +16,7 @@ import type { MaterialItemLike } from './shell/materials-model'
 import { DECISIONS } from './shell/decisions'
 import { keepCarpetsUnder } from './carpet-watch'
 import { frameDeps } from './frame-deps'
+import { imageDeps } from './export/pascal-image'
 import { planDeps } from './export/pascal-plan'
 import { levelManageDeps } from './level-manage-deps'
 import { nodePresets } from './node-presets'
@@ -235,6 +236,7 @@ export function createPascalBridge(): ShellBridge {
     ...levelManageDeps(),
     ...frameDeps(),
     ...planDeps(),
+    ...imageDeps(),
     // @@deps
   })
 }

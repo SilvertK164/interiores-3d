@@ -27,12 +27,12 @@ const azimuth = async (page: Page) => {
   return c ? Math.atan2(c.pz - c.tz, c.px - c.tx) : Number.NaN
 }
 
-test('en Ver aparecen la Vista 3D y la barra de cámara; Compartir y Renderizar están deshabilitados con "Pronto"; en Editar no', async ({ page }) => {
+test('en Ver aparecen la Vista 3D y la barra de cámara; están Exportar imagen 3D y Exportar plano, sin Compartir ni Renderizar; en Editar no', async ({ page }) => {
   await createBlankProject(page, 'vista')
   await toView(page)
   await expect(bar(page)).toBeVisible()
-  for (const name of ['Compartir', 'Renderizar']) await expect(page.getByRole('button', { name })).toBeDisabled()
-  await expect(page.getByText('Pronto')).toHaveCount(2)
+  await expect(page.getByRole('button', { name: 'Exportar imagen 3D' })).toBeEnabled()
+  for (const name of ['Compartir', 'Renderizar']) await expect(page.getByRole('button', { name })).toHaveCount(0)
   await modeButton(page, 'Editar').click()
   await expect(panel(page)).toHaveCount(0)
   await expect(bar(page)).toHaveCount(0)

@@ -1,22 +1,42 @@
 'use client'
 
+import { useState } from 'react'
+import { imageFileName } from '@/lib/export/file-name'
 import type { CameraMode, LevelMode, Shading, WallMode } from './bridge/types'
 import { selectViewOptions } from './bridge/view'
 import { DECISIONS, type Decisions } from './decisions'
-import { ShareRender, ViewBar, ViewPanel } from './ui/ViewControls'
+import { ExportButtons, ViewBar, ViewPanel } from './ui/ViewControls'
+import { downloadBlob } from './download-blob'
+import { toPng } from './to-png'
 import { useBridge, useShell } from './use-bridge'
 import { viewActions, viewGroups } from './view-model'
 
-/** Lo que se ve en Ver: el panel Vista 3D, la barra de cámara y Compartir y Renderizar (deshabilitados con "Pronto"). */
+/** Lo que se ve en Ver: el panel Vista 3D, la barra de cámara y los botones de exportar (plano e imagen 3D). */
 export function ShellView({
   decisions = DECISIONS,
   onExportPlan,
+  projectName = 'proyecto',
 }: {
   decisions?: Pick<Decisions, 'cameraControl' | 'styleControl' | 'walkthrough'>
   onExportPlan?: (opener: HTMLElement | null) => void
+  projectName?: string
 }) {
   const bridge = useBridge()
   const options = useShell(selectViewOptions)
+  const [imageBusy, setImageBusy] = useState(false)
+  const [imageError, setImageError] = useState(false)
+  const exportImage = async () => {
+    if (imageBusy) return
+    setImageBusy(true)
+    setImageError(false)
+    try {
+      downloadBlob(await toPng(await bridge.image.captureIsometric()), imageFileName(projectName))
+    } catch {
+      setImageError(true)
+    } finally {
+      setImageBusy(false)
+    }
+  }
   return (
     <>
       <ViewPanel
@@ -35,7 +55,12 @@ export function ShellView({
           else if (id === 'orbit-left' || id === 'orbit-right' || id === 'top') bridge.moveCamera(id)
         }}
       />
-      <ShareRender onExportPlan={onExportPlan} />
+      {imageError && (
+        <p role="alert" className="absolute bottom-24 right-5 z-10 rounded-xl bg-white px-3 py-2 text-sm text-danger-ink">
+          No pudimos generar la imagen. Inténtalo de nuevo.
+        </p>
+      )}
+      <ExportButtons imageBusy={imageBusy} onExportImage={() => void exportImage()} onExportPlan={onExportPlan} />
     </>
   )
 }

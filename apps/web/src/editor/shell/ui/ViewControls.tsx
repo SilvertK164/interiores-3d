@@ -1,7 +1,6 @@
-import { FileDown, Share2, Sparkles, type LucideIcon } from 'lucide-react'
+import { FileDown, ImageDown, type LucideIcon } from 'lucide-react'
 import { cx } from '@/lib/cx'
 import { ChipRow, FLOAT } from './primitives'
-import { SoonButton } from './status'
 
 export type ChipGroup = {
   id: string
@@ -72,20 +71,28 @@ export function ViewBar({
   )
 }
 
-/** Exportar plano (activo) junto a Compartir y Renderizar (visibles pero deshabilitados, con "Pronto"). */
-export function ShareRender({ onExportPlan }: { onExportPlan?: (opener: HTMLElement) => void } = {}) {
+const EXPORT_BUTTON = cx(FLOAT, 'focus-ring inline-flex h-12 cursor-pointer items-center gap-2 rounded-full px-5 text-[15px] font-semibold text-ink transition-colors duration-150 ease-out hover:bg-white disabled:cursor-wait disabled:opacity-60')
+
+/** Exportar plano (PDF) y exportar la vista isométrica como imagen. */
+export function ExportButtons({
+  onExportPlan,
+  onExportImage,
+  imageBusy = false,
+}: {
+  onExportPlan?: (opener: HTMLElement) => void
+  onExportImage?: () => void
+  imageBusy?: boolean
+} = {}) {
   return (
     <div className="absolute bottom-6 right-5 z-10 flex items-center gap-3">
-      <button
-        type="button"
-        onClick={(event) => onExportPlan?.(event.currentTarget)}
-        className={cx(FLOAT, 'focus-ring inline-flex h-12 cursor-pointer items-center gap-2 rounded-full px-5 text-[15px] font-semibold text-ink transition-colors duration-150 ease-out hover:bg-white')}
-      >
+      <button type="button" onClick={onExportImage} disabled={imageBusy} aria-busy={imageBusy || undefined} className={EXPORT_BUTTON}>
+        <ImageDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
+        {imageBusy ? 'Generando imagen…' : 'Exportar imagen 3D'}
+      </button>
+      <button type="button" onClick={(event) => onExportPlan?.(event.currentTarget)} className={EXPORT_BUTTON}>
         <FileDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
         Exportar plano
       </button>
-      <SoonButton icon={Share2} label="Compartir" />
-      <SoonButton icon={Sparkles} label="Renderizar" tone="primary" />
     </div>
   )
 }

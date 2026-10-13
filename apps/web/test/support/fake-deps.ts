@@ -130,6 +130,7 @@ export function createFakeDeps() {
     clearNodePatch: vi.fn(),
     measureLevels: vi.fn(async (): Promise<LevelMeasure[]> => []),
     buildPlan: vi.fn(async (_args: PlanBuildArgs): Promise<PlanResult> => ({ blob: new Blob(['%PDF-1.4']), pages: 1, skippedImages: 0 })),
+    captureView: vi.fn(async () => new Blob(['img'], { type: 'image/webp' })),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */

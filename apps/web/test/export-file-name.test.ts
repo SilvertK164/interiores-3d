@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { exportFileName } from '../src/lib/export/file-name'
+import { exportFileName, imageFileName } from '../src/lib/export/file-name'
 
 const SAFE = /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*-planos\.pdf$/
 
@@ -51,5 +51,12 @@ describe('exportFileName (criterio 3)', () => {
       expect(name, JSON.stringify(input)).toMatch(SAFE)
       expect(name.length).toBeLessThanOrEqual(80)
     }
+  })
+})
+
+describe('imageFileName', () => {
+  it('termina en -isometrico.png y limpia el nombre como el del PDF', () => {
+    expect(imageFileName('Casa Ñandú / 2º piso')).toBe('Casa-Nandu-2-piso-isometrico.png')
+    expect(imageFileName('***')).toBe('proyecto-isometrico.png')
   })
 })

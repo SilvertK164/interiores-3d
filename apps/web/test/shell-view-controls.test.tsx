@@ -1,7 +1,7 @@
 import { Footprints, RotateCcw } from 'lucide-react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { ShareRender, ViewBar, ViewPanel } from '../src/editor/shell/ui/ViewControls'
+import { ExportButtons, ViewBar, ViewPanel } from '../src/editor/shell/ui/ViewControls'
 
 const textOf = (markup: string) => markup.replace(/<[^>]+>/g, '')
 const noop = () => {}
@@ -29,20 +29,16 @@ describe('controles de Vista 3D', () => {
     expect(markup).toContain('h-16 w-[100px]')
   })
 
-  it('Compartir y Renderizar se ven deshabilitados con "Pronto"', () => {
-    const markup = renderToStaticMarkup(<ShareRender />)
-    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(2)
-    expect(textOf(markup)).toContain('Compartir')
-    expect(textOf(markup)).toContain('Renderizar')
-    expect(markup.match(/Pronto/g)).toHaveLength(2)
+  it('ofrece Exportar imagen 3D y Exportar plano, ambos activos y sin Compartir, Renderizar ni "Pronto"', () => {
+    const markup = renderToStaticMarkup(<ExportButtons onExportPlan={noop} onExportImage={noop} />)
+    expect(textOf(markup)).toBe('Exportar imagen 3DExportar plano')
+    expect(markup).not.toMatch(/<button[^>]*disabled=""/)
+    expect(markup).not.toContain('Pronto')
   })
 
-  it('Exportar plano está activo junto a Compartir y Renderizar', () => {
-    const markup = renderToStaticMarkup(<ShareRender onExportPlan={noop} />)
-    expect(textOf(markup)).toContain('Exportar plano')
-    const exportButton = markup.match(/<button[^>]*>(?:(?!<\/button>)[\s\S])*Exportar plano<\/button>/g) ?? []
-    expect(exportButton).toHaveLength(1)
-    expect(exportButton[0]).not.toContain('disabled')
-    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(2)
+  it('mientras genera la imagen, su botón queda deshabilitado y lo dice', () => {
+    const markup = renderToStaticMarkup(<ExportButtons imageBusy />)
+    expect(textOf(markup)).toContain('Generando imagen…')
+    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(1)
   })
 })

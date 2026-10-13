@@ -20,16 +20,15 @@ function render(node: React.ReactNode) {
 describe('ShellView', () => {
   const all = { cameraControl: true, styleControl: true, walkthrough: true }
 
-  it('muestra el panel Vista 3D, la barra de cámara y Compartir y Renderizar deshabilitados con "Pronto"', () => {
+  it('muestra el panel Vista 3D, la barra de cámara y los botones de exportar', () => {
     const markup = render(<ShellView decisions={all} />)
     const text = textOf(markup)
     expect(markup).toContain('aria-label="Vista 3D"')
     expect(markup).toContain('role="toolbar"')
-    for (const word of ['Muros', 'Niveles', 'Cámara', 'Estilo', 'Girar izq.', 'Girar der.', 'Vista superior', 'Recorrer', 'Compartir', 'Renderizar']) {
+    for (const word of ['Muros', 'Niveles', 'Cámara', 'Estilo', 'Girar izq.', 'Girar der.', 'Vista superior', 'Recorrer', 'Exportar imagen 3D', 'Exportar plano']) {
       expect(text, word).toContain(word)
     }
-    expect(markup.match(/Pronto/g)).toHaveLength(2)
-    expect(markup.match(/<button[^>]*disabled=""/g)).toHaveLength(2)
+    expect(markup).not.toContain('Pronto')
   })
 
   it('marca lo que Pascal tiene: muros cortados, un solo nivel y estilo realista', () => {
