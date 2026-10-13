@@ -142,7 +142,7 @@ describe('AuthBanner', () => {
 })
 
 describe('LoginForm', () => {
-  const base = { email: '', onEmail: noop, locked: false, error: null, notice: null, onSubmit: noop, onAction: noop }
+  const base = { email: '', onEmail: noop, locked: false, error: null, notice: null, onSubmit: noop, onAction: noop, onForgot: noop }
   const login = (props: Record<string, unknown> = {}) => html(createElement(LoginForm, { ...base, ...props }))
 
   it('tiene el título, el correo y la contraseña con su autocompletado, y el botón Ingresar', () => {
@@ -190,10 +190,6 @@ describe('LoginForm', () => {
     const alert = tagsOf(out, 'div').find((tag) => attr(tag, 'role') === 'alert') ?? ''
     expect(attr(alert, 'id')).toBeTruthy()
     expect(attr(password, 'aria-describedby')).toContain(attr(alert, 'id') ?? 'x')
-  })
-
-  it('no ofrece recuperar la contraseña (queda fuera hasta tener correo propio)', () => {
-    expect(textOf(login())).not.toMatch(/olvidaste/i)
   })
 })
 

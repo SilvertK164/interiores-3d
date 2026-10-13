@@ -1,6 +1,6 @@
 import { AuthApiError, AuthRetryableFetchError, AuthUnknownError, AuthWeakPasswordError } from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
-import { CONFIRM_EMAIL_NOTICE, SESSION_EXPIRED_NOTICE, describeAuthError } from '../src/lib/auth-errors'
+import { CONFIRM_EMAIL_NOTICE, RESET_SENT_NOTICE, SESSION_EXPIRED_NOTICE, describeAuthError } from '../src/lib/auth-errors'
 
 const api = (message: string, status: number, code?: string) => new AuthApiError(message, status, code)
 
@@ -137,5 +137,69 @@ describe('avisos que no son errores', () => {
       tone: 'info',
       message: 'Tu sesión venció. Vuelve a ingresar y seguimos donde lo dejaste.',
     })
+  })
+})
+
+describe('describeAuthError: pedir el enlace para recuperar la contraseña', () => {
+  it('el aviso de éxito es siempre el mismo y no dice si el correo existe', () => {
+    expect(RESET_SENT_NOTICE).toEqual({
+      tone: 'info',
+      message: 'Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva. Revisa también el correo no deseado.',
+    })
+  })
+
+  it('límite de envíos (429 o over_email_send_rate_limit): mensaje amable que pide esperar', () => {
+    for (const err of [api('x', 429, 'over_email_send_rate_limit'), api('x', 429, 'over_request_rate_limit'), api('x', 429)]) {
+      const out = describeAuthError(err, 'reset')
+      expect(out.tone).toBe('error')
+      expect(out.message).toBe('Pediste varios enlaces seguidos. Espera unos minutos antes de pedir otro.')
+    }
+  })
+
+  it('sin conexión: el mensaje de red de siempre', () => {
+    expect(describeAuthError(new AuthRetryableFetchError('Failed to fetch', 0), 'reset').message).toBe(NETWORK)
+  })
+
+  it('un correo que el servidor dice que no existe se trata como enviado: nunca se revela', () => {
+    for (const code of ['user_not_found', 'email_not_found']) {
+      expect(describeAuthError(api('x', 400, code), 'reset')).toEqual(RESET_SENT_NOTICE)
+    }
+  })
+
+  it('correo inválido apunta al campo; lo desconocido no lanza y no menciona cuentas', () => {
+    expect(describeAuthError(api('x', 400, 'email_address_invalid'), 'reset')).toMatchObject({ tone: 'error', field: 'email' })
+    for (const odd of [null, undefined, {}, new Error('boom'), api('x', 400, 'otra_cosa')]) {
+      const out = describeAuthError(odd, 'reset')
+      expect(out.message).toBe('No pudimos enviar el enlace. Inténtalo de nuevo en unos segundos.')
+      expect(out.message).not.toMatch(/existe|registrad|no hay una cuenta/i)
+    }
+  })
+})
+
+describe('describeAuthError: guardar la contraseña nueva', () => {
+  it('contraseña débil o igual a la actual: el foco va a la contraseña', () => {
+    expect(describeAuthError(api('x', 422, 'same_password'), 'new-password')).toMatchObject({
+      tone: 'error',
+      field: 'password',
+      message: 'Esa es tu contraseña actual. Elige una distinta.',
+    })
+    const weak = new AuthWeakPasswordError('weak', 422, ['pwned'])
+    expect(describeAuthError(weak, 'new-password')).toMatchObject({ field: 'password', message: 'Esa contraseña aparece en filtraciones de datos. Elige otra.' })
+  })
+
+  it('el enlace venció o ya se usó (sin sesión o 401/403): lo dice y ofrece volver a ingresar', () => {
+    for (const err of [api('x', 403, 'session_not_found'), api('x', 401, 'bad_jwt'), api('x', 401), api('x', 403, 'session_expired')]) {
+      const out = describeAuthError(err, 'new-password')
+      expect(out.message).toBe('El enlace venció o ya se usó. Pide uno nuevo desde «¿Olvidaste tu contraseña?» al ingresar.')
+      expect(out.action).toEqual({ kind: 'go-login', label: 'Volver a ingresar' })
+    }
+  })
+
+  it('red caída, límite de pedidos y lo desconocido', () => {
+    expect(describeAuthError(new AuthRetryableFetchError('Failed to fetch', 0), 'new-password').message).toBe(NETWORK)
+    expect(describeAuthError(api('x', 429), 'new-password').message).toBe('Hiciste muchos intentos seguidos. Espera unos minutos e inténtalo de nuevo.')
+    for (const odd of [null, {}, new Error('boom'), api('x', 400, 'otra_cosa')]) {
+      expect(describeAuthError(odd, 'new-password').message).toBe('No pudimos guardar tu contraseña nueva. Inténtalo de nuevo en unos segundos.')
+    }
   })
 })

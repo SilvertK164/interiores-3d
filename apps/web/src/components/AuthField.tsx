@@ -71,7 +71,7 @@ export function AuthField({ id, label, value, onChange, onBlur, type = 'text', a
           <button
             aria-label="Mostrar contraseña"
             aria-pressed={shown}
-            className="focus-ring absolute right-2 top-1/2 grid size-9 -translate-y-1/2 cursor-pointer place-items-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink/5 hover:text-ink"
+            className="focus-ring absolute right-1 top-1/2 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink/5 hover:text-ink"
             onClick={() => setShown((current) => !current)}
             onMouseDown={(e) => e.preventDefault()}
             type="button"
