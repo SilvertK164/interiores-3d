@@ -4,7 +4,7 @@ import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
 import { counts, ready, templateCounts } from './support/editor'
 import { hook } from './support/hooks'
 import { PROJECT_URL } from './support/projects'
-import { ANALYZE_URL, answerWith, failWith, sentBy, tinyPng } from './support/analysis'
+import { ANALYZE_URL, analyzePhoto, answerWith, failWith, sentBy } from './support/analysis'
 
 // Las piezas del ejemplo con confianza suficiente: la planta (20 %) se descarta con aviso.
 const EXAMPLE_PIECES = SAMPLE_ANALYSIS.furniture.filter((piece) => piece.confidence >= MIN_CONFIDENCE).length
@@ -21,13 +21,6 @@ async function expectExampleScene(page: Page) {
     expect(Math.abs(position[2])).toBeLessThanOrEqual(1.5 - 0.2 + 0.01)
     expect(position[1]).toBe(0)
   }
-}
-
-async function analyzePhoto(page: Page, width = '') {
-  await page.goto('/escena-desde-foto')
-  await page.getByLabel('Foto del ambiente').setInputFiles({ name: 'sala.png', mimeType: 'image/png', buffer: tinyPng() })
-  if (width) await page.getByLabel('Ancho conocido').fill(width)
-  await page.getByRole('button', { name: 'Analizar foto' }).click()
 }
 
 test.describe('escena desde una foto', () => {

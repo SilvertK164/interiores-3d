@@ -1,5 +1,5 @@
 import { crc32, deflateSync } from 'node:zlib'
-import type { Request, Route } from '@playwright/test'
+import type { Page, Request, Route } from '@playwright/test'
 
 // La API llama a Gemini desde el servidor. Las pruebas simulan la respuesta de POST /v1/analyze-room con page.route: no necesitan
 // clave de Gemini, ni cuota, ni gastar los 10 análisis por hora de la cuenta de prueba. El pedido lleva JSON y Authorization, así
@@ -55,6 +55,14 @@ export function gradientPng(width: number, height: number): Buffer {
 
 /** PNG de 2 × 2 píxeles: lo mínimo para tener una foto válida. */
 export const tinyPng = (): Buffer => solidPng(2, 2)
+
+/** Abre «Escena desde una foto», elige una foto mínima (con el ancho conocido, si se da) y pulsa «Analizar foto»: lo que responda lo decide el e2e con `page.route`. */
+export async function analyzePhoto(page: Page, width = '') {
+  await page.goto('/escena-desde-foto')
+  await page.getByLabel('Foto del ambiente').setInputFiles({ name: 'sala.png', mimeType: 'image/png', buffer: tinyPng() })
+  if (width) await page.getByLabel('Ancho conocido').fill(width)
+  await page.getByRole('button', { name: 'Analizar foto' }).click()
+}
 
 export const answerWith = (analysis: unknown) => (route: Route) =>
   route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: JSON.stringify(analysis) })
