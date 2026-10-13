@@ -20,7 +20,7 @@ import {
   WindowNode,
   ZoneNode,
 } from '@pascal-app/core'
-import { DEFAULT_LEVEL_HEIGHT, DEFAULT_STAIR_RUN, DOOR_HEIGHT, WINDOW_HEIGHT, WINDOW_SILL, cabinetWidth } from '../../lib/templates/geometry'
+import { DEFAULT_LEVEL_HEIGHT, DEFAULT_STAIR_RUN, DOOR_HEIGHT, WINDOW_HEIGHT, WINDOW_SILL, cabinetWidth, sceneCenter } from '../../lib/templates/geometry'
 import type { LevelDef, OpeningDef, Pt, TemplateDefinition } from '../../lib/templates/types'
 import { validateDefinition } from '../../lib/templates/validate'
 
@@ -95,11 +95,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
 
   // Las definiciones usan coordenadas positivas desde la esquina (0, 0); la escena se centra en el origen,
   // que es desde donde el editor encuadra la cámara. Las aberturas se miden sobre su muro y no se mueven.
-  const wallPoints = (def.levels[0] as LevelDef).walls.flatMap((w) => [w.from, w.to])
-  const xs = wallPoints.map((p) => p[0])
-  const zs = wallPoints.map((p) => p[1])
-  const centerX = (Math.min(...xs) + Math.max(...xs)) / 2
-  const centerZ = (Math.min(...zs) + Math.max(...zs)) / 2
+  const [centerX, centerZ] = sceneCenter(def.levels[0] as LevelDef)
   const at = (p: Pt): Pt => [round3(p[0] - centerX), round3(p[1] - centerZ)]
 
   const tag = clean(def.id)

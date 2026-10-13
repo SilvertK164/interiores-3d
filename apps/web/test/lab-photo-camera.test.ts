@@ -1,21 +1,25 @@
 import { describe, expect, it } from 'vitest'
+import { buildLabEnvelope } from '../src/editor/lab-scene'
 import { MIN_ROOM_WIDTH_M, analysisToDefinition, photoRoom } from '../src/lib/lab/analysis-to-definition'
 import {
   EYE_HEIGHT_M,
+  FLOOR_TOP_M,
   MAX_VIEW_REACH_M,
   NEAR_WALL_GAP_M,
   TARGET_HEIGHT_M,
   type CameraPose,
   type Vec3,
   photoCameraPose,
+  sceneCameraPose,
 } from '../src/lib/lab/photo-camera'
 import type { DetectedFurniture, RoomAnalysis } from '../src/lib/lab/schema'
+import { sceneCenter } from '../src/lib/templates/geometry'
 import type { LevelDef } from '../src/lib/templates/types'
 
 // El punto de vista de la foto: la cámara del editor abre en el muro cercano (el de y = 1 del análisis), a la altura de los ojos y
-// mirando hacia el muro opuesto. Lo que se prueba es la regla y que Pascal pueda cumplirla: sus controles (`custom-camera-controls.tsx`)
-// no dejan acercar la cámara a menos de 2 m de su punto de mira ni bajarla de ~5,7° sobre el horizonte; una pose que no cumpla eso se
-// corrige sola y deja de ser la de la foto.
+// mirando hacia el muro opuesto. Lo que se prueba es la regla y que la pose quede donde los controles de Pascal
+// (`custom-camera-controls.tsx`) dejan estar: a 2 m o más de su punto de mira y sin bajar de ~5,7° sobre el horizonte. `setLookAt`
+// acepta cualquier pose, pero el primer gesto de la persona (rueda o arrastre) llevaría de golpe una pose fuera de esos límites hasta ellos.
 const PASCAL_MIN_DISTANCE_M = 2
 const PASCAL_MAX_POLAR_RAD = Math.PI / 2 - 0.1
 
@@ -97,7 +101,7 @@ describe('photoCameraPose: la cámara en coordenadas del ambiente', () => {
     expect(photoCameraPose({ width: 8, depth: 6 }).target).toEqual([4, 1, 3])
   })
 
-  it('en uno chico el objetivo pasa el centro: a menos de 2 m de distancia Pascal movería la cámara', () => {
+  it('en uno chico el objetivo pasa el centro: a menos de 2 m, el primer zoom mandaría la cámara de golpe hacia atrás', () => {
     const pose = photoCameraPose({ width: 4, depth: 3 })
     expect(pose.target[2]).toBeLessThan(1.5)
     expect(view(pose).distance).toBeGreaterThanOrEqual(PASCAL_MIN_DISTANCE_M)
@@ -138,7 +142,7 @@ describe('photoCameraPose: la cámara en coordenadas del ambiente', () => {
     expect(side(0.15)).toBeLessThan(0)
   })
 
-  it('barrido de anchos: siempre adentro del ambiente, centrada, y con una pose que Pascal no corrige', () => {
+  it('barrido de anchos: siempre adentro del ambiente, centrada, y dentro de los límites de los controles de Pascal', () => {
     for (let width = MIN_ROOM_WIDTH_M; width <= 30; width += 0.25) {
       const room = photoRoom(width)
       const pose = photoCameraPose(room)
@@ -157,6 +161,74 @@ describe('photoCameraPose: la cámara en coordenadas del ambiente', () => {
   it('redondea al milímetro y no deja un -0', () => {
     for (const width of [3.333, 5.123, 7.777]) {
       for (const n of [...photoCameraPose(photoRoom(width)).position, ...photoCameraPose(photoRoom(width)).target]) {
+        expect(Math.round(n * 1000) / 1000).toBe(n)
+        expect(Object.is(n, -0)).toBe(false)
+      }
+    }
+  })
+})
+
+describe('sceneCenter: dónde queda el centro de una planta en la escena', () => {
+  it('es el centro de la caja que envuelve a sus muros (las definiciones usan coordenadas desde la esquina)', () => {
+    const level = { walls: [{ id: 'a', from: [1, 1], to: [5, 1] }, { id: 'b', from: [5, 1], to: [5, 4] }] } as unknown as LevelDef
+    expect(sceneCenter(level)).toEqual([3, 2.5])
+  })
+})
+
+type SceneNode = { type: string; name?: string; start?: [number, number]; end?: [number, number]; elevation?: number }
+
+describe('sceneCameraPose: la cámara en las coordenadas de la escena de Pascal', () => {
+  const sceneOf = (width: number) => {
+    const definition = analysisToDefinition(empty(), () => undefined, { knownWidthM: width })
+    const nodes = Object.values(buildLabEnvelope(definition, new Map()).graph.nodes) as SceneNode[]
+    const room = photoRoom(width)
+    return { definition, room, pose: sceneCameraPose(photoCameraPose(room), definition), walls: nodes.filter((n) => n.type === 'wall'), slab: nodes.find((n) => n.type === 'slab') }
+  }
+
+  it.each([4, 6, 5.3, 8])('la escena queda centrada en el origen y la cámara adentro, ante el muro cercano (ancho %s)', (width) => {
+    const { room, pose, walls } = sceneOf(width)
+    const points = walls.flatMap((wall) => [wall.start, wall.end]).filter((p): p is [number, number] => p !== undefined)
+    expect(Math.max(...points.map((p) => p[0]))).toBeCloseTo(room.width / 2, 2)
+    expect(Math.min(...points.map((p) => p[0]))).toBeCloseTo(-room.width / 2, 2)
+    expect(Math.max(...points.map((p) => p[1]))).toBeCloseTo(room.depth / 2, 2)
+    expect(Math.min(...points.map((p) => p[1]))).toBeCloseTo(-room.depth / 2, 2)
+    // La escena redondea al milímetro (de ahí la tolerancia). El muro cercano (el sur, z = +fondo/2): la cámara está a 0,2 m de su cara
+    // interior (el muro mide 0,2 m) y centrada.
+    const near = walls.find((wall) => wall.name === 'Muro sur')
+    expect(near?.start?.[1]).toBeCloseTo(room.depth / 2, 2)
+    expect(pose.position[2]).toBeCloseTo((near?.start?.[1] ?? 0) - 0.1 - 0.2, 2)
+    expect(pose.position[0]).toBe(0)
+    expect(pose.target[0]).toBe(0)
+    expect(pose.target[2]).toBeLessThan(pose.position[2])
+  })
+
+  it('las alturas se miden sobre el piso: la losa del ambiente está a 0,05 m del plano de la planta', () => {
+    const { pose, slab } = sceneOf(4)
+    expect(slab?.elevation).toBe(FLOOR_TOP_M)
+    expect(pose.position[1] - FLOOR_TOP_M).toBeCloseTo(EYE_HEIGHT_M, 6)
+    expect(pose.target[1] - FLOOR_TOP_M).toBeCloseTo(TARGET_HEIGHT_M, 6)
+  })
+
+  it('con 4 m de ancho: la cámara en (0; 1,55; 1,2) y mirando hacia (0; 1,05; -0,84)', () => {
+    const { pose } = sceneOf(4)
+    expect(pose.position).toEqual([0, 1.55, 1.2])
+    expect(pose.target[0]).toBe(0)
+    expect(pose.target[1]).toBe(1.05)
+    expect(pose.target[2]).toBeCloseTo(-0.84, 2)
+  })
+
+  it('traslada la pose entera sin cambiar la distancia ni el sentido en que mira', () => {
+    const { definition, room } = sceneOf(5)
+    const local = photoCameraPose(room)
+    const world = sceneCameraPose(local, definition)
+    const diff = (a: CameraPose, b: CameraPose) => sub(a.target, a.position).map((n, i) => n - (sub(b.target, b.position)[i] ?? 0))
+    for (const n of diff(local, world)) expect(Math.abs(n)).toBeLessThan(1e-9)
+  })
+
+  it('redondea al milímetro y no deja un -0', () => {
+    for (const width of [3.333, 5.123, 7.777]) {
+      const { pose } = sceneOf(width)
+      for (const n of [...pose.position, ...pose.target]) {
         expect(Math.round(n * 1000) / 1000).toBe(n)
         expect(Object.is(n, -0)).toBe(false)
       }
