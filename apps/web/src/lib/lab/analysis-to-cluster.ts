@@ -24,6 +24,15 @@ export type AnalysisToClusterOptions = {
   warn?: (message: string) => void
 }
 
+/**
+ * Las medidas del ambiente de la foto en metros: `knownWidthM` si es un número mayor que 0 y, si no, `DEFAULT_ROOM_WIDTH_M`, con el
+ * fondo en `ROOM_DEPTH_RATIO` de ese ancho. Es el único lugar donde se decide: lo usan este conversor y `photoToDefinition`.
+ */
+export function roomSize(knownWidthM?: number | null): { width: number; depth: number } {
+  const width = Number.isFinite(knownWidthM) && (knownWidthM as number) > 0 ? (knownWidthM as number) : DEFAULT_ROOM_WIDTH_M
+  return { width, depth: width * ROOM_DEPTH_RATIO }
+}
+
 /** Al milímetro, y nunca `-0`: un `-0` suelto no es igual a `0` para `toEqual` ni para quien compare con `Object.is`. */
 const round3 = (n: number) => Math.round(n * 1000) / 1000 + 0
 
@@ -52,8 +61,7 @@ export function analysisToCluster<T extends ClusterAssetLike>(
   resolve: (assetId: string) => T | undefined,
   opts: AnalysisToClusterOptions = {},
 ): ClusterPiece<T>[] {
-  const roomWidth = Number.isFinite(opts.knownWidthM) && (opts.knownWidthM as number) > 0 ? (opts.knownWidthM as number) : DEFAULT_ROOM_WIDTH_M
-  const roomDepth = roomWidth * ROOM_DEPTH_RATIO
+  const { width: roomWidth, depth: roomDepth } = roomSize(opts.knownWidthM)
   const pieces: ClusterPiece<T>[] = []
   for (const detected of analysis.furniture) {
     const asset = resolve(detected.asset_id)

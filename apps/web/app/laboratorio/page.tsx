@@ -10,7 +10,7 @@ import type { AnalysisCandidate } from '@/lib/lab/analysis-catalog'
 import { analysisToDefinition } from '@/lib/lab/analysis-to-definition'
 import { describeLabError } from '@/lib/lab/describe-error'
 import { labProjectName, parseKnownWidth } from '@/lib/lab/form-helpers'
-import { LabError, LabNotImplementedError } from '@/lib/lab/lab-error'
+import { LabError } from '@/lib/lab/lab-error'
 import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
 import { savedName } from '@/lib/person-name'
@@ -32,7 +32,7 @@ const FRAME = 'mx-auto flex min-h-dvh max-w-[1100px] flex-col gap-5 px-[clamp(20
 /** El aviso para la pantalla; del error inesperado, el detalle técnico queda en la consola del navegador. */
 function noticeFor(error: unknown, place: NoticePlace): Notice {
   if (!(error instanceof LabError)) console.error('[laboratorio]', error)
-  return { kind: error instanceof LabNotImplementedError ? 'info' : 'error', text: describeLabError(error), place }
+  return { text: describeLabError(error), place }
 }
 
 /** «Escena desde una foto»: del análisis de una foto al proyecto en el editor. Es la página del Laboratorio de Victoria. */
@@ -84,7 +84,7 @@ export default function LaboratorioPage() {
   async function analyze(event: FormEvent) {
     event.preventDefault()
     if (lock.current) return
-    if (!file) return setNotice({ kind: 'error', text: 'Elige primero la foto del ambiente.', place: 'form' })
+    if (!file) return setNotice({ text: 'Elige primero la foto del ambiente.', place: 'form' })
     start('analizando')
     try {
       const knownWidthM = parseKnownWidth(widthText)
@@ -99,12 +99,12 @@ export default function LaboratorioPage() {
   }
 
   /** Arma la definición (con `build`), la guarda como proyecto nuevo y abre el editor. Pascal se carga recién aquí. */
-  async function openInEditor(build: (warn: (message: string) => void) => TemplateDefinition, place: NoticePlace, label?: string) {
+  async function openInEditor(build: (warn: (message: string) => void) => TemplateDefinition | Promise<TemplateDefinition>, place: NoticePlace, label?: string) {
     if (!start('abriendo')) return
     const warnings: string[] = []
     let going = false
     try {
-      const definition = build((message) => warnings.push(message))
+      const definition = await build((message) => warnings.push(message))
       const { openDefinitionAsProject } = await import('@/editor/lab-scene')
       const result = await openDefinitionAsProject(definition, {
         api,
@@ -114,7 +114,7 @@ export default function LaboratorioPage() {
       if (result.saved) going = true // el candado sigue puesto: la página se reemplaza por el editor
       else {
         setPending(result)
-        setNotice({ kind: 'error', text: SAVE_FAILED, place })
+        setNotice({ text: SAVE_FAILED, place })
       }
     } catch (error) {
       setNotice(noticeFor(error, place))
@@ -124,8 +124,12 @@ export default function LaboratorioPage() {
     }
   }
 
-  const modelAnalysis = (current: RoomAnalysis) => (warn: (message: string) => void) =>
-    analysisToDefinition(current, { knownWidthM: parseKnownWidth(widthText), warn })
+  /** El ambiente de la foto: las piezas se resuelven contra el catálogo local, que se carga recién aquí (Pascal no se importa antes). */
+  const modelAnalysis = (current: RoomAnalysis) => async (warn: (message: string) => void) => {
+    const { analysisCatalog } = await import('@/editor/lab-scene')
+    const { pieces } = await analysisCatalog()
+    return analysisToDefinition(current, (id) => pieces.get(id), { knownWidthM: parseKnownWidth(widthText), warn })
+  }
 
   async function tryExample() {
     if (!start('analizando')) return

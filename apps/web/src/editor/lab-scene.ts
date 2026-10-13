@@ -16,8 +16,7 @@ import { type AssetLike, buildScene } from './templates/scene-builder'
 
 /**
  * Convierte cualquier definición válida en el sobre de escena que guarda la API (mismas versiones que las plantillas).
- * Si la definición tiene un problema, lo explica en castellano con la lista del validador: es el camino por el que el
- * laboratorio le cuenta a quien explora qué todavía no encaja con Pascal.
+ * Si la definición tiene un problema, lo explica en castellano con la lista del validador, en un `LabError` que la página muestra tal cual.
  */
 export function buildLabEnvelope(definition: TemplateDefinition, assets: ReadonlyMap<string, AssetLike>): SceneEnvelope {
   let graph: ReturnType<typeof buildScene>
@@ -25,7 +24,7 @@ export function buildLabEnvelope(definition: TemplateDefinition, assets: Readonl
     graph = buildScene(definition, assets)
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)
-    throw new LabError(`Pascal todavía no puede dibujar la definición que armó analysisToDefinition.\n${detail}`, 'definicion_invalida')
+    throw new LabError(`No pudimos dibujar el ambiente de tu foto.\n${detail}`, 'definicion_invalida')
   }
   const envelope = SceneEnvelopeSchema.parse({ schemaVersion: SCHEMA_VERSION, pascal: { core: PASCAL_CORE_VERSION }, graph })
   if (new TextEncoder().encode(JSON.stringify(envelope)).length > SCENE_MAX_BYTES) {
@@ -51,7 +50,7 @@ let analysis: Promise<AnalysisCatalog<AssetLike>> | undefined
 
 /**
  * Lo que se le ofrece al análisis al analizar una foto y con lo que se resuelve su respuesta: las piezas reconocibles del catálogo
- * local (`buildAnalysisCatalog`). Es la misma lista que usa «Muebles desde una foto» en el editor; la página del laboratorio
+ * local (`buildAnalysisCatalog`). Es la misma lista que usa «Muebles desde una foto» en el editor; la página «Escena desde una foto»
  * la pide acá para no importar Pascal.
  */
 export function analysisCatalog(): Promise<AnalysisCatalog<AssetLike>> {

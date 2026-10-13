@@ -27,7 +27,7 @@ const asset = (id: string): AssetLike => ({
 const ASSETS = new Map([...availableAssetIds()].map((id) => [id, asset(id)] as const))
 
 const ID = '0b0e8d9c-6a40-4d6e-9a3c-1f2f6a0f1b11'
-const created = { id: ID, name: 'Laboratorio · prueba', kind: 'vivienda' as const, templateId: null, version: 1 as const }
+const created = { id: ID, name: 'Desde una foto · prueba', kind: 'vivienda' as const, templateId: null, version: 1 as const }
 type FakeApi = Pick<ApiClient, 'createProject' | 'saveScene'> & { createProject: Mock; saveScene: Mock }
 const fakeApi = (saveScene: Mock = vi.fn(async () => ({ version: 2 }))): FakeApi =>
   ({ createProject: vi.fn(async () => created), saveScene }) as unknown as FakeApi
@@ -58,7 +58,7 @@ describe('buildLabEnvelope', () => {
     expect(nodeCounts(envelope.graph.nodes)).toEqual(nodeCounts(committed.graph.nodes))
   })
 
-  it('si la definición no es válida explica cada problema en castellano y señala dónde mirar', () => {
+  it('si la definición no es válida explica cada problema en castellano, sin nombrar funciones del código', () => {
     const error = (() => {
       try {
         buildLabEnvelope(withUnknownPiece(), ASSETS)
@@ -69,7 +69,8 @@ describe('buildLabEnvelope', () => {
     expect(error).toBeInstanceOf(LabError)
     expect((error as LabError).code).toBe('definicion_invalida')
     expect((error as LabError).message).toMatch(/pieza-que-no-existe/)
-    expect((error as LabError).message).toMatch(/analysisToDefinition/)
+    expect((error as LabError).message).toMatch(/No pudimos dibujar el ambiente/)
+    expect((error as LabError).message).not.toMatch(/analysisToDefinition/)
   })
 })
 
@@ -105,8 +106,8 @@ describe('openDefinitionAsProject', () => {
   it('crea el proyecto, guarda la escena con la versión 1 y abre el editor', async () => {
     const api = fakeApi()
     const navigate = vi.fn()
-    const result = await openDefinitionAsProject(loft, { api, name: 'Laboratorio · prueba', navigate, assets: ASSETS })
-    expect(api.createProject).toHaveBeenCalledWith({ name: 'Laboratorio · prueba', kind: 'vivienda' })
+    const result = await openDefinitionAsProject(loft, { api, name: 'Desde una foto · prueba', navigate, assets: ASSETS })
+    expect(api.createProject).toHaveBeenCalledWith({ name: 'Desde una foto · prueba', kind: 'vivienda' })
     expect(api.saveScene).toHaveBeenCalledWith(ID, result.envelope, 1)
     expect(SceneEnvelopeSchema.safeParse(result.envelope).success).toBe(true)
     expect(navigate).toHaveBeenCalledWith(`/proyectos/${ID}`)

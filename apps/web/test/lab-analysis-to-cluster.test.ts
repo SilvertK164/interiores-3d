@@ -4,6 +4,7 @@ import {
   MIN_CONFIDENCE,
   ROOM_DEPTH_RATIO,
   analysisToCluster,
+  roomSize,
 } from '../src/lib/lab/analysis-to-cluster'
 import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
 import type { DetectedFurniture, RoomAnalysis } from '../src/lib/lab/schema'
@@ -211,5 +212,19 @@ describe('analysisToCluster: varias piezas', () => {
     expect(pieces).toHaveLength(SAMPLE_ANALYSIS.furniture.length - 1)
     expect(pieces.map((p) => p.asset.id)).not.toContain('indoor-plant')
     expect(warnings).toHaveLength(1)
+  })
+})
+
+describe('roomSize: la medida del ambiente de la foto se decide en un solo lugar', () => {
+  it('sin ancho conocido, 4 m de ancho y el 75 % de fondo', () => {
+    expect(roomSize()).toEqual({ width: 4, depth: 3 })
+  })
+
+  it('con el ancho conocido, ese ancho y el 75 % de fondo', () => {
+    expect(roomSize(6)).toEqual({ width: 6, depth: 4.5 })
+  })
+
+  it.each([null, 0, -3, Number.NaN, Number.POSITIVE_INFINITY])('un ancho inválido (%s) cae a los 4 m', (knownWidthM) => {
+    expect(roomSize(knownWidthM)).toEqual({ width: 4, depth: 3 })
   })
 })
