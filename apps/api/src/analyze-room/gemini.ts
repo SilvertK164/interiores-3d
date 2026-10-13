@@ -4,7 +4,10 @@ import { ProviderError, type VisionProvider } from './types.js'
 
 export const DEFAULT_VISION_MODEL = 'gemini-3.5-flash'
 /** Si el modelo principal está saturado (503, 429, 500 o plazo vencido) se prueba el siguiente, mientras quede tiempo. */
-export const FALLBACK_VISION_MODELS = ['gemini-3.7-flash', 'gemini-3.6-flash'] as const
+export const FALLBACK_VISION_MODELS = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'] as const
+/** Pasadas por la lista de modelos y espera entre una y otra: Google a veces responde 503 a toda la familia durante unos segundos. */
+const MAX_PASSES = 2
+const PASS_DELAY_MS = 1_500
 const RETRYABLE = /^(timeout|network|http_(429|500|502|503|504))/
 /** Con menos tiempo que esto no se intenta otro modelo: la función de Vercel se corta a los 30 s. */
 const MIN_REMAINING_MS = 6_000
@@ -54,6 +57,8 @@ export type GeminiOptions = {
   model?: string
   timeoutMs?: number
   fetchImpl?: typeof fetch
+  /** Espera entre pasadas (las pruebas pasan 0). */
+  retryDelayMs?: number
 }
 
 const isTimeout = (error: unknown) => error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')
@@ -143,19 +148,27 @@ export function createGeminiProvider(options: GeminiOptions): VisionProvider {
   const first = options.model?.trim() || DEFAULT_VISION_MODEL
   const models = [first, ...FALLBACK_VISION_MODELS.filter((model) => model !== first)]
   const budget = options.timeoutMs ?? GEMINI_TIMEOUT_MS
+  const delay = options.retryDelayMs ?? PASS_DELAY_MS
   return async (request) => {
     const started = Date.now()
     let last: ProviderError = new ProviderError('unexpected')
-    for (const model of models) {
-      const remaining = budget - (Date.now() - started)
-      if (remaining < MIN_REMAINING_MS && model !== first) break
-      try {
-        return await createModelProvider(options, model, model === first ? budget : remaining)(request)
-      } catch (error) {
-        if (!(error instanceof ProviderError) || !RETRYABLE.test(error.reason)) throw error
-        last = error
+    for (let pass = 0; pass < MAX_PASSES; pass++) {
+      if (pass > 0) await new Promise((resolve) => setTimeout(resolve, delay))
+      for (const model of models) {
+        const remaining = budget - (Date.now() - started)
+        if (remaining < MIN_REMAINING_MS && !(pass === 0 && model === first)) return fail(last)
+        try {
+          return await createModelProvider(options, model, pass === 0 && model === first ? budget : remaining)(request)
+        } catch (error) {
+          if (!(error instanceof ProviderError) || !RETRYABLE.test(error.reason)) throw error
+          last = error
+        }
       }
     }
     throw last
   }
+}
+
+function fail(error: ProviderError): never {
+  throw error
 }
