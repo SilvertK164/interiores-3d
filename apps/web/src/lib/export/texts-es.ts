@@ -22,6 +22,8 @@ export const TEXT = {
   emptyLevel: '(vacía)',
   titleBlock: 'Incluir cajetín',
   titleBlockHint: 'Proyecto, escala, fecha y autor',
+  isometric: 'Incluir vistas isométricas',
+  isometricHint: 'Una hoja por planta, sin escala, con su cajetín',
   cancel: 'Cancelar',
   close: 'Cerrar',
   download: 'Descargar PDF',
@@ -44,6 +46,8 @@ export const TEXT = {
     project: 'Proyecto',
     level: 'Planta',
     scale: 'Escala',
+    noScale: 'Sin escala',
+    isometricSuffix: 'Isométrico',
     date: 'Fecha',
     author: 'Autor',
     north: 'N',
@@ -90,8 +94,8 @@ export function skippedImagesText(count: number): string {
 
 export const sheetOf = (n: number, total: number): string => `Hoja ${n} de ${total}`
 
-export function previewCaption(paper: PaperSize, orientation: Orientation, widthMm: number, heightMm: number, scale: Scale): string {
-  return `Vista previa · ${paperLabel(paper, orientation)} (${widthMm} × ${heightMm} mm) · ${scaleText(scale)}`
+export function previewCaption(paper: PaperSize, orientation: Orientation, widthMm: number, heightMm: number, scale: Scale | null): string {
+  return `Vista previa · ${paperLabel(paper, orientation)} (${widthMm} × ${heightMm} mm) · ${scale === null ? 'sin escala' : scaleText(scale)}`
 }
 
 /** Paginador de la vista previa: "Planta baja · 1 de 2". */

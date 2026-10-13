@@ -34,4 +34,17 @@ describe('createBuildPlan: lo que dibuja en cada hoja', () => {
     expect(loadFonts).not.toHaveBeenCalled()
     expect(first).toContain('Casa Alvear')
   })
+
+  it('con fotos isométricas suma una hoja por planta después de las plantas: sin escala, con su cajetín y "Hoja N de M"', async () => {
+    const { build } = setup()
+    const png = Uint8Array.from(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64')).buffer
+    const result = await build({ ...ARGS, isoImages: [{ levelId: 'level_a', bytes: png }, { levelId: 'level_b', bytes: png }] })
+    expect(result.pages).toBe(4)
+    const pages = await textOf(result.blob)
+    expect(pages).toHaveLength(4)
+    expect(pages[1]).toContain('Hoja 2 de 4')
+    for (const expected of ['Planta baja · Isométrico', 'Sin escala', 'Hoja 3 de 4', 'Casa Alvear']) expect(pages[2], expected).toContain(expected)
+    for (const expected of ['Planta 1 · Isométrico', 'Hoja 4 de 4']) expect(pages[3], expected).toContain(expected)
+    expect(pages[2]).not.toContain('1:50')
+  })
 })

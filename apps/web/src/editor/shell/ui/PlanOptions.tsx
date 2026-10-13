@@ -26,6 +26,8 @@ export type PlanOptionsProps = {
   onScale(value: Scale): void
   onMode(value: PlanMode): void
   onTitleBlock(value: boolean): void
+  isometric: boolean
+  onIsometric(value: boolean): void
   onToggleLevel(id: string): void
 }
 
@@ -37,9 +39,12 @@ const ROW =
 
 function Group({ legend, children }: { legend: string; children: ReactNode }) {
   return (
-    <fieldset className="m-0 min-w-0 border-0 p-0">
-      <legend className="mb-1.5 ml-1.5 text-[13px] text-ink-muted">{legend}</legend>
-      {children}
+    <fieldset className="m-0 grid min-w-0 grid-cols-[76px_minmax(0,1fr)] items-start gap-x-2 border-0 p-0">
+      <legend className="sr-only">{legend}</legend>
+      <span aria-hidden="true" className="pt-3 text-[13px] leading-none text-ink-muted">
+        {legend}
+      </span>
+      <div className="min-w-0">{children}</div>
     </fieldset>
   )
 }
@@ -91,7 +96,7 @@ export function PlanOptions(props: PlanOptionsProps) {
   const checkedCount = props.levels.filter((level) => level.checked).length
   const firstBlocked = props.scales.find((choice) => !choice.enabled && choice.reason)
   return (
-    <div className="flex min-w-0 flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-2.5">
       <Group legend={TEXT.paper}>
         <div className="flex flex-wrap gap-2">
           {(['A4', 'A3'] as const).map((paper) => (
@@ -143,9 +148,9 @@ export function PlanOptions(props: PlanOptionsProps) {
           })}
         </div>
         {firstBlocked?.reason ? (
-          <p className="ml-1.5 mt-1.5 text-[13px] text-sun-ink">{firstBlocked.reason}</p>
+          <p className="mt-1 text-[12px] leading-snug text-sun-ink">{firstBlocked.reason}</p>
         ) : (
-          <p className="ml-1.5 mt-1.5 text-[13px] text-ink-muted">{scaleEquivalence(props.scale)}</p>
+          <p className="mt-1 text-[12px] leading-snug text-ink-muted">{scaleEquivalence(props.scale)}</p>
         )}
       </Group>
 
@@ -154,17 +159,17 @@ export function PlanOptions(props: PlanOptionsProps) {
           <Choice checked={props.mode === 'paper'} disabled={busy} icon={<Printer aria-hidden="true" className="size-[18px]" strokeWidth={2} />} label={TEXT.modePaper} name={`${id}-mode`} onChange={() => props.onMode('paper')} value="paper" />
           <Choice checked={props.mode === 'color'} disabled={busy} icon={<Palette aria-hidden="true" className="size-[18px]" strokeWidth={2} />} label={TEXT.modeColor} name={`${id}-mode`} onChange={() => props.onMode('color')} value="color" />
         </div>
-        <p className="ml-1.5 mt-1.5 text-[13px] text-ink-muted">{props.mode === 'paper' ? TEXT.modePaperHint : TEXT.modeColorHint}</p>
+        <p className="mt-1 text-[12px] leading-snug text-ink-muted">{props.mode === 'paper' ? TEXT.modePaperHint : TEXT.modeColorHint}</p>
       </Group>
 
       <Group legend={TEXT.levels}>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {props.levels.map((level) => {
             const last = level.checked && checkedCount === 1
             const hint = level.empty ? TEXT.emptyLevelHint : last ? TEXT.levelsMin : null
             const hintId = `${id}-level-${level.id}`
             return (
-              <label className={ROW} key={level.id}>
+              <label className={cx(ROW, 'rounded-full px-3')} key={level.id}>
                 <input
                   aria-describedby={hint ? hintId : undefined}
                   checked={level.checked}
@@ -186,13 +191,16 @@ export function PlanOptions(props: PlanOptionsProps) {
         </div>
       </Group>
 
-      <label className={cx(ROW, 'justify-between rounded-[20px] py-3')}>
-        <span>
-          <span className="block font-medium">{TEXT.titleBlock}</span>
-          <span className="block text-[13px] text-ink-muted">{TEXT.titleBlockHint}</span>
-        </span>
-        <input aria-checked={props.titleBlock} checked={props.titleBlock} className="size-6 shrink-0 accent-brand" disabled={busy} onChange={(event) => props.onTitleBlock(event.target.checked)} role="switch" type="checkbox" />
-      </label>
+      <div className="grid grid-cols-2 gap-2">
+        <label className={cx(ROW, 'justify-between rounded-full')} title={TEXT.titleBlockHint}>
+          <span className="font-medium">{TEXT.titleBlock}</span>
+          <input aria-checked={props.titleBlock} checked={props.titleBlock} className="size-5 shrink-0 accent-brand" disabled={busy} onChange={(event) => props.onTitleBlock(event.target.checked)} role="switch" type="checkbox" />
+        </label>
+        <label className={cx(ROW, 'justify-between rounded-full')} title={TEXT.isometricHint}>
+          <span className="font-medium">{TEXT.isometric}</span>
+          <input aria-checked={props.isometric} checked={props.isometric} className="size-5 shrink-0 accent-brand" disabled={busy} onChange={(event) => props.onIsometric(event.target.checked)} role="switch" type="checkbox" />
+        </label>
+      </div>
     </div>
   )
 }

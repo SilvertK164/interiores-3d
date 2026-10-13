@@ -44,8 +44,8 @@ const quietly = (action: () => unknown) => {
   }
 }
 
-/** Dibuja la primera página de un PDF en un `<canvas>`. Devuelve cómo soltar los recursos. */
-export async function renderPdfPage(blob: Blob, canvas: HTMLCanvasElement, isCancelled: () => boolean): Promise<() => void> {
+/** Dibuja una página (por defecto la primera) de un PDF en un `<canvas>`. Devuelve cómo soltar los recursos. */
+export async function renderPdfPage(blob: Blob, canvas: HTMLCanvasElement, isCancelled: () => boolean, pageNumber = 1): Promise<() => void> {
   const pdfjs = await loadPdfJs()
   // `destroy` es del trabajo de carga (el documento ya no lo tiene en pdf.js 6): suelta el documento y su trabajador.
   const loading = pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) })
@@ -55,7 +55,7 @@ export async function renderPdfPage(blob: Blob, canvas: HTMLCanvasElement, isCan
     release()
     return () => {}
   }
-  const page = await doc.getPage(1)
+  const page = await doc.getPage(pageNumber)
   const base = page.getViewport({ scale: 1 })
   const viewport = page.getViewport({
     scale: canvasScale(canvas.clientWidth || canvas.parentElement?.clientWidth || 600, base.width, window.devicePixelRatio || 1),

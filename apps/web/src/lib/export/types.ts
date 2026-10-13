@@ -25,6 +25,8 @@ export type PlanOptions = {
   /** Ids de las plantas elegidas. */
   levelIds: readonly string[]
   titleBlock: boolean
+  /** Suma una hoja isométrica por planta al final del PDF. */
+  isometric?: boolean
   projectName: string
   /** Nombre de la cuenta (o el correo si no tiene nombre). */
   author: string
@@ -33,7 +35,13 @@ export type PlanOptions = {
 
 export type PlanProgress = { done: number; total: number }
 
+/** La foto isométrica de una planta (PNG), ya en el estilo del modo elegido. */
+export type IsoImage = { levelId: string; bytes: ArrayBuffer }
+
 export type PlanBuildArgs = PlanOptions & {
+  isoImages?: readonly IsoImage[]
+  /** Vista previa de una hoja isométrica: el PDF trae la planta y, como página 2, su hoja isométrica. */
+  isoPreview?: boolean
   onProgress?: (progress: PlanProgress) => void
   signal?: AbortSignal
   /** Para la vista previa de una sola planta: "Hoja `start + 1` de `total`" en lugar de "Hoja 1 de 1". */

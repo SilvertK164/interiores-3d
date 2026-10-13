@@ -28,6 +28,8 @@ const BASE: PlanOptionsProps = {
   onScale: noop,
   onMode: noop,
   onTitleBlock: noop,
+  isometric: true,
+  onIsometric: noop,
   onToggleLevel: noop,
 }
 const render = (overrides: Partial<PlanOptionsProps> = {}) => renderToStaticMarkup(<PlanOptions {...BASE} {...overrides} />)
@@ -66,7 +68,7 @@ describe('plantas y cajetín (criterio 15)', () => {
   it('"Incluir cajetín" es un interruptor con su ayuda', () => {
     const tag = inputs(markup).find((t) => t.includes('role="switch"')) ?? ''
     expect(tag).toContain('checked=""')
-    expect(textOf(markup)).toContain('Proyecto, escala, fecha y autor')
+    expect(markup).toContain('title="Proyecto, escala, fecha y autor"')
     expect(inputs(render({ titleBlock: false })).find((t) => t.includes('role="switch"'))).not.toContain('checked=""')
   })
 

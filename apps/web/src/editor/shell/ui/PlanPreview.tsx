@@ -17,6 +17,8 @@ export type PlanPreviewProps = PreviewState & {
   /** "Vista previa · A4 apaisada (297 × 210 mm) · 1:50". */
   caption: string
   mode: 'pdfjs' | 'frame'
+  /** Página del PDF que se dibuja (2 en la vista previa de una hoja isométrica). */
+  page?: number
   /** La cabida o el problema ("Cabe en la hoja · usa 64 % del ancho"). */
   message: string | null
   messageTone: 'ok' | 'problem'
@@ -40,7 +42,7 @@ export function PlanPreview(props: PlanPreviewProps) {
     if (!drawable || props.status !== 'ready' || !props.blob || !el) return
     let cancelled = false
     let release: (() => void) | undefined
-    renderPdfPage(props.blob, el, () => cancelled)
+    renderPdfPage(props.blob, el, () => cancelled, props.page ?? 1)
       .then((stop) => {
         if (cancelled) stop()
         else release = stop
@@ -52,7 +54,7 @@ export function PlanPreview(props: PlanPreviewProps) {
       cancelled = true
       release?.()
     }
-  }, [drawable, props.status, props.blob])
+  }, [drawable, props.status, props.blob, props.page])
 
   const loading = props.status === 'loading'
   const showFrameNote = !drawable && props.status !== 'idle'

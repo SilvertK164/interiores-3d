@@ -57,6 +57,7 @@ test('Papel: solo grises, sin imágenes y líneas de 0,7 pt o menos en todas las
   await openTemplate(page, 'loft', 'plano papel')
   const dialog = await openExportFromMore(page)
   await choose(dialog, /^Papel$/)
+  await dialog.getByRole('switch', { name: 'Incluir vistas isométricas' }).uncheck()
   await downloadPdf(page, dialog, 'test-results/plano-loft-grises.pdf')
   const pages = read('test-results/plano-loft-grises.pdf')
   expect(pages.length).toBeGreaterThanOrEqual(2)

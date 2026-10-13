@@ -11,6 +11,7 @@ export type ExportForm = {
   /** Ids de las plantas marcadas. */
   checked: readonly string[]
   titleBlock: boolean
+  isometric: boolean
 }
 
 export type ExportState = {
@@ -35,6 +36,7 @@ export type ExportAction =
   | { type: 'scale'; value: Scale }
   | { type: 'mode'; value: PlanMode }
   | { type: 'titleBlock'; value: boolean }
+  | { type: 'isometric'; value: boolean }
   | { type: 'toggleLevel'; id: string }
   | { type: 'previewLevel'; index: number }
   | { type: 'generate' }
@@ -44,7 +46,7 @@ export type ExportAction =
   | { type: 'cancelled' }
   | { type: 'dismissMessage' }
 
-const DEFAULT_FORM: ExportForm = { paper: 'A4', orientation: 'landscape', scale: 50, mode: 'paper', checked: [], titleBlock: true }
+const DEFAULT_FORM: ExportForm = { paper: 'A4', orientation: 'landscape', scale: 50, mode: 'paper', checked: [], titleBlock: true, isometric: true }
 
 export const initialState: ExportState = {
   status: 'idle',
@@ -61,6 +63,9 @@ export const initialState: ExportState = {
 export const selectedLevels = (state: ExportState): PlanLevel[] => state.levels.filter((level) => state.form.checked.includes(level.id))
 export const currentSheet = (state: ExportState): Sheet => sheetFor(state.form.paper, state.form.orientation, state.form.titleBlock)
 
+/** Hojas del PDF completo: una por planta marcada y, con vistas isométricas, otra por planta. */
+export const pageCount = (state: ExportState): number => selectedLevels(state).length * (state.form.isometric ? 2 : 1)
+
 /** Vuelve a calcular lo que depende de la hoja y de las plantas: orientación sugerida, escala que cabe y vista previa. */
 function normalize(state: ExportState): ExportState {
   const extent = maxExtent(selectedLevels(state))
@@ -69,7 +74,7 @@ function normalize(state: ExportState): ExportState {
   const sheet = sheetFor(state.form.paper, orientation, state.form.titleBlock)
   const best = largestFittingScale(extent, sheet)
   if (best !== null && (!state.touched.scale || !fitScale(extent, sheet, scale).fits)) scale = best
-  const previewIndex = Math.min(state.previewIndex, Math.max(0, selectedLevels(state).length - 1))
+  const previewIndex = Math.min(state.previewIndex, Math.max(0, pageCount({ ...state, form: { ...state.form, orientation, scale } }) - 1))
   return { ...state, form: { ...state.form, orientation, scale }, previewIndex }
 }
 
@@ -118,6 +123,8 @@ export function exportReducer(state: ExportState, action: ExportAction): ExportS
     }
     case 'mode':
       return { ...state, form: { ...state.form, mode: action.value } }
+    case 'isometric':
+      return { ...state, form: { ...state.form, isometric: action.value } }
     case 'titleBlock':
       return normalize({ ...state, form: { ...state.form, titleBlock: action.value } })
     case 'toggleLevel': {
@@ -156,13 +163,21 @@ type Meta = { projectName: string; author: string; date: Date }
 
 /** Las opciones del PDF completo (una hoja por planta marcada). */
 export function buildArgs(state: ExportState, meta: Meta): PlanBuildArgs {
-  const { paper, orientation, scale, mode, titleBlock } = state.form
-  return { paper, orientation, scale, mode, levelIds: selectedLevels(state).map((level) => level.id), titleBlock, ...meta }
+  const { paper, orientation, scale, mode, titleBlock, isometric } = state.form
+  return { paper, orientation, scale, mode, levelIds: selectedLevels(state).map((level) => level.id), titleBlock, isometric, ...meta }
 }
 
-/** Las opciones de la vista previa: solo la planta que se está viendo, numerada como en el PDF completo. */
+/** Las opciones de la vista previa: solo la hoja que se está viendo (planta o isométrica), numerada como en el PDF completo. */
 export function previewArgs(state: ExportState, meta: Meta): PlanBuildArgs {
   const chosen = selectedLevels(state)
-  const level = chosen[state.previewIndex]
-  return { ...buildArgs(state, meta), levelIds: level ? [level.id] : [], sheetNumbers: { start: state.previewIndex, total: chosen.length } }
+  const plans = chosen.length
+  const iso = state.previewIndex >= plans
+  const level = chosen[iso ? state.previewIndex - plans : state.previewIndex]
+  return {
+    ...buildArgs(state, meta),
+    levelIds: level ? [level.id] : [],
+    isometric: iso,
+    isoPreview: iso,
+    sheetNumbers: { start: state.previewIndex, total: pageCount(state) },
+  }
 }

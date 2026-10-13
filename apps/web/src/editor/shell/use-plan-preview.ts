@@ -7,7 +7,7 @@ export type PreviewState = { status: 'idle' | 'loading' | 'ready' | 'unavailable
 
 /** Lo que cambia la hoja de la vista previa (no el progreso, la señal ni la fecha): sirve de dependencia del efecto. */
 export function previewKey(args: PlanBuildArgs): string {
-  return JSON.stringify([args.paper, args.orientation, args.scale, args.mode, args.titleBlock, args.levelIds, args.sheetNumbers ?? null, args.projectName, args.author])
+  return JSON.stringify([args.paper, args.orientation, args.scale, args.mode, args.titleBlock, args.levelIds, args.isoPreview ?? false, args.sheetNumbers ?? null, args.projectName, args.author])
 }
 
 type Runner = {

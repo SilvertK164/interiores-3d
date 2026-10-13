@@ -10,7 +10,8 @@ import type { PlanMode, Scale } from './types'
 export type SheetInput = {
   sheet: Sheet
   mode: PlanMode
-  scale: Scale
+  /** `null` = hoja isométrica: sin escala gráfica ni norte. */
+  scale: Scale | null
   projectName: string
   /** Nombre de la planta ya en castellano ("Planta baja", "Planta 1", "Sótano 1"). */
   levelLabel: string
@@ -35,8 +36,10 @@ export function drawSheet(s: PdfSurface, input: SheetInput): void {
   s.lineWidth(0.5)
   s.rect(pt(frame.x), pt(frame.y), pt(frame.width), pt(frame.height), 'stroke')
   s.line(pt(band.x), pt(band.y), pt(band.x + band.width), pt(band.y))
-  drawNorth(s, layout.north, palette)
-  drawScaleBar(s, layout.scaleBar, input.scale, palette)
+  if (input.scale !== null) {
+    drawNorth(s, layout.north, palette)
+    drawScaleBar(s, layout.scaleBar, input.scale, palette)
+  }
   if (layout.legend && input.mode === 'color') {
     const view = buildLegend(sortLegend(input.legend), layout.legendCapacity)
     drawLegend(s, layout.legend, view, layout.legendCols, layout.legendRows, palette)

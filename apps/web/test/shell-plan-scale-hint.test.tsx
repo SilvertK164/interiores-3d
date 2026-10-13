@@ -29,6 +29,8 @@ const BASE: PlanOptionsProps = {
   onScale: noop,
   onMode: noop,
   onTitleBlock: noop,
+  isometric: true,
+  onIsometric: noop,
   onToggleLevel: noop,
 }
 const textOf = (markup: string) => markup.replace(/<[^>]+>/g, '')

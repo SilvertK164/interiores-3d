@@ -1,4 +1,5 @@
 import type { CoreDeps } from './core'
+import { levelsOf } from './levels'
 
 export type ImageDeps = {
   /** Fotografía lo que muestra el lienzo 3D en este momento (el generador de miniaturas de Pascal, modo `viewport`). */
@@ -28,6 +29,31 @@ export function createImageSlice(deps: CoreDeps & ImageDeps) {
           return await deps.captureView()
         } finally {
           if (change) deps.viewer.getState().setCameraMode(previous)
+        }
+      },
+      /**
+       * Una foto isométrica por planta: cada vez deja visible solo esa planta (modo Uno solo) y la elige como activa. Al final
+       * devuelve la cámara, el modo de plantas y la planta activa que había.
+       */
+      async captureIsometricLevels(levelIds: readonly string[]): Promise<Blob[]> {
+        const viewer = deps.viewer.getState()
+        const { buildingId } = levelsOf(deps.scene.getState(), viewer)
+        const before = { camera: viewer.cameraMode, levels: viewer.levelMode, selection: viewer.selection }
+        const photos: Blob[] = []
+        try {
+          viewer.setCameraMode('orthographic')
+          viewer.setLevelMode('solo')
+          for (const id of levelIds) {
+            deps.viewer.getState().setSelection(buildingId ? { buildingId, levelId: id } : { levelId: id })
+            await wait(SETTLE_MS)
+            photos.push(await deps.captureView())
+          }
+          return photos
+        } finally {
+          const now = deps.viewer.getState()
+          now.setCameraMode(before.camera)
+          now.setLevelMode(before.levels)
+          now.setSelection({ ...before.selection, selectedIds: [...before.selection.selectedIds] })
         }
       },
     },

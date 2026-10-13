@@ -87,6 +87,7 @@ export function createBuildPlan(deps: BuildDeps) {
       })
     }
 
+    const isoImages = args.isoImages ?? []
     const result = await deps.exportPages({
       levels: args.levelIds,
       page: {
@@ -110,24 +111,37 @@ export function createBuildPlan(deps: BuildDeps) {
         raw.info = { ...(raw.info ?? {}), Title: projectTitle(args.projectName), Author: args.author, Creator: TEXT.pdf.creator }
       },
       pageChrome: (raw, context) => {
-        const node = nodes()[context.levelId]
         const first = args.sheetNumbers?.start ?? 0
-        drawSheet(createPdfSurface(raw, deps.decisions.fonts), {
-          sheet,
-          mode: args.mode,
-          scale: args.scale,
-          projectName: args.projectName,
-          levelLabel: levelDisplayName({ name: node?.name, level: node?.level ?? 0 }),
-          author: args.author,
-          dateText: formatLongDate(args.date),
-          sheetNumber: first + context.index + 1,
-          sheetTotal: args.sheetNumbers?.total ?? context.count,
-          legend: legendFor(context.levelId),
+        const total = args.sheetNumbers?.total ?? context.count + isoImages.length
+        const chrome = (levelId: string, number: number, isometric: boolean) => {
+          const node = nodes()[levelId]
+          const level = levelDisplayName({ name: node?.name, level: node?.level ?? 0 })
+          drawSheet(createPdfSurface(raw, deps.decisions.fonts), {
+            sheet,
+            mode: args.mode,
+            scale: isometric ? null : args.scale,
+            projectName: args.projectName,
+            levelLabel: isometric ? `${level} · ${TEXT.pdf.isometricSuffix}` : level,
+            author: args.author,
+            dateText: formatLongDate(args.date),
+            sheetNumber: number,
+            sheetTotal: total,
+            legend: legendFor(levelId),
+          })
+        }
+        chrome(context.levelId, first + context.index + 1, false)
+        // Las hojas isométricas van después de la última planta, en el mismo documento (pdfkit deja agregar páginas).
+        if (context.index !== context.count - 1) return
+        const area = sheet.usable
+        isoImages.forEach((image, i) => {
+          raw.addPage({ size: [sheet.widthPt, sheet.heightPt], margin: 0 })
+          raw.image(image.bytes, mmToPt(area.x), mmToPt(area.y), { fit: [mmToPt(area.width), mmToPt(area.height)], align: 'center', valign: 'center' })
+          chrome(image.levelId, args.sheetNumbers ? first + 1 : context.count + i + 1, true)
         })
       },
       onProgress: args.onProgress ? (done, total) => args.onProgress?.({ done, total }) : undefined,
       signal: args.signal,
     })
-    return result
+    return { ...result, pages: result.pages + isoImages.length }
   }
 }

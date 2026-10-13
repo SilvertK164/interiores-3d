@@ -28,6 +28,8 @@ const BASE: PlanOptionsProps = {
   onScale: noop,
   onMode: noop,
   onTitleBlock: noop,
+  isometric: true,
+  onIsometric: noop,
   onToggleLevel: noop,
 }
 const render = (overrides: Partial<PlanOptionsProps> = {}) => renderToStaticMarkup(<PlanOptions {...BASE} {...overrides} />)

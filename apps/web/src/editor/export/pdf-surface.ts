@@ -26,6 +26,8 @@ export type PdfRawLike = {
   text(value: string, x: number, y: number, options?: { lineBreak?: boolean }): PdfRawLike
   widthOfString(value: string, options?: { lineBreak?: boolean }): number
   registerFont(name: string, source: ArrayBuffer | Uint8Array): PdfRawLike
+  addPage(options?: { size?: [number, number]; margin?: number }): PdfRawLike
+  image(source: ArrayBuffer, x: number, y: number, options?: { fit?: [number, number]; align?: string; valign?: string }): PdfRawLike
   /** Metadatos del documento (`Title`, `Author`, `Creator`). */
   info?: Record<string, unknown>
   /** Interno de `pdfkit`: la fuente en uso, con su ascendente en milésimas de em. */

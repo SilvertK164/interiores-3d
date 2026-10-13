@@ -139,6 +139,7 @@ test('la descarga es real: nombre <proyecto>-planos.pdf, una página por planta 
     }), { timeout: 30_000 })
     .toBeGreaterThan(500)
 
+  await dialog.getByRole('switch', { name: 'Incluir vistas isométricas' }).uncheck()
   const download = await downloadPdf(page, dialog, 'test-results/plano-loft-papel.pdf')
   expect(download.suggestedFilename()).toBe(exportFileName(name))
   expect(download.suggestedFilename()).toMatch(/^E2E-plano-\d+-planos\.pdf$/)

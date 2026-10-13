@@ -10,7 +10,8 @@ import type { Scale } from './types'
 export type BlockData = {
   projectName: string
   levelLabel: string
-  scale: Scale
+  /** `null` = vista isométrica: sin escala. */
+  scale: Scale | null
   dateText: string
   author: string
   /** "Hoja 1 de 2". */
@@ -75,7 +76,7 @@ export function drawBlock(s: PdfSurface, layout: BlockLayout, data: BlockData, p
   })
   field(s, layout.project, TEXT.pdf.project, data.projectName, 10, true, palette)
   field(s, layout.level, TEXT.pdf.level, data.levelLabel, 7.5, false, palette)
-  field(s, layout.scale, TEXT.pdf.scale, scaleText(data.scale), 7.5, false, palette)
+  field(s, layout.scale, TEXT.pdf.scale, data.scale === null ? TEXT.pdf.noScale : scaleText(data.scale), 7.5, false, palette)
   field(s, layout.date, TEXT.pdf.date, data.dateText, 7.5, false, palette)
   field(s, layout.author, TEXT.pdf.author, data.author, 7.5, false, palette)
 }

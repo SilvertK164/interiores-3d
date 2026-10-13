@@ -33,12 +33,20 @@ describe('plantas', () => {
   })
 
   it('la vista previa sigue a una planta marcada y se queda dentro de las marcadas', () => {
-    const state = reduce(measured([GROUND, UPPER]), { type: 'previewLevel', index: 5 })
+    const state = reduce(measured([GROUND, UPPER]), { type: 'isometric', value: false }, { type: 'previewLevel', index: 5 })
     expect(state.previewIndex).toBe(1)
     const fewer = exportReducer(state, { type: 'toggleLevel', id: 'b' })
     expect(fewer.previewIndex).toBe(0)
     expect(previewArgs(state, META).levelIds).toEqual(['b'])
     expect(previewArgs(state, META).sheetNumbers).toEqual({ start: 1, total: 2 })
+  })
+
+  it('con vistas isométricas el paginador suma una hoja por planta y las últimas piden la foto de su planta', () => {
+    const state = reduce(measured([GROUND, UPPER]), { type: 'previewLevel', index: 2 })
+    expect(state.previewIndex).toBe(2)
+    expect(previewArgs(state, META)).toMatchObject({ levelIds: ['a'], isoPreview: true, sheetNumbers: { start: 2, total: 4 } })
+    expect(exportReducer(state, { type: 'previewLevel', index: 9 }).previewIndex).toBe(3)
+    expect(previewArgs(reduce(measured([GROUND, UPPER])), META).isoPreview).toBe(false)
   })
 })
 
@@ -52,6 +60,7 @@ describe('opciones del PDF', () => {
       mode: 'color',
       levelIds: ['a', 'b'],
       titleBlock: false,
+      isometric: true,
       projectName: 'Casa Alvear',
       author: 'Silvert Quispe',
       date: META.date,
