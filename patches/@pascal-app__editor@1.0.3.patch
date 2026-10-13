@@ -1,0 +1,582 @@
+diff --git a/src/components/editor/first-person-controls.tsx b/src/components/editor/first-person-controls.tsx
+index 953a88b00aa9cc77c4bd0438eeb5540d00523025..462943ed9f8a8d215a15435a2a3b5ee1dcf78940 100644
+--- a/src/components/editor/first-person-controls.tsx
++++ b/src/components/editor/first-person-controls.tsx
+@@ -667,6 +667,13 @@ export const FirstPersonControls = () => {
+   const selectedLevelId = useViewer((state) => state.selection.levelId)
+   const placedSpawnNode = useScene((state) => resolvePlacedSpawnNode(state.nodes, selectedLevelId))
+   const isDroneMode = useEditor((state) => state.firstPersonMovementMode === 'drone')
++  // Madori: deja la cámara a mano para las pruebas e2e (medir cuánto avanza el recorrido); no cambia nada del recorrido.
++  useEffect(() => {
++    ;(globalThis as { __madoriCamera?: unknown }).__madoriCamera = camera
++    return () => {
++      ;(globalThis as { __madoriCamera?: unknown }).__madoriCamera = undefined
++    }
++  }, [camera])
+   const controllerRef = useRef<BVHEcctrlApi | null>(null)
+   const movementInputRef = useRef<MovementInput>({ ...inactiveMovementInput })
+   const hadPointerLockRef = useRef(false)
+@@ -737,6 +744,7 @@ export const FirstPersonControls = () => {
+   const replaceColliderWorld = useCallback((nextWorld: FirstPersonColliderWorld | null) => {
+     worldRef.current?.dispose()
+     worldRef.current = nextWorld
++    ;(globalThis as { __madoriWorld?: unknown }).__madoriWorld = nextWorld
+     setWorld(nextWorld)
+   }, [])
+ 
+@@ -1047,7 +1055,10 @@ export const FirstPersonControls = () => {
+   }, [isDroneMode, resolveInteractableTarget])
+ 
+   const placedSpawn = useMemo<FirstPersonSpawn | null>(() => {
+-    if (!(placedSpawnNode && placedSpawnNode.type === 'spawn')) return null
++    // Madori: sin nodo de salida, Recorrer empieza donde pide `__madoriSpawn` (dentro del ambiente más grande de la planta activa).
++    if (!(placedSpawnNode && placedSpawnNode.type === 'spawn')) {
++      return (globalThis as { __madoriSpawn?: FirstPersonSpawn }).__madoriSpawn ?? null
++    }
+ 
+     const spawnObject = sceneRegistry.nodes.get(placedSpawnNode.id)
+     if (spawnObject) {
+@@ -1796,7 +1807,8 @@ export const FirstPersonOverlay = ({ onExit }: { onExit: () => void }) => {
+       suspended={suspended}
+       zoneLabel={zoneLabel}
+     >
+-      {!hasPlacedSpawn && (
++      {/* Madori: el aviso en inglés se reemplazó por la ayuda propia del shell. */}
++      {false && !hasPlacedSpawn && (
+         <div className="corner-smooth rounded-full border border-border/40 bg-background/80 px-3 py-1 text-center text-muted-foreground text-xs shadow-elevation-3 backdrop-blur-xl">
+           Place a spawn point from the Build tab to control where walkthrough starts.
+         </div>
+diff --git a/src/components/editor/floorplan-camera-sync.ts b/src/components/editor/floorplan-camera-sync.ts
+index 448428e67899e42cc568a41493bf201a4511592e..0574d147319803c83edf9a75c5ba1cb7b1a162a7 100644
+--- a/src/components/editor/floorplan-camera-sync.ts
++++ b/src/components/editor/floorplan-camera-sync.ts
+@@ -207,7 +207,22 @@ export function useFloorplanCameraSyncBridge() {
+   }
+   const bridge = bridgeRef.current
+ 
+-  useEffect(() => subscribeCameraPose(bridge.receiveCameraPose), [bridge])
++  // Madori: con `__madoriDecoupled` la cámara 3D y el plano no se siguen (ni el giro, ni el zoom, ni el paneo).
++  const decoupled = () => Boolean((globalThis as { __madoriDecoupled?: boolean }).__madoriDecoupled)
++
++  useEffect(
++    () =>
++      subscribeCameraPose((pose) => {
++        if (!decoupled()) bridge.receiveCameraPose(pose)
++      }),
++    [bridge],
++  )
+ 
+-  useEffect(() => subscribeNavigationSyncPose(bridge.receiveNavigationPose), [bridge])
++  useEffect(
++    () =>
++      subscribeNavigationSyncPose((pose) => {
++        if (!decoupled()) bridge.receiveNavigationPose(pose)
++      }),
++    [bridge],
++  )
+ }
+diff --git a/src/components/editor/floorplan-panel.tsx b/src/components/editor/floorplan-panel.tsx
+index fc56af07361709346668b929311748651a0d4fab..74dd6f8cc9c7b4b73cbaae93df02abef563e62a8 100644
+--- a/src/components/editor/floorplan-panel.tsx
++++ b/src/components/editor/floorplan-panel.tsx
+@@ -6129,7 +6129,55 @@ export function FloorplanPanel({
+     [svgAspectRatio],
+   )
+ 
++  // Madori: `madori:plan-fit` pide volver al encuadre automático (que `__madoriPlanFit` calcula sobre la planta activa y su zona libre).
++  const [madoriFitVersion, setMadoriFitVersion] = useState(0)
++  // Si el pedido llega antes de que el contenido esté medido, se completa apenas se mide (una sola vez por pedido).
++  const madoriRefitPendingRef = useRef(false)
++  useEffect(() => {
++    const refit = () => {
++      madoriRefitPendingRef.current = true
++      hasUserAdjustedViewportRef.current = false
++      setViewport(null)
++      setMadoriFitVersion((version) => version + 1)
++    }
++    window.addEventListener('madori:plan-fit', refit)
++    return () => window.removeEventListener('madori:plan-fit', refit)
++  }, [])
++  useEffect(() => {
++    if (!(madoriRefitPendingRef.current && measuredSceneBBox && measuredSceneBBox.width > 0 && measuredSceneBBox.height > 0)) return
++    madoriRefitPendingRef.current = false
++    hasUserAdjustedViewportRef.current = false
++    setViewport(null)
++  }, [measuredSceneBBox])
++
+   const fittedViewport = useMemo(() => {
++    const madoriFit = (
++      globalThis as {
++        __madoriPlanFit?: (
++          content: { minX: number; minY: number; maxX: number; maxY: number },
++          surface: { width: number; height: number },
++        ) => FloorplanViewport | null
++      }
++    ).__madoriPlanFit
++    if (madoriFit && measuredSceneBBox && measuredSceneBBox.width > 0 && measuredSceneBBox.height > 0) {
++      const { x, y, width: w, height: h } = measuredSceneBBox
++      const corners = [
++        rotateSvgPoint({ x, y }, floorplanSceneRotationDeg),
++        rotateSvgPoint({ x: x + w, y }, floorplanSceneRotationDeg),
++        rotateSvgPoint({ x, y: y + h }, floorplanSceneRotationDeg),
++        rotateSvgPoint({ x: x + w, y: y + h }, floorplanSceneRotationDeg),
++      ]
++      const fitted = madoriFit(
++        {
++          minX: Math.min(...corners.map((c) => c.x)),
++          minY: Math.min(...corners.map((c) => c.y)),
++          maxX: Math.max(...corners.map((c) => c.x)),
++          maxY: Math.max(...corners.map((c) => c.y)),
++        },
++        surfaceSize,
++      )
++      if (fitted) return fitted
++    }
+     let minX = Number.POSITIVE_INFINITY
+     let maxX = Number.NEGATIVE_INFINITY
+     let minY = Number.POSITIVE_INFINITY
+@@ -6183,7 +6231,8 @@ export function FloorplanPanel({
+       centerY,
+       width,
+     }
+-  }, [floorplanSceneRotationDeg, measuredSceneBBox, svgAspectRatio, visibleSitePolygon])
++    // biome-ignore lint/correctness/useExhaustiveDependencies: `madoriFitVersion` fuerza el recálculo cuando Madori cambia los márgenes.
++  }, [floorplanSceneRotationDeg, madoriFitVersion, measuredSceneBBox, surfaceSize, svgAspectRatio, visibleSitePolygon])
+   latestFittedViewportRef.current = fittedViewport
+ 
+   // Measure the content-only subtree after its geometry settles. ViewBox-only
+@@ -6250,7 +6299,9 @@ export function FloorplanPanel({
+       observer.disconnect()
+       if (scheduledFrame !== null) cancelAnimationFrame(scheduledFrame)
+     }
+-  }, [isFloorplanOpen])
++    // Madori: el contenido (`floorplanContentRef`) solo existe cuando hay una planta activa; si el plano se abre antes (al recargar el
++    // proyecto) nunca se medía y el encuadre caía al terreno. Con la planta en las dependencias se vuelve a medir al aparecer.
++  }, [isFloorplanOpen, levelId, hasAmbientBuildingLevel])
+ 
+   const applyFloorplanNavigationState = useCallback(
+     (nextViewport: FloorplanViewport, userRotationDeg: number) => {
+@@ -7801,8 +7852,14 @@ export function FloorplanPanel({
+       smoothFloorplanNavigationView(localCenter, nextRotationDeg, viewport.width)
+       publishFloorplanNavigationPose(localCenter, nextRotationDeg, viewport.width)
+     }
+-    const orbitClockwise = () => orbit(true)
+-    const orbitCounterClockwise = () => orbit(false)
++    // Madori: con `__madoriDecoupled` los botones de giro de la cámara 3D no giran el plano (cada vista se mueve sola).
++    const decoupled = () => Boolean((globalThis as { __madoriDecoupled?: boolean }).__madoriDecoupled)
++    const orbitClockwise = () => {
++      if (!decoupled()) orbit(true)
++    }
++    const orbitCounterClockwise = () => {
++      if (!decoupled()) orbit(false)
++    }
+     document.addEventListener('keydown', onKeyDown)
+     document.addEventListener('keyup', onKeyUp)
+     window.addEventListener('blur', onBlur)
+@@ -11376,7 +11433,7 @@ export function FloorplanPanel({
+ 
+         {levelNode?.type !== 'level' && !hasAmbientBuildingLevel ? (
+           <div className="flex h-full items-center justify-center px-6 text-center text-muted-foreground text-sm">
+-            Switch to a building level to view and edit the floorplan.
++            Elige un nivel del edificio para ver y editar el plano.
+           </div>
+         ) : isFloorplanOpen ? (
+           // The panel stays mounted in 3D mode (display:none) to keep the
+diff --git a/src/components/editor/index.tsx b/src/components/editor/index.tsx
+index 157809cdf66e0f6c296d070881c3ff6b9a23b827..dc9edc3143ccdd93515fa6a85e3ca66b4e720f43 100644
+--- a/src/components/editor/index.tsx
++++ b/src/components/editor/index.tsx
+@@ -163,9 +163,21 @@ function initializeEditorRuntime(): () => void {
+     outliner.hoveredObjects.length = 0
+   }
+ }
++/** Parche de Madori: qué chrome propio de Pascal se dibuja en el layout v2 (todo visible por omisión). */
++export type EditorChrome = {
++  dock?: boolean
++  inspector?: boolean
++  helpers?: boolean
++  levelSelector?: boolean
++  /** Columna lateral izquierda de Pascal (rieles y paneles de plugins). */
++  sidebar?: boolean
++}
++
+ export interface EditorProps {
+   // Layout version — 'v1' (default) or 'v2' (navbar + two-column)
+   layoutVersion?: 'v1' | 'v2'
++  /** Parche de Madori: oculta el dock, el inspector, los ayudantes o el selector de nivel de Pascal (v2). */
++  chrome?: EditorChrome
+ 
+   // UI slots (v1)
+   appMenuButton?: ReactNode
+@@ -1254,6 +1266,7 @@ function PreviewStage({
+ function EditorContent({
+   guardAgainstSceneWipe,
+   layoutVersion = 'v1',
++  chrome = {},
+   appMenuButton,
+   sidebarTop,
+   navbarSlot,
+@@ -1588,7 +1601,7 @@ function EditorContent({
+       return <Component />
+     }
+ 
+-    const tabBarTabs = [
++    const tabBarTabs = chrome.sidebar === false ? [] : [
+       ...(sidebarTabs?.map(({ id, label, mobileDefaultSnap, mobileIcon, icon, noPanel }) => ({
+         id,
+         label,
+@@ -1635,22 +1648,26 @@ function EditorContent({
+               navbarSlot={navbarSlot}
+               overlays={
+                 <>
+-                  {!(isCaptureMode || stageOverlay) && <FloatingLevelSelector />}
+-                  {!(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
+-                    <div className="pointer-events-auto">
++                  {chrome.levelSelector !== false && !(isCaptureMode || stageOverlay) && (
++                    <div data-pascal-level-selector>
++                      <FloatingLevelSelector />
++                    </div>
++                  )}
++                  {chrome.dock !== false && !(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
++                    <div className="pointer-events-auto" data-pascal-dock>
+                       <ActionMenu />
+                     </div>
+                   )}
+-                  {!(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
+-                    <div className="pointer-events-auto">
++                  {chrome.inspector !== false && !(isVersionPreviewMode || isCaptureMode || isStudioMode) && (
++                    <div className="pointer-events-auto" data-pascal-inspector>
+                       <PanelManager
+                         inspectorFooter={inspectorFooter}
+                         multiSelectionFooter={multiSelectionFooter}
+                       />
+                     </div>
+                   )}
+-                  {!isCaptureMode && (
+-                    <div className="pointer-events-auto">
++                  {chrome.helpers !== false && !isCaptureMode && (
++                    <div className="pointer-events-auto" data-pascal-helpers>
+                       <HelperManager />
+                     </div>
+                   )}
+diff --git a/src/index.tsx b/src/index.tsx
+index 5c8bebbc5271d88e682c8c23afbfd4c9994e996d..ef265028de7341f7226ccbd6bd6f4457e083a4dd 100644
+--- a/src/index.tsx
++++ b/src/index.tsx
+@@ -438,8 +438,13 @@ export type {
+   FloorplanAnnotationVisibility,
+ } from './lib/floorplan/annotation-visibility'
+ export {
++  exportFloorplanPages,
+   exportFloorplanPdf,
+   type FloorplanExportScope,
++  type FloorplanLevelMeasure,
++  type FloorplanPagesOptions,
++  type FloorplanPagesResult,
++  measureFloorplanLevels,
+ } from './lib/floorplan/floorplan-export'
+ export {
+   createFloorplanContextExtensions,
+diff --git a/src/lib/floorplan/floorplan-export.tsx b/src/lib/floorplan/floorplan-export.tsx
+index 61478e5d842e9d6f8ad811513c98444e56c06294..bd1c545bcec6bf09246965fb6f6d2aa68057d653 100644
+--- a/src/lib/floorplan/floorplan-export.tsx
++++ b/src/lib/floorplan/floorplan-export.tsx
+@@ -301,6 +301,206 @@ export async function exportFloorplanPdf(scope: FloorplanExportScope): Promise<v
+   }
+ }
+ 
++/* ── Madori: planos configurables (hoja, escala fija y norte arriba) ─────────────────────────────────────── */
++type PdfRaw = FloorplanPdfDocument['raw']
++
++export type FloorplanLevelMeasure = {
++  id: string
++  name: string | null
++  level: number
++  /** Medidas del dibujo de la planta en metros, sin el margen de cotas. */
++  widthM: number
++  heightM: number
++  empty: boolean
++}
++
++export type FloorplanPagesOptions = {
++  /** Ids de las plantas elegidas; el orden sale de la planta (de la más baja a la más alta). */
++  levels: readonly string[]
++  /** Hoja y área útil en puntos del PDF, con el origen arriba a la izquierda. */
++  page: {
++    widthPt: number
++    heightPt: number
++    usable: { x: number; y: number; width: number; height: number }
++  }
++  /** Puntos del PDF por metro del plano (a 1:50 son 56,69). */
++  scale: number
++  /** Cambia o descarta (null) la geometría de cada nodo antes de dibujarla. */
++  mapGeometry?: (node: AnyNode | undefined, geometry: FloorplanGeometry) => FloorplanGeometry | null
++  /** Geometría propia que se suma al plano de la planta (por ejemplo, superficies). */
++  extraGeometry?: (levelId: string) => FloorplanGeometry[]
++  /** Envuelve el documento que usa el renderizador de Pascal (por ejemplo, para filtrar colores). */
++  wrapRaw?: (raw: PdfRaw) => PdfRaw
++  /** Se llama una vez, con el documento sin envolver, antes de la primera página (fuentes, metadatos). */
++  setup?: (raw: PdfRaw) => void | Promise<void>
++  /** Se llama al final de cada página, con el documento sin envolver y sin recorte (marco y cajetín). */
++  pageChrome?: (
++    raw: PdfRaw,
++    context: { index: number; count: number; levelId: string },
++  ) => void | Promise<void>
++  onProgress?: (done: number, total: number) => void
++  signal?: AbortSignal
++}
++
++export type FloorplanPagesResult = { blob: Blob; pages: number; skippedImages: number }
++
++const MADORI_ROTATION_DEG = 0
++
++function madoriHost(): HTMLDivElement {
++  const host = document.createElement('div')
++  host.style.cssText =
++    'position:fixed;left:-10000px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;'
++  document.body.appendChild(host)
++  return host
++}
++
++function madoriGeometries(levelId: AnyNodeId): ExportGeometry[] {
++  const { nodes, installedPlugins } = useScene.getState()
++  const viewer = useViewer.getState()
++  const floorplanMode = useFloorplanMode.getState().mode
++  const annotationState = useFloorplanAnnotationVisibility.getState()
++  return collectFloorplanGeometry(
++    nodes,
++    levelId,
++    'full',
++    'metric',
++    viewer.metricNotation,
++    resolveFloorplanExportAnnotationVisibility(floorplanMode, annotationState.visibility),
++    'floor-plan',
++    resolveFloorplanWallDimensionReference(floorplanMode, annotationState.wallDimensionReference),
++    installedPlugins,
++  )
++}
++
++/** Mide cada planta del edificio activo (de la más baja a la más alta): metros de ancho y alto del dibujo. */
++export async function measureFloorplanLevels(): Promise<FloorplanLevelMeasure[]> {
++  const { nodes } = useScene.getState()
++  const host = madoriHost()
++  const result: FloorplanLevelMeasure[] = []
++  try {
++    for (const level of resolveExportLevels(nodes)) {
++      const node = nodes[level.id]
++      const base = {
++        id: level.id as string,
++        name: node?.name?.trim() || null,
++        level: node ? levelIndexOf(node) : 0,
++      }
++      const geometries = madoriGeometries(level.id)
++      const mounted = geometries.some((geometry) => geometry.model)
++        ? await mountFloorplanSvg(host, geometries, MADORI_ROTATION_DEG)
++        : null
++      if (!mounted) {
++        result.push({ ...base, widthM: 0, heightM: 0, empty: true })
++        continue
++      }
++      try {
++        const bounds = measureFloorplanBounds(mounted.svg, '[data-floorplan-model]')
++        result.push({ ...base, widthM: bounds?.width ?? 0, heightM: bounds?.height ?? 0, empty: !bounds })
++      } finally {
++        mounted.cleanup()
++      }
++    }
++  } finally {
++    host.remove()
++  }
++  return result
++}
++
++/**
++ * Genera un PDF con una página por planta elegida, a escala fija y con el norte arriba, y devuelve el Blob (no descarga
++ * nada). El dibujo queda centrado en el área útil y recortado a ella: un exceso nunca pisa el cajetín.
++ */
++export async function exportFloorplanPages(
++  options: FloorplanPagesOptions,
++): Promise<FloorplanPagesResult> {
++  const { nodes } = useScene.getState()
++  const chosen = resolveExportLevels(nodes).filter((level) => options.levels.includes(level.id))
++  if (chosen.length === 0) throw new Error('[floorplan-export] no level to export')
++  const { page, scale } = options
++  const { doc, raw, finish } = await createFloorplanPdfDocument(
++    [page.widthPt, page.heightPt],
++    options.wrapRaw,
++  )
++  if (options.setup) await options.setup(raw)
++  const host = madoriHost()
++  const area = page.usable
++  let pages = 0
++  let skippedImages = 0
++  const onImageError = () => {
++    skippedImages += 1
++  }
++  try {
++    for (const [index, level] of chosen.entries()) {
++      if (options.signal?.aborted) throw new DOMException('Exportación cancelada', 'AbortError')
++      options.onProgress?.(index, chosen.length)
++      await nextFrames(1)
++      const geometries = madoriGeometries(level.id).map((geometry) => ({
++        ...geometry,
++        model:
++          geometry.model && options.mapGeometry
++            ? options.mapGeometry(nodes[geometry.id], geometry.model)
++            : geometry.model,
++      }))
++      const extras = options.extraGeometry ? options.extraGeometry(level.id) : []
++      doc.addPage([page.widthPt, page.heightPt])
++      pages += 1
++      const mounted = geometries.some((geometry) => geometry.model)
++        ? await mountFloorplanSvg(host, geometries, MADORI_ROTATION_DEG)
++        : null
++      if (mounted) {
++        try {
++          await mounted.setScreenUnitsPerPixel(1 / scale)
++          const { viewport } = mounted
++          const width = viewport.width * scale
++          const height = viewport.height * scale
++          const placement = {
++            x: area.x + (area.width - width) / 2,
++            y: area.y + (area.height - height) / 2,
++            width,
++            height,
++          }
++          raw.save()
++          raw.rect(area.x, area.y, area.width, area.height).clip()
++          const model = combineGeometryList([...geometries.map((geometry) => geometry.model), ...extras])
++          if (model) {
++            await renderFloorplanGeometryToPdfKit(doc, model, {
++              annotationLayer: false,
++              placement,
++              rotationDeg: MADORI_ROTATION_DEG,
++              viewport,
++              onImageError,
++              signal: options.signal,
++            })
++          }
++          const annotations = combineGeometryList(geometries.map((geometry) => geometry.annotations))
++          if (annotations) {
++            await renderFloorplanGeometryToPdfKit(doc, annotations, {
++              annotationLabelShifts: mounted.annotationLabelShifts,
++              annotationLayer: true,
++              placement,
++              rotationDeg: MADORI_ROTATION_DEG,
++              viewport,
++              onImageError,
++              signal: options.signal,
++            })
++          }
++          raw.restore()
++        } finally {
++          mounted.cleanup()
++        }
++      }
++      if (options.pageChrome) {
++        await options.pageChrome(raw, { index, count: chosen.length, levelId: level.id as string })
++      }
++      options.onProgress?.(index + 1, chosen.length)
++    }
++    return { blob: await finish(), pages, skippedImages }
++  } finally {
++    host.remove()
++  }
++}
++/* ── fin del parche de planos ─────────────────────────────────────────────────────────────────────────────── */
++
+ export function collectFloorplanSchedules(
+   nodes: Record<string, AnyNode>,
+   levelId: AnyNodeId,
+diff --git a/src/lib/floorplan/floorplan-pdfkit-document.ts b/src/lib/floorplan/floorplan-pdfkit-document.ts
+index 9db43343a5fd8980e165824e050c49961c6cfc5a..f73e502dcc88018b875b4a77fce1d22916b655df 100644
+--- a/src/lib/floorplan/floorplan-pdfkit-document.ts
++++ b/src/lib/floorplan/floorplan-pdfkit-document.ts
+@@ -167,22 +167,31 @@ export class FloorplanPdfDocument {
+   }
+ }
+ 
+-export async function createFloorplanPdfDocument(defaultPageSize: readonly [number, number]) {
++export async function createFloorplanPdfDocument(
++  defaultPageSize: readonly [number, number],
++  /** Madori: envuelve el documento que usa el renderizador (filtro de colores del modo Papel). */
++  wrapRaw?: (raw: PdfKitDocumentInstance) => PdfKitDocumentInstance,
++) {
+   const [{ default: PDFDocument }, { default: blobStream }] = await Promise.all([
+     import('pdfkit/js/pdfkit.standalone'),
+     import('blob-stream'),
+   ])
+   const raw = new PDFDocument({ autoFirstPage: false, compress: true, margin: 0 })
+   const stream = raw.pipe(blobStream())
++  // Madori: cerrar el documento y devolver el Blob sin descargarlo.
++  const finish = () =>
++    new Promise<Blob>((resolve, reject) => {
++      stream.on('finish', () => resolve(stream.toBlob('application/pdf')))
++      stream.on('error', reject)
++      raw.on('error', reject)
++      raw.end()
++    })
+   return {
+-    doc: new FloorplanPdfDocument(raw, defaultPageSize),
++    doc: new FloorplanPdfDocument(wrapRaw ? wrapRaw(raw) : raw, defaultPageSize),
++    raw,
++    finish,
+     save: async (filename: string) => {
+-      const blob = await new Promise<Blob>((resolve, reject) => {
+-        stream.on('finish', () => resolve(stream.toBlob('application/pdf')))
+-        stream.on('error', reject)
+-        raw.on('error', reject)
+-        raw.end()
+-      })
++      const blob = await finish()
+       const url = URL.createObjectURL(blob)
+       const anchor = document.createElement('a')
+       anchor.href = url
+diff --git a/src/lib/floorplan/floorplan-pdfkit-renderer.ts b/src/lib/floorplan/floorplan-pdfkit-renderer.ts
+index 4fb0cfe3a88bc2841871d70489d7adf3c86219bd..6b8165560cd41676fbd4d4517b08fe4a9c5b0555 100644
+--- a/src/lib/floorplan/floorplan-pdfkit-renderer.ts
++++ b/src/lib/floorplan/floorplan-pdfkit-renderer.ts
+@@ -32,6 +32,8 @@ type StyledGeometry = Extract<
+ >
+ 
+ type RenderContext = {
++  onImageError?: (error: unknown) => void
++  signal?: AbortSignal
+   annotationLabelShiftIndex: number
+   annotationLabelShifts: readonly FloorplanPoint[]
+   annotationLayer: boolean
+@@ -55,6 +57,10 @@ export async function renderFloorplanGeometryToPdfKit(
+     placement: FloorplanPdfKitPlacement
+     rotationDeg: number
+     viewport: FloorplanExportBounds
++    /** Madori: una imagen que no carga no tumba el PDF; quien llama la cuenta. */
++    onImageError?: (error: unknown) => void
++    /** Madori: al cancelar, la siguiente imagen corta el dibujo de la planta en curso. */
++    signal?: AbortSignal
+   },
+ ): Promise<void> {
+   const pointsPerUnit = options.placement.width / options.viewport.width
+@@ -72,6 +78,8 @@ export async function renderFloorplanGeometryToPdfKit(
+     annotationLayer: options.annotationLayer,
+     sceneRotationDeg: options.rotationDeg,
+     unitsPerPoint: 1 / pointsPerUnit,
++    onImageError: options.onImageError,
++    signal: options.signal,
+   })
+   raw.restore()
+ }
+@@ -158,7 +166,13 @@ async function renderGeometry(
+       drawEqualSpacingBadge(doc, geometry, context)
+       return
+     case 'image':
+-      await drawImage(doc, geometry)
++      if (context.signal?.aborted) throw new DOMException('Exportación cancelada', 'AbortError')
++      try {
++        await drawImage(doc, geometry)
++      } catch (error) {
++        if (!context.onImageError) throw error
++        context.onImageError(error)
++      }
+       return
+     case 'group':
+       raw.save()

@@ -1,0 +1,7 @@
+PDF.js (Mozilla), licencia Apache-2.0 (ver LICENSE.txt, que debe viajar con los archivos).
+Origen: paquete npm pdfjs-dist versión 6.4.299 (https://www.npmjs.com/package/pdfjs-dist), carpeta build/.
+Se usa solo para dibujar la vista previa del diálogo "Exportar plano" (src/editor/shell/ui/render-pdf-page.ts).
+Generado por apps/web/scripts/vendor-pdfjs.mjs (pnpm --filter @interiores/web pdfjs:vendor). No editar a mano.
+
+pdf.min.mjs  sha256 57456c8e0c81e46be31174b499ef77f2b9f5ee46d04412ba627320a36755d4c2  (origen: build/pdf.min.mjs)
+pdf.worker.min.mjs  sha256 9536359f1b8367850d485731ca1d5e45c159a7b7a0912325e539937aa21ceb18  (origen: build/pdf.worker.min.mjs)

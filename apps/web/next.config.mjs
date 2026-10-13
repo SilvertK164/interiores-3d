@@ -1,3 +1,5 @@
+import { buildSecurityHeaders } from './security-headers.mjs'
+
 const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
 
 /** @type {import('next').NextConfig} */
@@ -10,6 +12,17 @@ const nextConfig = {
   async rewrites() {
     return { fallback: [{ source: '/material/:path*', destination: 'https://editor.pascal.app/material/:path*' }] }
   },
+  // «Escena desde una foto» antes se llamaba /laboratorio: los enlaces y los favoritos viejos siguen sirviendo.
+  async redirects() {
+    return [{ source: '/laboratorio', destination: '/escena-desde-foto', permanent: true }]
+  },
+  // Cabeceras de seguridad (docs/seguridad-revision.md). Fuera de producción solo las inofensivas.
+  async headers() {
+    return [{ source: '/:path*', headers: buildSecurityHeaders(process.env, process.env.NODE_ENV === 'production') }]
+  },
+  // Solo en las pruebas en navegador: la insignia "N" de desarrollo de Next (abajo a la izquierda) tapa los controles del shell y
+  // bloquea los clics de Playwright. No toca el overlay de errores: un error de ejecución sigue apareciendo y rompe la prueba.
+  devIndicators: process.env.NEXT_PUBLIC_E2E === '1' ? false : undefined,
   env: {
     // Pascal arma las URLs de sus assets con esta base; si queda vacía usa editor.pascal.app.
     NEXT_PUBLIC_ASSETS_CDN_URL:

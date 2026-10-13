@@ -1,20 +1,29 @@
 'use client'
 
 import { loadPlugin } from '@pascal-app/core'
-import { CATALOG_ITEMS, Editor, ItemsPanel, type SceneGraph } from '@pascal-app/editor'
+import { CATALOG_ITEMS, Editor, type SceneGraph } from '@pascal-app/editor'
 import { builtinPlugin } from '@pascal-app/nodes'
-import { Sofa, Store } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LoaderPortal } from '@/components/LoaderPortal'
+import { useSceneLoading } from './use-scene-loading'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
+import { useNavigate } from '@/lib/use-navigate'
+import { takePhotoCamera } from '@/lib/lab/photo-camera-handoff'
+import { authorName } from '@/lib/person-name'
+import { useSession } from '@/lib/use-session'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { localizeCatalog } from './catalog-assets'
-import { buildCommerceItems } from './commerce-catalog'
+import { HIDDEN_CHROME, type PascalChrome } from './chrome'
 import { installE2eHooks } from './e2e-hooks'
+import { onThumbnailCapture } from './export/pascal-image'
+import { createPascalBridge } from './pascal-bridge'
+import { createSaveHandler } from './save-handler'
 import { SaveBanner } from './SaveBanner'
+import { EditorShell } from './shell/EditorShell'
+import { measureFrame } from './shell/frame-insets'
 import { type SaveOutcome, type SaverStatus, type SceneSaver, createSceneSaver } from './scene-saver'
 
 let pluginReady: Promise<unknown> | null = null
@@ -30,21 +39,17 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   const [status, setStatus] = useState<SaverStatus>('idle')
   const [detail, setDetail] = useState<string | undefined>()
   const [dismissed, setDismissed] = useState(false)
+  // Madori dibuja su propio dock, inspector, ayudantes y selector de nivel; los de Pascal quedan ocultos (parche `chrome`).
+  const [chrome, setChrome] = useState<PascalChrome>(HIDDEN_CHROME)
   const saver = useRef<SceneSaver<SceneGraph> | null>(null)
   const graphRef = useRef<SceneGraph | null>(null)
 
   // `<Editor>` vuelve a cargar la escena cada vez que cambia la identidad de `onLoad`:
   // estas funciones deben ser estables o cada cambio de estado de guardado borraría lo editado.
   const onLoad = useCallback(async () => graphRef.current, [])
-  const onSave = useCallback(async (scene: SceneGraph, options?: { keepalive?: boolean }) => {
-    const s = saver.current
-    if (!s) return
-    if (options?.keepalive) await s.flushNow(scene)
-    else await s.save(scene)
-  }, [])
+  const onSave = useMemo(() => createSaveHandler<SceneGraph>(() => saver.current), [])
 
   const items = useMemo(() => localizeCatalog(CATALOG_ITEMS), [])
-  const commerceItems = useMemo(() => buildCommerceItems(items), [items])
 
   useEffect(() => {
     let cancelled = false
@@ -76,7 +81,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
         })
         graphRef.current = fromEnvelope(project.scene)
         setPhase({ kind: 'ready', name: project.name })
-        if (process.env.NEXT_PUBLIC_E2E === '1') installE2eHooks()
+        if (process.env.NEXT_PUBLIC_E2E === '1') installE2eHooks({ setChrome })
       } catch (err) {
         if (!cancelled) setPhase({ kind: 'error', message: friendlyMessage(err) })
       }
@@ -86,6 +91,19 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     }
   }, [projectId])
 
+  // Lo que el guardador tiene en espera (ya encolado por Pascal, aún sin enviar) se manda al cerrar la página; Pascal solo
+  // envía lo que él todavía no encoló.
+  useEffect(() => {
+    const flush = () => void saver.current?.flushNow().catch(() => {})
+    window.addEventListener('pagehide', flush)
+    window.addEventListener('beforeunload', flush)
+    return () => {
+      window.removeEventListener('pagehide', flush)
+      window.removeEventListener('beforeunload', flush)
+      flush()
+    }
+  }, [])
+
   // Al volver a ingresar (otra pestaña) o renovarse el token, el guardado pausado por sesión vencida se reanuda.
   useEffect(() => {
     const { data } = supabaseBrowser().auth.onAuthStateChange((event) => {
@@ -94,37 +112,55 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     return () => data.subscription.unsubscribe()
   }, [])
 
-  const sidebarTabs = useMemo(
-    () => [
-      {
-        id: 'items',
-        label: 'Muebles',
-        icon: <Sofa aria-hidden size={20} />,
-        component: () => <ItemsPanel items={items} showSourceFilter={false} showTagFilters={false} />,
-      },
-      {
-        id: 'commerce',
-        label: 'Comercio',
-        icon: <Store aria-hidden size={20} />,
-        component: () => <ItemsPanel items={commerceItems} showSourceFilter={false} showTagFilters={false} />,
-      },
-    ],
-    [items, commerceItems],
-  )
+  // El puente con Pascal y el shell de Madori; `EditorShell` aplica el tema claro y oculta el aviso de cámara al montarse.
+  const bridge = useMemo(() => createPascalBridge(), [])
+  const { go, pending: leaving } = useNavigate()
+  const { session } = useSession()
+  const rootRef = useRef<HTMLDivElement>(null)
+  const sceneLoading = useSceneLoading(rootRef, phase.kind === 'ready')
+
+  // «Escena desde una foto» deja guardada la cámara de la foto (`photo-camera-handoff.ts`): se aplica UNA vez, cuando la escena
+  // terminó de cargar. El puente la retiene para que el encuadre automático del shell no la pise; sin pose, o si algo falla, el editor
+  // abre con su encuadre normal.
+  useEffect(() => {
+    if (phase.kind !== 'ready' || sceneLoading) return
+    const pose = takePhotoCamera(projectId)
+    if (!pose) return
+    try {
+      bridge.openCameraAt(pose, measureFrame())
+    } catch {
+      bridge.releaseCameraPose()
+    }
+  }, [bridge, phase.kind, projectId, sceneLoading])
 
   if (phase.kind === 'loading') return <LoaderPortal />
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>
 
   return (
-    <div className="relative h-screen w-screen">
+    <div className="relative h-screen w-screen overflow-hidden" ref={rootRef}>
+      {sceneLoading && (
+        <div className="fixed inset-0 z-[300]" style={{ background: '#FFF4E2' }}>
+          <LoaderPortal />
+        </div>
+      )}
       <SaveBanner detail={detail} dismissed={dismissed} onKeepEditing={() => setDismissed(true)} status={status} />
       <Editor
+        chrome={chrome}
         guardAgainstSceneWipe
         layoutVersion="v2"
         onLoad={onLoad}
+        onThumbnailCapture={onThumbnailCapture}
         onSave={onSave}
         projectId={projectId}
-        sidebarTabs={sidebarTabs}
+      />
+      <EditorShell
+        author={authorName(session?.user)}
+        backBusy={leaving}
+        bridge={bridge}
+        catalog={items}
+        onBack={() => go('/proyectos')}
+        projectName={phase.name}
+        saveStatus={status}
       />
     </div>
   )

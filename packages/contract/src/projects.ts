@@ -2,7 +2,13 @@ import { z } from 'zod'
 import { SceneEnvelopeSchema } from './scene.js'
 
 export const ProjectKindSchema = z.enum(['vivienda', 'comercio'])
-export const ProjectNameSchema = z.string().trim().min(1).max(80)
+/** 1 a 80 caracteres tras recortar y sin caracteres de control (saltos de línea, tabuladores…); la base lo repite con un check. */
+export const ProjectNameSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(80)
+  .regex(/^[^\p{Cc}]+$/u, 'El nombre no puede tener saltos de línea ni caracteres de control')
 /** Id de la plantilla de la que nació el proyecto; el mismo patrón que valida la columna `projects.template_id`. */
 export const TemplateIdSchema = z.string().regex(/^[a-z0-9-]{1,40}$/)
 

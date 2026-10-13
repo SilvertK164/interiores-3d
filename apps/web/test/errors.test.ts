@@ -8,7 +8,7 @@ describe('friendlyMessage', () => {
     expect(friendlyMessage(new ApiError(401, 'no_autenticado', 'x'))).toMatch(/sesión/i)
     expect(friendlyMessage(new ApiError(404, 'no_encontrado', 'x'))).toMatch(/no encontramos/i)
     expect(friendlyMessage(new ApiError(409, 'version_desactualizada', 'x'))).toMatch(/otra pestaña|más nueva/i)
-    expect(friendlyMessage(new ApiError(413, 'escena_demasiado_grande', 'x'))).toMatch(/5 MB/)
+    expect(friendlyMessage(new ApiError(413, 'escena_demasiado_grande', 'x'))).toMatch(/4 MB/)
     expect(friendlyMessage(new ApiError(0, 'sin_conexion', 'x'))).toMatch(/conexión/i)
   })
 

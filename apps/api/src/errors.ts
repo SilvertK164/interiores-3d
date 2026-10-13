@@ -1,4 +1,4 @@
-import { ERROR_CODES, type ErrorBody } from '@interiores/contract'
+import { ANALYSES_PER_HOUR, ANALYZE_IMAGE_MAX_BYTES, ERROR_CODES, type ErrorBody } from '@interiores/contract'
 
 export class AppError extends Error {
   constructor(
@@ -20,10 +20,24 @@ export const errors = {
       ERROR_CODES.conflict,
       'El proyecto cambió desde que lo abriste. Recarga la versión del servidor o sigue editando sin guardar.',
     ),
-  tooLarge: () => new AppError(413, ERROR_CODES.tooLarge, 'La escena supera el límite de 5 MB.'),
+  tooLarge: () => new AppError(413, ERROR_CODES.tooLarge, 'La escena supera el límite de 4 MB.'),
   preconditionRequired: () =>
     new AppError(428, ERROR_CODES.preconditionRequired, 'Falta el encabezado If-Match con la versión que tienes abierta.'),
   internal: () => new AppError(500, ERROR_CODES.internal, 'Ocurrió un error inesperado. Inténtalo de nuevo.'),
+
+  // Análisis de fotos (POST /v1/analyze-room): lo que se le dice a la persona, sin nombres del proveedor ni de la configuración.
+  analysisUnavailable: () =>
+    new AppError(503, ERROR_CODES.analysisUnavailable, 'El análisis de fotos no está disponible por ahora. Inténtalo más tarde.'),
+  analysisFailed: () =>
+    new AppError(502, ERROR_CODES.analysisFailed, 'No pudimos analizar la foto en este momento. Inténtalo de nuevo en unos minutos.'),
+  analysisLimit: () =>
+    new AppError(429, ERROR_CODES.analysisLimit, `Llegaste al límite de ${ANALYSES_PER_HOUR} análisis por hora. Inténtalo más tarde.`),
+  invalidCatalog: () =>
+    new AppError(422, ERROR_CODES.invalidCatalog, 'La lista de muebles del catálogo no es válida. Recarga la página e inténtalo de nuevo.'),
+  unreadableImage: () =>
+    new AppError(422, ERROR_CODES.unreadableImage, 'No pudimos leer la foto. Prueba con otra imagen en formato JPG, PNG o WebP.'),
+  imageTooLarge: () =>
+    new AppError(413, ERROR_CODES.imageTooLarge, `La foto supera el límite de ${ANALYZE_IMAGE_MAX_BYTES / (1024 * 1024)} MB. Prueba con una más liviana.`),
 }
 
 export function errorBody(code: string, message: string): ErrorBody {

@@ -41,6 +41,7 @@ describe('autenticación', () => {
     ['PATCH', '/v1/projects/0b0e8d9c-6a40-4d6e-9a3c-1f2f6a0f1b11'],
     ['DELETE', '/v1/projects/0b0e8d9c-6a40-4d6e-9a3c-1f2f6a0f1b11'],
     ['PUT', '/v1/projects/0b0e8d9c-6a40-4d6e-9a3c-1f2f6a0f1b11/scene'],
+    ['POST', '/v1/analyze-room'],
   ]
 
   it.each(routes)('%s %s sin token responde 401 con el cuerpo de error en castellano', async (method, url) => {
@@ -226,7 +227,7 @@ describe('PUT /v1/projects/:id/scene', () => {
     expect(res.statusCode).toBe(404)
   })
 
-  it('una escena mayor de 5 MB responde 413 con mensaje en castellano', async () => {
+  it('una escena mayor de 4 MB responde 413 con mensaje en castellano', async () => {
     const p = await createProject()
     const big = { ...emptyEnvelope(), graph: { nodes: { x: 'a'.repeat(SCENE_MAX_BYTES + 10) }, rootNodeIds: [] } }
     const res = await put(p.id, { ...headersA, 'if-match': '1', 'content-type': 'application/json' }, JSON.stringify(big))

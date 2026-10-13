@@ -11,13 +11,13 @@ const item = (id: string, folder = id) => ({
   floorPlanUrl: `${BUCKET}/${folder}/floor-plan.png`,
   dimensions: [1, 1, 1],
 })
-const manifest = { sofa: ['model.glb', 'thumbnail.webp', 'floor-plan.svg'], 'kitchen-cabinet': ['model.glb'] }
+const manifest = { sofa: ['model.glb', 'thumbnail.webp', 'floor-plan.png'], 'kitchen-cabinet': ['model.glb'] }
 
 describe('localizeCatalog', () => {
   it('conserva solo las piezas con modelo local y reescribe sus rutas a /items/<carpeta>/', () => {
     const local = localizeCatalog([item('sofa'), item('cabinet', 'kitchen-cabinet'), item('subida-de-usuario')], manifest)
     expect(local.map((i) => i.id)).toEqual(['sofa', 'cabinet'])
-    expect(local[0]).toMatchObject({ src: '/items/sofa/model.glb', thumbnail: '/items/sofa/thumbnail.webp', floorPlanUrl: '/items/sofa/floor-plan.svg' })
+    expect(local[0]).toMatchObject({ src: '/items/sofa/model.glb', thumbnail: '/items/sofa/thumbnail.webp', floorPlanUrl: '/items/sofa/floor-plan.png' })
   })
 
   it('con el manifiesto real del proyecto el sofá del catálogo oficial está disponible', () => {

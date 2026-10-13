@@ -25,8 +25,8 @@ for (const [path, item] of Object.entries(spec.paths)) {
 const real = new Set([...registered].filter((r) => !r.startsWith('HEAD ') && !r.startsWith('OPTIONS ')))
 
 describe('contrato OpenAPI ↔ rutas registradas', () => {
-  it('el registro de rutas no está vacío (las 6 de negocio y /health)', () => {
-    expect(real.size).toBe(7)
+  it('el registro de rutas no está vacío (las 6 de proyectos, el análisis de fotos y /health)', () => {
+    expect(real.size).toBe(8)
   })
 
   it('toda ruta del código está en el yaml', () => {

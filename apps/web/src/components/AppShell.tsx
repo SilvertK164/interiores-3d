@@ -17,6 +17,9 @@ const fraunces = Fraunces({
   axes: ['SOFT', 'opsz'],
 })
 
+/** Clases con las variables de fuente (DM Sans, Bricolage y Fraunces) para quien las necesite fuera de `.app-shell`, como el editor. */
+export const appFontClasses = `${dmSans.variable} ${bricolage.variable} ${fraunces.variable}`
+
 export function AppShell({
   children,
   className = '',
@@ -26,7 +29,7 @@ export function AppShell({
 }) {
   return (
     <div
-      className={`app-shell ${dmSans.variable} ${bricolage.variable} ${fraunces.variable} ${className}`}
+      className={`app-shell ${appFontClasses} ${className}`}
     >
       {children}
     </div>

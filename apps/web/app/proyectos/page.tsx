@@ -15,19 +15,17 @@ import { api } from '@/lib/api/instance'
 import { type NewProjectPreset, parseNewProjectParam } from '@/lib/new-project-preset'
 import { greetingName, savedName } from '@/lib/person-name'
 import { filterProjects, filterTemplates } from '@/lib/project-search'
-import { supabaseBrowser } from '@/lib/supabase/browser'
 import { CHIPS_ROW, GREETING_ROW, PROJECTS_FRAME, SECTION, SECTION_TITLE } from '@/lib/ui-layout'
 import { greetingForHour, pluralProjects, whenLabel } from '@/lib/ui-text'
 import { useLoginRedirect } from '@/lib/use-login-redirect'
-import { useNavigate } from '@/lib/use-navigate'
 import { useSession } from '@/lib/use-session'
+import { useSignOut } from '@/lib/use-sign-out'
 
 const CHIP = 'chip glass bg-white/70'
 
 export default function ProjectsPage() {
-  const nav = useNavigate()
   const toLogin = useLoginRedirect()
-  const [leaving, setLeaving] = useState(false)
+  const { leaving, signingOut, signOut } = useSignOut()
   const { session, loading, hadSession } = useSession()
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -67,16 +65,6 @@ export default function ProjectsPage() {
 
   const openDialog = (templateId: string | null = null) => setDialog({ open: true, preset: templateId ? { templateId } : null })
   const closeDialog = () => setDialog((d) => ({ ...d, open: false }))
-  const signOut = async () => {
-    if (leaving || nav.pending) return
-    setLeaving(true)
-    try {
-      await supabaseBrowser().auth.signOut()
-      nav.go('/login', 'replace')
-    } catch {
-      setLeaving(false)
-    }
-  }
 
   if (loading || !session) {
     return (
@@ -106,7 +94,7 @@ export default function ProjectsPage() {
           onQuery={setQuery}
           onSignOut={signOut}
           query={query}
-          signingOut={leaving || nav.pending}
+          signingOut={signingOut}
         />
 
         <div className={GREETING_ROW}>

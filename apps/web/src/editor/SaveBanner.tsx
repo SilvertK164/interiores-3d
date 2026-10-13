@@ -4,18 +4,23 @@ import type { SaverStatus } from './scene-saver'
 
 type Props = { status: SaverStatus; detail?: string; onKeepEditing: () => void; dismissed: boolean }
 
-/** Estado de guardado siempre visible; en conflicto, sesión vencida o rechazo explica qué hacer sin perder lo local. */
+const ALERT = 'absolute left-1/2 top-24 z-50 -translate-x-1/2 rounded-xl bg-white p-4 text-sm shadow-lg'
+
+/**
+ * Avisos que explican qué hacer cuando el guardado se detiene (rechazo, conflicto o sesión vencida) sin perder lo local.
+ * El estado corriente (guardando, guardado…) lo muestra el chip de la barra superior del shell.
+ */
 export function SaveBanner({ status, detail, onKeepEditing, dismissed }: Props) {
   if (status === 'rejected') {
     return (
-      <div data-testid="save-alert" role="alert" className="absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-xl bg-white p-4 text-sm shadow-lg">
+      <div data-testid="save-alert" role="alert" className={ALERT}>
         {detail ?? 'La escena no se puede guardar.'} Tu trabajo local sigue en esta pantalla.
       </div>
     )
   }
   if (status === 'conflict' && !dismissed) {
     return (
-      <div data-testid="save-alert" role="alert" className="absolute left-1/2 top-4 z-50 flex -translate-x-1/2 flex-col gap-2 rounded-xl bg-white p-4 shadow-lg">
+      <div data-testid="save-alert" role="alert" className={`${ALERT} flex flex-col gap-2`}>
         <p className="text-sm font-medium">Este proyecto cambió desde otra pestaña y tiene una versión más nueva.</p>
         <p className="text-sm text-muted-foreground">Tu trabajo local sigue aquí. Elige qué hacer:</p>
         <div className="flex gap-2">
@@ -31,23 +36,14 @@ export function SaveBanner({ status, detail, onKeepEditing, dismissed }: Props) 
   }
   if (status === 'unauthorized') {
     return (
-      <div data-testid="save-alert" role="alert" className="absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-xl bg-white p-4 text-sm shadow-lg">
-        Tu sesión venció. Tu trabajo local sigue aquí: <a className="underline" href="/login" rel="noreferrer" target="_blank">ingresa de nuevo en otra pestaña</a> y este editor retomará el guardado solo.
+      <div data-testid="save-alert" role="alert" className={ALERT}>
+        Tu sesión venció. Tu trabajo local sigue aquí:{' '}
+        <a className="underline" href="/login" rel="noreferrer" target="_blank">
+          ingresa de nuevo en otra pestaña
+        </a>{' '}
+        y este editor retomará el guardado solo.
       </div>
     )
   }
-  const label: Record<string, string> = {
-    pending: 'Cambios sin guardar…',
-    saving: 'Guardando…',
-    saved: 'Guardado',
-    error: 'No pudimos guardar. Reintentando…',
-    conflict: 'Sin guardar (versión desactualizada)',
-  }
-  const text = label[status]
-  if (!text) return null
-  return (
-    <p data-testid="save-status" role="status" className="absolute right-4 top-4 z-50 rounded-full bg-white/90 px-3 py-1 text-xs shadow">
-      {text}
-    </p>
-  )
+  return null
 }

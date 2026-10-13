@@ -22,6 +22,13 @@ describe('CreateProjectBody', () => {
     expect(CreateProjectBodySchema.safeParse({ name: 'a'.repeat(80) }).success).toBe(true)
   })
 
+  it('rechaza saltos de línea y otros caracteres de control dentro del nombre', () => {
+    for (const bad of ['Casa\nAlvear', 'Casa\tAlvear', 'Casa\u0000Alvear', 'Casa\u007fAlvear', 'Casa\u0085Alvear']) {
+      expect(CreateProjectBodySchema.safeParse({ name: bad }).success, JSON.stringify(bad)).toBe(false)
+    }
+    expect(CreateProjectBodySchema.safeParse({ name: 'Casa Alvear ñ 2' }).success).toBe(true)
+  })
+
   it('solo admite vivienda o comercio como tipo', () => {
     expect(CreateProjectBodySchema.safeParse({ name: 'x', kind: 'oficina' }).success).toBe(false)
     expect(CreateProjectBodySchema.safeParse({ name: 'x', kind: 'comercio' }).success).toBe(true)

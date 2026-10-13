@@ -1,0 +1,132 @@
+export type CatalogCategoryId = 'estar' | 'dormitorio' | 'cocina' | 'bano' | 'exterior' | 'otros'
+
+export const CATALOG_CATEGORIES: readonly { id: CatalogCategoryId; label: string }[] = [
+  { id: 'estar', label: 'Estar' },
+  { id: 'dormitorio', label: 'Dormitorio' },
+  { id: 'cocina', label: 'Cocina' },
+  { id: 'bano', label: 'Baño' },
+  { id: 'exterior', label: 'Exterior' },
+  { id: 'otros', label: 'Otros' },
+]
+
+type Entry = readonly [name: string, category: CatalogCategoryId]
+
+/** Nombre y categoría en castellano de los 101 ítems del catálogo de Pascal con modelo local (la clave es su `id`). */
+export const CATALOG_ES: Readonly<Record<string, Entry>> = {
+  // Muebles
+  cactus: ['Cactus', 'estar'],
+  'tv-stand': ['Mueble de TV', 'estar'],
+  'single-bed': ['Cama individual', 'dormitorio'],
+  'livingroom-chair': ['Sillón', 'estar'],
+  'small-indoor-plant': ['Planta chica', 'estar'],
+  column: ['Columna decorativa', 'otros'],
+  barbell: ['Mancuerna', 'otros'],
+  toy: ['Juguete', 'otros'],
+  'barbell-stand': ['Soporte de pesas', 'otros'],
+  books: ['Libros', 'estar'],
+  stool: ['Taburete', 'estar'],
+  'pool-table': ['Mesa de billar', 'otros'],
+  bookshelf: ['Biblioteca', 'estar'],
+  'coat-rack': ['Perchero', 'estar'],
+  'car-toy': ['Auto de juguete', 'otros'],
+  'bedside-table': ['Mesa de noche', 'dormitorio'],
+  cabinet: ['Gabinete modular', 'cocina'],
+  sofa: ['Sofá', 'estar'],
+  bunkbed: ['Litera', 'dormitorio'],
+  'office-table': ['Escritorio', 'otros'],
+  'dining-table': ['Mesa de comedor', 'estar'],
+  guitar: ['Guitarra', 'otros'],
+  'trash-bin': ['Cesto de basura', 'otros'],
+  'recessed-light': ['Luz empotrada', 'otros'],
+  shelf: ['Estante', 'estar'],
+  'table-lamp': ['Lámpara de mesa', 'estar'],
+  'ceiling-lamp': ['Lámpara de techo', 'estar'],
+  closet: ['Armario', 'dormitorio'],
+  'coffee-table': ['Mesa de centro', 'estar'],
+  'dining-chair': ['Silla de comedor', 'estar'],
+  dresser: ['Cómoda', 'dormitorio'],
+  'indoor-plant': ['Planta de interior', 'estar'],
+  'ironing-board': ['Tabla de planchar', 'otros'],
+  'double-bed': ['Cama doble', 'dormitorio'],
+  'floor-lamp': ['Lámpara de pie', 'estar'],
+  easel: ['Caballete', 'otros'],
+  'lounge-chair': ['Sillón de descanso', 'estar'],
+  'office-chair': ['Silla de oficina', 'otros'],
+  piano: ['Piano', 'estar'],
+  picture: ['Cuadro', 'estar'],
+  'rectangular-carpet': ['Alfombra rectangular', 'estar'],
+  'round-mirror': ['Espejo redondo', 'estar'],
+  'round-carpet': ['Alfombra redonda', 'estar'],
+  threadmill: ['Cinta para correr', 'otros'],
+  // Electrodomésticos e instalaciones
+  sprinkler: ['Rociador', 'otros'],
+  'exit-sign': ['Cartel de salida', 'otros'],
+  'sewing-machine': ['Máquina de coser', 'otros'],
+  television: ['Televisor', 'estar'],
+  'ac-block': ['Unidad exterior de aire', 'otros'],
+  'stereo-speaker': ['Parlante', 'estar'],
+  thermostat: ['Termostato', 'otros'],
+  toaster: ['Tostadora', 'cocina'],
+  kettle: ['Hervidor eléctrico', 'cocina'],
+  hydrant: ['Hidrante', 'exterior'],
+  'fire-detector': ['Detector de incendios', 'otros'],
+  'smoke-detector': ['Detector de humo', 'otros'],
+  'coffee-machine': ['Cafetera', 'cocina'],
+  'ceiling-fan': ['Ventilador de techo', 'estar'],
+  iron: ['Plancha', 'otros'],
+  'air-conditioning': ['Aire acondicionado', 'estar'],
+  computer: ['Computadora', 'otros'],
+  'alarm-keypad': ['Teclado de alarma', 'otros'],
+  'ev-wall-charger': ['Cargador para auto eléctrico', 'exterior'],
+  'electric-panel': ['Tablero eléctrico', 'otros'],
+  // Baño
+  'bathroom-sink': ['Lavabo', 'bano'],
+  'shower-angle': ['Ducha de esquina', 'bano'],
+  'toilet-paper': ['Papel higiénico', 'bano'],
+  'washing-machine': ['Lavadora', 'bano'],
+  'shower-rug': ['Alfombra de baño', 'bano'],
+  bathtub: ['Bañera', 'bano'],
+  'laundry-bag': ['Bolsa de ropa sucia', 'bano'],
+  'shower-square': ['Ducha cuadrada', 'bano'],
+  'drying-rack': ['Tendedero', 'bano'],
+  toilet: ['Inodoro', 'bano'],
+  // Cocina
+  microwave: ['Microondas', 'cocina'],
+  'cutting-board': ['Tabla de cortar', 'cocina'],
+  'kitchen-utensils': ['Utensilios de cocina', 'cocina'],
+  'kitchen-counter': ['Encimera de cocina', 'cocina'],
+  hood: ['Campana extractora', 'cocina'],
+  'kitchen-cabinet': ['Mueble de cocina', 'cocina'],
+  kitchen: ['Bloque de cocina', 'cocina'],
+  'frying-pan': ['Sartén', 'cocina'],
+  fruits: ['Frutas', 'cocina'],
+  fridge: ['Refrigerador', 'cocina'],
+  'kitchen-shelf': ['Repisa de cocina', 'cocina'],
+  'wine-bottle': ['Botella de vino', 'cocina'],
+  stove: ['Cocina con horno', 'cocina'],
+  // Exterior
+  ball: ['Pelota', 'exterior'],
+  bush: ['Arbusto', 'exterior'],
+  'basket-hoop': ['Aro de básquet', 'exterior'],
+  'parking-spot': ['Lugar de estacionamiento', 'exterior'],
+  palm: ['Palmera', 'exterior'],
+  sunbed: ['Tumbona', 'exterior'],
+  'fir-tree': ['Abeto', 'exterior'],
+  tree: ['Árbol', 'exterior'],
+  skate: ['Patineta', 'exterior'],
+  'outdoor-playhouse': ['Casita de juegos', 'exterior'],
+  'patio-umbrella': ['Sombrilla de patio', 'exterior'],
+  pillar: ['Pilar', 'exterior'],
+  scooter: ['Monopatín', 'exterior'],
+  tesla: ['Auto eléctrico', 'exterior'],
+}
+
+/** Nombre en castellano de un ítem; si no está en la tabla (un ítem nuevo de Pascal) se usa el de respaldo. */
+export function nameEs(id: string, fallback: string): string {
+  return CATALOG_ES[id]?.[0] ?? fallback
+}
+
+/** Categoría de un ítem; "otros" si no está en la tabla. */
+export function categoryOf(id: string): CatalogCategoryId {
+  return CATALOG_ES[id]?.[1] ?? 'otros'
+}

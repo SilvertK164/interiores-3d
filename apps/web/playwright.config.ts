@@ -6,6 +6,8 @@ export default defineConfig({
   testDir: './e2e',
   timeout: 90_000,
   retries: 0,
+  // Dos procesos: las pruebas con WebGL por software (swiftshader) fallan por tiempo al correr más en paralelo.
+  workers: 2,
   reporter: [['list']],
   use: { baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000', trace: 'retain-on-failure' },
   webServer: [

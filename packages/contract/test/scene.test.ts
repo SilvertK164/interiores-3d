@@ -28,7 +28,7 @@ describe('SceneEnvelope', () => {
     expect(isEmptyGraph({ nodes: { wall_1: {} }, rootNodeIds: ['wall_1'] })).toBe(false)
   })
 
-  it('el límite de escena es de 5 MB', () => {
-    expect(SCENE_MAX_BYTES).toBe(5 * 1024 * 1024)
+  it('el límite de escena es de 4 MB', () => {
+    expect(SCENE_MAX_BYTES).toBe(4 * 1024 * 1024)
   })
 })

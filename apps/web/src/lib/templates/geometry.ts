@@ -1,4 +1,4 @@
-import type { CabinetDef, ItemDef, Pt, RoomDef, ShelfDef, StairDef, TemplateDefinition, WallDef } from './types'
+import type { CabinetDef, ItemDef, LevelDef, Pt, RoomDef, ShelfDef, StairDef, TemplateDefinition, WallDef } from './types'
 
 const round = (n: number) => Math.round(n * 1000) / 1000
 
@@ -13,6 +13,17 @@ export function perimeter(prefix: string, x0: number, z0: number, x1: number, z1
     { id: `${prefix}-s`, from: [x0, z1], to: [x1, z1] },
     { id: `${prefix}-w`, from: [x0, z0], to: [x0, z1] },
   ]
+}
+
+/**
+ * El punto de la definición (coordenadas positivas desde la esquina) que `buildScene` lleva al origen de la escena: el centro de la caja
+ * que envuelve los muros de la planta. Para pasar un punto de la definición al mundo de Pascal hay que restárselo (en x y en z).
+ */
+export function sceneCenter(level: Pick<LevelDef, 'walls'>): Pt {
+  const points = level.walls.flatMap((wall) => [wall.from, wall.to])
+  const xs = points.map((p) => p[0])
+  const zs = points.map((p) => p[1])
+  return [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...zs) + Math.max(...zs)) / 2]
 }
 
 type Opts = { rotY?: number; y?: number }

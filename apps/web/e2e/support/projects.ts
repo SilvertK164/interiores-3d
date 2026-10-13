@@ -46,3 +46,7 @@ export async function createProjectViaUi(page: Page, options: NewProjectOptions)
   if (options.waitForEditor !== false) await ready(page)
   return page.url()
 }
+
+/** Un proyecto en blanco con nombre único (`E2E <etiqueta> <hora>`); devuelve la URL del proyecto abierto. */
+export const createBlankProject = (page: Page, label: string) =>
+  createProjectViaUi(page, { name: `E2E ${label} ${Date.now()}`, template: null })

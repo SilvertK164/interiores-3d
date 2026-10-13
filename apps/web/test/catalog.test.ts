@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { localizeCatalogItem } from '../src/editor/catalog.js'
 import manifest from '../src/editor/local-items.json' with { type: 'json' }
+import NO_FLOOR_PLAN from '../src/editor/no-floor-plan.json' with { type: 'json' }
 
 const BUCKET = 'https://byrpxoiotywskoojsrzd.supabase.co/storage/v1/object/public/items/system'
 
@@ -25,16 +26,29 @@ const cactus = {
 }
 
 describe('localizeCatalogItem', () => {
-  it('apunta modelo, miniatura y plano 2D a los archivos propios (el sofá trae su floor-plan.svg)', () => {
+  it('apunta modelo, miniatura y plano 2D a los archivos propios (el sofá trae el floor-plan.png oficial)', () => {
     const local = localizeCatalogItem(sofa, manifest)
     expect(local?.src).toBe('/items/sofa/model.glb')
     expect(local?.thumbnail).toBe('/items/sofa/thumbnail.webp')
-    expect(local?.floorPlanUrl).toBe('/items/sofa/floor-plan.svg')
+    expect(local?.floorPlanUrl).toBe('/items/sofa/floor-plan.png')
     expect(local?.dimensions).toEqual([2, 1, 1])
   })
 
-  it('quita floorPlanUrl cuando no existe el archivo local (el cactus no lo trae)', () => {
-    expect(localizeCatalogItem(cactus, manifest)?.floorPlanUrl).toBeUndefined()
+  it('prefiere floor-plan.png y usa el .svg solo de respaldo; sin ninguno quita floorPlanUrl', () => {
+    const both = { cactus: ['model.glb', 'floor-plan.svg', 'floor-plan.png'] }
+    const onlySvg = { cactus: ['model.glb', 'floor-plan.svg'] }
+    const none = { cactus: ['model.glb'] }
+    expect(localizeCatalogItem(cactus, both)?.floorPlanUrl).toBe('/items/cactus/floor-plan.png')
+    expect(localizeCatalogItem(cactus, onlySvg)?.floorPlanUrl).toBe('/items/cactus/floor-plan.svg')
+    expect(localizeCatalogItem(cactus, none)?.floorPlanUrl).toBeUndefined()
+  })
+
+  it('todos los muebles locales traen su proyección en planta; solo faltan modelos viejos que el catálogo de Pascal ya no ofrece (no-floor-plan.json)', () => {
+    const missing = Object.entries(manifest)
+      .filter(([, files]) => files.includes('model.glb') && !files.includes('floor-plan.png'))
+      .map(([folder]) => folder)
+    expect(missing).toEqual([...NO_FLOOR_PLAN].sort())
+    expect(missing).not.toContain('sofa')
   })
 
   it('conserva la herramienta nativa y usa la carpeta del modelo (cabinet vive en kitchen-cabinet)', () => {

@@ -1464,6 +1464,7 @@
      "category": "appliance",
      "name": "Computer",
      "thumbnail": "/items/computer/thumbnail.webp",
+     "floorPlanUrl": "/items/computer/floor-plan.png",
      "source": "library",
      "src": "/items/computer/model.glb",
      "dimensions": [
@@ -1533,6 +1534,7 @@
      "category": "appliance",
      "name": "Computer",
      "thumbnail": "/items/computer/thumbnail.webp",
+     "floorPlanUrl": "/items/computer/floor-plan.png",
      "source": "library",
      "src": "/items/computer/model.glb",
      "dimensions": [
@@ -1602,6 +1604,7 @@
      "category": "appliance",
      "name": "Computer",
      "thumbnail": "/items/computer/thumbnail.webp",
+     "floorPlanUrl": "/items/computer/floor-plan.png",
      "source": "library",
      "src": "/items/computer/model.glb",
      "dimensions": [
@@ -1671,6 +1674,7 @@
      "category": "furniture",
      "name": "Trash Bin",
      "thumbnail": "/items/trash-bin/thumbnail.webp",
+     "floorPlanUrl": "/items/trash-bin/floor-plan.png",
      "source": "library",
      "src": "/items/trash-bin/model.glb",
      "dimensions": [
@@ -1727,6 +1731,7 @@
      "category": "furniture",
      "name": "Trash Bin",
      "thumbnail": "/items/trash-bin/thumbnail.webp",
+     "floorPlanUrl": "/items/trash-bin/floor-plan.png",
      "source": "library",
      "src": "/items/trash-bin/model.glb",
      "dimensions": [
@@ -1783,6 +1788,7 @@
      "category": "furniture",
      "name": "Indoor Plant",
      "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "floorPlanUrl": "/items/indoor-plant/floor-plan.png",
      "source": "library",
      "src": "/items/indoor-plant/model.glb",
      "dimensions": [
@@ -1852,6 +1858,7 @@
      "category": "appliance",
      "name": "Coffee Machine",
      "thumbnail": "/items/coffee-machine/thumbnail.webp",
+     "floorPlanUrl": "/items/coffee-machine/floor-plan.png",
      "source": "library",
      "src": "/items/coffee-machine/model.glb",
      "dimensions": [
@@ -1921,6 +1928,7 @@
      "category": "kitchen",
      "name": "Stove",
      "thumbnail": "/items/stove/thumbnail.webp",
+     "floorPlanUrl": "/items/stove/floor-plan.png",
      "source": "library",
      "src": "/items/stove/model.glb",
      "dimensions": [
@@ -1978,6 +1986,7 @@
      "category": "kitchen",
      "name": "Fridge",
      "thumbnail": "/items/fridge/thumbnail.webp",
+     "floorPlanUrl": "/items/fridge/floor-plan.png",
      "source": "library",
      "src": "/items/fridge/model.glb",
      "dimensions": [
@@ -2047,6 +2056,7 @@
      "category": "furniture",
      "name": "Office Table",
      "thumbnail": "/items/office-table/thumbnail.webp",
+     "floorPlanUrl": "/items/office-table/floor-plan.png",
      "source": "library",
      "src": "/items/office-table/model.glb",
      "dimensions": [
@@ -2118,7 +2128,7 @@
      "category": "furniture",
      "name": "Office Chair",
      "thumbnail": "/items/office-chair/thumbnail.webp",
-     "floorPlanUrl": "/items/office-chair/floor-plan.svg",
+     "floorPlanUrl": "/items/office-chair/floor-plan.png",
      "source": "library",
      "src": "/items/office-chair/model.glb",
      "dimensions": [
@@ -2187,6 +2197,7 @@
      "category": "appliance",
      "name": "Computer",
      "thumbnail": "/items/computer/thumbnail.webp",
+     "floorPlanUrl": "/items/computer/floor-plan.png",
      "source": "library",
      "src": "/items/computer/model.glb",
      "dimensions": [
@@ -2256,6 +2267,7 @@
      "category": "bathroom",
      "name": "Toilet",
      "thumbnail": "/items/toilet/thumbnail.webp",
+     "floorPlanUrl": "/items/toilet/floor-plan.png",
      "source": "library",
      "src": "/items/toilet/model.glb",
      "dimensions": [
@@ -2313,6 +2325,7 @@
      "category": "bathroom",
      "name": "Bathroom Sink",
      "thumbnail": "/items/bathroom-sink/thumbnail.webp",
+     "floorPlanUrl": "/items/bathroom-sink/floor-plan.png",
      "source": "library",
      "src": "/items/bathroom-sink/model.glb",
      "dimensions": [
@@ -2382,6 +2395,7 @@
      "category": "furniture",
      "name": "Indoor Plant",
      "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "floorPlanUrl": "/items/indoor-plant/floor-plan.png",
      "source": "library",
      "src": "/items/indoor-plant/model.glb",
      "dimensions": [
@@ -2451,6 +2465,7 @@
      "category": "furniture",
      "name": "Indoor Plant",
      "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "floorPlanUrl": "/items/indoor-plant/floor-plan.png",
      "source": "library",
      "src": "/items/indoor-plant/model.glb",
      "dimensions": [

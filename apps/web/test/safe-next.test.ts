@@ -7,7 +7,7 @@ describe('safeNext', () => {
       '/proyectos',
       '/proyectos/3f2a9c1e-0000-4000-8000-000000000000',
       '/proyectos?nuevo=vivienda',
-      '/laboratorio#fotos',
+      '/escena-desde-foto#fotos',
       '/proyectos/abc?x=1&y=2#z',
       '/',
     ]) {

@@ -36,10 +36,10 @@ describe('LoaderPortal (carga de pantalla completa)', () => {
 
   it('el texto es configurable', () => {
     const custom = renderToStaticMarkup(
-      createElement(LoaderPortal, { label: 'Abriendo el laboratorio' }),
+      createElement(LoaderPortal, { label: 'Abriendo la escena' }),
     )
-    expect(custom).toContain('aria-label="Abriendo el laboratorio"')
-    expect(custom).toContain('<span class="sr-only">Abriendo el laboratorio</span>')
+    expect(custom).toContain('aria-label="Abriendo la escena"')
+    expect(custom).toContain('<span class="sr-only">Abriendo la escena</span>')
   })
 
   it('solo dibuja el logotipo: letras ocultas a los lectores, sin puntos ni barra de avance', () => {

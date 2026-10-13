@@ -14,6 +14,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: El parche de Pascal quedó aplicado
+        run: pnpm --filter @interiores/web exec vitest run pascal-patch
       - name: Supabase local (Docker)
         run: pnpm db:start
       - name: Variables de prueba desde Supabase local

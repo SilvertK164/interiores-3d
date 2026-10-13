@@ -168,3 +168,78 @@ describe('RLS de project_scenes', () => {
     expect(left.data).toEqual([])
   })
 })
+
+describe('límites en la base (migración 003): no se saltan yendo directo a PostgREST', () => {
+  const MIB = 1024 * 1024
+  const sceneWith = (extra: Record<string, unknown>) => ({ ...emptyScene, ...extra })
+  const newProject = async () => makeProject(a, `Límites ${Math.random().toString(36).slice(2, 8)}`)
+
+  it('rechaza una escena de más de 4 MiB y acepta una de unos 3 MiB', async () => {
+    const id = await newProject()
+    const big = { ...emptyScene, graph: { nodes: { x: 'a'.repeat(4 * MIB) }, rootNodeIds: [] } }
+    const rejected = await a.client.from('project_scenes').insert({ project_id: id, scene: big, schema_version: 1 })
+    expect(rejected.error?.code).toBe('23514')
+    expect(rejected.error?.message).toContain('project_scenes_scene_size')
+
+    const fine = { ...emptyScene, graph: { nodes: { x: 'a'.repeat(3 * MIB) }, rootNodeIds: [] } }
+    const accepted = await a.client.from('project_scenes').insert({ project_id: id, scene: fine, schema_version: 1 })
+    expect(accepted.error).toBeNull()
+    const grow = await a.client.from('project_scenes').update({ scene: big, version: 2 }).eq('project_id', id).select('version')
+    expect(grow.error?.code).toBe('23514')
+  })
+
+  it.each([
+    ['un arreglo en vez de un objeto', []],
+    ['una cadena', 'hola'],
+    ['sin schemaVersion', { pascal: { core: '1.0.3' }, graph: { nodes: {}, rootNodeIds: [] } }],
+    ['schemaVersion como texto', sceneWith({ schemaVersion: '1' })],
+    ['schemaVersion distinto de schema_version', sceneWith({ schemaVersion: 2 })],
+    ['sin graph', { schemaVersion: 1, pascal: { core: '1.0.3' } }],
+    ['graph como arreglo', sceneWith({ graph: [] })],
+    ['graph sin nodes', sceneWith({ graph: { rootNodeIds: [] } })],
+    ['graph sin rootNodeIds', sceneWith({ graph: { nodes: {} } })],
+    ['sin pascal.core', { schemaVersion: 1, graph: { nodes: {}, rootNodeIds: [] } }],
+  ])('rechaza una escena con la forma equivocada: %s', async (_motivo, scene) => {
+    const id = await newProject()
+    const { error } = await a.client.from('project_scenes').insert({ project_id: id, scene, schema_version: 1 })
+    expect(error?.code).toBe('23514')
+    expect(error?.message).toContain('project_scenes_scene_shape')
+  })
+
+  it('rechaza nombres vacíos, de solo espacios, de 81 caracteres y con caracteres de control', async () => {
+    for (const name of ['', '   ', 'x'.repeat(81), 'Casa\nAlvear', 'Casa\tAlvear', 'Casa\u007fAlvear']) {
+      const { error } = await a.client.from('projects').insert({ owner_id: a.id, name })
+      expect(error?.code, JSON.stringify(name)).toBe('23514')
+    }
+    const renamed = await a.client.from('projects').update({ name: 'a\nb' }).eq('id', projectA).select('id')
+    expect(renamed.error?.code).toBe('23514')
+    const ok = await a.client.from('projects').insert({ owner_id: a.id, name: 'x'.repeat(80) })
+    expect(ok.error).toBeNull()
+  })
+
+  it('el proyecto 51 de una persona es rechazado con un mensaje en castellano y otra persona sigue pudiendo crear', async () => {
+    const c = await createTestUser(env, admin, 'c')
+    const d = await createTestUser(env, admin, 'd')
+    try {
+      const rows = Array.from({ length: 50 }, (_, i) => ({ owner_id: c.id, name: `Proyecto ${i + 1}` }))
+      const bulk = await c.client.from('projects').insert(rows)
+      expect(bulk.error).toBeNull()
+
+      const over = await c.client.from('projects').insert({ owner_id: c.id, name: 'El 51' })
+      expect(over.error?.code).toBe('53400')
+      expect(over.error?.message).toMatch(/límite de 50 proyectos/)
+
+      const other = await d.client.from('projects').insert({ owner_id: d.id, name: 'El primero de D' })
+      expect(other.error).toBeNull()
+
+      // Borrar uno libera un cupo.
+      const first = await c.client.from('projects').select('id').limit(1).single()
+      await c.client.from('projects').delete().eq('id', (first.data as { id: string }).id)
+      const again = await c.client.from('projects').insert({ owner_id: c.id, name: 'Otra vez el 50' })
+      expect(again.error).toBeNull()
+    } finally {
+      await deleteTestUser(admin, c)
+      await deleteTestUser(admin, d)
+    }
+  })
+})

@@ -1,0 +1,88 @@
+/*
+ * Aspecto propio del shell del editor (barra, dock y paneles flotantes sobre el lienzo de Pascal).
+ * Va sin capa, así que gana a las utilidades de Tailwind donde hace falta. Las fuentes llegan por las variables
+ * de next/font que `applyEditorTheme` pone en <body> (portales incluidos).
+ */
+.editor-shell {
+  font-family: var(--font-dm), ui-sans-serif, system-ui, sans-serif;
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Todo lo que flota: vidrio firme para leerse sobre el plano o el 3D, con sombra de dos capas. El contenedor del shell no
+   recibe clics (deja pasar el lienzo): cada pieza flotante sí. */
+.shell-float {
+  pointer-events: auto;
+  background: rgb(255 255 255 / 0.84);
+  box-shadow:
+    0 1px 2px rgb(11 31 77 / 0.06),
+    0 14px 36px rgb(11 31 77 / 0.12);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .shell-float {
+    background: rgb(255 255 255 / 0.97);
+  }
+}
+
+/* El Loader compacto dentro de un chip: más pequeño y con el peso del texto del chip. */
+.shell-chip-loader .madori-loader--inline .madori-loader__win {
+  height: 22px;
+}
+.shell-chip-loader .madori-loader__label {
+  color: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Sin `outline-color` en las transiciones: el anillo de foco aparece ya en cobalto, sin un destello oscuro. */
+.editor-shell button,
+.editor-shell li {
+  transition-property: background-color, color, box-shadow, transform, opacity;
+}
+
+/* Objetivo táctil de 44 px aunque el chip se vea más bajo. */
+.shell-hit {
+  position: relative;
+}
+.shell-hit::after {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
+}
+
+/* Desplazamiento fino dentro de un panel. */
+.shell-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(11 31 77 / 0.22) transparent;
+  overscroll-behavior: contain;
+}
+
+/* Etiqueta emergente de "Pronto": aparece con el cursor o con el foco del teclado. */
+.shell-soon .shell-tip {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+  pointer-events: none;
+}
+.shell-soon:hover .shell-tip,
+.shell-soon:focus-visible .shell-tip {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editor-shell *,
+  .editor-shell *::before,
+  .editor-shell *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* La brújula de Pascal ("Align view to north", en inglés) cae justo sobre Deshacer y Rehacer y la maqueta no la trae. */
+button[aria-label='Align view to north'] {
+  display: none;
+}

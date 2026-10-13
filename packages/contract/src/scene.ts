@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 export const SCHEMA_VERSION = 1
-export const SCENE_MAX_BYTES = 5 * 1024 * 1024
+/** Tope de una escena (JSON). Vercel corta los cuerpos en 4,5 MB; la base lo repite con un check (migración 003). */
+export const SCENE_MAX_BYTES = 4 * 1024 * 1024
 export const PASCAL_CORE_VERSION = '1.0.3'
 
 export const SceneGraphSchema = z.looseObject({
