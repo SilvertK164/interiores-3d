@@ -1,0 +1,299 @@
+openapi: 3.1.0
+info:
+  title: API de Interiores
+  version: 1.0.0
+  description: >-
+    API del diseñador de interiores 2D/3D. Todas las rutas de /v1 exigen un token
+    de Supabase Auth (Bearer). Todos los errores usan ErrorBody con mensajes en castellano.
+servers:
+  - url: http://localhost:3001
+    description: Desarrollo local
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Estado del servicio
+      security: []
+      responses:
+        '200':
+          description: El servicio responde
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /v1/projects:
+    get:
+      operationId: listProjects
+      summary: Lista los proyectos de la persona, el más reciente primero
+      responses:
+        '200':
+          description: Lista de proyectos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createProject
+      summary: Crea un proyecto con su escena vacía
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectBody'
+      responses:
+        '201':
+          description: Proyecto creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCreated'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /v1/projects/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: getProject
+      summary: Devuelve el proyecto con su escena
+      responses:
+        '200':
+          description: Proyecto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: updateProject
+      summary: Cambia el nombre o el tipo del proyecto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectBody'
+      responses:
+        '200':
+          description: Proyecto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      operationId: deleteProject
+      summary: Elimina el proyecto y su escena
+      responses:
+        '204':
+          description: Eliminado, sin cuerpo
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/projects/{id}/scene:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    put:
+      operationId: saveScene
+      summary: Guarda la escena completa (bloqueo optimista por versión)
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SceneEnvelope'
+      responses:
+        '200':
+          description: Escena guardada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SceneSaved'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/TooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    ProjectId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      description: Versión de la escena que la persona tiene cargada
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    Unauthorized:
+      description: Falta la sesión o venció
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    NotFound:
+      description: No existe o no es de esta persona (nunca se responde 403)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    ValidationError:
+      description: Los datos enviados no cumplen el contrato
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    Conflict:
+      description: La versión enviada ya no es la vigente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    TooLarge:
+      description: La escena supera los 5 MB
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    PreconditionRequired:
+      description: Falta el encabezado If-Match
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+  schemas:
+    Health:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: ok
+    ProjectKind:
+      type: string
+      enum: [vivienda, comercio]
+    ProjectSummary:
+      type: object
+      required: [id, name, kind, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        kind:
+          oneOf:
+            - $ref: '#/components/schemas/ProjectKind'
+            - type: 'null'
+        updatedAt: { type: string, format: date-time }
+    ProjectCreated:
+      type: object
+      required: [id, name, kind, version]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        kind:
+          oneOf:
+            - $ref: '#/components/schemas/ProjectKind'
+            - type: 'null'
+        version: { type: integer, const: 1 }
+    ProjectDetail:
+      type: object
+      required: [id, name, kind, updatedAt, scene, version]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        kind:
+          oneOf:
+            - $ref: '#/components/schemas/ProjectKind'
+            - type: 'null'
+        updatedAt: { type: string, format: date-time }
+        scene:
+          $ref: '#/components/schemas/SceneEnvelope'
+        version: { type: integer, minimum: 1 }
+    CreateProjectBody:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        kind:
+          $ref: '#/components/schemas/ProjectKind'
+    UpdateProjectBody:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        kind:
+          oneOf:
+            - $ref: '#/components/schemas/ProjectKind'
+            - type: 'null'
+    SceneEnvelope:
+      type: object
+      required: [schemaVersion, pascal, graph]
+      properties:
+        schemaVersion: { type: integer, const: 1 }
+        pascal:
+          type: object
+          required: [core]
+          properties:
+            core: { type: string }
+        graph:
+          type: object
+          description: Grafo de escena de Pascal; la API no interpreta los nodos
+          required: [nodes, rootNodeIds]
+          additionalProperties: true
+          properties:
+            nodes: { type: object, additionalProperties: true }
+            rootNodeIds: { type: array, items: { type: string } }
+            collections: { type: object, additionalProperties: true }
+            materials: { type: object, additionalProperties: true }
+            installedPlugins: { type: array, items: { type: string } }
+    SceneSaved:
+      type: object
+      required: [version]
+      properties:
+        version: { type: integer, minimum: 1 }
+    ErrorBody:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }

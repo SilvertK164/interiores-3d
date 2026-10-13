@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.webp binary
+*.glb binary
+*.ktx2 binary
+*.ttf binary
+*.pen binary

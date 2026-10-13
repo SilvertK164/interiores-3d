@@ -2520,8 +2520,7 @@ Create `apps/web/package.json`:
     "typecheck": "node scripts/typecheck.mjs",
     "test": "vitest run",
     "assets:vendor": "node scripts/vendor-pascal-assets.mjs",
-    "e2e": "playwright test",
-    "e2e:login": "node e2e/save-auth.mjs"
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@interiores/contract": "workspace:*",
@@ -2570,7 +2569,7 @@ Create `apps/web/tsconfig.json`:
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": { "@/*": ["./src/*"] },
-    "types": ["node"]
+    "types": ["node", "react", "react-dom"]
   },
   "include": ["next-env.d.ts", "src", "app", "test", "e2e"],
   "exclude": ["node_modules"]
@@ -2700,15 +2699,12 @@ Create `apps/web/scripts/typecheck.mjs`:
 import { spawnSync } from 'node:child_process'
 
 const run = spawnSync('pnpm', ['exec', 'tsc', '--noEmit', '--pretty', 'false'], { encoding: 'utf8', shell: true })
-const errors = `${run.stdout}${run.stderr}`.split('
-').filter((l) => /\(\d+,\d+\): error TS\d+/.test(l))
+const errors = `${run.stdout}${run.stderr}`.split('\n').filter((l) => /\(\d+,\d+\): error TS\d+/.test(l))
 const own = errors.filter((l) => !l.includes('node_modules'))
 
 if (own.length > 0) {
-  console.error(own.join('
-'))
-  console.error(`
-${own.length} error(es) de tipos en archivos propios.`)
+  console.error(own.join('\n'))
+  console.error(`\n${own.length} error(es) de tipos en archivos propios.`)
   process.exit(1)
 }
 console.log(`Tipos OK (se ignoraron ${errors.length} error(es) internos de Pascal en node_modules).`)
@@ -3473,7 +3469,7 @@ describe('fronteras del editor (decisión D8)', () => {
     try {
       out = execFileSync(
         'git',
-        ['grep', '-l', '-E', "@pascal-app/|from 'three'|@react-three/", '--', '*.ts', '*.tsx', ':!tests/boundaries.test.ts'],
+        ['grep', '-l', '-E', "(from|import\\() *'(@pascal-app/|three'|@react-three/)", '--', '*.ts', '*.tsx', ':!tests/boundaries.test.ts'],
         { encoding: 'utf8' },
       )
     } catch (e) {
@@ -3766,7 +3762,7 @@ type Props = { status: SaverStatus; onKeepEditing: () => void; dismissed: boolea
 export function SaveBanner({ status, onKeepEditing, dismissed }: Props) {
   if (status === 'conflict' && !dismissed) {
     return (
-      <div role="alert" className="absolute left-1/2 top-4 z-50 flex -translate-x-1/2 flex-col gap-2 rounded-xl bg-white p-4 shadow-lg">
+      <div data-testid="save-alert" role="alert" className="absolute left-1/2 top-4 z-50 flex -translate-x-1/2 flex-col gap-2 rounded-xl bg-white p-4 shadow-lg">
         <p className="text-sm font-medium">Este proyecto cambió desde otra pestaña y tiene una versión más nueva.</p>
         <p className="text-sm text-muted-foreground">Tu trabajo local sigue aquí. Elige qué hacer:</p>
         <div className="flex gap-2">
@@ -3782,7 +3778,7 @@ export function SaveBanner({ status, onKeepEditing, dismissed }: Props) {
   }
   if (status === 'unauthorized') {
     return (
-      <div role="alert" className="absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-xl bg-white p-4 text-sm shadow-lg">
+      <div data-testid="save-alert" role="alert" className="absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-xl bg-white p-4 text-sm shadow-lg">
         Tu sesión venció. Tu trabajo local sigue aquí: <a className="underline" href="/login" rel="noreferrer" target="_blank">ingresa de nuevo en otra pestaña</a> y vuelve.
       </div>
     )
@@ -3797,7 +3793,7 @@ export function SaveBanner({ status, onKeepEditing, dismissed }: Props) {
   const text = label[status]
   if (!text) return null
   return (
-    <p role="status" className="absolute right-4 top-4 z-50 rounded-full bg-white/90 px-3 py-1 text-xs shadow">
+    <p data-testid="save-status" role="status" className="absolute right-4 top-4 z-50 rounded-full bg-white/90 px-3 py-1 text-xs shadow">
       {text}
     </p>
   )
@@ -3815,6 +3811,7 @@ type SceneNode = { id: string; type: string }
 export function installE2eHooks(): void {
   const nodes = () => Object.values(useScene.getState().nodes) as SceneNode[]
   ;(window as unknown as { __e2e: unknown }).__e2e = {
+    ready: () => nodes().some((n) => n.type === 'level'),
     wallCount: () => nodes().filter((n) => n.type === 'wall').length,
     addWall: () => {
       const level = nodes().find((n) => n.type === 'level')
@@ -3833,7 +3830,7 @@ Create `apps/web/src/editor/ProjectEditor.tsx`:
 import { loadPlugin } from '@pascal-app/core'
 import { CATALOG_ITEMS, Editor, ItemsPanel, type SceneGraph } from '@pascal-app/editor'
 import { builtinPlugin } from '@pascal-app/nodes'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
@@ -3850,13 +3847,24 @@ const ensurePlugin = () => {
   return pluginReady
 }
 
-type Phase = { kind: 'loading' } | { kind: 'ready'; graph: SceneGraph | null; name: string } | { kind: 'error'; message: string }
+type Phase = { kind: 'loading' } | { kind: 'ready'; name: string } | { kind: 'error'; message: string }
 
 export default function ProjectEditor({ projectId }: { projectId: string }) {
   const [phase, setPhase] = useState<Phase>({ kind: 'loading' })
   const [status, setStatus] = useState<SaverStatus>('idle')
   const [dismissed, setDismissed] = useState(false)
   const saver = useRef<SceneSaver<SceneGraph> | null>(null)
+  const graphRef = useRef<SceneGraph | null>(null)
+
+  // `<Editor>` vuelve a cargar la escena cada vez que cambia la identidad de `onLoad`:
+  // estas funciones deben ser estables o cada cambio de estado de guardado borraría lo editado.
+  const onLoad = useCallback(async () => graphRef.current, [])
+  const onSave = useCallback(async (scene: SceneGraph, options?: { keepalive?: boolean }) => {
+    const s = saver.current
+    if (!s) return
+    if (options?.keepalive) await s.flushNow(scene)
+    else await s.save(scene)
+  }, [])
 
   const items = useMemo(
     () => CATALOG_ITEMS.flatMap((i) => localizeCatalogItem(i, manifest as LocalItemsManifest) ?? []),
@@ -3884,7 +3892,8 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
             }
           },
         })
-        setPhase({ kind: 'ready', graph: fromEnvelope(project.scene), name: project.name })
+        graphRef.current = fromEnvelope(project.scene)
+        setPhase({ kind: 'ready', name: project.name })
         if (process.env.NEXT_PUBLIC_E2E === '1') installE2eHooks()
       } catch (err) {
         if (!cancelled) setPhase({ kind: 'error', message: friendlyMessage(err) })
@@ -3895,6 +3904,18 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     }
   }, [projectId])
 
+  const sidebarTabs = useMemo(
+    () => [
+      {
+        id: 'items',
+        label: 'Muebles',
+        icon: <span style={{ fontSize: 20 }}>🛋️</span>,
+        component: () => <ItemsPanel items={items} showSourceFilter={false} showTagFilters={false} />,
+      },
+    ],
+    [items],
+  )
+
   if (phase.kind === 'loading') return <p className="p-6 text-muted-foreground">Abriendo tu proyecto…</p>
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>
 
@@ -3904,22 +3925,10 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
       <Editor
         guardAgainstSceneWipe
         layoutVersion="v2"
-        onLoad={async () => phase.graph}
-        onSave={async (scene, options) => {
-          const s = saver.current
-          if (!s) return
-          if (options?.keepalive) await s.flushNow(scene)
-          else await s.save(scene)
-        }}
+        onLoad={onLoad}
+        onSave={onSave}
         projectId={projectId}
-        sidebarTabs={[
-          {
-            id: 'items',
-            label: 'Muebles',
-            icon: <span style={{ fontSize: 20 }}>🛋️</span>,
-            component: () => <ItemsPanel items={items} showSourceFilter={false} showTagFilters={false} />,
-          },
-        ]}
+        sidebarTabs={sidebarTabs}
       />
     </div>
   )
@@ -4044,13 +4053,13 @@ git push -u origin feature/t6-despliegue
 **Responsable sugerido:** ambas (la misma persona no revisa lo que escribió). 
 
 **Files:**
-- Create: `apps/web/playwright.config.ts`, `apps/web/e2e/{save-auth.mjs,persistence.spec.ts}`
+- Create: `apps/web/playwright.config.ts`, `apps/web/e2e/{auth.setup.ts,persistence.spec.ts,support/user.ts}`
 - Modify: `apps/web/.env.local` (solo local, `NEXT_PUBLIC_E2E=1`)
 - Create: `README.md`
 
 **Interfaces:**
 - Consumes: todo lo anterior; `window.__e2e` (Tarea 5).
-- Produces: `pnpm --filter @interiores/web e2e` (criterios de éxito 3 y 5 sobre un navegador real) y el README del informe.
+- Produces: `pnpm --filter @interiores/web e2e` (criterios de éxito 3 y 5 sobre un navegador real) y el README del informe. El gancho `window.__e2e` también expone `ready(): boolean` (hay un nivel cargado): las pruebas esperan a que el editor termine de cargar la escena antes de tocarla.
 
 - [ ] **Paso 1: Rama y configuración de Playwright**
 
@@ -4064,36 +4073,77 @@ Create `apps/web/playwright.config.ts`:
 ```ts
 import { defineConfig } from '@playwright/test'
 
+const STATE = 'e2e/.auth/state.json'
+
 export default defineConfig({
   testDir: './e2e',
   timeout: 90_000,
   retries: 0,
-  use: {
-    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
-    storageState: 'e2e/.auth/state.json',
-    trace: 'retain-on-failure',
-  },
+  reporter: [['list']],
+  use: { baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000', trace: 'retain-on-failure' },
+  webServer: [
+    { command: 'pnpm --filter @interiores/api dev', url: 'http://localhost:3001/health', reuseExistingServer: true, timeout: 60_000 },
+    { command: 'pnpm --filter @interiores/web dev', url: 'http://localhost:3000/login', reuseExistingServer: true, timeout: 120_000 },
+  ],
+  projects: [
+    { name: 'setup', testMatch: /auth\.setup\.ts/ },
+    {
+      name: 'chromium',
+      testMatch: /.*\.spec\.ts/,
+      dependencies: ['setup'],
+      use: { storageState: STATE, launchOptions: { args: ['--enable-unsafe-webgpu', '--use-angle=swiftshader', '--enable-features=Vulkan'] } },
+    },
+  ],
 })
 ```
 
-Create `apps/web/e2e/save-auth.mjs`:
+Create `apps/web/e2e/support/user.ts`:
 
-```js
-// El inicio de sesión real lo hace una persona a mano: se guarda la sesión para las pruebas.
-import { mkdirSync } from 'node:fs'
-import { chromium } from '@playwright/test'
+```ts
+import { randomUUID } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+import type { Page } from '@playwright/test'
+import { createClient } from '@supabase/supabase-js'
 
-const base = process.env.E2E_BASE_URL ?? 'http://localhost:3000'
-mkdirSync('e2e/.auth', { recursive: true })
-const browser = await chromium.launch({ headless: false })
-const context = await browser.newContext()
-const page = await context.newPage()
-await page.goto(`${base}/login`)
-console.log('Ingresa con una cuenta de PRUEBA en la ventana abierta; se guarda al llegar a /proyectos.')
-await page.waitForURL('**/proyectos', { timeout: 300_000 })
-await context.storageState({ path: 'e2e/.auth/state.json' })
-await browser.close()
-console.log('Sesión guardada en e2e/.auth/state.json (ignorado por git).')
+try {
+  process.loadEnvFile(fileURLToPath(new URL('../../../../.env.test', import.meta.url)))
+} catch {
+  // sin .env.test: variables del proceso
+}
+
+export type TestAccount = { email: string; password: string }
+
+/** Crea una cuenta de PRUEBA en Supabase local (contraseña aleatoria, nunca guardada). */
+export async function createAccount(): Promise<TestAccount> {
+  const { SUPABASE_URL: url, SUPABASE_SERVICE_ROLE_KEY: service } = process.env
+  if (!url || !service) throw new Error('Faltan SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY. Corre pnpm db:start y luego pnpm db:env.')
+  if (!/127\.0\.0\.1|localhost/.test(url)) throw new Error('La prueba E2E solo crea usuarios en Supabase local.')
+  const account = { email: `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 6)}@example.com`, password: randomUUID() }
+  const admin = createClient(url, service, { auth: { persistSession: false, autoRefreshToken: false } })
+  const created = await admin.auth.admin.createUser({ ...account, email_confirm: true })
+  if (created.error) throw new Error(`No se pudo crear el usuario de prueba: ${created.error.message}`)
+  return account
+}
+
+export async function signInViaUi(page: Page, account: TestAccount): Promise<void> {
+  await page.goto('/login')
+  await page.getByLabel('Correo').fill(account.email)
+  await page.getByLabel('Contraseña').fill(account.password)
+  await page.getByRole('button', { name: 'Ingresar' }).click()
+  await page.waitForURL('**/proyectos')
+}
+```
+
+Create `apps/web/e2e/auth.setup.ts`:
+
+```ts
+import { test as setup } from '@playwright/test'
+import { createAccount, signInViaUi } from './support/user'
+
+setup('crear usuario de prueba local e iniciar sesión', async ({ page }) => {
+  await signInViaUi(page, await createAccount())
+  await page.context().storageState({ path: 'e2e/.auth/state.json' })
+})
 ```
 
 - [ ] **Paso 2: Escribir la prueba E2E (en rojo hasta que haya sesión y gancho)**
@@ -4102,6 +4152,7 @@ Create `apps/web/e2e/persistence.spec.ts`:
 
 ```ts
 import { type Page, expect, test } from '@playwright/test'
+import { createAccount, signInViaUi } from './support/user'
 
 const wallCount = (page: Page) => page.evaluate(() => (window as unknown as { __e2e: { wallCount(): number } }).__e2e.wallCount())
 const addWall = (page: Page) => page.evaluate(() => (window as unknown as { __e2e: { addWall(): void } }).__e2e.addWall())
@@ -4111,7 +4162,7 @@ async function openNewProject(page: Page, name: string): Promise<string> {
   await page.getByLabel('Nombre del proyecto').fill(name)
   await page.getByRole('button', { name: 'Crear proyecto' }).click()
   await page.waitForURL(/\/proyectos\/[0-9a-f-]{36}$/)
-  await page.waitForFunction(() => Boolean((window as unknown as { __e2e?: unknown }).__e2e))
+  await page.waitForFunction(() => (window as unknown as { __e2e?: { ready(): boolean } }).__e2e?.ready())
   return page.url()
 }
 
@@ -4119,9 +4170,10 @@ test('un muro dibujado sobrevive a recargar (criterio 3)', async ({ page }) => {
   const url = await openNewProject(page, `E2E persistencia ${Date.now()}`)
   const before = await wallCount(page)
   await addWall(page)
-  await expect(page.getByRole('status')).toHaveText('Guardado', { timeout: 20_000 })
+  await expect(page.getByTestId('save-status')).toHaveText('Guardado', { timeout: 30_000 })
+  expect(await wallCount(page)).toBe(before + 1) // guardar no debe borrar lo editado
   await page.goto(url)
-  await page.waitForFunction(() => Boolean((window as unknown as { __e2e?: unknown }).__e2e))
+  await page.waitForFunction(() => (window as unknown as { __e2e?: { ready(): boolean } }).__e2e?.ready())
   expect(await wallCount(page)).toBe(before + 1)
 })
 
@@ -4129,56 +4181,66 @@ test('dos pestañas: la segunda en guardar recibe 409 y no pierde su trabajo (cr
   const url = await openNewProject(page, `E2E conflicto ${Date.now()}`)
   const second = await (await browser.newContext({ storageState: 'e2e/.auth/state.json' })).newPage()
   await second.goto(url)
-  await second.waitForFunction(() => Boolean((window as unknown as { __e2e?: unknown }).__e2e))
+  await second.waitForFunction(() => (window as unknown as { __e2e?: { ready(): boolean } }).__e2e?.ready())
 
   await addWall(page)
-  await expect(page.getByRole('status')).toHaveText('Guardado', { timeout: 20_000 })
+  await expect(page.getByTestId('save-status')).toHaveText('Guardado', { timeout: 30_000 })
 
   const localBefore = await wallCount(second)
   await addWall(second)
-  await expect(second.getByRole('alert')).toContainText('versión más nueva', { timeout: 30_000 })
+  await expect(second.getByTestId('save-alert')).toContainText('versión más nueva', { timeout: 30_000 })
   expect(await wallCount(second)).toBe(localBefore + 1)
+})
+
+test('otra cuenta no ve el proyecto: la API responde 404 y la pantalla lo explica (criterio 4)', async ({ browser, page }) => {
+  const url = await openNewProject(page, `E2E privado ${Date.now()}`)
+  const other = await (await browser.newContext()).newPage()
+  await signInViaUi(other, await createAccount())
+  await other.goto(url)
+  await expect(other.getByText('No encontramos ese proyecto.')).toBeVisible({ timeout: 30_000 })
 })
 ```
 
 - [ ] **Paso 3: Ver la prueba fallar y luego pasar**
 
-Run: `pnpm --filter @interiores/web e2e`
-Expected: FAIL — `browserContext.newContext: Failed to read storage state from e2e/.auth/state.json` (aún no hay sesión guardada). Pegar en el PR.
+Con Supabase local arriba (`pnpm db:start && pnpm db:env`). Playwright levanta (o reutiliza) la API y la web por `webServer`; el proyecto `setup` crea una cuenta de PRUEBA en Supabase local con contraseña aleatoria (nunca guardada) e inicia sesión por la interfaz; solo corre contra `localhost`.
 
-Preparar el entorno de prueba:
-1. En `apps/web/.env.local` agregar `NEXT_PUBLIC_E2E=1` (solo local; **no** en Vercel).
-2. Levantar `pnpm --filter @interiores/api dev` y `pnpm --filter @interiores/web dev`.
-3. Una persona corre `pnpm --filter @interiores/web e2e:login` y se registra o ingresa con una **cuenta de prueba** en la ventana que se abre.
+Run: `pnpm --filter @interiores/web e2e` sin `auth.setup.ts`
+Expected: FAIL — `Error reading storage state from e2e/.auth/state.json`. Pegar en el PR.
 
-Run: `pnpm --filter @interiores/web e2e`
-Expected: PASS (2 pruebas). Si `addWall` falla porque `useScene.getState().createNode` rechaza el nodo, abrir `node_modules/@pascal-app/core/dist/store/use-scene.d.ts`, corregir `e2e-hooks.ts` según la firma real y anotarlo en `docs/bitacora.md`.
+Run: `pnpm --filter @interiores/web e2e` con `auth.setup.ts`
+Expected: PASS (4: setup + 3 pruebas). Si una prueba falla, **depurar la causa** antes de tocar la prueba: una versión anterior de `ProjectEditor` pasaba `onLoad={async () => ...}` inline y cada cambio de estado de guardado hacía que `<Editor>` recargara la escena (el muro desaparecía); la solución son callbacks estables (`useCallback` + `useRef`), ya incluida en la Tarea 5.
 
-- [ ] **Paso 4: Criterio 4 (otra cuenta no ve el proyecto) a mano sobre la URL desplegada**
+- [ ] **Paso 4: Criterio 4 (otra cuenta no ve el proyecto)**
 
-Con una segunda cuenta, abrir la URL `/proyectos/<id>` de un proyecto de la primera. Expected: el editor muestra "No encontramos ese proyecto." (la API devolvió `404`). Anotar el resultado en el PR junto con la salida de `pnpm --filter @interiores/supabase-tests test`.
+Lo cubre la 3.ª prueba de Playwright (segunda cuenta abre la URL del proyecto de la primera y ve "No encontramos ese proyecto.") junto con `rls.test.ts` y `routes.test.ts`. Cuando haya despliegue en la nube, repetirlo a mano sobre la URL de Vercel y anotarlo en el PR.
 
 - [ ] **Paso 5: README del informe**
 
-Create `README.md`:
+Create `README.md` (el bloque usa cuatro comillas porque contiene un bloque de código):
 
-```markdown
+````markdown
 # Interiores — diseñador de interiores 2D y 3D
 
 TP final de IISAIA (FIUBA) de **Silvert Quispe** y **Victoria Villalba**. Diseña viviendas y comercios en un editor 2D/3D, guarda cada proyecto en tu cuenta y lo vuelve a abrir desde cualquier navegador.
 
-- **Web:** <URL de Vercel de `web`> · **API:** <URL de Vercel de `api`>/health
+- **Repositorio:** https://github.com/SilvertK164/interiores-3d
+- **Despliegue en Vercel + Supabase en la nube:** pendiente (Tarea 6 del plan); por ahora todo corre en local.
 - **Estado y decisiones vivas:** [`docs/ESTADO.md`](docs/ESTADO.md)
 
 ## Cómo correrlo
 
 ```bash
 pnpm install
-cp .env.example .env.test            # claves de Supabase *dev* (nunca al repo)
-pnpm verify                          # lint + build + tipos + pruebas (incluye RLS contra dev)
+pnpm db:start                        # Supabase local en Docker (la primera vez descarga ~2 GB de imágenes)
+pnpm db:env                          # escribe .env.test, apps/api/.env y apps/web/.env.local con las claves locales
+pnpm verify                          # lint + build + tipos + pruebas (incluye RLS contra Supabase local)
 pnpm --filter @interiores/api dev    # http://localhost:3001
 pnpm --filter @interiores/web dev    # http://localhost:3000
+pnpm --filter @interiores/web e2e    # navegador real: persistir, 404 entre cuentas y conflicto 409
 ```
+
+Requisitos: Node 22, pnpm 11 y Docker Desktop. `pnpm db:stop` apaga Supabase local y libera la memoria.
 
 ## Arquitectura
 
@@ -4193,6 +4255,7 @@ Las decisiones D1–D10 con sus alternativas descartadas están en el spec (secc
 3. **Bloqueo optimista (`If-Match` → `409`)** en vez de "la última escritura gana".
 4. **Pascal como base**, aislado en una carpeta, con plan B (`core` + `viewer`).
 5. **Catálogo autoalojado** desde el repo MIT de Pascal (100 muebles) para no depender de su bucket.
+6. **Supabase local primero** (Docker), nube después: las pruebas de RLS corren contra una base real sin tocar datos de nadie.
 
 ## Cómo gestioné el contexto
 
@@ -4202,14 +4265,14 @@ Las decisiones D1–D10 con sus alternativas descartadas están en el spec (secc
 
 ## Qué salió mal
 
-Ver [`docs/bitacora.md`](docs/bitacora.md): alucinaciones del agente (migraciones de Pascal, dependencia del bucket), el `ERR_PNPM_IGNORED_BUILDS` de pnpm 11 y lo que descubrimos al desplegar.
+Ver [`docs/bitacora.md`](docs/bitacora.md): alucinaciones del agente (migraciones de Pascal, dependencia del bucket), el `ERR_PNPM_IGNORED_BUILDS` de pnpm 11 y un error real que solo encontró la prueba en navegador: pasar `onLoad` como función nueva en cada render hacía que el editor recargara la escena y borrara lo que acababas de dibujar.
 
 ## Licencias de terceros
 
 Pascal Editor (MIT, © Pascal Group Inc.): código vía npm y assets copiados de su repo en `apps/web/public/` (ver `public/pascal-LICENSE.txt`).
-```
+````
 
-Reemplazar `<URL de Vercel de web>` y `<URL de Vercel de api>` por las URLs reales de la Tarea 6.
+Cuando exista el despliegue (Tarea 6), reemplazar la línea de despliegue por las URLs reales de `web` y `api`.
 
 - [ ] **Paso 6: Verificación final y PR**
 
