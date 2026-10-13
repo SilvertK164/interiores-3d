@@ -39,7 +39,9 @@ npx --yes supabase@2.120.0 db push
 | Authentication → **URL Configuration** → Site URL | `http://localhost:3000` (el valor por defecto) | La URL de producción de la web (paso 6) |
 | URL Configuration → Redirect URLs | `http://localhost:3000/**` | La URL de la web + `/**` |
 
-Por qué desactivar la confirmación en `dev`: el servicio de correo integrado de Supabase es solo para pruebas, envía únicamente a miembros del equipo de la organización y tiene un tope por hora muy bajo (su documentación decía 2 por hora el 2026-10-11; **revisa los límites vigentes**). La app crea cuentas con correo y contraseña y no usa enlaces mágicos ni OAuth: Site URL y Redirect URLs solo importan si activas la confirmación o agregas «olvidé mi contraseña».
+Por qué desactivar la confirmación en `dev`: el servicio de correo integrado de Supabase es solo para pruebas, envía únicamente a miembros del equipo de la organización y tiene un tope por hora muy bajo (su documentación decía 2 por hora el 2026-10-11; **revisa los límites vigentes**). La app crea cuentas con correo y contraseña y no usa enlaces mágicos ni OAuth, pero **«¿Olvidaste tu contraseña?» sí depende de Site URL y Redirect URLs** (2026-10-13): la web llama `resetPasswordForEmail` con `redirectTo` = `<origen de la web>/nueva-contrasena` y, si esa URL no está permitida, Supabase manda el enlace a Site URL en vez de a esa página.
+
+**Recuperar la contraseña** (Authentication → URL Configuration): la Redirect URL `https://madori-web-opal.vercel.app/**` ya cubre `/nueva-contrasena`; en `dev` (local) `http://localhost:3000/**`. No hay que agregar nada más. El correo sale del **SMTP por defecto de Supabase**, que tiene un límite bajo de correos por hora para todo el proyecto (el aviso en pantalla es «Pediste varios enlaces seguidos…»): para que lo usen más personas hace falta un **SMTP propio** (Authentication → Emails → SMTP Settings, «Custom SMTP»). Prueba manual pendiente contra Supabase real: pedir el enlace, abrirlo, crear la contraseña y reabrirlo para ver «El enlace venció o ya se usó».
 
 ## 4. Trabajar sin Docker (Victoria y colaboradores)
 
