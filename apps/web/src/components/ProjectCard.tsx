@@ -20,7 +20,7 @@ export function ProjectCard({ project, now }: { project: ProjectSummary; now: Da
   const showImage = project.templateId !== null && !imageFailed
   return (
     <BusyLink
-      className="group focus-ring grid size-full min-h-0 grid-rows-[minmax(0,1fr)_auto] rounded-3xl bg-white p-[7px] shadow-soft transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-[3px] hover:shadow-lift"
+      className="group focus-ring grid size-full min-h-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto] rounded-3xl bg-white p-[7px] shadow-soft transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-[3px] hover:shadow-lift"
       href={`/proyectos/${project.id}`}
     >
       <span className="relative isolate block min-h-0 overflow-hidden rounded-[18px]">
