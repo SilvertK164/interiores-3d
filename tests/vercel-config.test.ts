@@ -47,11 +47,11 @@ describe('apps/api/vercel.json (función de Vercel con Root Directory apps/api)'
     expect(existsSync(join(repo, 'apps/api/api/index.ts'))).toBe(true)
   })
 
-  it('la función puede durar 30 s (el análisis de fotos espera hasta 25 s a Gemini) y la ruta de la función existe', () => {
+  it('la función puede durar 60 s (el análisis de fotos espera hasta 55 s a Gemini, con modelos de respaldo) y la ruta de la función existe', () => {
     const functions = api.functions as Record<string, { maxDuration?: number }>
     expect(Object.keys(functions)).toEqual(['api/index.ts'])
     expect(existsSync(join(repo, 'apps/api/api/index.ts'))).toBe(true)
-    expect(functions['api/index.ts']?.maxDuration).toBe(30)
+    expect(functions['api/index.ts']?.maxDuration).toBe(60)
     const source = read('apps/api/src/analyze-room/gemini.ts')
     const timeout = Number(/GEMINI_TIMEOUT_MS = ([0-9_]+)/.exec(source)?.[1]?.replaceAll('_', ''))
     expect(timeout).toBeGreaterThan(0)
