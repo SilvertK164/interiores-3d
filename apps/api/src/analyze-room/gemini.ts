@@ -9,10 +9,12 @@ export const FALLBACK_VISION_MODELS = ['gemini-3.7-flash', 'gemini-3.6-flash', '
 const MAX_PASSES = 2
 const PASS_DELAY_MS = 1_500
 const RETRYABLE = /^(timeout|network|http_(429|500|502|503|504))/
-/** Con menos tiempo que esto no se intenta otro modelo: la función de Vercel se corta a los 30 s. */
+/** Con menos tiempo que esto no se intenta otro modelo: la función de Vercel se corta a los 60 s. */
 const MIN_REMAINING_MS = 6_000
 /** La función de Vercel dura hasta 30 s (`apps/api/vercel.json`): este plazo deja margen para validar y responder. */
-export const GEMINI_TIMEOUT_MS = 25_000
+export const GEMINI_TIMEOUT_MS = 55_000
+/** Cada intento con un modelo dura como mucho esto: uno lento no se come el plazo de los de respaldo. */
+const ATTEMPT_MS = 15_000
 /**
  * Con los modelos que razonan, los tokens de razonamiento cuentan contra este tope: los 2000 de TP3 se agotaban antes de
  * terminar el JSON. 8192 es lo máximo que aceptan todos los modelos Flash.
@@ -111,6 +113,8 @@ function createModelProvider(options: GeminiOptions, model: string, timeoutMs: n
         responseMimeType: 'application/json',
         responseSchema: responseSchemaFor(catalog),
         temperature: 0.1,
+        // Con el razonamiento al mínimo responde en 2 o 3 s; por defecto un modelo que razona podía tardar más de 25 s con una foto real.
+        thinkingConfig: { thinkingLevel: 'low' },
         maxOutputTokens: GEMINI_MAX_OUTPUT_TOKENS,
       },
     }
@@ -158,7 +162,7 @@ export function createGeminiProvider(options: GeminiOptions): VisionProvider {
         const remaining = budget - (Date.now() - started)
         if (remaining < MIN_REMAINING_MS && !(pass === 0 && model === first)) return fail(last)
         try {
-          return await createModelProvider(options, model, pass === 0 && model === first ? budget : remaining)(request)
+          return await createModelProvider(options, model, Math.min(ATTEMPT_MS, pass === 0 && model === first ? budget : remaining))(request)
         } catch (error) {
           if (!(error instanceof ProviderError) || !RETRYABLE.test(error.reason)) throw error
           last = error

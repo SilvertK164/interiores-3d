@@ -97,8 +97,8 @@ describe('createGeminiProvider: el pedido', () => {
     expect(schema.properties.furniture.items.properties.asset_id.enum).toEqual(['coffee-table'])
   })
 
-  it('espera como máximo 25 segundos y le pasa a fetch una señal de aborto', async () => {
-    expect(GEMINI_TIMEOUT_MS).toBe(25_000)
+  it('espera como máximo 55 segundos en total y le pasa a fetch una señal de aborto', async () => {
+    expect(GEMINI_TIMEOUT_MS).toBe(55_000)
     const { calls, fetchImpl } = stub(() => reply(200, envelope(JSON.stringify(RESULT))))
     await createGeminiProvider({ apiKey: KEY, fetchImpl })(REQUEST)
     expect(calls[0]?.init.signal).toBeInstanceOf(AbortSignal)
