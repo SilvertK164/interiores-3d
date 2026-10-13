@@ -7,6 +7,12 @@ import { type PagesOptions, type SceneNode, type ScenePort, createBuildPlan } fr
 import { loadPdfFonts } from './pdf-fonts'
 
 /**
+ * Pascal monta el plano con `flushSync` para medirlo y dibujarlo, y React no admite `flushSync` dentro de un efecto ni de un
+ * renderizado: el diálogo pide medir desde un efecto, así que todo se hace desde un turno aparte (medido en la Tarea 0b, M2).
+ */
+const nextTask = () => new Promise<void>((resolve) => setTimeout(resolve, 0))
+
+/**
  * Las dos funciones reales de `bridge.plan`: medir con `measureFloorplanLevels` y armar con `exportFloorplanPages` (parche de
  * `@pascal-app/editor`, ver docs/pascal-notes.md). Único lugar de la exportación que toca Pascal, junto con el parche.
  */
@@ -19,13 +25,19 @@ export function planDeps(): PlanDeps {
     },
   }
   const buildPlan = createBuildPlan({
-    exportPages: (options: PagesOptions) => exportFloorplanPages(options as unknown as FloorplanPagesOptions),
+    exportPages: async (options: PagesOptions) => {
+      await nextTask()
+      return exportFloorplanPages(options as unknown as FloorplanPagesOptions)
+    },
     scene,
     loadFonts: () => loadPdfFonts(),
     decisions: EXPORT_DECISIONS,
   })
   return {
-    measureLevels: async (): Promise<LevelMeasure[]> => measureFloorplanLevels(),
+    measureLevels: async (): Promise<LevelMeasure[]> => {
+      await nextTask()
+      return measureFloorplanLevels()
+    },
     buildPlan,
   }
 }

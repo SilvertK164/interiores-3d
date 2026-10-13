@@ -1,6 +1,6 @@
 import { Vector3 } from 'three'
 import { sceneRegistry, emitter, CabinetNode, DoorNode, ItemNode, ShelfNode, StairNode, StairSegmentNode, WallNode, WindowNode, ZoneNode, useScene } from '@pascal-app/core'
-import { armToolMode, getHistoryCommandState, subscribeCameraPose, useEditor, useFirstPersonHud } from '@pascal-app/editor'
+import { armToolMode, getHistoryCommandState, measureFloorplanLevels, subscribeCameraPose, useEditor, useFirstPersonHud } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import type { PascalChrome } from './chrome'
 
@@ -47,6 +47,14 @@ export function createE2eHooks(options: E2eOptions = {}) {
       const level = nodes().find((n) => n.type === 'level')
       if (!level) throw new Error('No hay nivel donde agregar el muro')
       useScene.getState().createNode(WallNode.parse({ start: [0, 0], end: [4, 0] }), level.id as never)
+    },
+    /** Las plantas como las mide el parche de planos: metros de ancho y alto y si están vacías. */
+    planMeasure: () => measureFloorplanLevels(),
+    /** Un muro horizontal de esa longitud (en metros) en el primer nivel, desde el origen. */
+    addWallOf: (length: number) => {
+      const level = nodes().find((n) => n.type === 'level')
+      if (!level) throw new Error('No hay nivel donde agregar el muro')
+      useScene.getState().createNode(WallNode.parse({ start: [0, 0], end: [length, 0] }), level.id as never)
     },
     /** Muestra u oculta el chrome de Pascal (la prueba de guarda lo enciende para comprobar que sus selectores existen). */
     setChrome: (chrome: PascalChrome) => options.setChrome?.(chrome),

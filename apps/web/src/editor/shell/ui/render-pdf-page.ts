@@ -6,10 +6,11 @@ type PdfPage = {
   getViewport(options: { scale: number }): PdfViewport
   render(options: { canvas: HTMLCanvasElement; viewport: PdfViewport }): { promise: Promise<void>; cancel(): void }
 }
-type PdfDocument = { getPage(number: number): Promise<PdfPage>; destroy(): Promise<void> | void }
+type PdfDocument = { getPage(number: number): Promise<PdfPage> }
+type PdfLoadingTask = { promise: Promise<PdfDocument>; destroy(): Promise<void> | void }
 type PdfJs = {
   GlobalWorkerOptions: { workerSrc: string }
-  getDocument(source: { data: Uint8Array }): { promise: Promise<PdfDocument> }
+  getDocument(source: { data: Uint8Array }): PdfLoadingTask
 }
 
 const LIBRARY_URL = '/pdfjs/pdf.min.mjs'
@@ -34,11 +35,22 @@ function loadPdfJs(): Promise<PdfJs> {
   return library
 }
 
+/** Soltar recursos es lo último que se hace: si falla, no debe tumbar la pantalla (se llama desde la limpieza de un efecto). */
+const quietly = (action: () => unknown) => {
+  try {
+    void Promise.resolve(action()).catch(() => {})
+  } catch {
+    // La página ya no existe o pdf.js ya la soltó: no hay nada más que liberar.
+  }
+}
+
 /** Dibuja la primera página de un PDF en un `<canvas>`. Devuelve cómo soltar los recursos. */
 export async function renderPdfPage(blob: Blob, canvas: HTMLCanvasElement, isCancelled: () => boolean): Promise<() => void> {
   const pdfjs = await loadPdfJs()
-  const doc = await pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise
-  const release = () => void doc.destroy()
+  // `destroy` es del trabajo de carga (el documento ya no lo tiene en pdf.js 6): suelta el documento y su trabajador.
+  const loading = pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) })
+  const doc = await loading.promise
+  const release = () => quietly(() => loading.destroy())
   if (isCancelled()) {
     release()
     return () => {}
@@ -53,7 +65,7 @@ export async function renderPdfPage(blob: Blob, canvas: HTMLCanvasElement, isCan
   const task = page.render({ canvas, viewport })
   await task.promise
   return () => {
-    task.cancel()
+    quietly(() => task.cancel())
     release()
   }
 }

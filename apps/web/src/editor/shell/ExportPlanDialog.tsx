@@ -3,6 +3,7 @@
 import { FileDown, X } from 'lucide-react'
 import { type RefObject, useEffect, useId, useReducer, useRef } from 'react'
 import { Loader } from '@/components/Loader'
+import { abortable } from '@/lib/export/abortable'
 import { EXPORT_DECISIONS } from '@/lib/export/decisions'
 import { exportFileName } from '@/lib/export/file-name'
 import { TEXT, generatingText, previewCaption } from '@/lib/export/texts-es'
@@ -81,11 +82,15 @@ export function ExportPlanDialog({ open, projectName, author, opener, onClose }:
     controller.current = abort
     dispatch({ type: 'generate' })
     try {
-      const result = await bridge.plan.build({
-        ...buildArgs(state, metaNow()),
-        onProgress: (value) => dispatch({ type: 'progress', value }),
-        signal: abort.signal,
-      })
+      // Pascal solo mira la señal entre una imagen y la siguiente: cancelar responde ya y la generación se corta sola después.
+      const result = await abortable(
+        bridge.plan.build({
+          ...buildArgs(state, metaNow()),
+          onProgress: (value) => !abort.signal.aborted && dispatch({ type: 'progress', value }),
+          signal: abort.signal,
+        }),
+        abort.signal,
+      )
       downloadBlob(result.blob, exportFileName(projectName))
       dispatch({ type: 'done', skippedImages: result.skippedImages })
     } catch (error) {
@@ -207,7 +212,15 @@ export function ExportPlanDialog({ open, projectName, author, opener, onClose }:
           <button className="btn btn-ghost focus-ring" onClick={cancelOrClose} type="button">
             {TEXT.cancel}
           </button>
-          <button aria-busy={generating} className="btn btn-primary focus-ring" disabled={!info.canDownload} onClick={generate} type="button">
+          {/* Mientras genera no se deshabilita: un botón deshabilitado suelta el foco y Esc dejaría de llegar al diálogo (generate ya ignora el segundo clic). */}
+          <button
+            aria-busy={generating}
+            aria-disabled={generating || !info.canDownload}
+            className="btn btn-primary focus-ring aria-disabled:cursor-progress aria-disabled:opacity-70"
+            disabled={!generating && !info.canDownload}
+            onClick={generate}
+            type="button"
+          >
             <FileDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
             {TEXT.download}
           </button>
