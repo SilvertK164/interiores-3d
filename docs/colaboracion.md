@@ -53,7 +53,7 @@ Conviene hacerlo antes de abrir un PR y cada vez que la rama base reciba cambios
 | API y contrato | `apps/api/`, `packages/contract/` |
 | Base de datos | `supabase/` |
 | Plantillas de ambientes | `apps/web/src/lib/templates/` |
-| Laboratorio de Victoria | `lab/` (guía en `lab/README.md`), `apps/web/src/lib/lab/`, `apps/web/app/laboratorio/` |
+| Laboratorio de Victoria | `lab/` (guía en `lab/README.md`), `apps/web/src/lib/lab/`, `apps/web/app/escena-desde-foto/` |
 
 ## Cuentas de prueba locales
 

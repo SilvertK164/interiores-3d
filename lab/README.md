@@ -1,8 +1,8 @@
 # Laboratorio de Victoria
 
-**Modelado a partir de fotos con Pascal.** Un espacio para explorar cómo llevar lo que detecta el análisis de fotos a una escena que nuestro editor sabe dibujar. Todo lo que rodea al modelado ya está armado; lo que queda en blanco es un lugar de exploración, sin prisa ni fecha.
+**Modelado a partir de fotos con Pascal.** Guía para probar el análisis de fotos y para mejorar cómo se lo lleva a una escena que nuestro editor sabe dibujar. **`analysisToDefinition` ya está implementada** y es lo que usa «Escena desde una foto», una función del producto: arma el ambiente de la foto con sus muros, una puerta, una ventana, piso de madera clara y los muebles dentro. Victoria puede seguir mejorándola; «Cómo funciona y por dónde mejorarla» cuenta qué decide hoy.
 
-> **Cambio (2026-10-13): el análisis ya no necesita TP3 local.** Lo que antes hacía el backend de TP3 (el «Modelador Espacial Rápido» de Victoria) lo hace ahora nuestra API en `POST /v1/analyze-room`, con la misma lógica portada a TypeScript (`apps/api/src/analyze-room/`). La web (la página «Escena desde una foto» de `/laboratorio` y «Muebles desde una foto» del editor) llama a nuestra API con tu sesión, así que también funciona desplegada. **TP3 queda como referencia de Victoria** y para comparar resultados (paso opcional).
+> **Cambio (2026-10-13): el análisis ya no necesita TP3 local.** Lo que antes hacía el backend de TP3 (el «Modelador Espacial Rápido» de Victoria) lo hace ahora nuestra API en `POST /v1/analyze-room`, con la misma lógica portada a TypeScript (`apps/api/src/analyze-room/`). La web (la página «Escena desde una foto» de `/escena-desde-foto` y «Muebles desde una foto» del editor) llama a nuestra API con tu sesión, así que también funciona desplegada. **TP3 queda como referencia de Victoria** y para comparar resultados (paso opcional).
 
 La guía supone que nunca viste el proyecto. Los comandos son de PowerShell y se corren desde la carpeta del repositorio.
 
@@ -18,7 +18,7 @@ La guía supone que nunca viste el proyecto. Los comandos son de PowerShell y se
    ```powershell
    pnpm install
    ```
-3. **Levantar nuestra web y abrir el laboratorio.** Hacen falta otras dos terminales (la API y la web) y la base local, que corre en Docker (ver «Docker Desktop»; sin Docker, ver «Trabajar sin Docker»).
+3. **Levantar nuestra web y abrir «Escena desde una foto».** Hacen falta otras dos terminales (la API y la web) y la base local, que corre en Docker (ver «Docker Desktop»; sin Docker, ver «Trabajar sin Docker»).
    ```powershell
    pnpm db:start                          # una vez: base local de Supabase
    pnpm db:env                            # una vez: escribe las variables locales
@@ -27,7 +27,7 @@ La guía supone que nunca viste el proyecto. Los comandos son de PowerShell y se
    pnpm --filter @interiores/api dev      # terminal 2: API en http://localhost:3001
    pnpm --filter @interiores/web dev      # terminal 3: web en http://localhost:3000
    ```
-   Después, abrir http://localhost:3000/laboratorio. Para ingresar sin registrarte puedes usar la cuenta de prueba `victoria@interiores.test` (la contraseña está en `scripts/lib/seed-users.mjs`; son cuentas solo para tu equipo local). Si prefieres, también puedes usar «Crear cuenta» con cualquier correo y una contraseña de 6 caracteres o más (en local no hace falta confirmar el correo).
+   Después, abrir http://localhost:3000/escena-desde-foto (la dirección de antes, `/laboratorio`, redirige). Para ingresar sin registrarte puedes usar la cuenta de prueba `victoria@interiores.test` (la contraseña está en `scripts/lib/seed-users.mjs`; son cuentas solo para tu equipo local). Si prefieres, también puedes usar «Crear cuenta» con cualquier correo y una contraseña de 6 caracteres o más (en local no hace falta confirmar el correo).
 
    **Para analizar una foto de verdad**, la API necesita la clave de Gemini (ver «La clave de Gemini»). Sin ella el análisis responde «no está disponible por ahora» y el botón **«Probar con un ejemplo»** funciona igual, sin clave ni cuota.
 
@@ -128,7 +128,7 @@ Quién arma qué: `apps/web/src/lib/lab/analysis-catalog.ts` (`buildAnalysisCata
 
 ## Muebles desde una foto (en el editor)
 
-Es el uso de este contrato dentro del editor, sin pasar por el laboratorio: en un proyecto abierto, **Editar → Más → «Muebles desde una foto»**. La persona sube la foto (y, si lo sabe, el ancho del ambiente), el análisis propone qué muebles del catálogo hay y dónde, y con **«Agregar al proyecto»** esa mini escena (un conjunto de piezas) se inserta en la planta activa:
+Es el uso de este contrato dentro del editor, sin pasar por la página «Escena desde una foto»: en un proyecto abierto, **Editar → Más → «Muebles desde una foto»**. La persona sube la foto (y, si lo sabe, el ancho del ambiente), el análisis propone qué muebles del catálogo hay y dónde, y con **«Agregar al proyecto»** esa mini escena (un conjunto de piezas) se inserta en la planta activa:
 
 - **Un solo paso del historial:** un Deshacer quita todas las piezas juntas.
 - **Quedan seleccionadas todas juntas** (Pascal 1.0.3 no tiene nodo grupo: se usa su multiselección, que las mueve, gira o borra a la vez).
@@ -137,7 +137,7 @@ Es el uso de este contrato dentro del editor, sin pasar por el laboratorio: en u
 - **Límites:** todo se apoya en el piso (nada sobre mesas) y las piezas pueden solaparse; no se agregan piezas de pared ni de techo; sin el estante paramétrico (`param:bookshelf`).
 - **Código:** `shell/PhotoFurnitureDialog.tsx` y `photo-furniture-model.ts` (diálogo y su estado), `shell/bridge/cluster.ts` (`bridge.cluster.insert(pieces, levelId?)`: lo único que el diálogo sabe de Pascal) y `src/editor/cluster-deps.ts` (el único enlace real con `@pascal-app/core`). Pruebas: `test/lab-analysis-*.test.ts`, `shell-bridge-cluster.test.ts`, `shell-photo-furniture-*.test.ts*` y `e2e/muebles-desde-foto.spec.ts` (con la respuesta de la API simulada, sin clave ni cuota).
 
-## Qué hay listo y qué puedes explorar
+## Qué hay y qué se puede mejorar
 
 ### Ya está armado
 
@@ -146,19 +146,25 @@ Es el uso de este contrato dentro del editor, sin pasar por el laboratorio: en u
 | Catálogo para el análisis | `apps/web/src/lib/lab/analysis-catalog.ts` | Las piezas candidatas (`catalog` del pedido) y el mapa id → pieza local |
 | Conjunto de muebles | `apps/web/src/lib/lab/analysis-to-cluster.ts` | Del análisis a piezas del catálogo con su posición y giro (lo usa «Muebles desde una foto») |
 | Cliente del análisis | `apps/web/src/lib/api/client.ts` (`api.analyzeRoom`), `photo.ts` (reduce la foto), `errors.ts` (cada error a castellano llano) y `lab/schema.ts` | Reduce la foto, la envía con el catálogo a nuestra API y valida la respuesta contra el contrato |
-| Página del laboratorio | `apps/web/app/laboratorio/` | «Escena desde una foto»: foto + ancho conocido, avisos, tabla de piezas y JSON crudo, y «Abrir en el editor» |
+| Página «Escena desde una foto» | `apps/web/app/escena-desde-foto/` | Foto + ancho conocido, avisos, tabla de piezas y JSON crudo, y «Abrir en el editor» (crea el proyecto «Desde una foto · fecha y hora») |
+| Del análisis al ambiente | `apps/web/src/lib/lab/analysis-to-definition.ts` (`analysisToDefinition`) | El ambiente de la foto con muros, puerta, ventana, piso de madera clara y los muebles dentro; lo usan «Abrir en el editor» y «Probar con un ejemplo» |
 | Análisis de ejemplo | `apps/web/src/lib/lab/sample-analysis.ts` | El mismo que usan el botón de ejemplo y las pruebas |
 | Camino al editor | `apps/web/src/editor/lab-scene.ts` | Cualquier definición válida → escena de Pascal → proyecto guardado → editor |
 | Scripts de TP3 (opcionales) | `scripts/lab-*.mjs` (`pnpm lab:setup`, `lab:tp3`, `lab:tp3:test`) | Descargar, levantar y probar tu backend original para comparar |
-| Pruebas | `apps/web/test/lab-*.test.ts`, `apps/web/e2e/laboratorio.spec.ts` | Plomería verificada, con la respuesta de la API simulada |
+| Pruebas | `apps/web/test/lab-*.test.ts`, `apps/web/e2e/escena-desde-foto.spec.ts` | Plomería y modelado verificados, con la respuesta de la API simulada |
 
-El camino al editor se puede comprobar sin análisis: en la página, el desplegable «Comprobar que el camino al editor funciona» abre la plantilla Loft como proyecto nuevo.
+El camino al editor se puede comprobar sin análisis: en la página, el desplegable «Comprobar que el camino al editor funciona» (solo fuera de producción) abre la plantilla Loft como proyecto nuevo.
 
-### Por dónde empezar
+### Cómo funciona y por dónde mejorarla
 
-El lugar en blanco es **`analysisToDefinition`** (`apps/web/src/lib/lab/analysis-to-definition.ts`): recibe el análisis de la foto y puede devolver la definición de un ambiente que el editor sabe dibujar. Qué medidas tiene ese ambiente, cómo se usan las piezas que el análisis eligió (cada `asset_id` ya es el id de una pieza del catálogo de Pascal, la que usan las definiciones en `asset`) y qué hacer con lo dudoso son decisiones abiertas para explorar a tu ritmo.
+**`analysisToDefinition`** (`apps/web/src/lib/lab/analysis-to-definition.ts`) ya está implementada. Recibe el análisis de la foto, el catálogo local (`resolve`: de un `asset_id` a la pieza del catálogo de Pascal, con su tamaño real) y, si la persona lo escribió, el ancho conocido, y devuelve la definición de un ambiente que el editor sabe dibujar. Es el único camino de «Escena desde una foto»: «Abrir en el editor» y «Probar con un ejemplo» la llaman y `openDefinitionAsProject` (`src/editor/lab-scene.ts`) la convierte en proyecto. Hoy decide esto:
 
-Mientras está en blanco, «Abrir en el editor» y «Probar con un ejemplo» muestran un aviso amable. Una idea es empezar por lo más chico (un ambiente con una sola pieza), mirarlo en el editor con el botón de ejemplo y recién después sumar piezas. Si la definición tiene algún problema, el mensaje del validador aparece en pantalla, en castellano.
+- **El ambiente:** un nivel con un ambiente rectangular de `ancho conocido ?? 4 m` y un fondo del 75 % (`roomSize`, el mismo que usa `analysisToCluster`); un ancho menor que 1 m se sube a 1 m y se avisa. Cuatro muros (`p-n`, `p-e`, `p-s` y `p-w`) con pintura blanca suave por dentro y revoque por fuera, con zócalo y cornisa; piso de madera clara (`wood-woodfine2`) y cielo.
+- **Los muebles:** son los de `analysisToCluster` (tamaño real del catálogo, giro de Pascal, lo dudoso o desconocido se descarta con aviso y nunca se reemplaza), pasados a coordenadas absolutas. Ninguna pieza cruza un muro: si su huella (ya girada) se sale, se acerca al interior hasta quedar a 0,2 m del eje del muro (10 cm de su cara) y se avisa; si no cabe en el ambiente, queda en el centro y se avisa.
+- **Puerta y ventana:** una de cada una: la puerta de 0,9 m y la ventana de un 35 % del largo del muro (hasta 2,2 m). La puerta prefiere el muro de quien mira la foto (sur) y la ventana el del fondo (norte); si hay muebles pegados delante, se corren a un tramo libre o pasan a otro muro, y en un ambiente muy chico se omiten si no caben.
+- **Avisos:** todo lo que se movió, se achicó o se dejó afuera sale por `opts.warn`; la página lo guarda en «Avisos del modelado» y lo muestra cuando el editor no llega a abrirse.
+
+Se puede seguir mejorando: más aberturas según la foto, que el frente de las piezas mire al centro, que las piezas no se pisen entre sí, otros materiales o varios ambientes. Una idea es mirar el resultado en el editor con el botón de ejemplo y cambiar de a una decisión, con su prueba en `apps/web/test/lab-analysis-to-definition.test.ts`. Si la definición tiene algún problema, el mensaje del validador aparece en pantalla, en castellano.
 
 Dónde mirar:
 
@@ -203,18 +209,18 @@ const ejemplo: TemplateDefinition = {
 
 Las medidas del ejemplo son solo de ejemplo.
 
-### Ideas para ir verificando
+### Qué verifican las pruebas y qué más se podría verificar
 
-Están como `it.todo` en `apps/web/test/lab-analysis-to-definition.test.ts`; cada una puede volverse una prueba cuando tenga sentido:
+`apps/web/test/lab-analysis-to-definition.test.ts` ya fija, con las piezas reales del catálogo y el validador de plantillas:
 
-- el ambiente podría medir el ancho conocido cuando la persona lo indica;
-- las piezas podrían quedar siempre dentro del ambiente, incluso las que el análisis ubica en el borde;
-- la rotación podría respetar el sentido horario del análisis (visto desde arriba);
-- el resultado podría pasar `validateDefinition` con las piezas y los materiales reales de Pascal;
-- un `asset_id` que no esté en el catálogo local podría avisarse (con `opts.warn`) sin romper el resto del análisis;
-- el análisis de ejemplo podría convertirse en una escena que `buildLabEnvelope` dibuje sin errores;
-- un análisis sin muebles podría producir un ambiente vacío pero válido;
-- las piezas de confianza baja podrían tener un tratamiento explícito y comentado.
+- el ambiente mide el ancho conocido (o 4 m) y el 75 % de fondo, y sus muros, puerta, ventana y piso son válidos para Pascal;
+- las piezas quedan siempre dentro del ambiente, con su huella girada a 0,2 m del muro como mínimo, incluso las que el análisis ubica en el borde;
+- la rotación respeta el sentido horario del análisis (visto desde arriba);
+- un `asset_id` que no esté en el catálogo local o una pieza de confianza baja se avisan (`opts.warn`) sin romper el resto;
+- el análisis de ejemplo (`SAMPLE_ANALYSIS`) se convierte en una escena que `buildLabEnvelope` dibuja sin errores;
+- un análisis sin muebles da un ambiente vacío pero válido.
+
+Ideas para sumar: que las piezas no se pisen entre sí, que el frente de cada pieza mire al centro del ambiente, aberturas que salgan de la foto y no solo de los muebles, y un tratamiento propio para las piezas de confianza media.
 
 Para correr solo estas pruebas:
 
@@ -224,16 +230,14 @@ pnpm --filter @interiores/web exec vitest run lab
 
 ### Cómo saber que funciona
 
-- Las pruebas del laboratorio en verde (los `todo` se van convirtiendo en pruebas).
+- Las pruebas del laboratorio en verde (`lab-*.test.ts`).
 - `pnpm verify` en verde (lint, build, tipos y pruebas).
-- El botón «Probar con un ejemplo» abre el editor con el ambiente.
+- El botón «Probar con un ejemplo» abre el editor con el ambiente y sus muebles; `apps/web/e2e/escena-desde-foto.spec.ts` lo comprueba en un navegador.
 - Opcional: una captura del resultado en `lab/resultados/capturas/`, por ejemplo para sumar al registro de pruebas.
-
-En `apps/web/e2e/laboratorio.spec.ts` hay una prueba en navegador marcada con `test.fixme` para el flujo completo; se activa cambiando `test.fixme` por `test` (y la prueba «mientras el modelado está en blanco» deja de tener sentido).
 
 ## Plan de pruebas
 
-Nueve casos para conocer cómo responde el análisis y qué muestra el laboratorio. Cada uno se registra como se explica en la sección siguiente.
+Nueve casos para conocer cómo responde el análisis y qué muestra «Escena desde una foto». Cada uno se registra como se explica en la sección siguiente.
 
 | # | Caso | Cómo probarlo | Resultado esperado |
 |---|---|---|---|

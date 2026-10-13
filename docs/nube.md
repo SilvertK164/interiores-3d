@@ -165,7 +165,7 @@ Son dos pasadas porque la web necesita la URL de la API para compilar y la API n
 - **Análisis de fotos:** su petición es la más grande de la API. Con una foto de 3 MiB (el tope, decodificada) y un catálogo de 64 KB, el JSON pesa unos 4,26 MB y entra bajo los 4,5 MB de Vercel (`ANALYZE_BODY_MAX_BYTES` del contrato); la web reduce la foto antes de enviarla, así que en la práctica son cientos de KB. La función puede durar hasta 30 s (`functions.maxDuration` de `apps/api/vercel.json`) y la espera a Gemini corta a los 25 s. **Revisa los límites de duración vigentes de tu plan de Vercel.**
 - **Sin pruebas reales:** nada de lo que depende de las cuentas (Auth, `db push`, Vercel) se ejecutó todavía, ni el análisis de fotos contra Gemini real (solo con la respuesta de Google simulada).
 
-## 11. Análisis de fotos («Muebles desde una foto» y `/laboratorio`)
+## 11. Análisis de fotos («Muebles desde una foto» y `/escena-desde-foto`)
 
 Desde el 2026-10-13 el análisis ya no necesita el servicio TP3 local ni su dirección: la web manda la foto a `POST /v1/analyze-room` de nuestra API (con la sesión de la persona) y la API llama a Gemini. El backend de TP3 queda como referencia del Laboratorio de Victoria (`lab/README.md`).
 
