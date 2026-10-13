@@ -7,7 +7,7 @@ import { selectViewOptions } from './bridge/view'
 import { DECISIONS, type Decisions } from './decisions'
 import { ExportButtons, ViewBar, ViewPanel } from './ui/ViewControls'
 import { downloadBlob } from './download-blob'
-import { toPng } from './to-png'
+import { type ImageStyle, toPng } from './to-png'
 import { useBridge, useShell } from './use-bridge'
 import { viewActions, viewGroups } from './view-model'
 
@@ -25,12 +25,13 @@ export function ShellView({
   const options = useShell(selectViewOptions)
   const [imageBusy, setImageBusy] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [imageStyle, setImageStyle] = useState<ImageStyle>('color')
   const exportImage = async () => {
     if (imageBusy) return
     setImageBusy(true)
     setImageError(false)
     try {
-      downloadBlob(await toPng(await bridge.image.captureIsometric()), imageFileName(projectName))
+      downloadBlob(await toPng(await bridge.image.captureIsometric(), imageStyle), imageFileName(projectName, imageStyle))
     } catch {
       setImageError(true)
     } finally {
@@ -60,7 +61,7 @@ export function ShellView({
           No pudimos generar la imagen. Inténtalo de nuevo.
         </p>
       )}
-      <ExportButtons imageBusy={imageBusy} onExportImage={() => void exportImage()} onExportPlan={onExportPlan} />
+      <ExportButtons imageBusy={imageBusy} imageStyle={imageStyle} onImageStyle={setImageStyle} onExportImage={() => void exportImage()} onExportPlan={onExportPlan} />
     </>
   )
 }

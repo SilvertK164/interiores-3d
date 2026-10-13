@@ -16,7 +16,7 @@ export function exportFileName(projectName: string, suffix = SUFFIX): string {
   return `${base || 'proyecto'}${suffix}`
 }
 
-/** Nombre de la imagen 3D: `<proyecto>-isometrico.png`, con las mismas reglas que el del PDF. */
-export function imageFileName(projectName: string): string {
-  return exportFileName(projectName, '-isometrico.png')
+/** Nombre de la imagen 3D: `<proyecto>-isometrico.png` (`-isometrico-bn.png` en blanco y negro), con las mismas reglas que el del PDF. */
+export function imageFileName(projectName: string, style: 'color' | 'bn' = 'color'): string {
+  return exportFileName(projectName, style === 'bn' ? '-isometrico-bn.png' : '-isometrico.png')
 }

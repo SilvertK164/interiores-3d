@@ -59,4 +59,7 @@ describe('imageFileName', () => {
     expect(imageFileName('Casa Ñandú / 2º piso')).toBe('Casa-Nandu-2-piso-isometrico.png')
     expect(imageFileName('***')).toBe('proyecto-isometrico.png')
   })
+  it('en blanco y negro lleva -bn', () => {
+    expect(imageFileName('Casa', 'bn')).toBe('Casa-isometrico-bn.png')
+  })
 })

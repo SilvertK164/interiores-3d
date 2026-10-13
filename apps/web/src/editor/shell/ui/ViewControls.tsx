@@ -78,13 +78,36 @@ export function ExportButtons({
   onExportPlan,
   onExportImage,
   imageBusy = false,
+  imageStyle = 'color',
+  onImageStyle,
 }: {
   onExportPlan?: (opener: HTMLElement) => void
   onExportImage?: () => void
   imageBusy?: boolean
+  imageStyle?: 'color' | 'bn'
+  onImageStyle?: (style: 'color' | 'bn') => void
 } = {}) {
   return (
     <div className="absolute bottom-6 right-5 z-10 flex items-center gap-3">
+      <div role="radiogroup" aria-label="Estilo de la imagen 3D" className={cx(FLOAT, 'inline-flex h-12 items-center gap-1 rounded-full p-1')}>
+        {(
+          [
+            ['color', 'Color'],
+            ['bn', 'Blanco y negro'],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            role="radio"
+            aria-checked={imageStyle === value}
+            onClick={() => onImageStyle?.(value)}
+            className={cx('focus-ring h-10 cursor-pointer rounded-full px-4 text-[14px] font-semibold', imageStyle === value ? 'bg-ink text-white' : 'text-ink hover:bg-white')}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       <button type="button" onClick={onExportImage} disabled={imageBusy} aria-busy={imageBusy || undefined} className={EXPORT_BUTTON}>
         <ImageDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
         {imageBusy ? 'Generando imagen…' : 'Exportar imagen 3D'}
