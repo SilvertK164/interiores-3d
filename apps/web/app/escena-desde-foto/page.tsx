@@ -11,6 +11,8 @@ import { describeLabError } from '@/lib/lab/describe-error'
 import { labProjectName, parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError } from '@/lib/lab/lab-error'
 import { showEditorPathTool } from '@/lib/lab/lab-view'
+import { type CameraPose, photoSceneCamera } from '@/lib/lab/photo-camera'
+import { savePhotoCamera } from '@/lib/lab/photo-camera-handoff'
 import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
 import { savedName } from '@/lib/person-name'
@@ -27,6 +29,8 @@ import { type Busy, PhotoCard } from './PhotoCard'
 import { ResultsCard } from './ResultsCard'
 
 const SAVE_FAILED = 'El proyecto se creó, pero no pudimos guardar la escena. Puedes reintentar.'
+/** Lo que `openInEditor` abre: la definición y, si viene de una foto, la cámara 3D con que debe abrir el editor (en las coordenadas de su escena). */
+type Built = { definition: TemplateDefinition; camera?: CameraPose }
 const FRAME = 'mx-auto flex min-h-dvh max-w-[1100px] flex-col gap-5 px-[clamp(20px,4vw,56px)] pb-12 pt-[18px]'
 
 /** El aviso para la pantalla; del error inesperado, el detalle técnico queda en la consola del navegador. */
@@ -53,6 +57,8 @@ export default function EscenaDesdeFotoPage() {
   const [busy, setBusy] = useState<Busy>(null)
   // Candado síncrono: el estado de React llega tarde y un doble clic crearía dos proyectos.
   const lock = useRef(false)
+  // La cámara del proyecto cuya escena no se pudo guardar: el reintento la guarda al abrir el editor.
+  const pendingCamera = useRef<CameraPose | null>(null)
 
   useEffect(() => {
     // Sin sesión desde el principio no hay aviso; si se perdió estando aquí, /login explica que venció. Salir a propósito no es perderla.
@@ -99,20 +105,22 @@ export default function EscenaDesdeFotoPage() {
   }
 
   /** Arma la definición (con `build`), la guarda como proyecto nuevo y abre el editor. Pascal se carga recién aquí. */
-  async function openInEditor(build: (warn: (message: string) => void) => TemplateDefinition | Promise<TemplateDefinition>, place: NoticePlace, label?: string) {
+  async function openInEditor(build: (warn: (message: string) => void) => Built | Promise<Built>, place: NoticePlace, label?: string) {
     if (!start('abriendo')) return
     const warnings: string[] = []
     let going = false
     try {
-      const definition = await build((message) => warnings.push(message))
+      const { definition, camera } = await build((message) => warnings.push(message))
       const { openDefinitionAsProject } = await import('@/editor/lab-scene')
       const result = await openDefinitionAsProject(definition, {
         api,
         name: labProjectName(new Date(), label),
         navigate: (href) => nav.go(href),
+        camera,
       })
       if (result.saved) going = true // el candado sigue puesto: la página se reemplaza por el editor
       else {
+        pendingCamera.current = camera ?? null
         setPending(result)
         setNotice({ text: SAVE_FAILED, place })
       }
@@ -124,11 +132,16 @@ export default function EscenaDesdeFotoPage() {
     }
   }
 
-  /** El ambiente de la foto: las piezas se resuelven contra el catálogo local, que se carga recién aquí (Pascal no se importa antes). */
-  const modelAnalysis = (current: RoomAnalysis) => async (warn: (message: string) => void) => {
+  /**
+   * El ambiente de la foto: las piezas se resuelven contra el catálogo local, que se carga recién aquí (Pascal no se importa antes).
+   * El editor abre con la cámara 3D en el punto de vista de la foto (`photoSceneCamera`).
+   */
+  const modelAnalysis = (current: RoomAnalysis) => async (warn: (message: string) => void): Promise<Built> => {
     const { analysisCatalog } = await import('@/editor/lab-scene')
     const { pieces } = await analysisCatalog()
-    return analysisToDefinition(current, (id) => pieces.get(id), { knownWidthM: parseKnownWidth(widthText), warn })
+    const knownWidthM = parseKnownWidth(widthText)
+    const definition = analysisToDefinition(current, (id) => pieces.get(id), { knownWidthM, warn })
+    return { definition, camera: photoSceneCamera(knownWidthM, definition) }
   }
 
   async function tryExample() {
@@ -149,7 +162,10 @@ export default function EscenaDesdeFotoPage() {
     const place = notice?.place ?? 'results'
     if (!pending || !start('abriendo')) return
     const result = await retrySaveTemplate(api, pending)
-    if (result.saved) return nav.go(`/proyectos/${result.project.id}`)
+    if (result.saved) {
+      if (pendingCamera.current) savePhotoCamera(result.project.id, pendingCamera.current)
+      return nav.go(`/proyectos/${result.project.id}`)
+    }
     setPending(result)
     setNotice(noticeFor(result.error, place))
     release()
@@ -204,7 +220,7 @@ export default function EscenaDesdeFotoPage() {
           <EditorPathTool
             busy={busy}
             notice={notice}
-            onOpenLoft={() => void openInEditor(() => loft, 'tool', 'prueba Loft')}
+            onOpenLoft={() => void openInEditor(() => ({ definition: loft }), 'tool', 'prueba Loft')}
             onRetry={() => void retry()}
             pending={pending}
           />

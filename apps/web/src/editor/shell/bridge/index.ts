@@ -17,9 +17,11 @@ export type BridgeDeps = CoreDeps & ModeDeps & LevelsDeps & CatalogDeps & Materi
 
 /** El puente: todo lo que el shell sabe hacer con Pascal, con dependencias inyectadas (los dobles de las pruebas o los almacenes reales). */
 export function createBridge(deps: BridgeDeps) {
+  const mode = createModeSlice(deps)
+  const frame = createFrameSlice(deps)
   return {
     ...createCoreSlice(deps),
-    ...createModeSlice(deps),
+    ...mode,
     ...createToolsSlice(deps),
     ...createLevelsSlice(deps),
     ...createCatalogSlice(deps),
@@ -28,11 +30,16 @@ export function createBridge(deps: BridgeDeps) {
     ...createViewSlice(deps),
     ...createPresetsSlice(deps),
     ...createLevelManageSlice(deps),
-    ...createFrameSlice(deps),
+    ...frame,
     ...createPlanSlice(deps),
     ...createImageSlice(deps),
     ...createClusterSlice(deps),
     // @@slices
+    /** Al desmontar el shell: suelta el solo lectura (modo) y la cámara retenida (encuadre). */
+    dispose(): void {
+      frame.releaseCameraPose()
+      mode.dispose()
+    },
   }
 }
 

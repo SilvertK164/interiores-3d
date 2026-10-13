@@ -6,10 +6,12 @@ import {
   FLOOR_TOP_M,
   MAX_VIEW_REACH_M,
   NEAR_WALL_GAP_M,
+  PHOTO_FOV_DEG,
   TARGET_HEIGHT_M,
   type CameraPose,
   type Vec3,
   photoCameraPose,
+  photoSceneCamera,
   sceneCameraPose,
 } from '../src/lib/lab/photo-camera'
 import type { DetectedFurniture, RoomAnalysis } from '../src/lib/lab/schema'
@@ -39,7 +41,7 @@ const sub = (a: readonly number[], b: readonly number[]): Vec3 => [(a[0] ?? 0) -
 const length = (v: readonly number[]) => Math.hypot(v[0] ?? 0, v[1] ?? 0, v[2] ?? 0)
 
 /** Hacia dónde mira la cámara (unitario), la derecha de la imagen (forward × up, como three.js) y la distancia al punto de mira. */
-function view({ position, target }: CameraPose) {
+function view({ position, target }: Pick<CameraPose, 'position' | 'target'>) {
   const delta = sub(target, position)
   const distance = length(delta)
   const forward = delta.map((n) => n / distance) as Vec3
@@ -88,17 +90,18 @@ describe('photoCameraPose: la cámara en coordenadas del ambiente', () => {
     expect(EYE_HEIGHT_M).toBe(1.5)
   })
 
-  it('mira hacia el muro opuesto (el de y = 0), derecho, a un metro de altura', () => {
+  it('mira hacia el muro opuesto (el de y = 0), derecho y hacia abajo, a 0,7 m de altura: así entran el piso y los muebles', () => {
     const { position, target } = photoCameraPose({ width: 4, depth: 3 })
     expect(target[0]).toBe(position[0])
     expect(target[1]).toBe(TARGET_HEIGHT_M)
-    expect(TARGET_HEIGHT_M).toBe(1)
+    expect(TARGET_HEIGHT_M).toBe(0.7)
+    expect(target[1]).toBeLessThan(position[1])
     expect(target[2]).toBeLessThan(position[2])
     expect(view({ position, target }).forward[0]).toBe(0)
   })
 
   it('en un ambiente hondo el objetivo es el centro del ambiente', () => {
-    expect(photoCameraPose({ width: 8, depth: 6 }).target).toEqual([4, 1, 3])
+    expect(photoCameraPose({ width: 8, depth: 6 }).target).toEqual([4, TARGET_HEIGHT_M, 3])
   })
 
   it('en uno chico el objetivo pasa el centro: a menos de 2 m, el primer zoom mandaría la cámara de golpe hacia atrás', () => {
@@ -158,6 +161,11 @@ describe('photoCameraPose: la cámara en coordenadas del ambiente', () => {
     }
   })
 
+  it('abre el campo de visión a 60° (el de un celular), más que los 50° de la cámara del editor', () => {
+    expect(photoCameraPose({ width: 4, depth: 3 }).fov).toBe(PHOTO_FOV_DEG)
+    expect(PHOTO_FOV_DEG).toBe(60)
+  })
+
   it('redondea al milímetro y no deja un -0', () => {
     for (const width of [3.333, 5.123, 7.777]) {
       for (const n of [...photoCameraPose(photoRoom(width)).position, ...photoCameraPose(photoRoom(width)).target]) {
@@ -209,12 +217,13 @@ describe('sceneCameraPose: la cámara en las coordenadas de la escena de Pascal'
     expect(pose.target[1] - FLOOR_TOP_M).toBeCloseTo(TARGET_HEIGHT_M, 6)
   })
 
-  it('con 4 m de ancho: la cámara en (0; 1,55; 1,2) y mirando hacia (0; 1,05; -0,84)', () => {
+  it('con 4 m de ancho: la cámara en (0; 1,55; 1,2) y mirando hacia (0; 0,75; -0,74), con 60° de campo de visión', () => {
     const { pose } = sceneOf(4)
     expect(pose.position).toEqual([0, 1.55, 1.2])
     expect(pose.target[0]).toBe(0)
-    expect(pose.target[1]).toBe(1.05)
-    expect(pose.target[2]).toBeCloseTo(-0.84, 2)
+    expect(pose.target[1]).toBe(0.75)
+    expect(pose.target[2]).toBeCloseTo(-0.742, 3)
+    expect(pose.fov).toBe(60)
   })
 
   it('traslada la pose entera sin cambiar la distancia ni el sentido en que mira', () => {
@@ -233,5 +242,17 @@ describe('sceneCameraPose: la cámara en las coordenadas de la escena de Pascal'
         expect(Object.is(n, -0)).toBe(false)
       }
     }
+  })
+})
+
+describe('photoSceneCamera: la cámara con la que abre el editor', () => {
+  it.each([undefined, null, 0.4, 4, 5.3, 8])('es la del ambiente de la foto en las coordenadas de su escena (ancho %s)', (width) => {
+    const definition = analysisToDefinition(empty(), () => undefined, { knownWidthM: width })
+    expect(photoSceneCamera(width, definition)).toEqual(sceneCameraPose(photoCameraPose(photoRoom(width)), definition))
+  })
+
+  it('sin ancho conocido, el ambiente de 4 × 3 m: la cámara en (0; 1,55; 1,2)', () => {
+    const definition = analysisToDefinition(empty(), () => undefined)
+    expect(photoSceneCamera(undefined, definition).position).toEqual([0, 1.55, 1.2])
   })
 })

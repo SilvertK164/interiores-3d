@@ -2,7 +2,7 @@ import * as Core from '@pascal-app/core'
 import * as Pascal from '@pascal-app/editor'
 import { Box3, Vector3 } from 'three'
 import type { FrameMeasure } from './shell/frame-insets'
-import type { FrameDeps } from './shell/bridge/frame'
+import type { FrameDeps, ScenePose } from './shell/bridge/frame'
 import { fitCamera, fitPlan, frameMargin } from './shell/framing'
 
 type PlanFit = (content: { minX: number; minY: number; maxX: number; maxY: number }, surface: { width: number; height: number }) => { centerX: number; centerY: number; width: number } | null
@@ -28,13 +28,38 @@ function activeBox(): { center: [number, number, number]; radius: number } | nul
 }
 
 /**
+ * Lo que mueve la cámara 3D por su cuenta, sin pasar por el encuadre: los gestos de la persona (`interaction-start`: arrastrar, rueda,
+ * teclas) y los botones de vista de Pascal (girar, vista superior, enfocar un nodo, encuadrar la escena). `apply-pose`, el evento del
+ * encuadre, no está: es lo que se emite para mover la cámara, no un movimiento de la persona.
+ */
+const CAMERA_MOVES = [
+  'camera-controls:interaction-start',
+  'camera-controls:orbit-cw',
+  'camera-controls:orbit-ccw',
+  'camera-controls:top-view',
+  'camera-controls:fit-scene',
+  'camera-controls:view',
+  'camera-controls:focus',
+] as const
+
+/** La pose de la foto, con el mismo evento del encuadre (`apply-pose`), siempre en perspectiva (una foto no es isométrica) y con su propio `fov`. */
+const photoPose = ({ position, target, fov }: ScenePose) => ({ position, target, fov: fov ?? FOV, projection: 'perspective' as const })
+
+/**
  * Encuadre de cada vista. El plano 2D lo ajusta Pascal con su propio encuadre automático, que el parche de Madori
  * (`floorplan-panel.tsx`, `__madoriPlanFit`) deja en manos de `fitPlan` (la planta activa, no el terreno); la cámara 3D recibe una
- * pose con el mismo evento que usan los botones de vista de Pascal (`camera-controls:apply-pose`).
+ * pose con el mismo evento que usan los botones de vista de Pascal (`camera-controls:apply-pose`): la diagonal que ajusta `fitCamera`
+ * o, si el puente retiene una (la de «Escena desde una foto»), esa.
  */
 export function frameDeps(): FrameDeps {
   return {
-    frameViews: ({ plan, scene }: FrameMeasure): boolean => {
+    watchCameraMoves: (listener) => {
+      for (const name of CAMERA_MOVES) Core.emitter.on(name, listener)
+      return () => {
+        for (const name of CAMERA_MOVES) Core.emitter.off(name, listener)
+      }
+    },
+    frameViews: ({ plan, scene }: FrameMeasure, scenePose?: ScenePose): boolean => {
       const global = globalThis as { __madoriPlanFit?: PlanFit }
       if (plan) {
         global.__madoriPlanFit = (content, surface) => fitPlan(content, surface, plan.insets, frameMargin(surface))
@@ -44,8 +69,12 @@ export function frameDeps(): FrameDeps {
       }
       const box = scene ? activeBox() : null
       if (scene && box) {
-        const pose = fitCamera({ box, insets: scene.insets, canvas: scene.canvas, fov: FOV, margin: frameMargin(scene.canvas) })
-        Core.emitter.emit('camera-controls:apply-pose', { ...pose, fov: FOV, projection: Pascal.useViewer.getState().cameraMode } as never)
+        if (scenePose) {
+          Core.emitter.emit('camera-controls:apply-pose', photoPose(scenePose))
+        } else {
+          const pose = fitCamera({ box, insets: scene.insets, canvas: scene.canvas, fov: FOV, margin: frameMargin(scene.canvas) })
+          Core.emitter.emit('camera-controls:apply-pose', { ...pose, fov: FOV, projection: Pascal.useViewer.getState().cameraMode } as never)
+        }
       }
       // Sin lienzo o sin geometría todavía: la escena sigue cargando y el shell reintenta.
       return (plan !== null || scene !== null) && (scene === null || box !== null)

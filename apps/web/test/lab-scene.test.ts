@@ -6,6 +6,8 @@ import { buildLabEnvelope, openDefinitionAsProject } from '../src/editor/lab-sce
 import { type AssetLike, MATERIAL_IDS } from '../src/editor/templates/scene-builder'
 import type { ApiClient } from '../src/lib/api/client'
 import { LabError } from '../src/lib/lab/lab-error'
+import type { CameraPose } from '../src/lib/lab/photo-camera'
+import { photoCameraKey } from '../src/lib/lab/photo-camera-handoff'
 import { TEMPLATE_DEFINITIONS } from '../src/lib/templates'
 import { retrySaveTemplate } from '../src/lib/templates/create-from-template'
 import { perimeter } from '../src/lib/templates/geometry'
@@ -142,4 +144,52 @@ describe('openDefinitionAsProject', () => {
     expect(api.createProject).toHaveBeenCalledTimes(1)
     expect(api.saveScene).toHaveBeenCalledTimes(2)
   })
+})
+
+describe('openDefinitionAsProject: la cámara de la foto', () => {
+  const camera: CameraPose = { position: [0, 1.55, 1.2], target: [0, 0.75, -0.742], fov: 60 }
+  /** Sustituye `window.sessionStorage` por un Map mientras dura la prueba. */
+  function withSessionStorage<T>(run: (data: Map<string, string>) => Promise<T>, failWrites = false): Promise<T> {
+    const data = new Map<string, string>()
+    const sessionStorage = {
+      getItem: (key: string) => data.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        if (failWrites) throw new DOMException('cuota', 'QuotaExceededError')
+        data.set(key, value)
+      },
+      removeItem: (key: string) => void data.delete(key),
+    }
+    vi.stubGlobal('window', { sessionStorage })
+    return run(data).finally(() => vi.unstubAllGlobals())
+  }
+
+  it('la guarda para el proyecto nuevo ANTES de navegar al editor', () =>
+    withSessionStorage(async (data) => {
+      const seen: (string | undefined)[] = []
+      const navigate = vi.fn(() => seen.push(data.get(photoCameraKey(ID))))
+      await openDefinitionAsProject(loft, { api: fakeApi(), name: 'x', navigate, assets: ASSETS, camera })
+      expect(navigate).toHaveBeenCalledWith(`/proyectos/${ID}`)
+      expect(JSON.parse(seen[0] ?? 'null')).toEqual(camera)
+    }))
+
+  it('sin cámara no escribe nada (el Loft de prueba no es de una foto)', () =>
+    withSessionStorage(async (data) => {
+      await openDefinitionAsProject(loft, { api: fakeApi(), name: 'x', navigate: vi.fn(), assets: ASSETS })
+      expect(data.size).toBe(0)
+    }))
+
+  it('si no se pudo guardar la escena no guarda la cámara: el editor todavía no se abre (se guarda al reintentar)', () =>
+    withSessionStorage(async (data) => {
+      const api = fakeApi(vi.fn().mockRejectedValue(new Error('sin red')))
+      const result = await openDefinitionAsProject(loft, { api, name: 'x', navigate: vi.fn(), assets: ASSETS, camera })
+      expect(result.saved).toBe(false)
+      expect(data.size).toBe(0)
+    }))
+
+  it('si el almacenamiento falla, el editor se abre igual (con su encuadre normal)', () =>
+    withSessionStorage(async () => {
+      const navigate = vi.fn()
+      await openDefinitionAsProject(loft, { api: fakeApi(), name: 'x', navigate, assets: ASSETS, camera })
+      expect(navigate).toHaveBeenCalledWith(`/proyectos/${ID}`)
+    }, true))
 })

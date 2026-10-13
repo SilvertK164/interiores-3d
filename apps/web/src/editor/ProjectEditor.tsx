@@ -10,6 +10,7 @@ import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
 import { useNavigate } from '@/lib/use-navigate'
+import { takePhotoCamera } from '@/lib/lab/photo-camera-handoff'
 import { authorName } from '@/lib/person-name'
 import { useSession } from '@/lib/use-session'
 import { supabaseBrowser } from '@/lib/supabase/browser'
@@ -22,6 +23,7 @@ import { createPascalBridge } from './pascal-bridge'
 import { createSaveHandler } from './save-handler'
 import { SaveBanner } from './SaveBanner'
 import { EditorShell } from './shell/EditorShell'
+import { measureFrame } from './shell/frame-insets'
 import { type SaveOutcome, type SaverStatus, type SceneSaver, createSceneSaver } from './scene-saver'
 
 let pluginReady: Promise<unknown> | null = null
@@ -116,6 +118,20 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
   const { session } = useSession()
   const rootRef = useRef<HTMLDivElement>(null)
   const sceneLoading = useSceneLoading(rootRef, phase.kind === 'ready')
+
+  // «Escena desde una foto» deja guardada la cámara de la foto (`photo-camera-handoff.ts`): se aplica UNA vez, cuando la escena
+  // terminó de cargar. El puente la retiene para que el encuadre automático del shell no la pise; sin pose, o si algo falla, el editor
+  // abre con su encuadre normal.
+  useEffect(() => {
+    if (phase.kind !== 'ready' || sceneLoading) return
+    const pose = takePhotoCamera(projectId)
+    if (!pose) return
+    try {
+      bridge.openCameraAt(pose, measureFrame())
+    } catch {
+      bridge.releaseCameraPose()
+    }
+  }, [bridge, phase.kind, projectId, sceneLoading])
 
   if (phase.kind === 'loading') return <LoaderPortal />
   if (phase.kind === 'error') return <p role="alert" className="p-6 text-destructive">{phase.message}</p>

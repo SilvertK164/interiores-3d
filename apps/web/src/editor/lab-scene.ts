@@ -9,6 +9,8 @@ import {
 import type { ApiClient } from '../lib/api/client'
 import { type AnalysisCatalog, buildAnalysisCatalog } from '../lib/lab/analysis-catalog'
 import { LabError } from '../lib/lab/lab-error'
+import type { CameraPose } from '../lib/lab/photo-camera'
+import { savePhotoCamera } from '../lib/lab/photo-camera-handoff'
 import { type CreateFromTemplateResult, retrySaveTemplate } from '../lib/templates/create-from-template'
 import type { TemplateDefinition } from '../lib/templates/types'
 import { buildAssetMap } from './catalog-assets'
@@ -73,17 +75,25 @@ export type OpenDefinitionOptions = {
   kind?: ProjectKind
   /** Piezas disponibles; por defecto, el catálogo local de Pascal. */
   assets?: ReadonlyMap<string, AssetLike>
+  /**
+   * La cámara 3D con la que debe abrir el editor (en las coordenadas de la escena, ver `photoSceneCamera`): se guarda para el proyecto
+   * nuevo justo antes de navegar y el editor la aplica una sola vez. Si no se puede guardar, el editor abre con su encuadre normal.
+   */
+  camera?: CameraPose
 }
 
 /**
  * La plomería completa para una definición cualquiera: arma la escena con `buildScene` (validándola ANTES de crear nada, para no
  * dejar proyectos vacíos), crea el proyecto, guarda la escena y abre el editor. Si falla el guardado devuelve el proyecto y la
- * escena para reintentar con `retrySaveTemplate`, sin crear otro proyecto.
+ * escena para reintentar con `retrySaveTemplate`, sin crear otro proyecto (la cámara, si hay, la guarda quien reintenta).
  */
 export async function openDefinitionAsProject(definition: TemplateDefinition, opts: OpenDefinitionOptions): Promise<CreateFromTemplateResult> {
   const envelope = buildLabEnvelope(definition, opts.assets ?? (await catalogAssets()))
   const project = await opts.api.createProject({ name: opts.name, kind: opts.kind ?? 'vivienda' })
   const result = await retrySaveTemplate(opts.api, { project, envelope, saved: false })
-  if (result.saved) opts.navigate(`/proyectos/${project.id}`)
+  if (result.saved) {
+    if (opts.camera) savePhotoCamera(project.id, opts.camera)
+    opts.navigate(`/proyectos/${project.id}`)
+  }
   return result
 }

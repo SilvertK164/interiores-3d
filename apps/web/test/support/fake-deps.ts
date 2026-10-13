@@ -1,6 +1,8 @@
 import { vi } from 'vitest'
 import type { BridgeDeps } from '../../src/editor/shell/bridge'
 import type { ClusterItem } from '../../src/editor/shell/bridge/cluster'
+import type { FrameMeasure } from '../../src/editor/shell/frame-insets'
+import type { ScenePose } from '../../src/editor/shell/bridge/frame'
 import type { EditorLike, EditorMode, HistoryState, SceneLike, SnapContext, SnapMode, ViewerLike } from '../../src/editor/shell/bridge/types'
 import type { MaterialItemLike } from '../../src/editor/shell/materials-model'
 import type { LevelMeasure, PlanBuildArgs, PlanResult } from '../../src/lib/export/types'
@@ -99,6 +101,8 @@ export function createFakeDeps() {
       for (const listener of [...historyListeners]) listener()
     },
   }
+  // Lo que mueve la cámara 3D por su cuenta (gestos, botones de vista): `cameraMoved()` lo dispara y `watching()` cuenta quién escucha.
+  const cameraListeners = new Set<() => void>()
   const undoTheme = vi.fn()
   const showHint = vi.fn()
   const materials = { items: FAKE_MATERIALS, selectedId: null as string | null, select: vi.fn() }
@@ -124,7 +128,11 @@ export function createFakeDeps() {
     deleteNodes: vi.fn(),
     moveCamera: vi.fn(),
     startWalkthrough: vi.fn(() => editor.setState({ isFirstPersonMode: true })),
-    frameViews: vi.fn(),
+    frameViews: vi.fn((_measure: FrameMeasure, _scenePose?: ScenePose): boolean => true),
+    watchCameraMoves: vi.fn((listener: () => void) => {
+      cameraListeners.add(listener)
+      return () => void cameraListeners.delete(listener)
+    }),
     updateLevels: vi.fn(),
     duplicateLevel: vi.fn((_id: string): string | null => 'level_copia'),
     deleteLevel: vi.fn(),
@@ -150,5 +158,8 @@ export function createFakeDeps() {
     scene: scene.getState(),
     history: history.read(),
   })
-  return { deps, editor, viewer, scene, history, undoTheme, showHint, snapshot }
+  const cameraMoved = () => {
+    for (const listener of [...cameraListeners]) listener()
+  }
+  return { deps, editor, viewer, scene, history, undoTheme, showHint, snapshot, cameraMoved, watching: () => cameraListeners.size }
 }
