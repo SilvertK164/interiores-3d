@@ -15,7 +15,8 @@ pnpm db:env                          # escribe .env.test, apps/api/.env y apps/w
 pnpm verify                          # lint + build + tipos + pruebas (incluye RLS contra Supabase local)
 pnpm --filter @interiores/api dev    # http://localhost:3001
 pnpm --filter @interiores/web dev    # http://localhost:3000
-pnpm --filter @interiores/web e2e    # navegador real: persistir, 404 entre cuentas y conflicto 409
+pnpm --filter @interiores/web e2e    # navegador real: persistir, 404 entre cuentas, conflicto 409, catálogo y plantillas
+pnpm --filter @interiores/web templates:build   # regenera las plantillas (public/templates/)
 ```
 
 Requisitos: Node 22, pnpm 11 y Docker Desktop. `pnpm db:stop` apaga Supabase local y libera la memoria.
@@ -32,8 +33,10 @@ Las decisiones D1–D10 con sus alternativas descartadas están en el spec (secc
 2. **RLS como segunda barrera:** la API reenvía el JWT de la persona; `service_role` solo existe en pruebas.
 3. **Bloqueo optimista (`If-Match` → `409`)** en vez de "la última escritura gana".
 4. **Pascal como base**, aislado en una carpeta, con plan B (`core` + `viewer`).
-5. **Catálogo autoalojado** desde el repo MIT de Pascal (100 muebles) para no depender de su bucket.
+5. **Catálogo autoalojado** desde el repo MIT de Pascal (101 muebles) para no depender de su bucket.
 6. **Supabase local primero** (Docker), nube después: las pruebas de RLS corren contra una base real sin tocar datos de nadie.
+7. **Plantillas como código:** cada plantilla es una definición de datos (niveles, escalera, materiales de la biblioteca de Pascal, estantes y gabinetes paramétricos) validada (muros cerrados, aberturas dentro de su muro, piezas dentro de un ambiente, materiales existentes) que un constructor convierte en escena con los esquemas reales de Pascal; el JSON generado se commitea y una prueba falla si se desactualiza. Las texturas que el repo no trae se piden al CDN de Pascal.
+8. **Piezas realistas:** se probaron piezas de Kenney (CC0) y se descartaron por su estilo de videojuego; el comercio se arma con los estantes y gabinetes paramétricos de Pascal.
 
 ## Cómo gestioné el contexto
 
@@ -47,4 +50,4 @@ Ver [`docs/bitacora.md`](docs/bitacora.md): alucinaciones del agente (migracione
 
 ## Licencias de terceros
 
-Pascal Editor (MIT, © Pascal Group Inc.): código vía npm y assets copiados de su repo en `apps/web/public/` (ver `public/pascal-LICENSE.txt`).
+Pascal Editor (MIT, © Pascal Group Inc.): código vía npm y assets copiados de su repo en `apps/web/public/` (ver `public/pascal-LICENSE.txt`). Detalle, texturas del CDN de Pascal y nodos paramétricos en [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

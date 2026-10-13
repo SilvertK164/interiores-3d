@@ -3,6 +3,7 @@
 import { loadPlugin } from '@pascal-app/core'
 import { CATALOG_ITEMS, Editor, ItemsPanel, type SceneGraph } from '@pascal-app/editor'
 import { builtinPlugin } from '@pascal-app/nodes'
+import { Sofa, Store } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '@/lib/api/instance'
 import { ApiError } from '@/lib/api/client'
@@ -10,6 +11,7 @@ import { friendlyMessage } from '@/lib/api/errors'
 import { supabaseBrowser } from '@/lib/supabase/browser'
 import { fromEnvelope, toEnvelope } from './adapter'
 import { type LocalItemsManifest, localizeCatalogItem } from './catalog'
+import { buildCommerceItems } from './commerce-catalog'
 import { installE2eHooks } from './e2e-hooks'
 import manifest from './local-items.json'
 import { SaveBanner } from './SaveBanner'
@@ -45,6 +47,7 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
     () => CATALOG_ITEMS.flatMap((i) => localizeCatalogItem(i, manifest as LocalItemsManifest) ?? []),
     [],
   )
+  const commerceItems = useMemo(() => buildCommerceItems(items), [items])
 
   useEffect(() => {
     let cancelled = false
@@ -99,11 +102,17 @@ export default function ProjectEditor({ projectId }: { projectId: string }) {
       {
         id: 'items',
         label: 'Muebles',
-        icon: <span style={{ fontSize: 20 }}>🛋️</span>,
+        icon: <Sofa aria-hidden size={20} />,
         component: () => <ItemsPanel items={items} showSourceFilter={false} showTagFilters={false} />,
       },
+      {
+        id: 'commerce',
+        label: 'Comercio',
+        icon: <Store aria-hidden size={20} />,
+        component: () => <ItemsPanel items={commerceItems} showSourceFilter={false} showTagFilters={false} />,
+      },
     ],
-    [items],
+    [items, commerceItems],
   )
 
   if (phase.kind === 'loading') return <p className="p-6 text-muted-foreground">Abriendo tu proyecto…</p>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ApiError } from '../src/lib/api/client.js'
 import { friendlyMessage } from '../src/lib/api/errors.js'
+import { TemplateError } from '../src/lib/templates/template-error'
 
 describe('friendlyMessage', () => {
   it('traduce cada estado a castellano llano', () => {
@@ -20,5 +21,11 @@ describe('friendlyMessage', () => {
   it('un error desconocido no filtra detalles técnicos', () => {
     expect(friendlyMessage(new Error('TypeError: x is undefined'))).toBe('Algo salió mal. Inténtalo de nuevo.')
     expect(friendlyMessage(new ApiError(500, 'error_interno', 'boom'))).toBe('Algo salió mal. Inténtalo de nuevo.')
+  })
+
+  it('muestra tal cual el mensaje de un error de plantilla, que ya está escrito para personas', () => {
+    expect(friendlyMessage(new TemplateError('No pudimos cargar la plantilla. Revisa tu conexión e inténtalo de nuevo.'))).toBe(
+      'No pudimos cargar la plantilla. Revisa tu conexión e inténtalo de nuevo.',
+    )
   })
 })

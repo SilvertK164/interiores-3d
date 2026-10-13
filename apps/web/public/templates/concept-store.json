@@ -1,0 +1,5338 @@
+{
+ "schemaVersion": 1,
+ "pascal": {
+  "core": "1.0.3"
+ },
+ "graph": {
+  "nodes": {
+   "wall_concept_store_pb_p_n": {
+    "object": "node",
+    "id": "wall_concept_store_pb_p_n",
+    "type": "wall",
+    "name": "Muro p-n",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_concept_store_pb_ventana_barra"
+    ],
+    "interiorMaterialPreset": "library:flooring-rusticbrick",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     -7,
+     -4
+    ],
+    "end": [
+     7,
+     -4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_pb_p_e": {
+    "object": "node",
+    "id": "wall_concept_store_pb_p_e",
+    "type": "wall",
+    "name": "Muro p-e",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     7,
+     -4
+    ],
+    "end": [
+     7,
+     4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_pb_p_s": {
+    "object": "node",
+    "id": "wall_concept_store_pb_p_s",
+    "type": "wall",
+    "name": "Muro p-s",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_concept_store_pb_puerta_entrada",
+     "window_concept_store_pb_vidriera_1",
+     "window_concept_store_pb_vidriera_2"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     -7,
+     4
+    ],
+    "end": [
+     7,
+     4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_pb_p_w": {
+    "object": "node",
+    "id": "wall_concept_store_pb_p_w",
+    "type": "wall",
+    "name": "Muro p-w",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_concept_store_pb_ventana_oeste"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     -7,
+     -4
+    ],
+    "end": [
+     -7,
+     4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_pb_div": {
+    "object": "node",
+    "id": "wall_concept_store_pb_div",
+    "type": "wall",
+    "name": "Muro div",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "door_concept_store_pb_paso_barra",
+     "door_concept_store_pb_puerta_deposito",
+     "door_concept_store_pb_puerta_bano"
+    ],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     2.5,
+     -4
+    ],
+    "end": [
+     2.5,
+     4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_pb_div_barra": {
+    "object": "node",
+    "id": "wall_concept_store_pb_div_barra",
+    "type": "wall",
+    "name": "Muro div-barra",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     2.5,
+     0
+    ],
+    "end": [
+     7,
+     0
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_pb_div_bano": {
+    "object": "node",
+    "id": "wall_concept_store_pb_div_bano",
+    "type": "wall",
+    "name": "Muro div-bano",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:concrete-plaster",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     2.5,
+     2
+    ],
+    "end": [
+     7,
+     2
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "door_concept_store_pb_puerta_entrada": {
+    "object": "node",
+    "id": "door_concept_store_pb_puerta_entrada",
+    "type": "door",
+    "name": "puerta-entrada",
+    "parentId": "wall_concept_store_pb_p_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.2,
+     1.2,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_p_s",
+    "width": 1.6,
+    "height": 2.4,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "window_concept_store_pb_vidriera_1": {
+    "object": "node",
+    "id": "window_concept_store_pb_vidriera_1",
+    "type": "window",
+    "name": "vidriera-1",
+    "parentId": "wall_concept_store_pb_p_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.1,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_p_s",
+    "width": 2.4,
+    "height": 2.4,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "window_concept_store_pb_vidriera_2": {
+    "object": "node",
+    "id": "window_concept_store_pb_vidriera_2",
+    "type": "window",
+    "name": "vidriera-2",
+    "parentId": "wall_concept_store_pb_p_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     8,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_p_s",
+    "width": 2,
+    "height": 2.4,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "window_concept_store_pb_ventana_oeste": {
+    "object": "node",
+    "id": "window_concept_store_pb_ventana_oeste",
+    "type": "window",
+    "name": "ventana-oeste",
+    "parentId": "wall_concept_store_pb_p_w",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.4,
+     1.6,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_p_w",
+    "width": 2,
+    "height": 2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "window_concept_store_pb_ventana_barra": {
+    "object": "node",
+    "id": "window_concept_store_pb_ventana_barra",
+    "type": "window",
+    "name": "ventana-barra",
+    "parentId": "wall_concept_store_pb_p_n",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     11.7,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_p_n",
+    "width": 1.6,
+    "height": 1.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "door_concept_store_pb_paso_barra": {
+    "object": "node",
+    "id": "door_concept_store_pb_paso_barra",
+    "type": "door",
+    "name": "paso-barra",
+    "parentId": "wall_concept_store_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_div",
+    "width": 1.2,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_concept_store_pb_puerta_deposito": {
+    "object": "node",
+    "id": "door_concept_store_pb_puerta_deposito",
+    "type": "door",
+    "name": "puerta-deposito",
+    "parentId": "wall_concept_store_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_div",
+    "width": 0.9,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "door_concept_store_pb_puerta_bano": {
+    "object": "node",
+    "id": "door_concept_store_pb_puerta_bano",
+    "type": "door",
+    "name": "puerta-bano",
+    "parentId": "wall_concept_store_pb_div",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     7,
+     1.05,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_pb_div",
+    "width": 0.8,
+    "height": 2.1,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "doorCategory": "interior",
+    "doorType": "hinged",
+    "leafCount": 1,
+    "operationState": 0,
+    "slideDirection": "left",
+    "trackStyle": "none",
+    "garagePanelCount": 4,
+    "openingKind": "door",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingTopRadii": [
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.45,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "threshold": true,
+    "thresholdHeight": 0.02,
+    "hingesSide": "left",
+    "swingDirection": "inward",
+    "swingAngle": 0,
+    "segments": [
+     {
+      "type": "panel",
+      "heightRatio": 0.4,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     },
+     {
+      "type": "panel",
+      "heightRatio": 0.6,
+      "columnRatios": [
+       1
+      ],
+      "dividerThickness": 0.03,
+      "panelDepth": 0.01,
+      "panelInset": 0.04
+     }
+    ],
+    "handle": true,
+    "handleHeight": 1.05,
+    "handleSide": "right",
+    "contentPadding": [
+     0.04,
+     0.04
+    ],
+    "doorCloser": false,
+    "panicBar": false,
+    "panicBarHeight": 1
+   },
+   "zone_concept_store_pb_salon": {
+    "object": "node",
+    "id": "zone_concept_store_pb_salon",
+    "type": "zone",
+    "name": "Salón de ventas",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      -7,
+      -4
+     ],
+     [
+      2.5,
+      -4
+     ],
+     [
+      2.5,
+      4
+     ],
+     [
+      -7,
+      4
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1F5FE0"
+   },
+   "slab_concept_store_pb_salon": {
+    "object": "node",
+    "id": "slab_concept_store_pb_salon",
+    "type": "slab",
+    "name": "Salón de ventas (losa)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:wood-hungarianparquet10",
+    "polygon": [
+     [
+      -7,
+      -4
+     ],
+     [
+      2.5,
+      -4
+     ],
+     [
+      2.5,
+      4
+     ],
+     [
+      -7,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_concept_store_pb_salon": {
+    "object": "node",
+    "id": "ceiling_concept_store_pb_salon",
+    "type": "ceiling",
+    "name": "Salón de ventas (cielo)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-plaster",
+    "polygon": [
+     [
+      -7,
+      -4
+     ],
+     [
+      2.5,
+      -4
+     ],
+     [
+      2.5,
+      4
+     ],
+     [
+      -7,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_concept_store_pb_barra": {
+    "object": "node",
+    "id": "zone_concept_store_pb_barra",
+    "type": "zone",
+    "name": "Barra de café",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      2.5,
+      -4
+     ],
+     [
+      7,
+      -4
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      2.5,
+      0
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#B97A00"
+   },
+   "slab_concept_store_pb_barra": {
+    "object": "node",
+    "id": "slab_concept_store_pb_barra",
+    "type": "slab",
+    "name": "Barra de café (losa)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:flooring-terrazzo19",
+    "polygon": [
+     [
+      2.5,
+      -4
+     ],
+     [
+      7,
+      -4
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      2.5,
+      0
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_concept_store_pb_barra": {
+    "object": "node",
+    "id": "ceiling_concept_store_pb_barra",
+    "type": "ceiling",
+    "name": "Barra de café (cielo)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-plaster",
+    "polygon": [
+     [
+      2.5,
+      -4
+     ],
+     [
+      7,
+      -4
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      2.5,
+      0
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_concept_store_pb_deposito": {
+    "object": "node",
+    "id": "zone_concept_store_pb_deposito",
+    "type": "zone",
+    "name": "Depósito",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      2.5,
+      0
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      2.5,
+      2
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#7A8AA8"
+   },
+   "slab_concept_store_pb_deposito": {
+    "object": "node",
+    "id": "slab_concept_store_pb_deposito",
+    "type": "slab",
+    "name": "Depósito (losa)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:concrete-polished",
+    "polygon": [
+     [
+      2.5,
+      0
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      2.5,
+      2
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_concept_store_pb_deposito": {
+    "object": "node",
+    "id": "ceiling_concept_store_pb_deposito",
+    "type": "ceiling",
+    "name": "Depósito (cielo)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-drywall",
+    "polygon": [
+     [
+      2.5,
+      0
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      2.5,
+      2
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "zone_concept_store_pb_bano": {
+    "object": "node",
+    "id": "zone_concept_store_pb_bano",
+    "type": "zone",
+    "name": "Baño",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      2.5,
+      2
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      2.5,
+      4
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#1FA971"
+   },
+   "slab_concept_store_pb_bano": {
+    "object": "node",
+    "id": "slab_concept_store_pb_bano",
+    "type": "slab",
+    "name": "Baño (losa)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:flooring-tile85a",
+    "polygon": [
+     [
+      2.5,
+      2
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      2.5,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_concept_store_pb_bano": {
+    "object": "node",
+    "id": "ceiling_concept_store_pb_bano",
+    "type": "ceiling",
+    "name": "Baño (cielo)",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-drywall",
+    "polygon": [
+     [
+      2.5,
+      2
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      2.5,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "item_concept_store_pb_1": {
+    "object": "node",
+    "id": "item_concept_store_pb_1",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -4.4,
+     0,
+     -1.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_concept_store_pb_2": {
+    "object": "node",
+    "id": "item_concept_store_pb_2",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -2.2,
+     0,
+     -1.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_concept_store_pb_3": {
+    "object": "node",
+    "id": "item_concept_store_pb_3",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0,
+     0,
+     -1.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_concept_store_pb_4": {
+    "object": "node",
+    "id": "item_concept_store_pb_4",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -4.4,
+     0,
+     0.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_concept_store_pb_5": {
+    "object": "node",
+    "id": "item_concept_store_pb_5",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -2.2,
+     0,
+     0.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_concept_store_pb_6": {
+    "object": "node",
+    "id": "item_concept_store_pb_6",
+    "type": "item",
+    "name": "Dining Table",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0,
+     0,
+     0.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dining-table",
+     "category": "furniture",
+     "name": "Dining Table",
+     "thumbnail": "/items/dining-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dining-table/model.glb",
+     "dimensions": [
+      2.16,
+      0.7,
+      0.95
+     ],
+     "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "wood",
+      "modern",
+      "minimalist",
+      "kitchen",
+      "eating",
+      "surface",
+      "contemporary",
+      "gathering",
+      "walnut"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0077
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.7
+     }
+    }
+   },
+   "item_concept_store_pb_7": {
+    "object": "node",
+    "id": "item_concept_store_pb_7",
+    "type": "item",
+    "name": "Rectangular Carpet",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -2.2,
+     0,
+     -0.6
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "rectangular-carpet",
+     "category": "furniture",
+     "name": "Rectangular Carpet",
+     "thumbnail": "/items/rectangular-carpet/thumbnail.webp",
+     "source": "library",
+     "src": "/items/rectangular-carpet/model.glb",
+     "dimensions": [
+      2.78,
+      0.04,
+      1.81
+     ],
+     "tags": [
+      "carpet",
+      "rug",
+      "mat",
+      "textile",
+      "woven",
+      "rectangular",
+      "modern",
+      "wool",
+      "cotton",
+      "minimalist",
+      "decor",
+      "plush"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.03
+     }
+    }
+   },
+   "item_concept_store_pb_8": {
+    "object": "node",
+    "id": "item_concept_store_pb_8",
+    "type": "item",
+    "name": "Rectangular Carpet",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -5.1,
+     0,
+     2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "rectangular-carpet",
+     "category": "furniture",
+     "name": "Rectangular Carpet",
+     "thumbnail": "/items/rectangular-carpet/thumbnail.webp",
+     "source": "library",
+     "src": "/items/rectangular-carpet/model.glb",
+     "dimensions": [
+      2.78,
+      0.04,
+      1.81
+     ],
+     "tags": [
+      "carpet",
+      "rug",
+      "mat",
+      "textile",
+      "woven",
+      "rectangular",
+      "modern",
+      "wool",
+      "cotton",
+      "minimalist",
+      "decor",
+      "plush"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.03
+     }
+    }
+   },
+   "item_concept_store_pb_9": {
+    "object": "node",
+    "id": "item_concept_store_pb_9",
+    "type": "item",
+    "name": "Sofa",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -6.3,
+     0,
+     2
+    ],
+    "rotation": [
+     0,
+     1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "sofa",
+     "category": "furniture",
+     "name": "Sofa",
+     "thumbnail": "/items/sofa/thumbnail.webp",
+     "floorPlanUrl": "/items/sofa/floor-plan.svg",
+     "source": "library",
+     "src": "/items/sofa/model.glb",
+     "dimensions": [
+      2.06,
+      0.74,
+      1.01
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      -0.0023,
+      0.009,
+      0.0459
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_10": {
+    "object": "node",
+    "id": "item_concept_store_pb_10",
+    "type": "item",
+    "name": "Coffee Table",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -5.1,
+     0,
+     2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coffee-table",
+     "category": "furniture",
+     "name": "Coffee Table",
+     "thumbnail": "/items/coffee-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coffee-table/model.glb",
+     "dimensions": [
+      1.72,
+      0.3,
+      1.04
+     ],
+     "tags": [
+      "table",
+      "cocktail",
+      "wood",
+      "modern",
+      "minimalist",
+      "furniture",
+      "living",
+      "lounge",
+      "walnut",
+      "metal",
+      "glass",
+      "surface",
+      "decor"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0089
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.3
+     }
+    }
+   },
+   "item_concept_store_pb_11": {
+    "object": "node",
+    "id": "item_concept_store_pb_11",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -6.4,
+     0,
+     3.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_12": {
+    "object": "node",
+    "id": "item_concept_store_pb_12",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2,
+     0,
+     1.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_13": {
+    "object": "node",
+    "id": "item_concept_store_pb_13",
+    "type": "item",
+    "name": "Floor Lamp",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -6.4,
+     0,
+     0.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "floor-lamp",
+     "category": "furniture",
+     "name": "Floor Lamp",
+     "thumbnail": "/items/floor-lamp/thumbnail.webp",
+     "source": "library",
+     "src": "/items/floor-lamp/model.glb",
+     "dimensions": [
+      0.7,
+      1.86,
+      0.69
+     ],
+     "tags": [
+      "lamp",
+      "luminaire",
+      "light",
+      "torchere",
+      "lighting",
+      "illumination",
+      "metal",
+      "brass",
+      "modern",
+      "minimalist",
+      "industrial",
+      "decor",
+      "ambient",
+      "reading",
+      "sleek"
+     ],
+     "offset": [
+      0.0341,
+      0.0045,
+      0.0219
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "interactive": {
+      "controls": [
+       {
+        "kind": "toggle"
+       },
+       {
+        "kind": "slider",
+        "label": "Intensity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "displayMode": "dial",
+        "default": 100
+       }
+      ],
+      "effects": [
+       {
+        "kind": "light",
+        "color": "#ffffff",
+        "intensityRange": [
+         0,
+         2
+        ],
+        "offset": [
+         0,
+         1.4,
+         0
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "item_concept_store_pb_14": {
+    "object": "node",
+    "id": "item_concept_store_pb_14",
+    "type": "item",
+    "name": "Computer",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -3,
+     0.92,
+     2.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "computer",
+     "category": "appliance",
+     "name": "Computer",
+     "thumbnail": "/items/computer/thumbnail.webp",
+     "source": "library",
+     "src": "/items/computer/model.glb",
+     "dimensions": [
+      0.68,
+      0.48,
+      0.19
+     ],
+     "tags": [
+      "computer",
+      "desktop",
+      "workstation",
+      "monitor",
+      "technology",
+      "office",
+      "electronics",
+      "modern",
+      "sleek",
+      "metal",
+      "silver",
+      "minimalist",
+      "hardware",
+      "productivity"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_15": {
+    "object": "node",
+    "id": "item_concept_store_pb_15",
+    "type": "item",
+    "name": "Coffee Machine",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.3,
+     0.92,
+     -2.1
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coffee-machine",
+     "category": "appliance",
+     "name": "Coffee Machine",
+     "thumbnail": "/items/coffee-machine/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coffee-machine/model.glb",
+     "dimensions": [
+      0.16,
+      0.24,
+      0.23
+     ],
+     "tags": [
+      "coffee",
+      "machine",
+      "maker",
+      "espresso",
+      "brewer",
+      "kitchen",
+      "appliance",
+      "modern",
+      "metal",
+      "sleek",
+      "black",
+      "silver",
+      "beverage",
+      "brewing"
+     ],
+     "offset": [
+      0.0003,
+      0.0003,
+      -0.0366
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_16": {
+    "object": "node",
+    "id": "item_concept_store_pb_16",
+    "type": "item",
+    "name": "Fridge",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.4,
+     0,
+     -3.35
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "fridge",
+     "category": "kitchen",
+     "name": "Fridge",
+     "thumbnail": "/items/fridge/thumbnail.webp",
+     "source": "library",
+     "src": "/items/fridge/model.glb",
+     "dimensions": [
+      0.7,
+      1.92,
+      0.72
+     ],
+     "tags": [
+      "fridge",
+      "refrigerator",
+      "freezer",
+      "appliance",
+      "kitchen",
+      "storage",
+      "cooling",
+      "metal",
+      "steel",
+      "modern",
+      "industrial",
+      "minimalist",
+      "silver",
+      "sleek"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0507
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_17": {
+    "object": "node",
+    "id": "item_concept_store_pb_17",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.2,
+     0,
+     -1.05
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_18": {
+    "object": "node",
+    "id": "item_concept_store_pb_18",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5,
+     0,
+     -1.05
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_19": {
+    "object": "node",
+    "id": "item_concept_store_pb_19",
+    "type": "item",
+    "name": "Stool",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.8,
+     0,
+     -1.05
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "stool",
+     "category": "furniture",
+     "name": "Stool",
+     "thumbnail": "/items/stool/thumbnail.webp",
+     "source": "library",
+     "src": "/items/stool/model.glb",
+     "dimensions": [
+      0.52,
+      1.16,
+      0.55
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_20": {
+    "object": "node",
+    "id": "item_concept_store_pb_20",
+    "type": "item",
+    "name": "Toilet",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.6,
+     0,
+     3
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "toilet",
+     "category": "bathroom",
+     "name": "Toilet",
+     "thumbnail": "/items/toilet/thumbnail.webp",
+     "source": "library",
+     "src": "/items/toilet/model.glb",
+     "dimensions": [
+      0.42,
+      0.82,
+      0.72
+     ],
+     "tags": [
+      "floor",
+      "large"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.2393
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_21": {
+    "object": "node",
+    "id": "item_concept_store_pb_21",
+    "type": "item",
+    "name": "Bathroom Sink",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.6,
+     0,
+     3.55
+    ],
+    "rotation": [
+     0,
+     3.141592653589793,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "bathroom-sink",
+     "category": "bathroom",
+     "name": "Bathroom Sink",
+     "thumbnail": "/items/bathroom-sink/thumbnail.webp",
+     "source": "library",
+     "src": "/items/bathroom-sink/model.glb",
+     "dimensions": [
+      1.83,
+      0.97,
+      0.63
+     ],
+     "tags": [
+      "sink",
+      "basin",
+      "lavatory",
+      "washbasin",
+      "vanity",
+      "modern",
+      "minimalist",
+      "ceramic",
+      "porcelain",
+      "white",
+      "plumbing",
+      "washing",
+      "bathroom",
+      "hygiene"
+     ],
+     "offset": [
+      0.1037,
+      0,
+      0.0221
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_pb_22": {
+    "object": "node",
+    "id": "item_concept_store_pb_22",
+    "type": "item",
+    "name": "Trash Bin",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.3,
+     0,
+     2.5
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "trash-bin",
+     "category": "furniture",
+     "name": "Trash Bin",
+     "thumbnail": "/items/trash-bin/thumbnail.webp",
+     "source": "library",
+     "src": "/items/trash-bin/model.glb",
+     "dimensions": [
+      0.35,
+      0.59,
+      0.42
+     ],
+     "tags": [
+      "floor"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "shelf_concept_store_pb_expositor_1": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_expositor_1",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -5.6,
+     0,
+     -3.65
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_expositor_2": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_expositor_2",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -4,
+     0,
+     -3.65
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_expositor_3": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_expositor_3",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -2.4,
+     0,
+     -3.65
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_expositor_4": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_expositor_4",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -0.8,
+     0,
+     -3.65
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_expositor_5": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_expositor_5",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     0.8,
+     0,
+     -3.65
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_repisa_1": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_repisa_1",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -5.6,
+     1.5,
+     -3.77
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 3,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_repisa_2": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_repisa_2",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -4,
+     1.5,
+     -3.77
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 3,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_repisa_3": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_repisa_3",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -2.4,
+     1.5,
+     -3.77
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 3,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_repisa_4": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_repisa_4",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     -0.8,
+     1.5,
+     -3.77
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 3,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_repisa_5": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_repisa_5",
+    "type": "shelf",
+    "name": "Repisa",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     0.8,
+     1.5,
+     -3.77
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.25,
+    "thickness": 0.04,
+    "height": 0.9,
+    "style": "wall-shelf",
+    "rows": 3,
+    "columns": 1,
+    "withBack": false,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_rack_deposito_1": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_rack_deposito_1",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     4,
+     0,
+     0.45
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_rack_deposito_2": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_rack_deposito_2",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     6,
+     0,
+     0.45
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_pb_rack_este": {
+    "object": "node",
+    "id": "shelf_concept_store_pb_rack_este",
+    "type": "shelf",
+    "name": "Góndola",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     6.65,
+     0,
+     1.2
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "width": 1.4,
+    "depth": 0.5,
+    "thickness": 0.04,
+    "height": 1.8,
+    "style": "open-rack",
+    "rows": 4,
+    "columns": 1,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "cabinet-module_concept_store_pb_caja_1": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_pb_caja_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_pb_caja",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_pb_caja_1_1",
+      "type": "drawer",
+      "drawerCount": 3
+     }
+    ]
+   },
+   "cabinet-module_concept_store_pb_caja_2": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_pb_caja_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_pb_caja",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_pb_caja_2_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet-module_concept_store_pb_caja_3": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_pb_caja_3",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_pb_caja",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.9,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 0.6,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal",
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_pb_caja_3_1",
+      "type": "drawer",
+      "drawerCount": 3
+     }
+    ]
+   },
+   "cabinet_concept_store_pb_caja": {
+    "object": "node",
+    "id": "cabinet_concept_store_pb_caja",
+    "type": "cabinet",
+    "name": "Caja",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_concept_store_pb_caja_1",
+     "cabinet-module_concept_store_pb_caja_2",
+     "cabinet-module_concept_store_pb_caja_3"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     -2.8,
+     0,
+     2.4
+    ],
+    "rotation": 0,
+    "width": 2.4,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "materialPreset": "library:preset-charcoal"
+   },
+   "cabinet-module_concept_store_pb_vitrina_oeste_1": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_pb_vitrina_oeste_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_pb_vitrina_oeste",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.5,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_pb_vitrina_oeste_1_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 4
+     }
+    ]
+   },
+   "cabinet-module_concept_store_pb_vitrina_oeste_2": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_pb_vitrina_oeste_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_pb_vitrina_oeste",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.5,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_pb_vitrina_oeste_2_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 4
+     }
+    ]
+   },
+   "cabinet_concept_store_pb_vitrina_oeste": {
+    "object": "node",
+    "id": "cabinet_concept_store_pb_vitrina_oeste",
+    "type": "cabinet",
+    "name": "Vitrina",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "tall",
+    "children": [
+     "cabinet-module_concept_store_pb_vitrina_oeste_1",
+     "cabinet-module_concept_store_pb_vitrina_oeste_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     -6.6,
+     0,
+     -1.6
+    ],
+    "rotation": 1.5707963267948966,
+    "width": 2,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false
+   },
+   "cabinet-module_concept_store_pb_barra_1": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_pb_barra_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_pb_barra",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_pb_barra_1_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet-module_concept_store_pb_barra_2": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_pb_barra_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_pb_barra",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "base",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.6,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1.2,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true,
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_pb_barra_2_1",
+      "type": "door",
+      "doorType": "double"
+     }
+    ]
+   },
+   "cabinet_concept_store_pb_barra": {
+    "object": "node",
+    "id": "cabinet_concept_store_pb_barra",
+    "type": "cabinet",
+    "name": "Barra de café",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "runTier": "base",
+    "children": [
+     "cabinet-module_concept_store_pb_barra_1",
+     "cabinet-module_concept_store_pb_barra_2"
+    ],
+    "barLedge": {
+     "edge": "back",
+     "height": 1.06,
+     "depth": 0.35
+    },
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     5,
+     0,
+     -2.1
+    ],
+    "rotation": 3.141592653589793,
+    "width": 2.4,
+    "depth": 0.7,
+    "carcassHeight": 0.8,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": true
+   },
+   "sseg_concept_store_pb_escalera": {
+    "object": "node",
+    "id": "sseg_concept_store_pb_escalera",
+    "type": "stair-segment",
+    "parentId": "stair_concept_store_pb_escalera",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "segmentType": "stair",
+    "width": 1.1,
+    "length": 3.8,
+    "height": 3.4,
+    "stepCount": 14,
+    "attachmentSide": "front",
+    "fillToFloor": true,
+    "thickness": 0.25
+   },
+   "stair_concept_store_pb_escalera": {
+    "object": "node",
+    "id": "stair_concept_store_pb_escalera",
+    "type": "stair",
+    "parentId": "level_concept_store_pb",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     -1.3,
+     0,
+     3.05
+    ],
+    "rotation": 1.5707963267948966,
+    "stairType": "straight",
+    "fromLevelId": "level_concept_store_pb",
+    "toLevelId": "level_concept_store_alta",
+    "slabOpeningMode": "destination",
+    "openingOffset": 0,
+    "width": 1.1,
+    "stepCount": 14,
+    "thickness": 0.25,
+    "fillToFloor": true,
+    "innerRadius": 0.9,
+    "sweepAngle": 1.5707963267948966,
+    "topLandingMode": "none",
+    "topLandingDepth": 0.9,
+    "showCenterColumn": true,
+    "showStepSupports": true,
+    "railingMode": "both",
+    "railingHeight": 0.92,
+    "children": [
+     "sseg_concept_store_pb_escalera"
+    ]
+   },
+   "level_concept_store_pb": {
+    "object": "node",
+    "id": "level_concept_store_pb",
+    "type": "level",
+    "parentId": "building_concept_store",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "wall_concept_store_pb_p_n",
+     "wall_concept_store_pb_p_e",
+     "wall_concept_store_pb_p_s",
+     "wall_concept_store_pb_p_w",
+     "wall_concept_store_pb_div",
+     "wall_concept_store_pb_div_barra",
+     "wall_concept_store_pb_div_bano",
+     "zone_concept_store_pb_salon",
+     "slab_concept_store_pb_salon",
+     "ceiling_concept_store_pb_salon",
+     "zone_concept_store_pb_barra",
+     "slab_concept_store_pb_barra",
+     "ceiling_concept_store_pb_barra",
+     "zone_concept_store_pb_deposito",
+     "slab_concept_store_pb_deposito",
+     "ceiling_concept_store_pb_deposito",
+     "zone_concept_store_pb_bano",
+     "slab_concept_store_pb_bano",
+     "ceiling_concept_store_pb_bano",
+     "item_concept_store_pb_1",
+     "item_concept_store_pb_2",
+     "item_concept_store_pb_3",
+     "item_concept_store_pb_4",
+     "item_concept_store_pb_5",
+     "item_concept_store_pb_6",
+     "item_concept_store_pb_7",
+     "item_concept_store_pb_8",
+     "item_concept_store_pb_9",
+     "item_concept_store_pb_10",
+     "item_concept_store_pb_11",
+     "item_concept_store_pb_12",
+     "item_concept_store_pb_13",
+     "item_concept_store_pb_14",
+     "item_concept_store_pb_15",
+     "item_concept_store_pb_16",
+     "item_concept_store_pb_17",
+     "item_concept_store_pb_18",
+     "item_concept_store_pb_19",
+     "item_concept_store_pb_20",
+     "item_concept_store_pb_21",
+     "item_concept_store_pb_22",
+     "shelf_concept_store_pb_expositor_1",
+     "shelf_concept_store_pb_expositor_2",
+     "shelf_concept_store_pb_expositor_3",
+     "shelf_concept_store_pb_expositor_4",
+     "shelf_concept_store_pb_expositor_5",
+     "shelf_concept_store_pb_repisa_1",
+     "shelf_concept_store_pb_repisa_2",
+     "shelf_concept_store_pb_repisa_3",
+     "shelf_concept_store_pb_repisa_4",
+     "shelf_concept_store_pb_repisa_5",
+     "shelf_concept_store_pb_rack_deposito_1",
+     "shelf_concept_store_pb_rack_deposito_2",
+     "shelf_concept_store_pb_rack_este",
+     "cabinet_concept_store_pb_caja",
+     "cabinet_concept_store_pb_vitrina_oeste",
+     "cabinet_concept_store_pb_barra",
+     "stair_concept_store_pb_escalera"
+    ],
+    "level": 0,
+    "baseElevation": 0,
+    "height": 3.4
+   },
+   "wall_concept_store_alta_a_n": {
+    "object": "node",
+    "id": "wall_concept_store_alta_a_n",
+    "type": "wall",
+    "name": "Muro a-n",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_concept_store_alta_ventana_norte"
+    ],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     2.5,
+     -4
+    ],
+    "end": [
+     7,
+     -4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_alta_a_e": {
+    "object": "node",
+    "id": "wall_concept_store_alta_a_e",
+    "type": "wall",
+    "name": "Muro a-e",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_concept_store_alta_ventana_este"
+    ],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     7,
+     -4
+    ],
+    "end": [
+     7,
+     4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_alta_a_s": {
+    "object": "node",
+    "id": "wall_concept_store_alta_a_s",
+    "type": "wall",
+    "name": "Muro a-s",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "window_concept_store_alta_ventana_sur"
+    ],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "skirting": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.02,
+     "profile": "flat"
+    },
+    "crown": {
+     "enabled": true,
+     "sides": "interior",
+     "height": 0.12,
+     "proud": 0.055,
+     "profile": "flat"
+    },
+    "start": [
+     2.5,
+     4
+    ],
+    "end": [
+     7,
+     4
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "wall_concept_store_alta_baranda": {
+    "object": "node",
+    "id": "wall_concept_store_alta_baranda",
+    "type": "wall",
+    "name": "Muro baranda",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "interiorMaterialPreset": "library:preset-cream",
+    "exteriorMaterialPreset": "library:flooring-agedbrick",
+    "thickness": 0.2,
+    "height": 1.05,
+    "start": [
+     2.5,
+     -4
+    ],
+    "end": [
+     2.5,
+     1.6
+    ],
+    "frontSide": "unknown",
+    "backSide": "unknown"
+   },
+   "window_concept_store_alta_ventana_norte": {
+    "object": "node",
+    "id": "window_concept_store_alta_ventana_norte",
+    "type": "window",
+    "name": "ventana-norte",
+    "parentId": "wall_concept_store_alta_a_n",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.2,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_alta_a_n",
+    "width": 1.4,
+    "height": 1.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "window_concept_store_alta_ventana_este": {
+    "object": "node",
+    "id": "window_concept_store_alta_ventana_este",
+    "type": "window",
+    "name": "ventana-este",
+    "parentId": "wall_concept_store_alta_a_e",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.5,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_alta_a_e",
+    "width": 2.6,
+    "height": 1.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "window_concept_store_alta_ventana_sur": {
+    "object": "node",
+    "id": "window_concept_store_alta_ventana_sur",
+    "type": "window",
+    "name": "ventana-sur",
+    "parentId": "wall_concept_store_alta_a_s",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     2.2,
+     1.5,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "side": "front",
+    "wallId": "wall_concept_store_alta_a_s",
+    "width": 1.4,
+    "height": 1.2,
+    "constructionType": "framed",
+    "dimensionReference": "nominal",
+    "openingKind": "window",
+    "windowType": "fixed",
+    "operationState": 0,
+    "awningDirection": "up",
+    "casementStyle": "single",
+    "hingesSide": "left",
+    "openingShape": "rectangle",
+    "openingRadiusMode": "all",
+    "openingCornerRadii": [
+     0.15,
+     0.15,
+     0.15,
+     0.15
+    ],
+    "cornerRadius": 0.15,
+    "archHeight": 0.35,
+    "openingRevealRadius": 0.025,
+    "frameThickness": 0.05,
+    "frameDepth": 0.07,
+    "columnRatios": [
+     1
+    ],
+    "rowRatios": [
+     1
+    ],
+    "columnDividerThickness": 0.03,
+    "rowDividerThickness": 0.03,
+    "sill": true,
+    "sillDepth": 0.08,
+    "sillThickness": 0.03
+   },
+   "zone_concept_store_alta_showroom": {
+    "object": "node",
+    "id": "zone_concept_store_alta_showroom",
+    "type": "zone",
+    "name": "Showroom y oficina",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "polygon": [
+     [
+      2.5,
+      -4
+     ],
+     [
+      7,
+      -4
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      2.5,
+      4
+     ]
+    ],
+    "autoFromWalls": false,
+    "boundaryWallIds": [],
+    "spaceRole": "generic",
+    "roomNumber": "",
+    "enclosureStatus": "auto",
+    "floorFinish": "",
+    "wallFinish": "",
+    "ceilingFinish": "",
+    "ceilingHeight": 2.7,
+    "occupancy": "",
+    "clearDimensionPolicy": "none",
+    "color": "#7A8AA8"
+   },
+   "slab_concept_store_alta_showroom": {
+    "object": "node",
+    "id": "slab_concept_store_alta_showroom",
+    "type": "slab",
+    "name": "Showroom y oficina (losa)",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "materialPreset": "library:wood-woodfine22",
+    "polygon": [
+     [
+      2.5,
+      -4
+     ],
+     [
+      7,
+      -4
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      2.5,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "elevation": 0.05,
+    "thickness": 0.05,
+    "recessed": false,
+    "autoFromWalls": false
+   },
+   "ceiling_concept_store_alta_showroom": {
+    "object": "node",
+    "id": "ceiling_concept_store_alta_showroom",
+    "type": "ceiling",
+    "name": "Showroom y oficina (cielo)",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "materialPreset": "library:concrete-plaster",
+    "polygon": [
+     [
+      2.5,
+      -4
+     ],
+     [
+      7,
+      -4
+     ],
+     [
+      7,
+      4
+     ],
+     [
+      2.5,
+      4
+     ]
+    ],
+    "holes": [],
+    "holeMetadata": [],
+    "autoFromWalls": false
+   },
+   "item_concept_store_alta_1": {
+    "object": "node",
+    "id": "item_concept_store_alta_1",
+    "type": "item",
+    "name": "Sofa",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.6,
+     0,
+     -2.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "sofa",
+     "category": "furniture",
+     "name": "Sofa",
+     "thumbnail": "/items/sofa/thumbnail.webp",
+     "floorPlanUrl": "/items/sofa/floor-plan.svg",
+     "source": "library",
+     "src": "/items/sofa/model.glb",
+     "dimensions": [
+      2.06,
+      0.74,
+      1.01
+     ],
+     "tags": [
+      "floor",
+      "seating"
+     ],
+     "offset": [
+      -0.0023,
+      0.009,
+      0.0459
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_alta_2": {
+    "object": "node",
+    "id": "item_concept_store_alta_2",
+    "type": "item",
+    "name": "Coffee Table",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.6,
+     0,
+     -1
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coffee-table",
+     "category": "furniture",
+     "name": "Coffee Table",
+     "thumbnail": "/items/coffee-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coffee-table/model.glb",
+     "dimensions": [
+      1.72,
+      0.3,
+      1.04
+     ],
+     "tags": [
+      "table",
+      "cocktail",
+      "wood",
+      "modern",
+      "minimalist",
+      "furniture",
+      "living",
+      "lounge",
+      "walnut",
+      "metal",
+      "glass",
+      "surface",
+      "decor"
+     ],
+     "offset": [
+      0,
+      0,
+      0.0089
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.3
+     }
+    }
+   },
+   "item_concept_store_alta_3": {
+    "object": "node",
+    "id": "item_concept_store_alta_3",
+    "type": "item",
+    "name": "Rectangular Carpet",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.6,
+     0,
+     -1.2
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "rectangular-carpet",
+     "category": "furniture",
+     "name": "Rectangular Carpet",
+     "thumbnail": "/items/rectangular-carpet/thumbnail.webp",
+     "source": "library",
+     "src": "/items/rectangular-carpet/model.glb",
+     "dimensions": [
+      2.78,
+      0.04,
+      1.81
+     ],
+     "tags": [
+      "carpet",
+      "rug",
+      "mat",
+      "textile",
+      "woven",
+      "rectangular",
+      "modern",
+      "wool",
+      "cotton",
+      "minimalist",
+      "decor",
+      "plush"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.03
+     }
+    }
+   },
+   "item_concept_store_alta_4": {
+    "object": "node",
+    "id": "item_concept_store_alta_4",
+    "type": "item",
+    "name": "Coat Rack",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     4.2,
+     0,
+     0.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coat-rack",
+     "category": "furniture",
+     "name": "Coat Rack",
+     "thumbnail": "/items/coat-rack/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coat-rack/model.glb",
+     "dimensions": [
+      0.33,
+      1.76,
+      0.33
+     ],
+     "tags": [
+      "coatrack",
+      "rack",
+      "hanger",
+      "valet",
+      "organizer",
+      "storage",
+      "entryway",
+      "hallway",
+      "minimalist",
+      "metal",
+      "wood",
+      "mudroom",
+      "hooks",
+      "clothes"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_alta_5": {
+    "object": "node",
+    "id": "item_concept_store_alta_5",
+    "type": "item",
+    "name": "Coat Rack",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.3,
+     0,
+     0.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coat-rack",
+     "category": "furniture",
+     "name": "Coat Rack",
+     "thumbnail": "/items/coat-rack/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coat-rack/model.glb",
+     "dimensions": [
+      0.33,
+      1.76,
+      0.33
+     ],
+     "tags": [
+      "coatrack",
+      "rack",
+      "hanger",
+      "valet",
+      "organizer",
+      "storage",
+      "entryway",
+      "hallway",
+      "minimalist",
+      "metal",
+      "wood",
+      "mudroom",
+      "hooks",
+      "clothes"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_alta_6": {
+    "object": "node",
+    "id": "item_concept_store_alta_6",
+    "type": "item",
+    "name": "Coat Rack",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.4,
+     0,
+     0.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "coat-rack",
+     "category": "furniture",
+     "name": "Coat Rack",
+     "thumbnail": "/items/coat-rack/thumbnail.webp",
+     "source": "library",
+     "src": "/items/coat-rack/model.glb",
+     "dimensions": [
+      0.33,
+      1.76,
+      0.33
+     ],
+     "tags": [
+      "coatrack",
+      "rack",
+      "hanger",
+      "valet",
+      "organizer",
+      "storage",
+      "entryway",
+      "hallway",
+      "minimalist",
+      "metal",
+      "wood",
+      "mudroom",
+      "hooks",
+      "clothes"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_alta_7": {
+    "object": "node",
+    "id": "item_concept_store_alta_7",
+    "type": "item",
+    "name": "Office Table",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.9,
+     0,
+     2.9
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "office-table",
+     "category": "furniture",
+     "name": "Office Table",
+     "thumbnail": "/items/office-table/thumbnail.webp",
+     "source": "library",
+     "src": "/items/office-table/model.glb",
+     "dimensions": [
+      1.51,
+      0.76,
+      0.62
+     ],
+     "tags": [
+      "desk",
+      "table",
+      "workstation",
+      "furniture",
+      "office",
+      "work",
+      "study",
+      "writing",
+      "modern",
+      "minimalist",
+      "industrial",
+      "wood",
+      "metal"
+     ],
+     "offset": [
+      -0.0001,
+      0,
+      -0.0052
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.75
+     }
+    }
+   },
+   "item_concept_store_alta_8": {
+    "object": "node",
+    "id": "item_concept_store_alta_8",
+    "type": "item",
+    "name": "Office Chair",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.9,
+     0,
+     2.1
+    ],
+    "rotation": [
+     0,
+     3.141592653589793,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "office-chair",
+     "category": "furniture",
+     "name": "Office Chair",
+     "thumbnail": "/items/office-chair/thumbnail.webp",
+     "floorPlanUrl": "/items/office-chair/floor-plan.svg",
+     "source": "library",
+     "src": "/items/office-chair/model.glb",
+     "dimensions": [
+      0.66,
+      1.16,
+      0.69
+     ],
+     "tags": [
+      "chair",
+      "seating",
+      "ergonomic",
+      "swivel",
+      "office",
+      "desk",
+      "mesh",
+      "leather",
+      "modern",
+      "task",
+      "workspace",
+      "professional",
+      "computer"
+     ],
+     "offset": [
+      0.0024,
+      0.0015,
+      0.0332
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_alta_9": {
+    "object": "node",
+    "id": "item_concept_store_alta_9",
+    "type": "item",
+    "name": "Computer",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     5.9,
+     0.76,
+     2.9
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "computer",
+     "category": "appliance",
+     "name": "Computer",
+     "thumbnail": "/items/computer/thumbnail.webp",
+     "source": "library",
+     "src": "/items/computer/model.glb",
+     "dimensions": [
+      0.68,
+      0.48,
+      0.19
+     ],
+     "tags": [
+      "computer",
+      "desktop",
+      "workstation",
+      "monitor",
+      "technology",
+      "office",
+      "electronics",
+      "modern",
+      "sleek",
+      "metal",
+      "silver",
+      "minimalist",
+      "hardware",
+      "productivity"
+     ],
+     "offset": [
+      0,
+      0,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_alta_10": {
+    "object": "node",
+    "id": "item_concept_store_alta_10",
+    "type": "item",
+    "name": "Dresser",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     6.6,
+     0,
+     1.5
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "dresser",
+     "category": "furniture",
+     "name": "Dresser",
+     "thumbnail": "/items/dresser/thumbnail.webp",
+     "source": "library",
+     "src": "/items/dresser/model.glb",
+     "dimensions": [
+      1.23,
+      0.73,
+      0.61
+     ],
+     "tags": [
+      "dresser",
+      "chest",
+      "bureau",
+      "storage",
+      "bedroom",
+      "drawers",
+      "wood",
+      "modern",
+      "organization",
+      "cabinet",
+      "rustic",
+      "minimalist"
+     ],
+     "offset": [
+      0,
+      0,
+      -0.0066
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "surface": {
+      "height": 0.73
+     }
+    }
+   },
+   "item_concept_store_alta_11": {
+    "object": "node",
+    "id": "item_concept_store_alta_11",
+    "type": "item",
+    "name": "Indoor Plant",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.2,
+     0,
+     3.4
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "indoor-plant",
+     "category": "furniture",
+     "name": "Indoor Plant",
+     "thumbnail": "/items/indoor-plant/thumbnail.webp",
+     "source": "library",
+     "src": "/items/indoor-plant/model.glb",
+     "dimensions": [
+      0.69,
+      1.63,
+      0.83
+     ],
+     "tags": [
+      "plant",
+      "greenery",
+      "botanical",
+      "foliage",
+      "houseplant",
+      "organic",
+      "natural",
+      "modern",
+      "minimalist",
+      "tropical",
+      "decor",
+      "accent",
+      "green",
+      "ceramic"
+     ],
+     "offset": [
+      -0.0506,
+      0,
+      0.0664
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    }
+   },
+   "item_concept_store_alta_12": {
+    "object": "node",
+    "id": "item_concept_store_alta_12",
+    "type": "item",
+    "name": "Floor Lamp",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "position": [
+     3.3,
+     0,
+     -3.3
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "children": [],
+    "asset": {
+     "id": "floor-lamp",
+     "category": "furniture",
+     "name": "Floor Lamp",
+     "thumbnail": "/items/floor-lamp/thumbnail.webp",
+     "source": "library",
+     "src": "/items/floor-lamp/model.glb",
+     "dimensions": [
+      0.7,
+      1.86,
+      0.69
+     ],
+     "tags": [
+      "lamp",
+      "luminaire",
+      "light",
+      "torchere",
+      "lighting",
+      "illumination",
+      "metal",
+      "brass",
+      "modern",
+      "minimalist",
+      "industrial",
+      "decor",
+      "ambient",
+      "reading",
+      "sleek"
+     ],
+     "offset": [
+      0.0341,
+      0.0045,
+      0.0219
+     ],
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ],
+     "interactive": {
+      "controls": [
+       {
+        "kind": "toggle"
+       },
+       {
+        "kind": "slider",
+        "label": "Intensity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "displayMode": "dial",
+        "default": 100
+       }
+      ],
+      "effects": [
+       {
+        "kind": "light",
+        "color": "#ffffff",
+        "intensityRange": [
+         0,
+         2
+        ],
+        "offset": [
+         0,
+         1.4,
+         0
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "shelf_concept_store_alta_exhibidor_alto_1": {
+    "object": "node",
+    "id": "shelf_concept_store_alta_exhibidor_alto_1",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     3.8,
+     0,
+     -3.65
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_alta_exhibidor_alto_2": {
+    "object": "node",
+    "id": "shelf_concept_store_alta_exhibidor_alto_2",
+    "type": "shelf",
+    "name": "Exhibidor",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     6,
+     0,
+     -3.65
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ],
+    "width": 1.5,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 1.2,
+    "style": "cubby",
+    "rows": 3,
+    "columns": 3,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": true,
+    "bracketStyle": "minimal"
+   },
+   "shelf_concept_store_alta_biblioteca": {
+    "object": "node",
+    "id": "shelf_concept_store_alta_biblioteca",
+    "type": "shelf",
+    "name": "Biblioteca",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "position": [
+     6.65,
+     0,
+     -1
+    ],
+    "rotation": [
+     0,
+     -1.5707963267948966,
+     0
+    ],
+    "width": 1.8,
+    "depth": 0.4,
+    "thickness": 0.04,
+    "height": 2,
+    "style": "bookshelf",
+    "rows": 5,
+    "columns": 2,
+    "withBack": true,
+    "withSides": true,
+    "withBottom": false,
+    "bracketStyle": "minimal"
+   },
+   "cabinet-module_concept_store_alta_vitrina_alta_1": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_alta_vitrina_alta_1",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_alta_vitrina_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     -0.5,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_alta_vitrina_alta_1_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 4
+     }
+    ]
+   },
+   "cabinet-module_concept_store_alta_vitrina_alta_2": {
+    "object": "node",
+    "id": "cabinet-module_concept_store_alta_vitrina_alta_2",
+    "type": "cabinet-module",
+    "parentId": "cabinet_concept_store_alta_vitrina_alta",
+    "visible": true,
+    "metadata": {},
+    "children": [],
+    "cabinetType": "tall",
+    "moduleKind": "standard",
+    "topFinish": "none",
+    "topFinishHeight": 0.33,
+    "topFinishDepth": 0.32,
+    "position": [
+     0.5,
+     0,
+     0
+    ],
+    "rotation": 0,
+    "width": 1,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false,
+    "stack": [
+     {
+      "id": "cabinet-module_concept_store_alta_vitrina_alta_2_1",
+      "type": "door",
+      "doorType": "glass",
+      "shelfCount": 4
+     }
+    ]
+   },
+   "cabinet_concept_store_alta_vitrina_alta": {
+    "object": "node",
+    "id": "cabinet_concept_store_alta_vitrina_alta",
+    "type": "cabinet",
+    "name": "Vitrina",
+    "parentId": "level_concept_store_alta",
+    "visible": true,
+    "metadata": {},
+    "runTier": "tall",
+    "children": [
+     "cabinet-module_concept_store_alta_vitrina_alta_1",
+     "cabinet-module_concept_store_alta_vitrina_alta_2"
+    ],
+    "withWaterfall": false,
+    "withFinishedEnds": false,
+    "position": [
+     3.2,
+     0,
+     1.2
+    ],
+    "rotation": 1.5707963267948966,
+    "width": 2,
+    "depth": 0.5,
+    "carcassHeight": 1.9,
+    "operationState": 0,
+    "plinthHeight": 0.1,
+    "toeKickDepth": 0.075,
+    "boardThickness": 0.018,
+    "countertopThickness": 0.02,
+    "countertopOverhang": 0.02,
+    "countertopBackOverhang": 0,
+    "withFinishedBack": false,
+    "frontThickness": 0.018,
+    "frontGap": 0.003,
+    "frontStyle": "slab",
+    "panelReady": false,
+    "handleStyle": "bar",
+    "handlePosition": "auto",
+    "frontOverlay": "full",
+    "withBottomPanel": true,
+    "showPlinth": true,
+    "withCountertop": false
+   },
+   "level_concept_store_alta": {
+    "object": "node",
+    "id": "level_concept_store_alta",
+    "type": "level",
+    "parentId": "building_concept_store",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "wall_concept_store_alta_a_n",
+     "wall_concept_store_alta_a_e",
+     "wall_concept_store_alta_a_s",
+     "wall_concept_store_alta_baranda",
+     "zone_concept_store_alta_showroom",
+     "slab_concept_store_alta_showroom",
+     "ceiling_concept_store_alta_showroom",
+     "item_concept_store_alta_1",
+     "item_concept_store_alta_2",
+     "item_concept_store_alta_3",
+     "item_concept_store_alta_4",
+     "item_concept_store_alta_5",
+     "item_concept_store_alta_6",
+     "item_concept_store_alta_7",
+     "item_concept_store_alta_8",
+     "item_concept_store_alta_9",
+     "item_concept_store_alta_10",
+     "item_concept_store_alta_11",
+     "item_concept_store_alta_12",
+     "shelf_concept_store_alta_exhibidor_alto_1",
+     "shelf_concept_store_alta_exhibidor_alto_2",
+     "shelf_concept_store_alta_biblioteca",
+     "cabinet_concept_store_alta_vitrina_alta"
+    ],
+    "level": 1,
+    "baseElevation": 0,
+    "height": 2.8
+   },
+   "building_concept_store": {
+    "object": "node",
+    "id": "building_concept_store",
+    "type": "building",
+    "parentId": "site_concept_store",
+    "visible": true,
+    "metadata": {},
+    "children": [
+     "level_concept_store_pb",
+     "level_concept_store_alta"
+    ],
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "rotation": [
+     0,
+     0,
+     0
+    ]
+   },
+   "site_concept_store": {
+    "object": "node",
+    "id": "site_concept_store",
+    "type": "site",
+    "parentId": null,
+    "visible": true,
+    "metadata": {},
+    "polygon": {
+     "type": "polygon",
+     "points": [
+      [
+       -15,
+       -15
+      ],
+      [
+       15,
+       -15
+      ],
+      [
+       15,
+       15
+      ],
+      [
+       -15,
+       15
+      ]
+     ]
+    },
+    "children": [
+     "building_concept_store"
+    ]
+   }
+  },
+  "rootNodeIds": [
+   "site_concept_store"
+  ],
+  "collections": {},
+  "materials": {},
+  "installedPlugins": []
+ }
+}
