@@ -166,6 +166,17 @@ function placeOpening(kind: OpeningKind, room: Room, boxes: readonly Box[], take
   return { side: best.side, opening }
 }
 
+/** Última red de seguridad: en un mismo muro dos aberturas nunca se pisan (el validador lo rechaza); si pasara, se omite la segunda con aviso. */
+function withoutOverlaps(openings: OpeningDef[], warn: (message: string) => void): OpeningDef[] {
+  const kept: OpeningDef[] = []
+  for (const opening of openings) {
+    const clash = kept.some((other) => other.wall === opening.wall && other.at + other.width / 2 > opening.at - opening.width / 2 + EPS && opening.at + opening.width / 2 > other.at - other.width / 2 + EPS)
+    if (clash) warn(`No hubo lugar libre para la ${opening.name?.toLowerCase() ?? 'abertura'}: se omitió.`)
+    else kept.push(opening)
+  }
+  return kept
+}
+
 /**
  * Convierte lo que detectó el análisis de una foto en la definición de un ambiente (un `TemplateDefinition` de un nivel) con sus
  * muros, una puerta, una ventana, piso de madera clara y los muebles del análisis dentro. No inventa nada: las piezas que el análisis
@@ -184,7 +195,13 @@ export function analysisToDefinition<T extends AnalysisAssetLike>(
   const pieces = analysisToCluster(analysis, resolve, { knownWidthM: room.width, warn })
   const { items, boxes } = placePieces(pieces, room, warn)
   const door = placeOpening(DOOR, room, boxes)
-  const window = placeOpening(WINDOW, room, boxes, door ? { [door.side]: [door.opening.at - door.opening.width / 2, door.opening.at + door.opening.width / 2] } : {})
+  const doorSpan: Span | null = door ? [door.opening.at - door.opening.width / 2, door.opening.at + door.opening.width / 2] : null
+  let window = placeOpening(WINDOW, room, boxes, door && doorSpan ? { [door.side]: doorSpan } : {})
+  // Con muebles pegados a todos los muros, la ventana puede caer sobre la puerta: se prueba en los otros muros y, si no hay lugar, se omite.
+  if (window && door && doorSpan && window.side === door.side && overlap(window.opening.at - window.opening.width / 2, window.opening.at + window.opening.width / 2, [doorSpan]) > EPS) {
+    window = placeOpening({ ...WINDOW, order: WINDOW.order.filter((side) => side !== door.side) }, room, boxes)
+    if (!window) warn('No hubo lugar libre para la ventana: el ambiente quedó solo con la puerta.')
+  }
 
   return {
     id: 'foto',
@@ -199,7 +216,7 @@ export function analysisToDefinition<T extends AnalysisAssetLike>(
         trim: true,
         walls: perimeter('p', 0, 0, room.width, room.depth).map((wall) => ({ ...wall, name: WALL_NAMES[wall.id.slice(-1) as Side] })),
         rooms: [{ id: 'ambiente', name: 'Ambiente', color: '#1F5FE0', rect: [0, 0, room.width, room.depth], floor: FLOOR_MATERIAL, ceiling: CEILING }],
-        openings: [door, window].flatMap((placed) => (placed ? [placed.opening] : [])),
+        openings: withoutOverlaps([door, window].flatMap((placed) => (placed ? [placed.opening] : [])), warn),
         items,
       },
     ],

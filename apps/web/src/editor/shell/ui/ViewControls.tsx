@@ -88,7 +88,7 @@ export function ExportButtons({
   onImageStyle?: (style: 'color' | 'bn') => void
 } = {}) {
   return (
-    <div className="absolute bottom-6 right-5 z-10 flex items-center gap-3">
+    <div className="absolute bottom-6 right-5 z-10 flex flex-col items-end gap-2">
       <fieldset className={cx(FLOAT, 'm-0 inline-flex h-12 items-center gap-1 rounded-full border-0 p-1')}>
         <legend className="sr-only">Colores de la imagen 3D</legend>
         {(
@@ -106,6 +106,7 @@ export function ExportButtons({
           </label>
         ))}
       </fieldset>
+      <div className="flex items-center gap-3">
       <button type="button" onClick={onExportImage} disabled={imageBusy} aria-busy={imageBusy || undefined} className={EXPORT_BUTTON}>
         <ImageDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
         {imageBusy ? 'Generando imagen…' : 'Exportar imagen 3D'}
@@ -114,6 +115,7 @@ export function ExportButtons({
         <FileDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
         Exportar plano
       </button>
+      </div>
     </div>
   )
 }

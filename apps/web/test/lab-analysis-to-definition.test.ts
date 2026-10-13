@@ -264,3 +264,18 @@ describe('analysisToDefinition: lo que Pascal necesita', () => {
     expect(run(SAMPLE_ANALYSIS).definition).toEqual(sample.definition)
   })
 })
+
+describe('analysisToDefinition: siempre se puede dibujar (puerta y ventana nunca se pisan)', () => {
+  it('con muebles pegados a los cuatro muros la definición sigue siendo válida', () => {
+    const ids = [...ASSETS.keys()].filter((id) => (RECOGNIZABLE_IDS as readonly string[]).includes(id)).slice(0, 14)
+    const edges: [number, number][] = [[0.04, 0.3], [0.04, 0.7], [0.96, 0.3], [0.96, 0.7], [0.3, 0.04], [0.7, 0.04], [0.3, 0.96], [0.7, 0.96], [0.5, 0.04], [0.5, 0.96], [0.04, 0.5], [0.96, 0.5]]
+    for (const knownWidthM of [null, 2, 3, 4.5, 8]) {
+      const furniture = ids.slice(0, edges.length).map((asset_id, i) => piece({ asset_id, x: (edges[i] as [number, number])[0], y: (edges[i] as [number, number])[1] }))
+      const { definition } = run(analysisOf(...furniture), { knownWidthM })
+      const level = definition.levels[0] as LevelDef
+      const errors = validateDefinition(definition, new Set(ASSETS.keys()), MATERIAL_IDS)
+      expect(errors, `ancho ${knownWidthM}`).toEqual([])
+      expect(level.openings?.some((o) => o.type === 'door')).toBe(true)
+    }
+  })
+})
