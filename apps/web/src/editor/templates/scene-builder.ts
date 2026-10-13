@@ -53,6 +53,38 @@ const round3 = (n: number) => Math.round(n * 1000) / 1000
 const clean = (s: string) => s.replace(/[^a-z0-9]/g, '_')
 const lib = (id: string) => `library:${id}`
 
+export type ItemPlacement = {
+  /** Sin `id`, el esquema de Pascal genera uno nuevo (`item_…`). */
+  id?: string
+  parentId: string
+  position: [number, number, number]
+  /** Giro alrededor del eje vertical, el `rotation[1]` de Pascal (el de three.js: positivo = antihorario visto desde arriba). */
+  rotY?: number
+}
+
+/**
+ * El nodo `item` de un mueble del catálogo apoyado donde diga `placement`, con los valores por defecto que completa el esquema de
+ * Pascal. Lo arman igual las plantillas (`buildScene`) y «Muebles desde una foto» (`cluster-deps.ts`).
+ */
+export function buildItemNode(asset: AssetLike, placement: ItemPlacement) {
+  return ItemNode.parse({
+    ...(placement.id ? { id: placement.id } : {}),
+    parentId: placement.parentId,
+    name: asset.name,
+    position: placement.position,
+    rotation: [0, placement.rotY ?? 0, 0],
+    asset: {
+      ...asset,
+      tags: asset.tags ?? [],
+      thumbnail: asset.thumbnail ?? FALLBACK_THUMBNAIL,
+      offset: asset.offset ?? [0, 0, 0],
+      rotation: asset.rotation ?? [0, 0, 0],
+      scale: asset.scale ?? [1, 1, 1],
+      source: 'library',
+    },
+  })
+}
+
 /**
  * Convierte una definición de plantilla en el grafo de escena de Pascal usando los esquemas reales de
  * `@pascal-app/core` (así se completan los valores por defecto). Es determinista: los ids salen de la definición.
@@ -136,22 +168,7 @@ export function buildScene(def: TemplateDefinition, assets: ReadonlyMap<string, 
     level.items.forEach((it, i) => {
       const asset = assets.get(it.asset) as AssetLike
       const id = sub('item', level, i + 1)
-      nodes[id] = ItemNode.parse({
-        id,
-        parentId: lid,
-        name: asset.name,
-        position: [at(it.at)[0], it.y ?? FLOOR_Y, at(it.at)[1]],
-        rotation: [0, it.rotY ?? 0, 0],
-        asset: {
-          ...asset,
-          tags: asset.tags ?? [],
-          thumbnail: asset.thumbnail ?? FALLBACK_THUMBNAIL,
-          offset: asset.offset ?? [0, 0, 0],
-          rotation: asset.rotation ?? [0, 0, 0],
-          scale: asset.scale ?? [1, 1, 1],
-          source: 'library',
-        },
-      })
+      nodes[id] = buildItemNode(asset, { id, parentId: lid, position: [at(it.at)[0], it.y ?? FLOOR_Y, at(it.at)[1]], rotY: it.rotY })
       children.push(id)
     })
 

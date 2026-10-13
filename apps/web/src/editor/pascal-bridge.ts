@@ -18,6 +18,7 @@ import { keepCarpetsUnder } from './carpet-watch'
 import { frameDeps } from './frame-deps'
 import { imageDeps } from './export/pascal-image'
 import { planDeps } from './export/pascal-plan'
+import { clusterDeps } from './cluster-deps'
 import { levelManageDeps } from './level-manage-deps'
 import { nodePresets } from './node-presets'
 import { createViewStorage } from './shell/view-storage'
@@ -237,6 +238,7 @@ export function createPascalBridge(): ShellBridge {
     ...frameDeps(),
     ...planDeps(),
     ...imageDeps(),
+    ...clusterDeps(),
     // @@deps
   })
 }

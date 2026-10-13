@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import type { BridgeDeps } from '../../src/editor/shell/bridge'
+import type { ClusterItem } from '../../src/editor/shell/bridge/cluster'
 import type { EditorLike, EditorMode, HistoryState, SceneLike, SnapContext, SnapMode, ViewerLike } from '../../src/editor/shell/bridge/types'
 import type { MaterialItemLike } from '../../src/editor/shell/materials-model'
 import type { LevelMeasure, PlanBuildArgs, PlanResult } from '../../src/lib/export/types'
@@ -101,6 +102,7 @@ export function createFakeDeps() {
   const undoTheme = vi.fn()
   const showHint = vi.fn()
   const materials = { items: FAKE_MATERIALS, selectedId: null as string | null, select: vi.fn() }
+  let clusterSeq = 0
   const deps = {
     editor,
     viewer,
@@ -131,6 +133,14 @@ export function createFakeDeps() {
     measureLevels: vi.fn(async (): Promise<LevelMeasure[]> => []),
     buildPlan: vi.fn(async (_args: PlanBuildArgs): Promise<PlanResult> => ({ blob: new Blob(['%PDF-1.4']), pages: 1, skippedImages: 0 })),
     captureView: vi.fn(async () => new Blob(['img'], { type: 'image/webp' })),
+    // Como Pascal: los muebles quedan en la escena (hijos de la planta) y devuelve sus ids en el mismo orden.
+    insertItems: vi.fn((input: { parentId: string; items: readonly ClusterItem[] }): string[] => {
+      const ids = input.items.map(() => `item_foto_${++clusterSeq}`)
+      scene.setState({
+        nodes: { ...scene.getState().nodes, ...Object.fromEntries(ids.map((id) => [id, { id, type: 'item', parentId: input.parentId }])) },
+      })
+      return ids
+    }),
     // @@fake-deps
   } satisfies BridgeDeps
   /** Estado crudo de los cuatro orígenes (lo que entrega `bridge.snapshot()`): los selectores puros se prueban con esto. */
