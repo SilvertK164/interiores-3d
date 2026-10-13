@@ -41,7 +41,8 @@ const MOVE_TOLERANCE_M = 0.05
 
 type Side = 'n' | 'e' | 's' | 'w'
 type Span = [number, number]
-type Room = { width: number; depth: number }
+/** El ambiente de la foto, rectangular, en metros: `width` en x (izquierda a derecha de la foto) y `depth` en z (de y = 0, el fondo, a y = 1, quien mira). */
+export type Room = { width: number; depth: number }
 /** Lo que ocupa una pieza en el plano, en metros desde la esquina (0, 0) del ambiente. */
 type Box = { x0: number; x1: number; z0: number; z1: number }
 
@@ -49,6 +50,18 @@ const WALL_NAMES: Record<Side, string> = { n: 'Muro norte', e: 'Muro este', s: '
 const round3 = (n: number) => Math.round(n * 1000) / 1000 + 0
 const METERS = new Intl.NumberFormat('es', { maximumFractionDigits: 2 })
 const meters = (n: number) => `${METERS.format(n)} m`
+
+/**
+ * El ambiente de la foto: `knownWidthM ?? 4` m de ancho (nunca menos de `MIN_ROOM_WIDTH_M`) por el 75 % de fondo (`roomSize`). Lo usan
+ * `analysisToDefinition` (que avisa con `warn` si tuvo que subir un ancho demasiado chico) y la cámara con la que abre el editor
+ * (`photoCameraPose`): así los dos hablan siempre del mismo ambiente.
+ */
+export function photoRoom(knownWidthM?: number | null, warn: (message: string) => void = () => {}): Room {
+  const asked = roomSize(knownWidthM).width
+  if (asked < MIN_ROOM_WIDTH_M) warn(`El ancho indicado (${meters(asked)}) es demasiado chico para un ambiente: se usó ${meters(MIN_ROOM_WIDTH_M)}.`)
+  const width = round3(Math.max(asked, MIN_ROOM_WIDTH_M))
+  return { width, depth: round3(roomSize(width).depth) }
+}
 
 /** Mitades del rectángulo que ocupa la pieza una vez girada `rotY` (ejes x y z del plano); `[0, 0]` si no se conocen sus medidas. */
 function halfExtents(asset: AnalysisAssetLike, rotY: number): Pt {
@@ -166,12 +179,9 @@ export function analysisToDefinition<T extends AnalysisAssetLike>(
   opts: AnalysisToDefinitionOptions = {},
 ): TemplateDefinition {
   const warn = opts.warn ?? (() => {})
-  const asked = roomSize(opts.knownWidthM).width
-  if (asked < MIN_ROOM_WIDTH_M) warn(`El ancho indicado (${meters(asked)}) es demasiado chico para un ambiente: se usó ${meters(MIN_ROOM_WIDTH_M)}.`)
-  const width = round3(Math.max(asked, MIN_ROOM_WIDTH_M))
-  const room: Room = { width, depth: round3(roomSize(width).depth) }
+  const room = photoRoom(opts.knownWidthM, warn)
 
-  const pieces = analysisToCluster(analysis, resolve, { knownWidthM: width, warn })
+  const pieces = analysisToCluster(analysis, resolve, { knownWidthM: room.width, warn })
   const { items, boxes } = placePieces(pieces, room, warn)
   const door = placeOpening(DOOR, room, boxes)
   const window = placeOpening(WINDOW, room, boxes, door ? { [door.side]: [door.opening.at - door.opening.width / 2, door.opening.at + door.opening.width / 2] } : {})
