@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { ANALYZE_BODY_MAX_BYTES } from '../packages/contract/src/analyze-room.js'
 
 // El despliegue en Vercel no se pudo probar (no hay cuentas): estas pruebas solo cuidan que la configuración
 // del repositorio sea coherente consigo misma y con la guía. No prueban a Vercel.
@@ -46,6 +47,21 @@ describe('apps/api/vercel.json (función de Vercel con Root Directory apps/api)'
     expect(existsSync(join(repo, 'apps/api/api/index.ts'))).toBe(true)
   })
 
+  it('la función puede durar 30 s (el análisis de fotos espera hasta 25 s a Gemini) y la ruta de la función existe', () => {
+    const functions = api.functions as Record<string, { maxDuration?: number }>
+    expect(Object.keys(functions)).toEqual(['api/index.ts'])
+    expect(existsSync(join(repo, 'apps/api/api/index.ts'))).toBe(true)
+    expect(functions['api/index.ts']?.maxDuration).toBe(30)
+    const source = read('apps/api/src/analyze-room/gemini.ts')
+    const timeout = Number(new RegExp('GEMINI_TIMEOUT_MS = ([0-9_]+)').exec(source)?.[1]?.replaceAll('_', ''))
+    expect(timeout).toBeGreaterThan(0)
+    expect(timeout).toBeLessThan((functions['api/index.ts']?.maxDuration as number) * 1000)
+  })
+
+  it('el cuerpo más grande del análisis cabe en los 4,5 MB que Vercel admite por petición', () => {
+    expect(ANALYZE_BODY_MAX_BYTES).toBeLessThan(4_500_000)
+  })
+
   it('publica una carpeta public/ vacía para que no se sirva como archivo estático el código de la API', () => {
     expect(api.outputDirectory).toBe('public')
     expect(existsSync(join(repo, 'apps/api/public/.gitkeep'))).toBe(true)
@@ -66,6 +82,8 @@ describe('coherencia entre el repositorio y docs/nube.md', () => {
       ['apps/api/src/config.ts', 'SUPABASE_URL'],
       ['apps/api/src/config.ts', 'SUPABASE_ANON_KEY'],
       ['apps/api/src/config.ts', 'CORS_ORIGINS'],
+      ['apps/api/src/config.ts', 'GEMINI_API_KEY'],
+      ['apps/api/src/config.ts', 'VISION_MODEL'],
     ]
     for (const [file, name] of reads) {
       expect(read(file), `${file} ya no lee ${name}`).toContain(name)
@@ -79,6 +97,17 @@ describe('coherencia entre el repositorio y docs/nube.md', () => {
     for (const line of variablesVercel) {
       expect(line.split('|')[1]).not.toMatch(/NEXT_PUBLIC_E2E|SERVICE_ROLE|SECRET/i)
     }
+  })
+
+  it('la guía explica el análisis de fotos: la clave de Gemini solo en el proyecto API, la migración 004 y el aviso de privacidad', () => {
+    expect(guide).toContain('| `GEMINI_API_KEY` |')
+    expect(guide).toContain('| `VISION_MODEL` |')
+    expect(guide).toContain('gemini-3.5-flash')
+    expect(guide).toMatch(/Migración 004/)
+    expect(guide).toMatch(/nivel gratuito[^.]*Google puede usar/)
+    expect(guide).toMatch(/Sensitive|Sensible/)
+    const web = guide.slice(guide.indexOf('Proyecto web:'), guide.indexOf('Proyecto API:'))
+    expect(web).not.toContain('GEMINI')
   })
 
   it('ningún archivo de configuración ni la guía traen una clave con forma real', () => {
