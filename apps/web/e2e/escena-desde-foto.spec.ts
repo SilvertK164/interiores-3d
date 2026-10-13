@@ -1,5 +1,5 @@
 import { type Page, expect, test } from '@playwright/test'
-import { MIN_CONFIDENCE } from '../src/lib/lab/analysis-to-cluster'
+import { MIN_CONFIDENCE } from '../src/lib/lab/layout-constants'
 import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
 import { counts, ready, templateCounts } from './support/editor'
 import { hook } from './support/hooks'
@@ -9,17 +9,18 @@ import { ANALYZE_URL, analyzePhoto, answerWith, failWith, sentBy } from './suppo
 // Las piezas del ejemplo con confianza suficiente: la planta (20 %) se descarta con aviso.
 const EXAMPLE_PIECES = SAMPLE_ANALYSIS.furniture.filter((piece) => piece.confidence >= MIN_CONFIDENCE).length
 
-/** La escena de «Escena desde una foto» con el análisis de ejemplo: un ambiente de 4 × 3 m con piso, cielo, cuatro muros, puerta, ventana y los muebles dentro. */
+/** La escena de «Escena desde una foto» con el análisis de ejemplo: un ambiente de 5 × 4,4 m con piso, cielo, cuatro muros, puerta, ventana y los muebles dentro. */
 async function expectExampleScene(page: Page) {
   await expect.poll(async () => (await counts(page)).zone, { timeout: 60_000 }).toBe(1)
   expect(await counts(page)).toMatchObject({ zone: 1, slab: 1, ceiling: 1, wall: 4, door: 1, window: 1, item: EXAMPLE_PIECES })
-  // La escena queda centrada en el origen: el ambiente va de -2 a 2 en x y de -1,5 a 1,5 en z, y ningún mueble flota ni pisa un muro.
-  const items = (await hook(page, 'nodesOf', 'item')) as { position: [number, number, number] }[]
+  // La escena queda centrada en el origen: el ambiente va de -2,5 a 2,5 en x y de -2,2 a 2,2 en z; ningún mueble pisa un muro (la cara está a 0,1 m del
+  // borde) y solo la tele, sobre su mueble, no está en el piso (0,35 m).
+  const items = (await hook(page, 'nodesOf', 'item')) as { asset: { id: string }; position: [number, number, number] }[]
   expect(items).toHaveLength(EXAMPLE_PIECES)
-  for (const { position } of items) {
-    expect(Math.abs(position[0])).toBeLessThanOrEqual(2 - 0.2 + 0.01)
-    expect(Math.abs(position[2])).toBeLessThanOrEqual(1.5 - 0.2 + 0.01)
-    expect(position[1]).toBe(0)
+  for (const { asset, position } of items) {
+    expect(Math.abs(position[0]), asset.id).toBeLessThanOrEqual(2.5 - 0.1 + 0.01)
+    expect(Math.abs(position[2]), asset.id).toBeLessThanOrEqual(2.2 - 0.1 + 0.01)
+    expect(position[1], asset.id).toBe(asset.id === 'television' ? 0.35 : 0)
   }
 }
 
@@ -35,13 +36,25 @@ test.describe('escena desde una foto', () => {
     await expect(page.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible()
     await expect(page.getByRole('listitem').filter({ hasText: SAMPLE_ANALYSIS.warnings[0] as string })).toBeVisible()
 
+    // El ambiente en metros, desde dónde se tomó la foto y las aberturas.
+    await expect(page.getByTestId('room-summary')).toHaveText('Ambiente de 5 × 4,4 m (ancho × fondo)')
+    await expect(page.getByText('Foto tomada a 2,5 m del muro oeste y 4,3 m del muro norte, mirando hacia el norte.')).toBeVisible()
+    await expect(page.getByText('Aberturas: ventana en el muro este, puerta en el muro sur.')).toBeVisible()
+
     const table = page.getByRole('table', { name: 'Piezas detectadas' })
     await expect(table.getByRole('row')).toHaveCount(SAMPLE_ANALYSIS.furniture.length + 1) // + la fila de títulos
     // El nombre sale del catálogo que se le envió al análisis (las tablas en castellano), no del id que devuelve.
-    for (const label of ['Sofá', 'Mesa de centro', 'Silla de comedor', 'Biblioteca', 'Cama doble', 'Planta de interior', 'Televisor']) {
-      await expect(table.getByRole('rowheader', { name: label })).toBeVisible()
+    for (const label of ['Mueble de TV', 'Televisor', 'Alfombra rectangular', 'Mesa de centro', 'Sofá', 'Sillón', 'Biblioteca', 'Lámpara de pie', 'Planta de interior']) {
+      await expect(table.getByRole('rowheader', { name: label })).toBeVisible() // la de confianza baja lleva además «Confianza baja»
     }
     await expect(table.getByRole('cell', { name: '20 %', exact: true })).toBeVisible() // la confianza baja del ejemplo
+    // La posición en metros y hacia dónde mira cada pieza, en castellano.
+    const rowOf = (label: string) => table.getByRole('row').filter({ has: page.getByRole('rowheader', { name: label, exact: true }) })
+    await expect(rowOf('Sofá')).toContainText('2,5 m del muro oeste')
+    await expect(rowOf('Sofá')).toContainText('mira al norte')
+    await expect(rowOf('Sofá')).toContainText('contra el muro sur')
+    await expect(rowOf('Televisor')).toContainText('sobre «Mueble de TV»')
+    await expect(rowOf('Sillón')).toContainText('mira al oeste')
 
     expect(JSON.parse((await page.getByTestId('raw-json').textContent()) ?? '')).toEqual(SAMPLE_ANALYSIS)
 
@@ -51,6 +64,8 @@ test.describe('escena desde una foto', () => {
     expect(sent?.body.image.startsWith('/9j/')).toBe(true)
     expect(sent?.body.knownWidthM).toBe(4.5)
     expect(sent?.body.catalog.map((option) => option.id)).toContain('sofa')
+    // Cada pieza del catálogo viaja con sus medidas reales en metros [ancho, alto, fondo]: el análisis las usa de regla para estimar el ambiente.
+    expect(sent?.body.catalog.find((option) => option.id === 'sofa')?.dimensions_m).toEqual([2.06, 0.74, 1.01])
     expect(JSON.stringify(sent?.body)).not.toMatch(/model.glb|items/)
   })
 

@@ -16,8 +16,9 @@ export function keepCarpetsUnder(): () => void {
       if (node.type === 'item' && CARPET_ASSETS.has(node.asset?.id ?? '') && !previous.nodes[node.id as Core.AnyNodeId] && node.parentId) levels.add(node.parentId)
     }
     if (levels.size === 0) return
-    const history = Core.useScene.temporal.getState()
-    history.pause()
+    // La pausa lleva la cuenta de Pascal (`pauseSceneHistory`): `updateNode` pausa y reanuda por su cuenta y, con `temporal.pause()` a secas, su
+    // reanudación volvería a grabar el cambio (y Deshacer lo gastaría en deshacer el orden, no en quitar lo que se agregó).
+    Core.pauseSceneHistory(Core.useScene)
     try {
       for (const levelId of levels) {
         const level = state.nodes[levelId as Core.AnyNodeId] as { children?: string[] } | undefined
@@ -27,7 +28,7 @@ export function keepCarpetsUnder(): () => void {
         if (ordered) state.updateNode(levelId as Core.AnyNodeId, { children: ordered } as never)
       }
     } finally {
-      history.resume()
+      Core.resumeSceneHistory(Core.useScene)
     }
   })
 }

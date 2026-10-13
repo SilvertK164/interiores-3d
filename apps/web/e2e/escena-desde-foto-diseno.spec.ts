@@ -160,7 +160,7 @@ test.describe('diseño de /escena-desde-foto', () => {
       await page.getByLabel('Ancho conocido').fill('4,5')
       await page.getByRole('button', { name: 'Analizar foto' }).click()
       await expect(page.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible({ timeout: 30_000 })
-      await expect(page.getByText('7 piezas')).toBeVisible()
+      await expect(page.getByText('9 piezas')).toBeVisible()
       await expect(page.getByRole('button', { name: 'Abrir en el editor' })).toBeVisible()
       expect(await overflow(page)).toBeLessThanOrEqual(0)
       expect(await smallTargets(page)).toEqual([])

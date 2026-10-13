@@ -4,7 +4,7 @@ import { counts } from './support/editor'
 import { hook } from './support/hooks'
 import { createBlankProject } from './support/projects'
 import { dockButton, undoRedo } from './support/shell'
-import { ANALYZE_URL, answerWith, failWith, jpegSize, sentBy, solidPng, tinyPng } from './support/analysis'
+import { ANALYZE_URL, EMPTY_ANALYSIS, answerWith, failWith, jpegSize, sentBy, solidPng, tinyPng } from './support/analysis'
 
 // El análisis se simula con page.route sobre POST /v1/analyze-room (ver support/analysis.ts): no hace falta clave de Gemini ni cuota.
 const photoDialog = (page: Page) => page.getByRole('dialog', { name: 'Muebles desde una foto' })
@@ -38,35 +38,48 @@ test.describe('muebles desde una foto', () => {
     const dialog = await openFromMore(page)
     await analyze(dialog)
 
-    // La lista: seis piezas (la planta de confianza baja se descarta con aviso), todas marcadas, con su nombre en castellano.
-    await expect(dialog.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible()
+    // La lista: ocho piezas (la planta de confianza baja se descarta con aviso), todas marcadas, con su nombre en castellano.
+    // El editor corre WebGL por software y la foto se reduce en el mismo hilo: se le da más aire que los 5 s de siempre.
+    await expect(dialog.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible({ timeout: 30_000 })
     const boxes = dialog.getByRole('checkbox')
-    await expect(boxes).toHaveCount(6)
-    for (const name of ['Televisor', 'Mesa de centro', 'Sofá', 'Silla de comedor', 'Biblioteca', 'Cama doble']) {
+    await expect(boxes).toHaveCount(8)
+    for (const name of ['Mueble de TV', 'Televisor', 'Alfombra rectangular', 'Mesa de centro', 'Sofá', 'Sillón', 'Biblioteca', 'Lámpara de pie']) {
       await expect(dialog.getByRole('checkbox', { name: new RegExp(name) })).toBeChecked()
     }
     await expect(dialog.getByText(SAMPLE_ANALYSIS.warnings[0] as string)).toBeVisible()
     await expect(dialog.getByText(/Se omitió «Planta de interior»/)).toBeVisible()
-    await expect(dialog.getByText('6 de 6 muebles elegidos')).toBeVisible()
+    await expect(dialog.getByText('8 de 8 muebles elegidos')).toBeVisible()
+
+    // Quitar el mueble de TV quita también la tele que está sobre él (no queda flotando); marcar la tele devuelve su mueble.
+    await dialog.getByRole('checkbox', { name: /Mueble de TV/ }).uncheck()
+    await expect(dialog.getByRole('checkbox', { name: /Televisor/ })).not.toBeChecked()
+    await expect(dialog.getByText('6 de 8 muebles elegidos')).toBeVisible()
+    await dialog.getByRole('checkbox', { name: /Televisor/ }).check()
+    await expect(dialog.getByRole('checkbox', { name: /Mueble de TV/ })).toBeChecked()
+    await expect(dialog.getByText('8 de 8 muebles elegidos')).toBeVisible()
 
     // La persona quita una y agrega las demás.
-    await dialog.getByRole('checkbox', { name: /Silla de comedor/ }).uncheck()
-    await expect(dialog.getByText('5 de 6 muebles elegidos')).toBeVisible()
+    await dialog.getByRole('checkbox', { name: /Lámpara de pie/ }).uncheck()
+    await expect(dialog.getByText('7 de 8 muebles elegidos')).toBeVisible()
     await dialog.getByRole('button', { name: 'Agregar al proyecto' }).click()
     await expect(dialog).toBeHidden()
 
-    // Se agregaron cinco muebles, todos en la planta activa, sobre el piso y con el tamaño real del catálogo.
-    await expect.poll(async () => (await items(page)) - before).toBe(5)
+    // Se agregaron siete muebles, todos en la planta activa, sobre el piso (la tele, sobre su mueble: a 0,35 m) y con el tamaño real del catálogo.
+    await expect.poll(async () => (await items(page)) - before).toBe(7)
     const state = await hook(page, 'state')
     const added = ((await hook(page, 'nodesOf', 'item')) as { id: string; parentId: string; position: number[]; asset: { id: string; dimensions: number[] } }[]).slice(before)
-    expect(added.map((n) => n.asset.id).sort()).toEqual(['bookshelf', 'coffee-table', 'double-bed', 'sofa', 'television'])
+    expect(added.map((n) => n.asset.id).sort()).toEqual(['bookshelf', 'coffee-table', 'livingroom-chair', 'rectangular-carpet', 'sofa', 'television', 'tv-stand'])
     for (const node of added) {
       expect(node.parentId).toBe(state.levelId)
-      expect(node.position[1]).toBe(0)
+      expect(node.position[1]).toBe(node.asset.id === 'television' ? 0.35 : 0)
       expect(node.position.every(Number.isFinite)).toBe(true)
     }
     const sofa = added.find((n) => n.asset.id === 'sofa')
     expect(sofa?.asset.dimensions).toEqual([2.06, 0.74, 1.01])
+    const tv = added.find((n) => n.asset.id === 'television')
+    const stand = added.find((n) => n.asset.id === 'tv-stand')
+    expect(tv?.position[0]).toBeCloseTo(stand?.position[0] ?? 99, 2)
+    expect(tv?.position[2]).toBeCloseTo(stand?.position[2] ?? 99, 2)
 
     // Quedan seleccionadas todas juntas (la multiselección de Pascal las mueve, gira o borra a la vez) y el editor pasa a Seleccionar.
     expect([...state.selectedIds].sort()).toEqual(added.map((n) => n.id).sort())
@@ -84,7 +97,7 @@ test.describe('muebles desde una foto', () => {
     await undoRedo(page).undo.click()
     await expect.poll(() => items(page)).toBe(before)
     await undoRedo(page).redo.click()
-    await expect.poll(() => items(page)).toBe(before + 5)
+    await expect.poll(() => items(page)).toBe(before + 7)
   })
 
   test('si el análisis falla, el diálogo lo explica en castellano y se puede volver a intentar sin perder lo escrito', async ({ page }) => {
@@ -108,7 +121,7 @@ test.describe('muebles desde una foto', () => {
     let calls = 0
     await page.route(ANALYZE_URL, (route) => {
       calls++
-      return answerWith({ furniture: [], warnings: ['No se ve ningún mueble.'], calibration: { status: 'uncalibrated', width_m: null } })(route)
+      return answerWith(EMPTY_ANALYSIS)(route)
     })
     await createBlankProject(page, 'foto-vacia')
     const dialog = await openFromMore(page)
@@ -120,7 +133,7 @@ test.describe('muebles desde una foto', () => {
 
     await dialog.getByLabel('Ancho del ambiente').fill('')
     await dialog.getByRole('button', { name: 'Analizar foto' }).click()
-    await expect(dialog.getByText('No encontramos muebles del catálogo en esta foto')).toBeVisible()
+    await expect(dialog.getByText('No encontramos muebles del catálogo en esta foto')).toBeVisible({ timeout: 30_000 })
     await expect(dialog.getByText('No se ve ningún mueble.')).toBeVisible()
     await expect(dialog.getByRole('button', { name: 'Agregar al proyecto' })).toBeDisabled()
     await dialog.getByRole('button', { name: 'Cambiar la foto' }).click()
