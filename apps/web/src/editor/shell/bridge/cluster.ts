@@ -2,6 +2,7 @@ import { footprint } from '@/lib/templates/geometry'
 import { createClickGuard } from '../click-guard'
 import { DECISIONS, type Decisions } from '../decisions'
 import type { CatalogItemLike } from '../furniture-model'
+import { roundMm } from '../properties-units'
 import type { CoreDeps } from './core'
 import { levelsOf } from './levels'
 import type { SceneNodeLike } from './types'
@@ -33,8 +34,8 @@ type Box = { minX: number; maxX: number; minZ: number; maxZ: number }
 const FLOOR_Y = 0
 /** Medida de un mueble sin `dimensions`: la que usa Pascal por omisión (1 x 1 x 1 m). */
 const DEFAULT_SIDE = 1
-/** Al milímetro, y nunca `-0`. */
-const round3 = (n: number) => Math.round(n * 1000) / 1000 + 0
+/** Al milímetro y nunca `-0` (un `-0` suelto no es igual a `0` para quien compare con `Object.is`). */
+const mm = (n: number) => roundMm(n) + 0
 
 function boxOf(points: readonly Pt[]): Box | null {
   if (points.length === 0) return null
@@ -108,7 +109,7 @@ export function createClusterSlice(deps: CoreDeps & ClusterDeps, decisions: Pick
         const here = centerOfBox(box)
         const items = pieces.map((piece): ClusterItem => ({
           asset: piece.asset,
-          position: [round3(piece.at[0] + center[0] - here[0]), FLOOR_Y, round3(piece.at[1] + center[1] - here[1])],
+          position: [mm(piece.at[0] + center[0] - here[0]), FLOOR_Y, mm(piece.at[1] + center[1] - here[1])],
           rotY: piece.rotY,
         }))
         const ids = deps.insertItems({ parentId: target.id, items })

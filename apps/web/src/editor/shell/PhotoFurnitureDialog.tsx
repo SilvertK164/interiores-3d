@@ -81,7 +81,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
       if (!(error instanceof LabError)) console.error('[muebles desde una foto]', error)
       if (mine === run.current) dispatch({ type: 'failed', message: describeLabError(error) })
     } finally {
-      busy.current = false
+      if (mine === run.current) busy.current = false
     }
   }
 
@@ -108,7 +108,9 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
         dialogRef.current?.close()
       }}
       onClose={() => {
+        // Lo que TP3 conteste después ya no cuenta, y un análisis nuevo no espera al viejo.
         run.current++
+        busy.current = false
         ;(opener.current ?? previous.current)?.focus()
         onClose()
       }}

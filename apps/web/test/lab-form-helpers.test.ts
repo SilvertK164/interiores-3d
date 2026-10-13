@@ -1,7 +1,7 @@
 import { ProjectNameSchema } from '@interiores/contract'
 import { describe, expect, it } from 'vitest'
 import { LabError } from '../src/lib/lab/lab-error'
-import { labProjectName, normalizeServiceUrl, parseKnownWidth, readSavedServiceUrl, saveServiceUrl } from '../src/lib/lab/form-helpers'
+import { DEFAULT_SERVICE_URL, labProjectName, normalizeServiceUrl, parseKnownWidth, readSavedServiceUrl, saveServiceUrl } from '../src/lib/lab/form-helpers'
 
 describe('parseKnownWidth', () => {
   it.each([
@@ -34,6 +34,13 @@ describe('normalizeServiceUrl', () => {
 
   it.each(['', 'localhost:8000', 'ftp://localhost', 'no es una dirección'])('"%s" no sirve', (raw) => {
     expect(() => normalizeServiceUrl(raw)).toThrow(LabError)
+  })
+})
+
+describe('DEFAULT_SERVICE_URL', () => {
+  it('es la dirección local de TP3 (la misma para la página del laboratorio y para «Muebles desde una foto») y pasa la validación', () => {
+    expect(DEFAULT_SERVICE_URL).toBe('http://localhost:8000')
+    expect(normalizeServiceUrl(DEFAULT_SERVICE_URL)).toBe(DEFAULT_SERVICE_URL)
   })
 })
 
