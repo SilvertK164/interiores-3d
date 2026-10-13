@@ -9,7 +9,7 @@ export function localizeCatalog<T extends CatalogItem>(items: readonly T[], mani
   return items.flatMap((item) => localizeCatalogItem(item, manifest) ?? [])
 }
 
-/** Mapa id → pieza local que consume `buildScene`. Lo usan el generador de plantillas y el laboratorio. */
+/** Mapa id → pieza local que consume `buildScene`. Lo usan el generador de plantillas y «Escena desde una foto». */
 export function buildAssetMap(items: readonly CatalogItem[], manifest: LocalItemsManifest = localManifest): Map<string, AssetLike> {
   return new Map(localizeCatalog(items, manifest).map((item) => [item.id, item as unknown as AssetLike] as const))
 }

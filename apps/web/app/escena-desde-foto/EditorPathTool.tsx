@@ -14,8 +14,8 @@ type Props = {
 }
 
 /**
- * Herramienta de Victoria, a un costado: abre la plantilla Loft como proyecto nuevo por el mismo camino que usa el laboratorio
- * (cuenta, guardado y editor), sin pasar por el análisis. Si eso funciona, cualquier definición válida también.
+ * Herramienta de comprobación, solo fuera de producción (`showEditorPathTool`): abre la plantilla Loft como proyecto nuevo por el mismo
+ * camino que usa «Escena desde una foto» (cuenta, guardado y editor), sin pasar por el análisis. Si eso funciona, cualquier definición válida también.
  */
 export function EditorPathTool({ busy, notice, pending, onOpenLoft, onRetry }: Props) {
   return (
@@ -26,7 +26,7 @@ export function EditorPathTool({ busy, notice, pending, onOpenLoft, onRetry }: P
       </summary>
       <div className="flex flex-col items-start gap-3 pb-4 pt-1">
         <p className="m-0 max-w-[62ch] text-ink-muted">
-          Abre la plantilla Loft como proyecto nuevo, por el mismo camino que usa el laboratorio (cuenta, guardado y editor). Si esto funciona,
+          Abre la plantilla Loft como proyecto nuevo, por el mismo camino que usa «Escena desde una foto» (cuenta, guardado y editor). Si esto funciona,
           cualquier definición válida también.
         </p>
         <button className="btn glass" disabled={busy !== null} onClick={onOpenLoft} type="button">

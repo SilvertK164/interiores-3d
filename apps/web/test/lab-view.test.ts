@@ -10,6 +10,7 @@ import {
   pieceCountLabel,
   positionText,
   rotationText,
+  showEditorPathTool,
   sizeText,
 } from '../src/lib/lab/lab-view'
 import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
@@ -72,7 +73,7 @@ describe('origen y calibración del análisis', () => {
   })
 })
 
-describe('ANALYSIS_TEXT: el aviso de privacidad es el mismo en el diálogo del editor y en /laboratorio', () => {
+describe('ANALYSIS_TEXT: el aviso de privacidad es el mismo en el diálogo del editor y en /escena-desde-foto', () => {
   it('dice a dónde va la foto, que no se guarda y que Google puede usarla en el nivel gratuito', () => {
     expect(ANALYSIS_TEXT.privacy).toMatch(/Google \(Gemini\)/)
     expect(ANALYSIS_TEXT.privacy).toMatch(/no la guardamos/)
@@ -84,5 +85,23 @@ describe('ANALYSIS_TEXT: el aviso de privacidad es el mismo en el diálogo del e
 
   it('no menciona TP3 ni lenguaje técnico', () => {
     for (const text of Object.values(ANALYSIS_TEXT)) expect(text).not.toMatch(/TP3|API|JSON|servicio/i)
+  })
+})
+
+describe('showEditorPathTool: «Comprobar que el camino al editor funciona» no se ve en producción', () => {
+  it('en desarrollo y en las pruebas se muestra', () => {
+    expect(showEditorPathTool({ nodeEnv: 'development' })).toBe(true)
+    expect(showEditorPathTool({ nodeEnv: 'test' })).toBe(true)
+    expect(showEditorPathTool({ nodeEnv: undefined })).toBe(true)
+  })
+
+  it('en producción se oculta', () => {
+    expect(showEditorPathTool({ nodeEnv: 'production' })).toBe(false)
+    expect(showEditorPathTool({ nodeEnv: 'production', e2e: '0' })).toBe(false)
+    expect(showEditorPathTool({ nodeEnv: 'production', e2e: '' })).toBe(false)
+  })
+
+  it('con NEXT_PUBLIC_E2E=1 se muestra también en una compilación de producción (las pruebas en navegador)', () => {
+    expect(showEditorPathTool({ nodeEnv: 'production', e2e: '1' })).toBe(true)
   })
 })

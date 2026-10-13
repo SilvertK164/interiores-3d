@@ -1,19 +1,36 @@
 import { type Page, expect, test } from '@playwright/test'
+import { MIN_CONFIDENCE } from '../src/lib/lab/analysis-to-cluster'
 import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
 import { counts, ready, templateCounts } from './support/editor'
+import { hook } from './support/hooks'
 import { PROJECT_URL } from './support/projects'
 import { ANALYZE_URL, answerWith, failWith, sentBy, tinyPng } from './support/analysis'
 
-const MODELING_BLANK = /analysisToDefinition todavía está en blanco/
+// Las piezas del ejemplo con confianza suficiente: la planta (20 %) se descarta con aviso.
+const EXAMPLE_PIECES = SAMPLE_ANALYSIS.furniture.filter((piece) => piece.confidence >= MIN_CONFIDENCE).length
+
+/** La escena de «Escena desde una foto» con el análisis de ejemplo: un ambiente de 4 × 3 m con piso, cielo, cuatro muros, puerta, ventana y los muebles dentro. */
+async function expectExampleScene(page: Page) {
+  await expect.poll(async () => (await counts(page)).zone, { timeout: 60_000 }).toBe(1)
+  expect(await counts(page)).toMatchObject({ zone: 1, slab: 1, ceiling: 1, wall: 4, door: 1, window: 1, item: EXAMPLE_PIECES })
+  // La escena queda centrada en el origen: el ambiente va de -2 a 2 en x y de -1,5 a 1,5 en z, y ningún mueble flota ni pisa un muro.
+  const items = (await hook(page, 'nodesOf', 'item')) as { position: [number, number, number] }[]
+  expect(items).toHaveLength(EXAMPLE_PIECES)
+  for (const { position } of items) {
+    expect(Math.abs(position[0])).toBeLessThanOrEqual(2 - 0.2 + 0.01)
+    expect(Math.abs(position[2])).toBeLessThanOrEqual(1.5 - 0.2 + 0.01)
+    expect(position[1]).toBe(0)
+  }
+}
 
 async function analyzePhoto(page: Page, width = '') {
-  await page.goto('/laboratorio')
+  await page.goto('/escena-desde-foto')
   await page.getByLabel('Foto del ambiente').setInputFiles({ name: 'sala.png', mimeType: 'image/png', buffer: tinyPng() })
   if (width) await page.getByLabel('Ancho conocido').fill(width)
   await page.getByRole('button', { name: 'Analizar foto' }).click()
 }
 
-test.describe('laboratorio', () => {
+test.describe('escena desde una foto', () => {
   test('con el análisis simulado, analizar una foto muestra avisos, la tabla de piezas y el JSON crudo, y envía bien el pedido', async ({ page }) => {
     let sent: ReturnType<typeof sentBy> | undefined
     await page.route(ANALYZE_URL, (route) => {
@@ -75,35 +92,48 @@ test.describe('laboratorio', () => {
     await expect(page.getByRole('alert').filter({ hasText: 'No hay conexión' })).toBeVisible()
   })
 
-  test('mientras el modelado está en blanco, «Abrir en el editor» lo explica con amabilidad y la página sigue disponible', async ({ page }) => {
+  test('«Abrir en el editor» crea el proyecto «Desde una foto · fecha y hora» y abre el editor con el ambiente y los muebles', async ({ page }) => {
+    test.setTimeout(180_000)
     await page.route(ANALYZE_URL, answerWith(SAMPLE_ANALYSIS))
     await analyzePhoto(page)
+    const created = page.waitForRequest((request) => request.method() === 'POST' && /\/v1\/projects$/.test(request.url()))
     await page.getByRole('button', { name: 'Abrir en el editor' }).click()
-
-    await expect(page.getByText(MODELING_BLANK)).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Escena desde una foto' })).toBeVisible()
-    await expect(page).toHaveURL(/\/laboratorio$/)
-    await expect(page.getByRole('button', { name: 'Abrir en el editor' })).toBeEnabled()
+    expect((await created).postDataJSON().name).toMatch(/^Desde una foto · \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/)
+    await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
+    await ready(page)
+    await expectExampleScene(page)
   })
 
-  test('«Probar con un ejemplo» no llama a la API, muestra el ejemplo y explica que el modelado está en blanco', async ({ page }) => {
+  test('«Probar con un ejemplo» no llama a la API y abre un proyecto real en el editor, con el ambiente y los muebles del ejemplo', async ({ page }) => {
+    test.setTimeout(180_000)
     let calledApi = false
     await page.route(ANALYZE_URL, (route) => {
       calledApi = true
       return route.abort()
     })
-    await page.goto('/laboratorio')
+    await page.goto('/escena-desde-foto')
     await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
-
-    await expect(page.getByText(MODELING_BLANK)).toBeVisible()
-    await expect(page.getByText('Análisis de ejemplo: no viene de una foto.')).toBeVisible()
-    await expect(page.getByRole('table', { name: 'Piezas detectadas' }).getByRole('row')).toHaveCount(SAMPLE_ANALYSIS.furniture.length + 1)
+    await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
+    await ready(page)
+    await expectExampleScene(page)
     expect(calledApi).toBe(false)
+  })
+
+  test('la pantalla es del producto: no habla de laboratorio ni de modelado en blanco', async ({ page }) => {
+    await page.goto('/escena-desde-foto')
+    await expect(page.getByRole('heading', { name: 'Escena desde una foto', level: 1 })).toBeVisible()
+    await expect(page.getByText(/laboratorio|victoria|en blanco/i)).toHaveCount(0)
+  })
+
+  test('/laboratorio, la dirección de antes, redirige para siempre a /escena-desde-foto', async ({ request }) => {
+    const response = await request.get('/laboratorio', { maxRedirects: 0 })
+    expect(response.status()).toBe(308)
+    expect(new URL(response.headers().location ?? '', 'http://localhost').pathname).toBe('/escena-desde-foto')
   })
 
   test('el camino al editor funciona con cualquier definición válida: el Loft se abre con los mismos nodos que su plantilla', async ({ page }) => {
     test.setTimeout(180_000)
-    await page.goto('/laboratorio')
+    await page.goto('/escena-desde-foto')
     await page.getByText('Comprobar que el camino al editor funciona').click()
     await page.getByRole('button', { name: 'Abrir el Loft como prueba' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
@@ -127,7 +157,7 @@ test.describe('laboratorio', () => {
       failedOnce = true
       return route.abort('failed')
     })
-    await page.goto('/laboratorio')
+    await page.goto('/escena-desde-foto')
     await page.getByText('Comprobar que el camino al editor funciona').click()
     await page.getByRole('button', { name: 'Abrir el Loft como prueba' }).dblclick()
 
@@ -136,20 +166,5 @@ test.describe('laboratorio', () => {
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
     expect(projectsCreated).toBe(1)
-  })
-
-  // Cuando analysisToDefinition exista, esta prueba puede activarse cambiando `test.fixme` por `test` (y la de «en blanco» de arriba
-  // ya no tendrá sentido). Comprueba lo básico: el proyecto se abre y el editor muestra un ambiente con piezas; los conteos
-  // exactos dependen de cómo se modele, así que se afinan al decidirlo.
-  test.fixme('con el modelado en marcha, «Probar con un ejemplo» abre el editor con un ambiente y sus piezas', async ({ page }) => {
-    test.setTimeout(180_000)
-    await page.goto('/laboratorio')
-    await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
-    await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
-    await ready(page)
-
-    const got = await counts(page)
-    expect(got.zone).toBeGreaterThanOrEqual(1)
-    expect((got.item ?? 0) + (got.shelf ?? 0) + (got.cabinet ?? 0)).toBeGreaterThan(0)
   })
 })

@@ -1,4 +1,4 @@
-import { FlaskConical, Folder, LogOut, Plus, Search } from 'lucide-react'
+import { Folder, LogOut, Plus, ScanSearch, Search } from 'lucide-react'
 import { cx } from '@/lib/cx'
 import { initialsFor } from '@/lib/person-name'
 import { BusyLink } from './BusyLink'
@@ -17,13 +17,13 @@ type Props = {
   /** «Nuevo proyecto» es de /proyectos; sin `onNew` se ofrece volver a «Mis proyectos». */
   onNew?: () => void
   /** La página en la que está la persona: su enlace queda marcado (`aria-current`). */
-  current?: 'laboratorio'
+  current?: 'escena-desde-foto'
 }
 
 const ROUND = 'glass focus-ring grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-ink transition-transform duration-200 ease-out hover:-translate-y-px'
 const CURRENT = 'bg-brand-wash text-brand-deep'
 
-/** Cabecera de la interfaz propia: marca, buscador de vidrio y nuevo proyecto (en /proyectos), laboratorio, avatar y salir. */
+/** Cabecera de la interfaz propia: marca, buscador de vidrio y nuevo proyecto (en /proyectos), «Escena desde una foto», avatar y salir. */
 export function AppHeader({ email, name, onSignOut, signingOut = false, query = '', onQuery, onNew, current }: Props) {
   return (
     <header className="flex flex-wrap items-center gap-3 desk:flex-nowrap desk:gap-4">
@@ -53,13 +53,13 @@ export function AppHeader({ email, name, onSignOut, signingOut = false, query = 
         </BusyLink>
       )}
       <BusyLink
-        aria-current={current === 'laboratorio' ? 'page' : undefined}
-        aria-label="Laboratorio"
-        className={cx(ROUND, current === 'laboratorio' && CURRENT)}
-        href="/laboratorio"
-        title="Laboratorio"
+        aria-current={current === 'escena-desde-foto' ? 'page' : undefined}
+        aria-label="Escena desde una foto"
+        className={cx(ROUND, current === 'escena-desde-foto' && CURRENT)}
+        href="/escena-desde-foto"
+        title="Escena desde una foto"
       >
-        <FlaskConical aria-hidden size={20} />
+        <ScanSearch aria-hidden size={20} />
       </BusyLink>
       <span
         className="grid size-[42px] shrink-0 place-items-center rounded-full bg-brand-wash text-sm font-medium text-brand-deep"

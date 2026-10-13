@@ -15,7 +15,7 @@ type Props = {
   analysis: RoomAnalysis | null
   candidates: readonly AnalysisCandidate[]
   fromExample: boolean
-  /** Lo que el modelado (`analysisToDefinition`) quiso contar de las piezas que no pudo representar. */
+  /** Lo que `analysisToDefinition` movió o dejó afuera al armar el ambiente (piezas fuera del ambiente, sin catálogo o de confianza baja). */
   modelWarnings: string[]
   busy: Busy
   notice: Notice | null
@@ -62,7 +62,7 @@ export function ResultsCard({ analysis, candidates, fromExample, modelWarnings, 
               </button>
               {busy === 'abriendo' && <Loader inline label="Abriendo el editor…" size="sm" />}
             </div>
-            <p className="m-0 text-[13px] text-ink-muted">Crea el proyecto «Laboratorio · fecha y hora» en tu cuenta y lo abre en el editor.</p>
+            <p className="m-0 text-[13px] text-ink-muted">Crea el proyecto «Desde una foto · fecha y hora» en tu cuenta y lo abre en el editor.</p>
           </div>
         </>
       ) : (

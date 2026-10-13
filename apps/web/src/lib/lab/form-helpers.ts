@@ -16,8 +16,8 @@ export function parseKnownWidth(text: string): number | null {
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
-/** "Laboratorio · 11/10/2026 15:04" con la hora local; `label` agrega una etiqueta antes de la fecha. */
+/** "Desde una foto · 11/10/2026 15:04" con la hora local: el nombre del proyecto que crea «Escena desde una foto»; `label` agrega una etiqueta antes de la fecha. */
 export function labProjectName(date: Date, label?: string): string {
   const stamp = `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`
-  return ['Laboratorio', label, stamp].filter(Boolean).join(' · ')
+  return ['Desde una foto', label, stamp].filter(Boolean).join(' · ')
 }

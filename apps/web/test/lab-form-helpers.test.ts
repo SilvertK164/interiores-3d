@@ -30,8 +30,8 @@ describe('el laboratorio ya no habla con TP3', () => {
 })
 
 describe('labProjectName', () => {
-  it('"Laboratorio · día/mes/año hora:minutos" con la hora local', () => {
-    expect(labProjectName(new Date(2026, 9, 11, 15, 4))).toBe('Laboratorio · 11/10/2026 15:04')
+  it('"Desde una foto · día/mes/año hora:minutos" con la hora local', () => {
+    expect(labProjectName(new Date(2026, 9, 11, 15, 4))).toBe('Desde una foto · 11/10/2026 15:04')
   })
 
   it('sirve como nombre de proyecto (la API acepta hasta 80 caracteres)', () => {
@@ -39,6 +39,6 @@ describe('labProjectName', () => {
   })
 
   it('admite un sufijo para distinguir pruebas', () => {
-    expect(labProjectName(new Date(2026, 9, 11, 15, 4), 'prueba Loft')).toBe('Laboratorio · prueba Loft · 11/10/2026 15:04')
+    expect(labProjectName(new Date(2026, 9, 11, 15, 4), 'prueba Loft')).toBe('Desde una foto · prueba Loft · 11/10/2026 15:04')
   })
 })

@@ -3,13 +3,13 @@ import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
 import { ANALYZE_URL, answerWith, gradientPng } from './support/analysis'
 import { createAccount, signInViaUi } from './support/user'
 
-// «Escena desde una foto» (/laboratorio) con la interfaz propia: que se vea bien y se use bien en escritorio y en el celular.
-// Las capturas quedan en test-results/laboratorio/ para mirarlas; lo que se comprueba aquí son las reglas, no los píxeles.
+// «Escena desde una foto» (/escena-desde-foto) con la interfaz propia: que se vea bien y se use bien en escritorio y en el celular.
+// Las capturas quedan en test-results/escena-desde-foto/ para mirarlas; lo que se comprueba aquí son las reglas, no los píxeles.
 const SCREENS = [
   { name: '1280', viewport: { width: 1280, height: 800 } },
   { name: '390', viewport: { width: 390, height: 844 } },
 ]
-const SHOTS = 'test-results/laboratorio'
+const SHOTS = 'test-results/escena-desde-foto'
 
 /** Cuánto se sale la página de la pantalla a lo ancho: tiene que ser 0 (nada de desplazamiento horizontal). */
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
@@ -97,7 +97,7 @@ const contrastFailures = (page: Page) =>
     return failures
   })
 
-test.describe('diseño de /laboratorio', () => {
+test.describe('diseño de /escena-desde-foto', () => {
   test('el verificador de contraste no pasa de largo: detecta gris claro sobre blanco y acepta la tinta de la marca', async ({ page }) => {
     await page.setContent(`
       <div class="app-shell" style="background:#eef2f8">
@@ -116,7 +116,7 @@ test.describe('diseño de /laboratorio', () => {
     test(`${screen.name} px: el texto cumple el contraste AA (WCAG) en cada paso`, async ({ page }) => {
       await page.setViewportSize(screen.viewport)
       await page.route(ANALYZE_URL, answerWith(SAMPLE_ANALYSIS))
-      await page.goto('/laboratorio')
+      await page.goto('/escena-desde-foto')
       await expect(page.getByRole('heading', { name: 'Escena desde una foto', level: 1 })).toBeVisible()
       expect(await contrastFailures(page), 'sin foto').toEqual([])
 
@@ -133,7 +133,7 @@ test.describe('diseño de /laboratorio', () => {
     test(`${screen.name} px: sin desplazamiento horizontal, objetivos táctiles de 44 px y la maqueta de cada paso`, async ({ page }) => {
       await page.setViewportSize(screen.viewport)
       await page.route(ANALYZE_URL, answerWith(SAMPLE_ANALYSIS))
-      await page.goto('/laboratorio')
+      await page.goto('/escena-desde-foto')
 
       // Paso 1: sin foto. Título, subtítulo, las dos tarjetas y la herramienta plegada.
       await expect(page.getByRole('heading', { name: 'Escena desde una foto', level: 1 })).toBeVisible()
@@ -177,7 +177,7 @@ test.describe('diseño de /laboratorio', () => {
   }
 
   test('con teclado se llega a la zona de la foto y se ve dónde está el foco', async ({ page }) => {
-    await page.goto('/laboratorio')
+    await page.goto('/escena-desde-foto')
     await expect(page.getByRole('heading', { name: 'Escena desde una foto', level: 1 })).toBeVisible()
     let onPhoto = false
     for (let presses = 0; presses < 12 && !onPhoto; presses++) {
@@ -195,7 +195,7 @@ test.describe('diseño de /laboratorio', () => {
   })
 
   test('arrastrar y soltar una foto la elige; otro tipo de archivo se ignora', async ({ page }) => {
-    await page.goto('/laboratorio')
+    await page.goto('/escena-desde-foto')
     const zone = page.locator('label:has(input[type="file"])')
     const drop = (name: string, type: string, buffer: Buffer) =>
       zone.evaluate(
@@ -222,7 +222,7 @@ test.describe('diseño de /laboratorio', () => {
       await gate
       return answerWith(SAMPLE_ANALYSIS)(route)
     })
-    await page.goto('/laboratorio')
+    await page.goto('/escena-desde-foto')
     await page.getByLabel('Foto del ambiente').setInputFiles({ name: 'sala.png', mimeType: 'image/png', buffer: gradientPng(60, 40) })
     await page.getByRole('button', { name: 'Analizar foto' }).click()
     const loader = page.getByRole('status').filter({ hasText: 'Analizando tu foto' })
@@ -241,15 +241,15 @@ test.describe('diseño de /laboratorio', () => {
 test.describe('cabecera de la interfaz propia', () => {
   test.use({ storageState: { cookies: [], origins: [] } })
 
-  test('el laboratorio queda marcado como la página actual, «Mis proyectos» vuelve a la lista y Salir lleva a /login sin avisar que la sesión venció', async ({ page }) => {
+  test('«Escena desde una foto» queda marcada como la página actual, «Mis proyectos» vuelve a la lista y Salir lleva a /login sin avisar que la sesión venció', async ({ page }) => {
     const account = await createAccount()
     await signInViaUi(page, account)
 
-    // Desde /proyectos al laboratorio y de vuelta.
-    await page.getByRole('link', { name: 'Laboratorio' }).click()
-    await page.waitForURL('**/laboratorio')
+    // Desde /proyectos a la escena desde una foto y de vuelta.
+    await page.getByRole('link', { name: 'Escena desde una foto', exact: true }).click()
+    await page.waitForURL('**/escena-desde-foto')
     await expect(page.getByRole('heading', { name: 'Escena desde una foto', level: 1 })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Laboratorio' })).toHaveAttribute('aria-current', 'page')
+    await expect(page.getByRole('link', { name: 'Escena desde una foto', exact: true })).toHaveAttribute('aria-current', 'page')
     await expect(page.getByRole('searchbox')).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Nuevo proyecto' })).toHaveCount(0)
     await page.getByRole('link', { name: 'Mis proyectos' }).click()
@@ -261,9 +261,9 @@ test.describe('cabecera de la interfaz propia', () => {
     await page.waitForURL(/\/login/)
     expect(new URL(page.url()).search).not.toContain('motivo')
 
-    // Y desde el laboratorio.
+    // Y desde «Escena desde una foto».
     await signInViaUi(page, account)
-    await page.goto('/laboratorio')
+    await page.goto('/escena-desde-foto')
     await expect(page.getByRole('heading', { name: 'Escena desde una foto', level: 1 })).toBeVisible()
     await page.getByRole('button', { name: 'Salir' }).click()
     await page.waitForURL(/\/login/)

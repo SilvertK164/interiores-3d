@@ -5,5 +5,5 @@
 # Laboratorio de Victoria: modelado a partir de fotos con Pascal
 /lab/ @vivillalbatevez
 /apps/web/src/lib/lab/ @vivillalbatevez
-/apps/web/app/laboratorio/ @vivillalbatevez
-/apps/web/e2e/laboratorio.spec.ts @vivillalbatevez
+/apps/web/app/escena-desde-foto/ @vivillalbatevez
+/apps/web/e2e/escena-desde-foto.spec.ts @vivillalbatevez

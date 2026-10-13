@@ -87,12 +87,12 @@ export function ProjectsSection({ projects, visible, query, error, now, onNew }:
       <li className="min-h-[120px] min-w-0 desk:min-h-0">
         <BusyLink
           className="focus-ring grid size-full cursor-pointer place-items-center rounded-3xl bg-white/55 text-center text-brand transition-[transform,background-color] duration-200 ease-out hover:-translate-y-[3px] hover:bg-white/90"
-          href="/laboratorio"
+          href="/escena-desde-foto"
         >
           <span>
             <ScanSearch aria-hidden className="mx-auto" size={30} />
             <span className="mt-1.5 block font-display font-medium">Escena desde una foto</span>
-            <span className="block text-[13px] text-ink-muted">Laboratorio</span>
+            <span className="block text-[13px] text-ink-muted">Sube una foto</span>
           </span>
         </BusyLink>
       </li>

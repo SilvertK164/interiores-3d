@@ -69,11 +69,11 @@ export function startupNotes(env) {
     : [
         'No encontré GEMINI_API_KEY (ni en tu entorno ni en lab/.env.local).',
         'TP3 arranca igual, pero «Analizar foto» responderá el error 503 hasta que la configures.',
-        '«Probar con un ejemplo (sin servicio)» en el laboratorio sigue funcionando. Cómo configurar la clave: lab/README.md.',
+        '«Probar con un ejemplo (sin servicio)» en «Escena desde una foto» sigue funcionando. Cómo configurar la clave: lab/README.md.',
       ]
   lines.push(env.VISION_MODEL ? `Modelo de visión: ${env.VISION_MODEL}.` : 'Modelo de visión: el que trae TP3 por defecto.')
   lines.push(`TP3 acepta fotos desde: ${env.CORS_ORIGINS}.`)
-  lines.push(`TP3 en http://localhost:${TP3_PORT} (su pantalla original sirve para comparar) · laboratorio: http://localhost:3000/laboratorio`)
+  lines.push(`TP3 en http://localhost:${TP3_PORT} (su pantalla original sirve para comparar) · escena desde una foto: http://localhost:3000/escena-desde-foto`)
   return lines
 }
 

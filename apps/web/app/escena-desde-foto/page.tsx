@@ -1,6 +1,5 @@
 'use client'
 
-import { FlaskConical } from 'lucide-react'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { AppHeader } from '@/components/AppHeader'
 import { AppShell } from '@/components/AppShell'
@@ -11,6 +10,7 @@ import { analysisToDefinition } from '@/lib/lab/analysis-to-definition'
 import { describeLabError } from '@/lib/lab/describe-error'
 import { labProjectName, parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError } from '@/lib/lab/lab-error'
+import { showEditorPathTool } from '@/lib/lab/lab-view'
 import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
 import { savedName } from '@/lib/person-name'
@@ -31,12 +31,12 @@ const FRAME = 'mx-auto flex min-h-dvh max-w-[1100px] flex-col gap-5 px-[clamp(20
 
 /** El aviso para la pantalla; del error inesperado, el detalle técnico queda en la consola del navegador. */
 function noticeFor(error: unknown, place: NoticePlace): Notice {
-  if (!(error instanceof LabError)) console.error('[laboratorio]', error)
+  if (!(error instanceof LabError)) console.error('[escena-desde-foto]', error)
   return { text: describeLabError(error), place }
 }
 
-/** «Escena desde una foto»: del análisis de una foto al proyecto en el editor. Es la página del Laboratorio de Victoria. */
-export default function LaboratorioPage() {
+/** «Escena desde una foto»: del análisis de una foto al proyecto en el editor. */
+export default function EscenaDesdeFotoPage() {
   const nav = useNavigate()
   const toLogin = useLoginRedirect()
   const { leaving, signingOut, signOut } = useSignOut()
@@ -155,20 +155,19 @@ export default function LaboratorioPage() {
     release()
   }
 
-  const loft = TEMPLATE_DEFINITIONS.find((definition) => definition.id === 'loft')
+  // Solo fuera de producción (o con NEXT_PUBLIC_E2E=1): Next reemplaza estos dos valores al compilar si se escriben tal cual.
+  const loft = showEditorPathTool({ nodeEnv: process.env.NODE_ENV, e2e: process.env.NEXT_PUBLIC_E2E })
+    ? TEMPLATE_DEFINITIONS.find((definition) => definition.id === 'loft')
+    : undefined
 
-  if (loading || !session) return <LoaderPortal label="Abriendo el laboratorio" />
+  if (loading || !session) return <LoaderPortal label="Abriendo la escena desde una foto" />
 
   return (
     <AppShell>
       <div className={FRAME}>
-        <AppHeader current="laboratorio" email={session.user.email} name={savedName(session.user)} onSignOut={signOut} signingOut={signingOut} />
+        <AppHeader current="escena-desde-foto" email={session.user.email} name={savedName(session.user)} onSignOut={signOut} signingOut={signingOut} />
 
         <div className="flex flex-col gap-2 pt-3">
-          <span className="chip glass w-fit text-ink-muted">
-            <FlaskConical aria-hidden size={14} />
-            Laboratorio de Victoria
-          </span>
           <h1 className="m-0 font-display text-[clamp(28px,3.6vw,44px)] font-bold leading-[1.05] tracking-[-0.035em]">Escena desde una foto</h1>
           <p className="m-0 max-w-[58ch] text-[15px] text-ink-muted">
             Sube la foto de un ambiente y te proponemos qué muebles del catálogo hay y dónde. Después la llevas a un proyecto nuevo y sigues editando.

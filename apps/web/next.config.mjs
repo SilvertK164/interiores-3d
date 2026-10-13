@@ -12,6 +12,10 @@ const nextConfig = {
   async rewrites() {
     return { fallback: [{ source: '/material/:path*', destination: 'https://editor.pascal.app/material/:path*' }] }
   },
+  // «Escena desde una foto» antes se llamaba /laboratorio: los enlaces y los favoritos viejos siguen sirviendo.
+  async redirects() {
+    return [{ source: '/laboratorio', destination: '/escena-desde-foto', permanent: true }]
+  },
   // Cabeceras de seguridad (docs/seguridad-revision.md). Fuera de producción solo las inofensivas.
   async headers() {
     return [{ source: '/:path*', headers: buildSecurityHeaders(process.env, process.env.NODE_ENV === 'production') }]

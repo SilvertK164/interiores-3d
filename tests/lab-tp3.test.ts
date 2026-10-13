@@ -81,10 +81,10 @@ describe('startupNotes', () => {
     expect(startupNotes({ CORS_ORIGINS: 'http://localhost:3000' }).join('\n')).toMatch(/modelo.*TP3/i)
   })
 
-  it('cuenta dónde mirar: la pantalla original de TP3 para comparar y nuestro laboratorio', () => {
+  it('cuenta dónde mirar: la pantalla original de TP3 para comparar y nuestra «Escena desde una foto»', () => {
     const notes = startupNotes({ CORS_ORIGINS: 'http://localhost:3000' }).join('\n')
     expect(notes).toContain('http://localhost:8000')
-    expect(notes).toContain('http://localhost:3000/laboratorio')
+    expect(notes).toContain('http://localhost:3000/escena-desde-foto')
   })
 })
 

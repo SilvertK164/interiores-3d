@@ -205,10 +205,10 @@ test.describe('volver a donde ibas', () => {
 
   test('/login?motivo=sesion avisa que la sesión venció y, al ingresar, se vuelve a next', async ({ page }) => {
     const account = await createAccount()
-    await gotoLogin(page, `?motivo=sesion&next=${encodeURIComponent('/laboratorio')}`)
+    await gotoLogin(page, `?motivo=sesion&next=${encodeURIComponent('/escena-desde-foto')}`)
     await expect(page.getByRole('status').filter({ hasText: SESSION_NOTICE })).toBeVisible()
     await submitLogin(page, account)
-    await page.waitForURL('**/laboratorio')
+    await page.waitForURL('**/escena-desde-foto')
   })
 
   test('si la API responde 401, se manda a ingresar con el aviso y después se vuelve a la lista', async ({ page }) => {

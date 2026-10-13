@@ -1,7 +1,7 @@
 import { MIN_CONFIDENCE } from './analysis-to-cluster'
 import type { DetectedFurniture, RoomAnalysis } from './schema'
 
-/** Lo que dice la página /laboratorio de un análisis: funciones puras, para probarlas sin navegador. */
+/** Lo que dice y muestra la página /escena-desde-foto de un análisis: funciones puras, para probarlas sin navegador. */
 
 const METERS = new Intl.NumberFormat('es', { maximumFractionDigits: 2 })
 
@@ -31,3 +31,9 @@ export function calibrationText(calibration: RoomAnalysis['calibration']): strin
     ? `Ancho conocido: ${METERS.format(calibration.width_m)} m.`
     : 'Sin ancho conocido: las medidas son proporciones del ambiente.'
 }
+
+/**
+ * ¿Se muestra «Comprobar que el camino al editor funciona»? Es una herramienta de desarrollo (abre el Loft sin pasar por el análisis):
+ * en producción no se ve, salvo con `NEXT_PUBLIC_E2E=1`, que es como corren las pruebas en navegador (`next.config.mjs`, `ProjectEditor`).
+ */
+export const showEditorPathTool = ({ nodeEnv, e2e }: { nodeEnv?: string; e2e?: string }): boolean => nodeEnv !== 'production' || e2e === '1'

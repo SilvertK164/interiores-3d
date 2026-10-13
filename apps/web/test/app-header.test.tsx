@@ -8,20 +8,20 @@ const textOf = (markup: string) => markup.replace(/<[^>]+>/g, '')
 describe('AppHeader en /proyectos (con buscador y «Nuevo proyecto»)', () => {
   const markup = renderToStaticMarkup(<AppHeader {...base} onNew={() => {}} onQuery={() => {}} query="" />)
 
-  it('trae el buscador, el botón de nuevo proyecto y el enlace al laboratorio', () => {
+  it('trae el buscador, el botón de nuevo proyecto y el enlace a «Escena desde una foto»', () => {
     expect(markup).toContain('aria-label="Buscar proyectos y plantillas"')
     expect(textOf(markup)).toContain('Nuevo proyecto')
-    expect(markup).toMatch(/<a[^>]*href="\/laboratorio"/)
+    expect(markup).toMatch(/<a[^>]*href="\/escena-desde-foto"/)
   })
 
-  it('no ofrece «Mis proyectos» (ya está en esa página) y el laboratorio no está marcado como actual', () => {
+  it('no ofrece «Mis proyectos» (ya está en esa página) y la escena desde una foto no está marcada como actual', () => {
     expect(markup).not.toContain('aria-label="Mis proyectos"')
     expect(markup).not.toContain('aria-current')
   })
 })
 
-describe('AppHeader en /laboratorio (sin buscador ni «Nuevo proyecto»)', () => {
-  const markup = renderToStaticMarkup(<AppHeader {...base} current="laboratorio" />)
+describe('AppHeader en /escena-desde-foto (sin buscador ni «Nuevo proyecto»)', () => {
+  const markup = renderToStaticMarkup(<AppHeader {...base} current="escena-desde-foto" />)
 
   it('no muestra un buscador que no filtraría nada ni el botón de nuevo proyecto', () => {
     expect(markup).not.toContain('type="search"')
@@ -32,8 +32,14 @@ describe('AppHeader en /laboratorio (sin buscador ni «Nuevo proyecto»)', () =>
     expect(markup).toMatch(/<a[^>]*aria-label="Mis proyectos"[^>]*href="\/proyectos"|<a[^>]*href="\/proyectos"[^>]*aria-label="Mis proyectos"/)
   })
 
-  it('marca el laboratorio como la página actual', () => {
-    expect(markup).toMatch(/<a[^>]*aria-current="page"[^>]*href="\/laboratorio"|<a[^>]*href="\/laboratorio"[^>]*aria-current="page"/)
+  it('marca «Escena desde una foto» como la página actual, con su nombre y su título', () => {
+    expect(markup).toMatch(/<a[^>]*aria-current="page"[^>]*href="\/escena-desde-foto"|<a[^>]*href="\/escena-desde-foto"[^>]*aria-current="page"/)
+    expect(markup).toContain('aria-label="Escena desde una foto"')
+    expect(markup).toContain('title="Escena desde una foto"')
+  })
+
+  it('no dice «Laboratorio» en ninguna parte', () => {
+    expect(markup).not.toMatch(/laboratorio/i)
   })
 
   it('conserva el avatar con las iniciales y el botón de salir, y los íconos son decorativos', () => {
@@ -43,7 +49,7 @@ describe('AppHeader en /laboratorio (sin buscador ni «Nuevo proyecto»)', () =>
   })
 
   it('mientras sale, el botón de salir queda ocupado y deshabilitado', () => {
-    const leaving = renderToStaticMarkup(<AppHeader {...base} current="laboratorio" signingOut />)
+    const leaving = renderToStaticMarkup(<AppHeader {...base} current="escena-desde-foto" signingOut />)
     expect(leaving).toMatch(/<button[^>]*aria-busy="true"[^>]*disabled=""|<button[^>]*disabled=""[^>]*aria-busy="true"/)
   })
 })
