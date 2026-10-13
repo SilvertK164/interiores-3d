@@ -101,6 +101,8 @@ export function createE2eHooks(options: E2eOptions = {}) {
     },
     deleteNode: (id: string) => useScene.getState().deleteNode(id as never),
     cameraPose: () => pose,
+    /** El campo de visión vertical real de la cámara 3D, en grados (lo que fija `apply-pose`): la pose que publica Pascal siempre dice 50. */
+    cameraFov: () => (globalThis as { __pascalCameraControls?: () => { camera?: { fov?: number } } | null }).__pascalCameraControls?.()?.camera?.fov ?? null,
     /** Copia de todos los nodos de un tipo. */
     nodesOf: (type: string) => nodes().filter((n) => n.type === type).map((n) => JSON.parse(JSON.stringify(n)) as Record<string, unknown>),
     /** Los ojos del recorrido: posición (mundo y de la planta `levelId`), giro y los textos de planta y ambiente que muestra Pascal. */

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { footprint } from '../src/lib/templates/geometry'
-import { ANALYZE_URL, analyzePhoto, answerWith } from './support/analysis'
+import { ANALYZE_URL, FOUR_PIECES_ANALYSIS, analyzePhoto, answerWith } from './support/analysis'
 import { counts, ready } from './support/editor'
 import { hook } from './support/hooks'
 import { PROJECT_URL } from './support/projects'
@@ -11,24 +11,12 @@ import { viewButton } from './support/shell'
 // para mirarlas; lo que se comprueba aquí son las reglas (cuántos nodos hay y que cada pieza queda dentro y apoyada), no los píxeles.
 const SHOTS = 'test-results/escena-desde-foto'
 
-// La biblioteca (contra el este) y el mueble de TV (contra el norte) van pegados a los muros: donde más fácil sería cruzarlos.
-const ANALYSIS = {
-  furniture: [
-    { asset_id: 'sofa', x: 0.5, y: 0.82, width: 0.5, depth: 0.3, rotation_deg: 180, confidence: 0.92 },
-    { asset_id: 'coffee-table', x: 0.5, y: 0.55, width: 0.4, depth: 0.25, rotation_deg: 0, confidence: 0.88 },
-    { asset_id: 'tv-stand', x: 0.5, y: 0.03, width: 0.4, depth: 0.1, rotation_deg: 0, confidence: 0.9 },
-    { asset_id: 'bookshelf', x: 0.99, y: 0.45, width: 0.25, depth: 0.08, rotation_deg: 90, confidence: 0.81 },
-  ],
-  warnings: [],
-  calibration: { status: 'uncalibrated', width_m: null },
-}
-
 type ItemNode = { asset: { id: string; dimensions: [number, number, number] }; position: [number, number, number]; rotation: [number, number, number] }
 
 test('abrir en el editor genera el ambiente con muros, piso y las cuatro piezas dentro, y se ve en 3D', async ({ page }) => {
   test.setTimeout(180_000)
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.route(ANALYZE_URL, answerWith(ANALYSIS))
+  await page.route(ANALYZE_URL, answerWith(FOUR_PIECES_ANALYSIS))
   await analyzePhoto(page)
   await page.getByRole('button', { name: 'Abrir en el editor' }).click()
   await page.waitForURL(PROJECT_URL, { timeout: 90_000 })

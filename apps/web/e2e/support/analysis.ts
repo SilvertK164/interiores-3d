@@ -64,6 +64,21 @@ export async function analyzePhoto(page: Page, width = '') {
   await page.getByRole('button', { name: 'Analizar foto' }).click()
 }
 
+/**
+ * Una respuesta del análisis con cuatro piezas del catálogo (para las pruebas en 3D): el sofá y la mesa en el centro, el mueble de TV
+ * contra el muro del fondo y la biblioteca contra el este (pegados a los muros, donde más fácil sería cruzarlos). El sofá, de espaldas a quien mira.
+ */
+export const FOUR_PIECES_ANALYSIS = {
+  furniture: [
+    { asset_id: 'sofa', x: 0.5, y: 0.82, width: 0.5, depth: 0.3, rotation_deg: 180, confidence: 0.92 },
+    { asset_id: 'coffee-table', x: 0.5, y: 0.55, width: 0.4, depth: 0.25, rotation_deg: 0, confidence: 0.88 },
+    { asset_id: 'tv-stand', x: 0.5, y: 0.03, width: 0.4, depth: 0.1, rotation_deg: 0, confidence: 0.9 },
+    { asset_id: 'bookshelf', x: 0.99, y: 0.45, width: 0.25, depth: 0.08, rotation_deg: 90, confidence: 0.81 },
+  ],
+  warnings: [],
+  calibration: { status: 'uncalibrated', width_m: null },
+}
+
 export const answerWith = (analysis: unknown) => (route: Route) =>
   route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: JSON.stringify(analysis) })
 
