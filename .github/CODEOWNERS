@@ -1,9 +1,8 @@
 # Quién revisa cada parte. GitHub pide la revisión de la persona dueña de lo que cambia el PR.
-# Lo último que coincide gana, así que el laboratorio de Victoria va después de la regla general.
+# Lo último que coincide gana, así que lo de Victoria va después de la regla general.
 * @SilvertK164
 
-# Laboratorio de Victoria: modelado a partir de fotos con Pascal
-/lab/ @vivillalbatevez
+# Escena desde una foto: modelado a partir de fotos con Pascal
 /apps/web/src/lib/lab/ @vivillalbatevez
 /apps/web/app/escena-desde-foto/ @vivillalbatevez
 /apps/web/e2e/escena-desde-foto.spec.ts @vivillalbatevez

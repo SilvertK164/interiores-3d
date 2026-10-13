@@ -9,7 +9,7 @@ import type { RoomAnalysis, WallSide } from './schema'
  * Del plano de una foto al proyecto: el ambiente del tamaño que estimó Gemini (un solo nivel, rectangular, con sus cuatro muros, un piso de
  * madera clara y el cielo), las puertas y ventanas en los muros que dijo y los muebles en sus posiciones, con su giro y su altura. Es lo
  * que usa «Escena desde una foto» para abrir el editor: `openDefinitionAsProject` (`src/editor/lab-scene.ts`) la dibuja con `buildScene`,
- * como a cualquier plantilla. Es pura (sin Pascal ni DOM) y tiene su guía de ideas para mejorarla en `lab/README.md`.
+ * como a cualquier plantilla. Es pura (sin Pascal ni DOM) y tiene sus reglas fijadas en `test/lab-analysis-to-definition.test.ts`.
  *
  * El plano pasa antes por el acomodador (`solveLayout`, `layout-solver.ts`), que lo corrige: nada fuera del ambiente ni solapado, lo que va
  * contra un muro mira hacia adentro, los asientos miran a su foco y lo apoyado sube a la altura real de su soporte. Todo lo que mueve o deja
