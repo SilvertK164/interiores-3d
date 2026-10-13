@@ -102,13 +102,28 @@ El script nunca imprime la clave. `VISION_MODEL` (opcional) cambia el modelo; po
 
 **Sin clave** no hay problema para explorar: el análisis responde 503 con un mensaje claro y el botón **«Probar con un ejemplo (sin servicio)»** usa un análisis fijo (siete piezas, una de confianza baja y un aviso), sin servicio, sin clave y sin cuota.
 
+## El contrato con TP3 (el editor y TP3 se actualizan juntos)
+
+TP3 ya no devuelve siete tipos fijos: **elige piezas del catálogo local de Pascal**. El navegador le manda la lista de opciones y TP3 solo puede contestar con ids de esa lista. Frontend y backend dependen uno del otro: **un cambio del contrato se hace en los dos repositorios a la vez** (si el editor es nuevo y TP3 viejo, la página lo avisa: «Ese servicio de TP3 es de una versión anterior»; la guía de TP3 está en su `INTEGRACION-CATALOGO-PASCAL.md`).
+
+| Campo del pedido (`multipart/form-data`) | Contenido |
+|---|---|
+| `image` | La foto: JPG, PNG o WebP de hasta 8 MB |
+| `known_width_m` | Ancho conocido en metros (opcional, mayor que 0 y hasta 100) |
+| `catalog_json` | Lista JSON de 1 a 100 opciones, de hasta 64 KB y con ids únicos: `{ "id", "name", "category", "tags" }` (hasta 10 etiquetas de 40 caracteres) y nada más. **Sin rutas, `src` ni medidas** |
+
+La respuesta trae `furniture[]` con `asset_id` (un id de la lista enviada), `x`, `y`, `width`, `depth` (proporciones del ambiente, de 0 a 1), `rotation_deg` (horario visto desde arriba, de −360 a 360) y `confidence`; además `warnings` y `calibration`. Los errores `422 invalid_catalog` (la lista no cumple los límites) y los de siempre se traducen en una sola capa, `analyze-room.ts`.
+
+Quién arma qué: `apps/web/src/lib/lab/analysis-catalog.ts` (`buildAnalysisCatalog`, código puro) elige entre las piezas locales las que una persona reconoce en una foto (mobiliario y decoración que se apoyan en el piso: nada de instalaciones, piezas de pared o techo ni lo que va sobre una mesa) y escribe el nombre en castellano con las tablas de `catalog-es`. La página del laboratorio y «Muebles desde una foto» del editor usan **la misma lista**. Si Pascal suma una pieza, no es candidata hasta agregarla a `RECOGNIZABLE` en ese archivo. El tamaño de cada pieza es **siempre el real del catálogo**: el `width` y `depth` de Gemini no se usan.
+
 ## Qué hay listo y qué puedes explorar
 
 ### Ya está armado
 
 | Pieza | Dónde | Para qué |
 |---|---|---|
-| Cliente de TP3 | `apps/web/src/lib/lab/analyze-room.ts`, `schema.ts` | Envía la foto, valida la respuesta y traduce cada error a castellano llano |
+| Catálogo para el análisis | `apps/web/src/lib/lab/analysis-catalog.ts` | Las piezas candidatas (`catalog_json`) y el mapa id → pieza local |
+| Cliente de TP3 | `apps/web/src/lib/lab/analyze-room.ts`, `schema.ts` | Envía la foto y el catálogo, valida la respuesta y traduce cada error a castellano llano |
 | Página del laboratorio | `apps/web/app/laboratorio/` | Foto + ancho conocido + dirección de TP3; avisos, tabla de piezas y JSON crudo |
 | Análisis de ejemplo | `apps/web/src/lib/lab/sample-analysis.ts` | El mismo que usan el botón de ejemplo y las pruebas |
 | Camino al editor | `apps/web/src/editor/lab-scene.ts` | Cualquier definición válida → escena de Pascal → proyecto guardado → editor |
@@ -119,9 +134,9 @@ El camino al editor se puede comprobar sin análisis: en la página, el desplega
 
 ### Por dónde empezar
 
-El lugar en blanco es **`analysisToDefinition`** (`apps/web/src/lib/lab/analysis-to-definition.ts`): recibe el análisis de TP3 y puede devolver la definición de un ambiente que el editor sabe dibujar. Qué medidas tiene ese ambiente, qué pieza de Pascal representa cada tipo y qué hacer con lo dudoso son decisiones abiertas para explorar a tu ritmo.
+El lugar en blanco es **`analysisToDefinition`** (`apps/web/src/lib/lab/analysis-to-definition.ts`): recibe el análisis de TP3 y puede devolver la definición de un ambiente que el editor sabe dibujar. Qué medidas tiene ese ambiente, cómo se usan las piezas que TP3 eligió (cada `asset_id` ya es el id de una pieza del catálogo de Pascal, la que usan las definiciones en `asset`) y qué hacer con lo dudoso son decisiones abiertas para explorar a tu ritmo.
 
-Mientras está en blanco, «Abrir en el editor» y «Probar con un ejemplo» muestran un aviso amable. Una idea es empezar por lo más chico (un ambiente con una sola pieza), mirarlo en el editor con el botón de ejemplo y recién después sumar tipos. Si la definición tiene algún problema, el mensaje del validador aparece en pantalla, en castellano.
+Mientras está en blanco, «Abrir en el editor» y «Probar con un ejemplo» muestran un aviso amable. Una idea es empezar por lo más chico (un ambiente con una sola pieza), mirarlo en el editor con el botón de ejemplo y recién después sumar piezas. Si la definición tiene algún problema, el mensaje del validador aparece en pantalla, en castellano.
 
 Dónde mirar:
 
@@ -174,7 +189,7 @@ Están como `it.todo` en `apps/web/test/lab-analysis-to-definition.test.ts`; cad
 - las piezas podrían quedar siempre dentro del ambiente, incluso las que TP3 ubica en el borde;
 - la rotación podría respetar el sentido horario de TP3 (visto desde arriba);
 - el resultado podría pasar `validateDefinition` con las piezas y los materiales reales de Pascal;
-- los tipos desconocidos podrían avisarse (con `opts.warn`) sin romper el resto del análisis;
+- un `asset_id` que no esté en el catálogo local podría avisarse (con `opts.warn`) sin romper el resto del análisis;
 - el análisis de ejemplo podría convertirse en una escena que `buildLabEnvelope` dibuje sin errores;
 - un análisis sin muebles podría producir un ambiente vacío pero válido;
 - las piezas de confianza baja podrían tener un tratamiento explícito y comentado.
@@ -200,14 +215,14 @@ Ocho casos para conocer cómo responde TP3 y qué muestra el laboratorio. Cada u
 
 | # | Caso | Cómo probarlo | Resultado esperado |
 |---|---|---|---|
-| 1 | Foto clara | Una foto nítida de un ambiente con algunos de los siete tipos de mueble (JPG, PNG o WebP de menos de 8 MB) | Responde 200: la tabla lista las piezas con su confianza y el JSON crudo coincide con la tabla. Los avisos pueden venir vacíos |
+| 1 | Foto clara | Una foto nítida de un ambiente con algunos de los muebles del catálogo (sofás, mesas, camas, plantas...; JPG, PNG o WebP de menos de 8 MB) | Responde 200: la tabla lista las piezas con su confianza y el JSON crudo coincide con la tabla. Los avisos pueden venir vacíos |
 | 2 | Foto con oclusión | Una foto donde un mueble queda tapado por otro (o por una persona o un objeto) | Los avisos del servicio mencionan la oclusión y la confianza de esa pieza baja; no aparecen muebles inventados detrás |
 | 3 | Sin clave | Levantar TP3 sin `GEMINI_API_KEY` y pulsar «Analizar foto» | Mensaje en castellano «no tiene la clave de Gemini» con el aviso de que el ejemplo sigue funcionando; no aparece resultado |
 | 4 | Archivo enorme | Un JPG o PNG válido de más de 8 MB | Mensaje «La foto supera el tamaño máximo que acepta TP3» (error 413 del servicio) |
 | 5 | Formato inválido | Un GIF, PDF o TXT (en el selector de archivos, elegir «Todos los archivos») | Mensaje «TP3 no aceptó el formato de la foto» (error 400) |
 | 6 | Ancho conocido | Repetir el caso 1 escribiendo 4,5 en el ancho; después probar con 0 y con 101 | Con 4,5 el resultado dice «Ancho conocido: 4,5 m» (`calibration.status = user_provided`). Con 0 o 101 la página avisa el rango válido (0 a 100 m) antes de enviar. Sin ancho: «Sin ancho conocido» |
 | 7 | Baja confianza | Una foto oscura, borrosa o tomada desde lejos | Piezas con confianza baja en la tabla y avisos del servicio; sirve para ver qué hacer con lo dudoso |
-| 8 | Objetos fuera de los siete tipos | Una foto con lámparas, alfombras o cuadros además de muebles | No aparecen en la tabla; los avisos suelen mencionarlos como elementos sin clasificar. Si el proveedor devolviera un tipo fuera de la lista, TP3 responde 502 y se muestra «el análisis falló o la respuesta no sirvió» |
+| 8 | Objetos que no están en el catálogo | Una foto con cuadros, lámparas de mesa o electrodomésticos chicos además de muebles | No aparecen en la tabla; los avisos suelen mencionarlos como elementos sin clasificar. Si el proveedor devolviera un `asset_id` fuera de la lista enviada, TP3 responde 502 y se muestra «el análisis falló o la respuesta no sirvió» |
 
 ## Cómo registrar resultados
 
@@ -219,7 +234,7 @@ Ocho casos para conocer cómo responde TP3 y qué muestra el laboratorio. Cada u
 ## Límites conocidos
 
 - **Las medidas son estimadas.** TP3 devuelve proporciones del ambiente visible, no metros; con el ancho conocido solo se calibra esa referencia.
-- **Siete tipos:** sofá, mesa, silla, estante, cama, planta y televisor. Lo demás se ignora y a veces se menciona en los avisos.
+- **Solo las piezas del catálogo que se reconocen en una foto** (unas 40: sofás, sillones, mesas, camas, armarios, plantas, alfombras, artefactos de cocina y baño; la lista está en `analysis-catalog.ts`). Lo demás se ignora y a veces se menciona en los avisos. El estante paramétrico (`param:bookshelf`) no es candidato todavía: «Muebles desde una foto» solo crea piezas del catálogo.
 - **No es un modelo 3D real de la foto.** Es una propuesta cenital aproximada: posiciones, tamaños y giros de piezas, sin geometría de la escena.
 - **No ve lo que no se ve:** una pieza tapada puede faltar o venir con poca confianza.
 - **Depende de Gemini:** el nivel gratuito tiene cuotas que pueden cambiar y el modelo por defecto puede dejar de existir (se cambia con `VISION_MODEL`).

@@ -57,7 +57,8 @@ test.describe('laboratorio', () => {
 
     const table = page.getByRole('table', { name: 'Piezas detectadas' })
     await expect(table.getByRole('row')).toHaveCount(SAMPLE_ANALYSIS.furniture.length + 1) // + la fila de títulos
-    for (const label of ['Sofá', 'Mesa', 'Silla', 'Estante', 'Cama', 'Planta', 'Televisor']) {
+    // El nombre sale del catálogo que se le envió a TP3 (las tablas en castellano), no del id que devuelve.
+    for (const label of ['Sofá', 'Mesa de centro', 'Silla de comedor', 'Biblioteca', 'Cama doble', 'Planta de interior', 'Televisor']) {
       await expect(table.getByRole('rowheader', { name: label })).toBeVisible()
     }
     await expect(table.getByRole('cell', { name: '20 %', exact: true })).toBeVisible() // la confianza baja del ejemplo
@@ -66,6 +67,18 @@ test.describe('laboratorio', () => {
 
     expect(sent).toContain('name="image"; filename="sala.png"')
     expect(sent).toMatch(/name="known_width_m"\r\n\r\n4\.5\r\n/) // la coma decimal viaja como punto
+    // El catálogo viaja en catalog_json: las piezas que TP3 puede elegir, sin rutas.
+    expect(sent).toContain('name="catalog_json"')
+    expect(sent).toContain('"id":"sofa"')
+    expect(sent).not.toMatch(/model\.glb|\/items\//)
+  })
+
+  test('si TP3 devuelve un id que el editor no tiene, la tabla lo muestra tal cual y lo aclara', async ({ page }) => {
+    const unknown = { ...SAMPLE_ANALYSIS, furniture: [{ ...SAMPLE_ANALYSIS.furniture[0], asset_id: 'lampara-rara' }] }
+    await page.route('**/api/analyze-room', answerWith(unknown))
+    await analyzePhoto(page)
+    const table = page.getByRole('table', { name: 'Piezas detectadas' })
+    await expect(table.getByRole('rowheader', { name: 'lampara-rara (no está en el catálogo)' })).toBeVisible()
   })
 
   test('recuerda la dirección del servicio de TP3 entre visitas', async ({ page }) => {

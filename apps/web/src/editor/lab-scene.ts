@@ -7,6 +7,7 @@ import {
   SceneEnvelopeSchema,
 } from '@interiores/contract'
 import type { ApiClient } from '../lib/api/client'
+import { type AnalysisCatalog, buildAnalysisCatalog } from '../lib/lab/analysis-catalog'
 import { LabError } from '../lib/lab/lab-error'
 import { type CreateFromTemplateResult, retrySaveTemplate } from '../lib/templates/create-from-template'
 import type { TemplateDefinition } from '../lib/templates/types'
@@ -44,6 +45,23 @@ function catalogAssets(): Promise<ReadonlyMap<string, AssetLike>> {
       throw error
     })
   return catalog
+}
+
+let analysis: Promise<AnalysisCatalog<AssetLike>> | undefined
+
+/**
+ * Lo que se le ofrece a TP3 al analizar una foto y con lo que se resuelve su respuesta: las piezas reconocibles del catálogo
+ * local (`buildAnalysisCatalog`). Es la misma lista que usa «Muebles desde una foto» en el editor; la página del laboratorio
+ * la pide acá para no importar Pascal.
+ */
+export function analysisCatalog(): Promise<AnalysisCatalog<AssetLike>> {
+  analysis ??= catalogAssets()
+    .then((assets) => buildAnalysisCatalog([...assets.values()]))
+    .catch((error) => {
+      analysis = undefined
+      throw error
+    })
+  return analysis
 }
 
 export type OpenDefinitionOptions = {

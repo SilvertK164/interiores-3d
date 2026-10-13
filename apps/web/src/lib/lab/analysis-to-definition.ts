@@ -6,7 +6,7 @@ import type { RoomAnalysis } from './schema'
 export type AnalysisToDefinitionOptions = {
   /** Ancho del ambiente en metros si la persona lo escribió en el formulario; `null` o ausente si no lo sabe. */
   knownWidthM?: number | null
-  /** Para contarle algo a la persona sobre lo modelado (por ejemplo, un tipo que no se pudo representar): la página lo muestra junto a los avisos de TP3. */
+  /** Para contarle algo a la persona sobre lo modelado (por ejemplo, una pieza que no se pudo representar): la página lo muestra junto a los avisos de TP3. */
   warn?: (message: string) => void
 }
 
@@ -15,7 +15,8 @@ export type AnalysisToDefinitionOptions = {
  * muros, aberturas y piezas que el editor sabe dibujar. Es el espacio de exploración del Laboratorio de Victoria.
  *
  * Qué entra y qué sale:
- *  - Entra el análisis de TP3 (forma en `schema.ts`; `SAMPLE_ANALYSIS` trae uno de ejemplo con los siete tipos).
+ *  - Entra el análisis de TP3 (forma en `schema.ts`; `SAMPLE_ANALYSIS` trae uno de ejemplo con siete piezas del catálogo: cada
+ *    `asset_id` es el id de una pieza de Pascal que el catálogo local de `analysis-catalog.ts` ofreció a TP3).
  *  - Sale una definición de plantilla (tipos en `src/lib/templates/types.ts`, ayudas en `geometry.ts` y ejemplos reales en
  *    `src/lib/templates/definitions/`). Con ella ya funciona el resto del camino: la página la convierte en escena con
  *    `buildLabEnvelope`, crea el proyecto, lo guarda y abre el editor. Si la definición tiene un problema, el mensaje del

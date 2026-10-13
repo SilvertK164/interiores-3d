@@ -1,13 +1,17 @@
-import { type DetectedFurniture, furnitureLabel } from '@/lib/lab/schema'
+import { type AnalysisCandidate, pieceLabel } from '@/lib/lab/analysis-catalog'
+import type { DetectedFurniture } from '@/lib/lab/schema'
 
 const percent = (value: number) => `${Math.round(value * 100)} %`
 
-/** Las piezas que detectó TP3, tal cual las devuelve (proporciones del ambiente), sin interpretarlas. */
-export function PiecesTable({ furniture }: { furniture: DetectedFurniture[] }) {
+/**
+ * Las piezas que detectó TP3, tal cual las devuelve (proporciones del ambiente), sin interpretarlas. El nombre sale del catálogo
+ * que se le envió (`candidates`); si TP3 devolviera un id que no está, se muestra tal cual y se aclara.
+ */
+export function PiecesTable({ furniture, candidates }: { furniture: DetectedFurniture[]; candidates: readonly AnalysisCandidate[] }) {
   if (furniture.length === 0) {
     return <p className="text-sm text-muted-foreground">TP3 no detectó ningún mueble en esta foto.</p>
   }
-  const rows = furniture.map((piece, index) => ({ piece, key: `${index}-${piece.type}` }))
+  const rows = furniture.map((piece, index) => ({ piece, key: `${index}-${piece.asset_id}` }))
   return (
     <div className="overflow-x-auto rounded-xl bg-secondary">
       <table className="w-full text-left text-sm">
@@ -24,7 +28,7 @@ export function PiecesTable({ furniture }: { furniture: DetectedFurniture[] }) {
         <tbody>
           {rows.map(({ piece, key }) => (
             <tr key={key}>
-              <th className="px-3 py-2 font-medium" scope="row">{furnitureLabel(piece.type)}</th>
+              <th className="px-3 py-2 font-medium" scope="row">{pieceLabel(piece.asset_id, candidates)}</th>
               <td className="px-3 py-2">{percent(piece.confidence)}</td>
               <td className="px-3 py-2">{percent(piece.x)} del ancho · {percent(piece.y)} del fondo</td>
               <td className="px-3 py-2">{percent(piece.width)} × {percent(piece.depth)}</td>

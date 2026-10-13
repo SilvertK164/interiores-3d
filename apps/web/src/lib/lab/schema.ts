@@ -1,33 +1,17 @@
 import { z } from 'zod'
 
-/** Los siete tipos de mueble que el servicio de TP3 sabe devolver (`FurnitureType` de su `main.py`). */
-export const FURNITURE_TYPES = ['sofa', 'mesa', 'silla', 'estante', 'cama', 'planta', 'tv'] as const
-export type FurnitureType = (typeof FURNITURE_TYPES)[number]
-
-const LABELS: Record<FurnitureType, string> = {
-  sofa: 'Sofá',
-  mesa: 'Mesa',
-  silla: 'Silla',
-  estante: 'Estante',
-  cama: 'Cama',
-  planta: 'Planta',
-  tv: 'Televisor',
-}
-
-export const isFurnitureType = (value: string): value is FurnitureType => (FURNITURE_TYPES as readonly string[]).includes(value)
-
-/** Nombre en castellano para mostrar en pantalla; un tipo fuera de los siete se muestra tal cual, avisando que no lo es. */
-export const furnitureLabel = (type: string): string => (isFurnitureType(type) ? LABELS[type] : `${type} (tipo desconocido)`)
-
 const proportion = z.number().min(0).max(1)
 
 /**
- * Un mueble detectado. `x` e `y` son el centro como proporción del ancho y del fondo del ambiente; `width` y `depth`, su tamaño
- * con la misma proporción; `rotation_deg` gira en sentido horario visto desde arriba. Los rangos son los que TP3 garantiza.
- * `type` es texto libre a propósito: un tipo nuevo o inesperado no debe invalidar toda la respuesta.
+ * Un mueble detectado. `asset_id` es el id de UNA de las piezas del catálogo que se le enviaron a TP3 en `catalog_json`
+ * (`analysis-catalog.ts`); `x` e `y` son el centro como proporción del ancho y del fondo del ambiente; `width` y `depth`, su
+ * tamaño con la misma proporción (una estimación de Gemini: el tamaño real sale siempre del catálogo); `rotation_deg` gira en
+ * sentido horario visto desde arriba. Los rangos son los que TP3 garantiza.
+ * `asset_id` es texto libre a propósito: TP3 ya comprobó que esté en la lista, pero un id que este editor no conozca no debe
+ * invalidar toda la respuesta; quien lo use lo resuelve contra el catálogo local y avisa si no está.
  */
 export const DetectedFurnitureSchema = z.object({
-  type: z.string(),
+  asset_id: z.string().min(1).max(100),
   x: proportion,
   y: proportion,
   width: z.number().gt(0).max(1),

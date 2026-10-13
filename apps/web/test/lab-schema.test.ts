@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { buildAnalysisCatalog } from '../src/lib/lab/analysis-catalog'
 import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
-import { FURNITURE_TYPES, RoomAnalysisSchema, furnitureLabel, isFurnitureType } from '../src/lib/lab/schema'
+import { RoomAnalysisSchema } from '../src/lib/lab/schema'
+import { availableAssets } from './support/asset-ids'
 
-const piece = { type: 'sofa', x: 0.5, y: 0.6, width: 0.3, depth: 0.12, rotation_deg: 0, confidence: 0.8 }
+const piece = { asset_id: 'sofa', x: 0.5, y: 0.6, width: 0.3, depth: 0.12, rotation_deg: 0, confidence: 0.8 }
 const response = { furniture: [piece], warnings: ['oclusión parcial'], calibration: { status: 'uncalibrated', width_m: null } }
 
 describe('RoomAnalysisSchema (la respuesta de TP3)', () => {
@@ -26,7 +28,11 @@ describe('RoomAnalysisSchema (la respuesta de TP3)', () => {
     ['un fondo mayor que 1', { ...piece, depth: 1.2 }],
     ['un giro de más de 360 grados', { ...piece, rotation_deg: 400 }],
     ['una confianza mayor que 1', { ...piece, confidence: 1.4 }],
-    ['una pieza sin tipo', { ...piece, type: undefined }],
+    ['una pieza sin asset_id', { ...piece, asset_id: undefined }],
+    ['un asset_id vacío', { ...piece, asset_id: '' }],
+    ['un asset_id de más de 100 caracteres', { ...piece, asset_id: 'a'.repeat(101) }],
+    ['un asset_id que no es texto', { ...piece, asset_id: 7 }],
+    ['el formato anterior de TP3 (type en lugar de asset_id)', { ...piece, asset_id: undefined, type: 'sofa' }],
   ])('rechaza %s', (_name, bad) => {
     expect(RoomAnalysisSchema.safeParse({ ...response, furniture: [bad] }).success).toBe(false)
   })
@@ -40,9 +46,9 @@ describe('RoomAnalysisSchema (la respuesta de TP3)', () => {
     expect(RoomAnalysisSchema.safeParse(bad).success).toBe(false)
   })
 
-  it('deja pasar un tipo que no conoce: qué hacer con él es cosa del modelado, no del esquema', () => {
-    const parsed = RoomAnalysisSchema.parse({ ...response, furniture: [{ ...piece, type: 'lampara' }] })
-    expect(parsed.furniture[0]?.type).toBe('lampara')
+  it('deja pasar un asset_id que no conoce: resolverlo contra el catálogo (y avisar si no está) es cosa de quien lo usa, no del esquema', () => {
+    const parsed = RoomAnalysisSchema.parse({ ...response, furniture: [{ ...piece, asset_id: 'lampara-rara' }] })
+    expect(parsed.furniture[0]?.asset_id).toBe('lampara-rara')
   })
 
   it('descarta los campos que no conoce', () => {
@@ -52,29 +58,17 @@ describe('RoomAnalysisSchema (la respuesta de TP3)', () => {
   })
 })
 
-describe('tipos de mueble de TP3', () => {
-  it('son siete y se reconocen', () => {
-    expect([...FURNITURE_TYPES]).toEqual(['sofa', 'mesa', 'silla', 'estante', 'cama', 'planta', 'tv'])
-    expect(isFurnitureType('cama')).toBe(true)
-    expect(isFurnitureType('lampara')).toBe(false)
-  })
-
-  it('tienen nombre en castellano para mostrar en pantalla', () => {
-    expect(FURNITURE_TYPES.map((t) => furnitureLabel(t))).toEqual(['Sofá', 'Mesa', 'Silla', 'Estante', 'Cama', 'Planta', 'Televisor'])
-  })
-
-  it('un tipo desconocido se muestra tal cual, aclarando que no es de los siete', () => {
-    expect(furnitureLabel('lampara')).toBe('lampara (tipo desconocido)')
-  })
-})
-
 describe('SAMPLE_ANALYSIS (el análisis de ejemplo)', () => {
+  const { pieces } = buildAnalysisCatalog(availableAssets().map((a) => ({ id: a.id, name: a.name })))
+
   it('cumple el esquema de TP3', () => {
     expect(RoomAnalysisSchema.safeParse(SAMPLE_ANALYSIS).success).toBe(true)
   })
 
-  it('trae una pieza de cada uno de los siete tipos', () => {
-    expect(SAMPLE_ANALYSIS.furniture.map((f) => f.type).sort()).toEqual([...FURNITURE_TYPES].sort())
+  it('trae siete piezas distintas, todas del catálogo que se le ofrece a TP3 (ninguna inventada)', () => {
+    const ids = SAMPLE_ANALYSIS.furniture.map((f) => f.asset_id)
+    expect(new Set(ids).size).toBe(7)
+    for (const id of ids) expect(pieces.has(id), id).toBe(true)
   })
 
   it('incluye una pieza de confianza baja y un aviso, para ver cómo se comporta cada caso', () => {

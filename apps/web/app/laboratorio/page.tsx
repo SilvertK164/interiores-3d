@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { LoaderPortal } from '@/components/LoaderPortal'
 import { api } from '@/lib/api/instance'
+import type { AnalysisCandidate } from '@/lib/lab/analysis-catalog'
 import { analysisToDefinition } from '@/lib/lab/analysis-to-definition'
 import { analyzeRoom } from '@/lib/lab/analyze-room'
 import { describeLabError } from '@/lib/lab/describe-error'
@@ -44,6 +45,8 @@ export default function LaboratorioPage() {
   const [widthText, setWidthText] = useState('')
   const [serviceUrl, setServiceUrl] = useState(DEFAULT_URL)
   const [analysis, setAnalysis] = useState<RoomAnalysis | null>(null)
+  // Las piezas del catálogo que se le ofrecieron a TP3: con ellas se escriben los nombres de la tabla.
+  const [candidates, setCandidates] = useState<AnalysisCandidate[]>([])
   const [fromExample, setFromExample] = useState(false)
   const [modelWarnings, setModelWarnings] = useState<string[]>([])
   const [notice, setNotice] = useState<Notice | null>(null)
@@ -74,6 +77,14 @@ export default function LaboratorioPage() {
     setBusy(null)
   }
 
+  /** Las piezas del catálogo local que se le ofrecen a TP3. Pascal se carga recién aquí (o al abrir el editor), nunca antes. */
+  async function loadCandidates(): Promise<AnalysisCandidate[]> {
+    const { analysisCatalog } = await import('@/editor/lab-scene')
+    const { candidates: loaded } = await analysisCatalog()
+    setCandidates(loaded)
+    return loaded
+  }
+
   async function analyze(e: FormEvent) {
     e.preventDefault()
     if (lock.current) return
@@ -83,7 +94,7 @@ export default function LaboratorioPage() {
       const baseUrl = normalizeServiceUrl(serviceUrl)
       const knownWidthM = parseKnownWidth(widthText)
       saveServiceUrl(baseUrl)
-      setAnalysis(await analyzeRoom(file, { baseUrl, knownWidthM }))
+      setAnalysis(await analyzeRoom(file, { baseUrl, knownWidthM, catalog: await loadCandidates() }))
       setFromExample(false)
       setModelWarnings([])
     } catch (error) {
@@ -122,8 +133,15 @@ export default function LaboratorioPage() {
   const modelAnalysis = (current: RoomAnalysis) => (warn: (message: string) => void) =>
     analysisToDefinition(current, { knownWidthM: parseKnownWidth(widthText), warn })
 
-  function tryExample() {
-    if (lock.current) return
+  async function tryExample() {
+    if (!start('analizando')) return
+    try {
+      await loadCandidates()
+    } catch (error) {
+      return setNotice(noticeFor(error))
+    } finally {
+      release()
+    }
     setAnalysis(SAMPLE_ANALYSIS)
     setFromExample(true)
     void openInEditor(modelAnalysis(SAMPLE_ANALYSIS))
@@ -186,7 +204,7 @@ export default function LaboratorioPage() {
             {busy === 'analizando' ? <LoaderCircle aria-hidden className="animate-spin" size={16} /> : <ScanSearch aria-hidden size={16} />}
             {busy === 'analizando' ? 'Analizando…' : 'Analizar foto'}
           </button>
-          <button className={SECONDARY} disabled={busy !== null} onClick={tryExample} type="button">
+          <button className={SECONDARY} disabled={busy !== null} onClick={() => void tryExample()} type="button">
             Probar con un ejemplo (sin servicio)
           </button>
         </div>
@@ -224,7 +242,7 @@ export default function LaboratorioPage() {
           </p>
           <WarningList title="Avisos del servicio" warnings={analysis.warnings} />
           <WarningList title="Avisos del modelado" warnings={modelWarnings} />
-          <PiecesTable furniture={analysis.furniture} />
+          <PiecesTable candidates={candidates} furniture={analysis.furniture} />
           <details className="rounded-xl bg-secondary px-4 py-3 text-sm" open>
             <summary className="cursor-pointer font-medium">JSON crudo</summary>
             <pre className="mt-2 max-h-72 overflow-auto text-xs" data-testid="raw-json">

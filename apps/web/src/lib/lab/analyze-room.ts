@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { type AnalysisCandidate, serializeCandidates } from './analysis-catalog'
 import { normalizeServiceUrl } from './form-helpers'
 import { LabError } from './lab-error'
 import { type RoomAnalysis, RoomAnalysisSchema } from './schema'
@@ -12,6 +13,11 @@ export type AnalyzeRoomOptions = {
   baseUrl: string
   /** Ancho conocido del ambiente en metros; si no se indica, TP3 responde sin calibrar. */
   knownWidthM?: number | null
+  /**
+   * Las piezas del catálogo que TP3 puede elegir (`buildAnalysisCatalog(...).candidates`). Viajan en `catalog_json` y TP3
+   * solo devuelve ids de esta lista: frontend y TP3 se actualizan juntos (lab/README.md).
+   */
+  catalog: readonly AnalysisCandidate[]
   fetchImpl?: typeof fetch
   timeoutMs?: number
 }
@@ -21,12 +27,17 @@ const TP3_MESSAGES: Record<string, string> = {
   invalid_file_type: 'TP3 no aceptó el formato de la foto: funciona con imágenes JPG, PNG o WebP.',
   file_too_large: 'La foto supera el tamaño máximo que acepta TP3 (8 MB por defecto). Puedes probar con una más liviana.',
   invalid_calibration: 'TP3 no aceptó el ancho conocido: acepta anchos entre 0 y 100 metros.',
+  invalid_catalog:
+    'TP3 no aceptó la lista de muebles del catálogo que le enviamos (tiene que ser de 1 a 100 opciones, de hasta 64 KB). Suele pasar cuando el editor y TP3 son de versiones que no se entienden: conviene actualizar los dos juntos, como explica lab/README.md.',
   image_unreadable: 'TP3 no pudo leer la foto: el archivo parece dañado o no es realmente una imagen del formato que indica su extensión.',
   provider_failure:
     'TP3 se conectó con Gemini, pero el análisis falló o la respuesta no sirvió. Suele resolverse esperando un momento y volviendo a intentar; si se repite, vale la pena revisar la clave y la cuota en Google AI Studio.',
   provider_not_configured:
     'El servicio de TP3 está corriendo, pero no tiene la clave de Gemini (GEMINI_API_KEY). Puedes configurarla como explica lab/README.md y reiniciar «pnpm lab:tp3». Mientras tanto, «Probar con un ejemplo (sin servicio)» sigue funcionando.',
 }
+
+/** TP3 sin catálogo (versión anterior) devuelve `type` con los siete tipos fijos en lugar de `asset_id`. */
+const LegacyAnalysisSchema = z.object({ furniture: z.array(z.object({ type: z.string() }).loose()).min(1) })
 
 const Tp3ErrorSchema = z.object({ error: z.object({ code: z.string() }) })
 
@@ -54,9 +65,16 @@ export async function analyzeRoom(file: Blob, opts: AnalyzeRoomOptions): Promise
   const doFetch = opts.fetchImpl ?? ((...args: Parameters<typeof fetch>) => fetch(...args))
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
 
+  if (opts.catalog.length === 0) {
+    throw new LabError(
+      'No hay piezas del catálogo para ofrecerle a TP3, así que no puede elegir ninguna. Conviene recargar la página y volver a intentar.',
+      'catalogo_vacio',
+    )
+  }
   const form = new FormData()
   form.append('image', file)
   if (opts.knownWidthM != null) form.append('known_width_m', String(opts.knownWidthM))
+  form.append('catalog_json', serializeCandidates(opts.catalog))
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
@@ -77,8 +95,15 @@ export async function analyzeRoom(file: Blob, opts: AnalyzeRoomOptions): Promise
           )
     }
     if (!response.ok) throw await failureOf(response, base)
-    const parsed = RoomAnalysisSchema.safeParse(await response.json().catch(() => null))
+    const body = await response.json().catch(() => null)
+    const parsed = RoomAnalysisSchema.safeParse(body)
     if (!parsed.success) {
+      if (LegacyAnalysisSchema.safeParse(body).success) {
+        throw new LabError(
+          'Ese servicio de TP3 es de una versión anterior: responde con los siete tipos fijos en lugar de elegir piezas del catálogo. El editor y TP3 se actualizan juntos: actualiza TP3 a su versión más reciente (lab/README.md).',
+          'tp3_desactualizado',
+        )
+      }
       throw new LabError(
         'El servicio respondió, pero con un formato que no esperábamos. Conviene confirmar que la dirección sea la del backend de TP3 y que sea su versión más reciente.',
         'respuesta_invalida',
