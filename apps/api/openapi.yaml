@@ -146,11 +146,13 @@ paths:
   /v1/analyze-room:
     post:
       operationId: analyzeRoom
-      summary: Propone qué muebles del catálogo hay en la foto de un ambiente
+      summary: Arma el plano visto desde arriba del ambiente de una foto, con los muebles del catálogo en metros
       description: >-
-        Recibe la foto en base64 (JSON, sin multipart) y las piezas del catálogo entre las que puede elegir. La API las
-        envía a un modelo de visión (Gemini) y devuelve, por cada mueble reconocido, el id de UNA de esas piezas con su
-        posición como proporción del ambiente. Cada persona puede pedir hasta 10 análisis por hora: los pedidos
+        Recibe la foto en base64 (JSON, sin multipart) y las piezas del catálogo entre las que puede elegir, con sus medidas
+        reales. La API las envía a un modelo de visión (Gemini) y devuelve el plano: las medidas del ambiente, desde dónde se
+        tomó la foto, sus puertas y ventanas y, por cada mueble reconocido, el id de UNA de esas piezas con su posición en
+        metros, hacia dónde mira, si está contra un muro y si está apoyado sobre otro mueble. Las coordenadas tienen el origen en
+        la esquina noroeste, x hacia el este y z hacia el sur. Cada persona puede pedir hasta 10 análisis por hora: los pedidos
         inválidos no cuentan; los que llegan al modelo sí, aunque el modelo falle. La foto no se guarda ni se registra.
       requestBody:
         required: true
@@ -160,7 +162,7 @@ paths:
               $ref: '#/components/schemas/AnalyzeRoomBody'
       responses:
         '200':
-          description: Muebles propuestos
+          description: El plano del ambiente con sus muebles
           content:
             application/json:
               schema:
@@ -425,7 +427,7 @@ components:
           type: number
           exclusiveMinimum: 0
           maximum: 100
-          description: Ancho conocido del ambiente, en metros
+          description: Ancho conocido del muro del fondo de la foto (de lado a lado), en metros; ayuda al modelo a calibrar las medidas
         catalog:
           type: array
           minItems: 1
@@ -437,7 +439,8 @@ components:
       type: object
       additionalProperties: false
       description: >-
-        Lo único que el servicio sabe de cada pieza (sin rutas ni medidas). Los textos no pueden llevar dobles corchetes,
+        Lo único que el servicio sabe de cada pieza (sin rutas). Las medidas reales son opcionales y sirven de regla para
+        estimar el tamaño del ambiente y evitar que los muebles se superpongan. Los textos no pueden llevar dobles corchetes,
         porque el catálogo viaja al modelo entre las etiquetas [[CATALOG_START]] y [[CATALOG_END]].
       required: [id, name, category]
       properties:
@@ -448,39 +451,96 @@ components:
           type: array
           maxItems: 10
           items: { type: string, minLength: 1, maxLength: 40 }
+        dimensions_m:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items: { type: number, exclusiveMinimum: 0, maximum: 20 }
+          description: Medidas reales de la pieza en metros, [ancho, alto, fondo]
+    RoomSize:
+      type: object
+      description: El ambiente, un rectángulo medido entre las caras interiores de los muros
+      required: [width_m, depth_m]
+      properties:
+        width_m: { type: number, minimum: 1.5, maximum: 12, description: De oeste a este, en metros }
+        depth_m: { type: number, minimum: 1.5, maximum: 12, description: De norte a sur, en metros }
+    PhotoCamera:
+      type: object
+      description: >-
+        Desde dónde se tomó la foto: su posición en el plano (dentro del ambiente, en una esquina o hasta 1 m fuera de un muro) y
+        el punto del plano al que mira el centro de la foto, que debe ser distinto de la posición. La altura de los ojos es
+        siempre 1,5 m.
+      required: [x_m, z_m, look_at]
+      properties:
+        x_m: { type: number, minimum: -1, maximum: 13 }
+        z_m: { type: number, minimum: -1, maximum: 13 }
+        look_at:
+          type: object
+          required: [x_m, z_m]
+          properties:
+            x_m: { type: number, minimum: -1, maximum: 13 }
+            z_m: { type: number, minimum: -1, maximum: 13 }
+        fov_deg:
+          type: number
+          minimum: 30
+          maximum: 100
+          description: Campo de visión vertical de la foto en grados; si falta, 60
+    RoomOpening:
+      type: object
+      description: >-
+        Una puerta o una ventana. at_m es la distancia al centro de la abertura medida a lo largo del muro desde su esquina
+        izquierda mirando el muro desde dentro del ambiente (muro norte: desde el oeste; sur: desde el este; este: desde el
+        norte; oeste: desde el sur).
+      required: [type, wall, at_m, width_m]
+      properties:
+        type: { type: string, enum: [door, window] }
+        wall: { type: string, enum: [n, s, e, w] }
+        at_m: { type: number, minimum: 0, maximum: 12 }
+        width_m: { type: number, minimum: 0.3, maximum: 6 }
     DetectedFurniture:
       type: object
       description: >-
-        Un mueble reconocido. x e y son su centro y width y depth su tamaño, todos como proporción del ancho y del fondo
-        del ambiente (la esquina superior izquierda es 0,0); rotation_deg gira en sentido horario visto desde arriba.
-      required: [asset_id, x, y, width, depth, rotation_deg, confidence]
+        Un mueble del plano. x_m y z_m son el centro de su huella en metros (origen en la esquina noroeste, x hacia el este, z
+        hacia el sur); facing_deg, hacia dónde mira su frente (0 = al sur, giro horario visto desde arriba: 90 = al oeste, 180
+        = al norte, 270 = al este); against_wall, el muro contra el que está pegado; on_top_of, el índice (desde 0) de otro mueble
+        de la lista sobre el que está apoyado, sin ciclos. El tamaño real sale siempre del catálogo.
+      required: [asset_id, x_m, z_m, facing_deg, against_wall, on_top_of, confidence]
       properties:
         asset_id: { type: string, minLength: 1, maxLength: 100, description: El id de una de las piezas del catálogo enviado }
-        x: { type: number, minimum: 0, maximum: 1 }
-        y: { type: number, minimum: 0, maximum: 1 }
-        width: { type: number, exclusiveMinimum: 0, maximum: 1 }
-        depth: { type: number, exclusiveMinimum: 0, maximum: 1 }
-        rotation_deg: { type: number, minimum: -360, maximum: 360 }
-        confidence: { type: number, minimum: 0, maximum: 1 }
-    Calibration:
-      type: object
-      required: [status, width_m]
-      properties:
-        status: { type: string, enum: [uncalibrated, user_provided] }
-        width_m:
+        x_m: { type: number, minimum: -1, maximum: 13 }
+        z_m: { type: number, minimum: -1, maximum: 13 }
+        facing_deg: { type: number, minimum: -360, maximum: 360 }
+        against_wall:
           oneOf:
-            - type: number
+            - type: string
+              enum: [n, s, e, w]
             - type: 'null'
+        on_top_of:
+          oneOf:
+            - type: integer
+              minimum: 0
+              maximum: 99
+            - type: 'null'
+        confidence: { type: number, minimum: 0, maximum: 1 }
     RoomAnalysis:
       type: object
-      required: [furniture, warnings, calibration]
+      description: El plano del ambiente visto desde arriba, en el orden en que el modelo lo razona
+      required: [room, camera, openings, furniture, warnings]
       properties:
+        room:
+          $ref: '#/components/schemas/RoomSize'
+        camera:
+          $ref: '#/components/schemas/PhotoCamera'
+        openings:
+          type: array
+          maxItems: 30
+          items:
+            $ref: '#/components/schemas/RoomOpening'
         furniture:
           type: array
+          maxItems: 100
           items:
             $ref: '#/components/schemas/DetectedFurniture'
         warnings:
           type: array
           items: { type: string }
-        calibration:
-          $ref: '#/components/schemas/Calibration'

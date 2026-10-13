@@ -8,16 +8,12 @@ import {
   ANALYZE_IMAGE_MAX_BYTES,
   ANALYZE_MIME_TYPES,
   AnalyzeRoomBodySchema,
-  CalibrationSchema,
   CatalogOptionSchema,
-  DetectedFurnitureSchema,
   ERROR_CODES,
-  RoomAnalysisSchema,
 } from '../src/index.js'
 
 const option = (id: string, extra: object = {}) => ({ id, name: 'Sofá', category: 'seating', tags: ['living-room'], ...extra })
 const body = (extra: object = {}) => ({ image: '/9j/4AAQ', mime: 'image/jpeg', catalog: [option('sofa')], ...extra })
-const piece = (extra: object = {}) => ({ asset_id: 'sofa', x: 0.5, y: 0.5, width: 0.3, depth: 0.2, rotation_deg: 90, confidence: 0.9, ...extra })
 const accepts = (schema: { safeParse(v: unknown): { success: boolean } }, value: unknown) => schema.safeParse(value).success
 
 describe('constantes del análisis de fotos', () => {
@@ -92,9 +88,19 @@ describe('CatalogOption y catálogo', () => {
     expect(CatalogOptionSchema.parse(option(' sofa ', { name: '  Sofá  ' }))).toMatchObject({ id: 'sofa', name: 'Sofá' })
   })
 
-  it('no admite campos de más (rutas, tamaños): el servicio solo debe saber lo que elige', () => {
+  it('no admite campos de más (rutas, nombres de medidas ajenos): el servicio solo debe saber lo que elige', () => {
     expect(accepts(CatalogOptionSchema, option('sofa', { src: '/items/sofa/model.glb' }))).toBe(false)
     expect(accepts(CatalogOptionSchema, option('sofa', { dimensions: [1, 1, 1] }))).toBe(false)
+  })
+
+  it('las medidas reales de la pieza viajan como dimensions_m = [ancho, alto, fondo] en metros, y son opcionales', () => {
+    expect(accepts(CatalogOptionSchema, option('sofa', { dimensions_m: [2.06, 0.74, 1.01] }))).toBe(true)
+    expect(CatalogOptionSchema.parse(option('sofa', { dimensions_m: [2.06, 0.74, 1.01] })).dimensions_m).toEqual([2.06, 0.74, 1.01])
+    expect(CatalogOptionSchema.parse(option('sofa')).dimensions_m).toBeUndefined()
+    for (const bad of [[1, 1], [1, 1, 1, 1], [0, 1, 1], [1, -1, 1], [1, 1, 20.5], ['1', 1, 1], [1, 1, Number.NaN], 'grande', null]) {
+      expect(accepts(CatalogOptionSchema, option('sofa', { dimensions_m: bad })), JSON.stringify(bad)).toBe(false)
+    }
+    expect(accepts(CatalogOptionSchema, option('sofa', { dimensions_m: [20, 20, 20] }))).toBe(true)
   })
 
   it('el id empieza con letra o número y sigue con letras, números, punto, guion, guion bajo o dos puntos', () => {
@@ -156,36 +162,3 @@ describe('CatalogOption y catálogo', () => {
   })
 })
 
-describe('RoomAnalysis (la respuesta)', () => {
-  const analysis = (furniture: object[] = [piece()]) => ({
-    furniture,
-    warnings: ['La planta está tapada por el sofá.'],
-    calibration: { status: 'uncalibrated', width_m: null },
-  })
-
-  it('acepta un análisis completo y uno sin muebles', () => {
-    expect(accepts(RoomAnalysisSchema, analysis())).toBe(true)
-    expect(accepts(RoomAnalysisSchema, { ...analysis([]), warnings: [] })).toBe(true)
-  })
-
-  it('cada mueble es un asset_id con posición, tamaño, giro y confianza dentro de sus rangos', () => {
-    const ok = [{}, { x: 0 }, { x: 1 }, { y: 1 }, { width: 1 }, { rotation_deg: -360 }, { rotation_deg: 360 }, { confidence: 0 }]
-    for (const extra of ok) expect(accepts(DetectedFurnitureSchema, piece(extra)), JSON.stringify(extra)).toBe(true)
-    const bad = [{ x: -0.01 }, { x: 1.01 }, { y: 1.01 }, { width: 0 }, { width: 1.01 }, { depth: 0 }, { rotation_deg: 361 }, { rotation_deg: -361 }, { confidence: 1.01 }, { asset_id: '' }, { asset_id: 'a'.repeat(101) }]
-    for (const extra of bad) expect(accepts(DetectedFurnitureSchema, piece(extra)), JSON.stringify(extra)).toBe(false)
-  })
-
-  it('la calibración es uncalibrated o user_provided, con el ancho en metros o null', () => {
-    expect(accepts(CalibrationSchema, { status: 'user_provided', width_m: 4.5 })).toBe(true)
-    expect(accepts(CalibrationSchema, { status: 'uncalibrated', width_m: null })).toBe(true)
-    expect(accepts(CalibrationSchema, { status: 'otra', width_m: null })).toBe(false)
-    expect(accepts(CalibrationSchema, { status: 'uncalibrated' })).toBe(false)
-  })
-
-  it('exige los tres campos', () => {
-    for (const key of ['furniture', 'warnings', 'calibration']) {
-      const { [key]: _omitted, ...rest } = analysis() as Record<string, unknown>
-      expect(accepts(RoomAnalysisSchema, rest), key).toBe(false)
-    }
-  })
-})
