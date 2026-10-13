@@ -3,6 +3,11 @@ import { buildPrompt } from './prompt.js'
 import { ProviderError, type VisionProvider } from './types.js'
 
 export const DEFAULT_VISION_MODEL = 'gemini-3.5-flash'
+/** Si el modelo principal está saturado (503, 429, 500 o plazo vencido) se prueba el siguiente, mientras quede tiempo. */
+export const FALLBACK_VISION_MODELS = ['gemini-3.7-flash', 'gemini-3.6-flash'] as const
+const RETRYABLE = /^(timeout|network|http_(429|500|502|503|504))/
+/** Con menos tiempo que esto no se intenta otro modelo: la función de Vercel se corta a los 30 s. */
+const MIN_REMAINING_MS = 6_000
 /** La función de Vercel dura hasta 30 s (`apps/api/vercel.json`): este plazo deja margen para validar y responder. */
 export const GEMINI_TIMEOUT_MS = 25_000
 /**
@@ -90,9 +95,7 @@ function textOf(envelope: Envelope): string {
  * El proveedor de visión con Gemini, portado del backend de TP3: prompt con el catálogo delimitado, esquema de salida con el
  * `asset_id` enumerado y una sola llamada con plazo de 25 s. Devuelve el JSON que contestó el modelo, sin validarlo.
  */
-export function createGeminiProvider(options: GeminiOptions): VisionProvider {
-  const model = options.model?.trim() || DEFAULT_VISION_MODEL
-  const timeoutMs = options.timeoutMs ?? GEMINI_TIMEOUT_MS
+function createModelProvider(options: GeminiOptions, model: string, timeoutMs: number): VisionProvider {
   const doFetch = options.fetchImpl ?? ((...args: Parameters<typeof fetch>) => fetch(...args))
   const url = `${ENDPOINT}/${encodeURIComponent(model)}:generateContent`
 
@@ -132,5 +135,27 @@ export function createGeminiProvider(options: GeminiOptions): VisionProvider {
     } catch {
       throw new ProviderError('not_json')
     }
+  }
+}
+
+/** El proveedor de visión: el modelo pedido y, si está saturado, los de respaldo (`FALLBACK_VISION_MODELS`). */
+export function createGeminiProvider(options: GeminiOptions): VisionProvider {
+  const first = options.model?.trim() || DEFAULT_VISION_MODEL
+  const models = [first, ...FALLBACK_VISION_MODELS.filter((model) => model !== first)]
+  const budget = options.timeoutMs ?? GEMINI_TIMEOUT_MS
+  return async (request) => {
+    const started = Date.now()
+    let last: ProviderError = new ProviderError('unexpected')
+    for (const model of models) {
+      const remaining = budget - (Date.now() - started)
+      if (remaining < MIN_REMAINING_MS && model !== first) break
+      try {
+        return await createModelProvider(options, model, model === first ? budget : remaining)(request)
+      } catch (error) {
+        if (!(error instanceof ProviderError) || !RETRYABLE.test(error.reason)) throw error
+        last = error
+      }
+    }
+    throw last
   }
 }
