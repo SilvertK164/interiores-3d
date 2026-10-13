@@ -6,6 +6,7 @@ import { Loader } from '@/components/Loader'
 import { ANALYSIS_TEXT } from '@/lib/lab/analysis-text'
 import type { CreateFromTemplateResult } from '@/lib/templates/create-from-template'
 import { LabNotice, type Notice, PendingActions } from './LabNotice'
+import { ExamplePhoto } from './ExamplePhoto'
 import { PhotoDropzone } from './PhotoDropzone'
 
 export type Busy = 'analizando' | 'abriendo' | null
@@ -20,20 +21,24 @@ type Props = {
   pending: CreateFromTemplateResult | null
   onSubmit: (event: FormEvent) => void
   onExample: () => void
+  /** El ejemplo está cargado: se muestra su foto en lugar de la zona para subir la propia. */
+  fromExample: boolean
+  /** Quita el ejemplo para volver a pedir la foto de la persona. */
+  onLeaveExample: () => void
   onRetry: () => void
 }
 
 const CARD = 'glass flex flex-col gap-4 rounded-[28px] p-5 sm:p-6'
 
-/** Primera tarjeta: la foto (con vista previa), el ancho conocido del muro del fondo, el aviso de privacidad y los dos botones de análisis. */
-export function PhotoCard({ file, onFile, widthText, onWidth, busy, notice, pending, onSubmit, onExample, onRetry }: Props) {
+/** Primera tarjeta: la foto (con vista previa; con el ejemplo, la foto de ejemplo), el ancho conocido del muro del fondo, el aviso de privacidad y los dos botones de análisis. */
+export function PhotoCard({ file, onFile, widthText, onWidth, busy, notice, pending, onSubmit, onExample, fromExample, onLeaveExample, onRetry }: Props) {
   const analyzing = busy === 'analizando'
   return (
     <form aria-labelledby="tu-foto" className={CARD} onSubmit={onSubmit}>
       <h2 className="font-display text-[19px] font-bold tracking-[-0.02em]" id="tu-foto">
         Tu foto
       </h2>
-      <PhotoDropzone disabled={busy !== null} file={file} onFile={onFile} />
+      {fromExample ? <ExamplePhoto disabled={busy !== null} onUseOwn={onLeaveExample} /> : <PhotoDropzone disabled={busy !== null} file={file} onFile={onFile} />}
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         Ancho conocido del ambiente, en metros (opcional)

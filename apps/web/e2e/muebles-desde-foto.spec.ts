@@ -1,5 +1,5 @@
 import { type Locator, type Page, expect, test } from '@playwright/test'
-import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
+import { EXAMPLE_ANALYSIS, EXAMPLE_PHOTO, SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
 import { counts } from './support/editor'
 import { hook } from './support/hooks'
 import { createBlankProject } from './support/projects'
@@ -203,10 +203,16 @@ test.describe('muebles desde una foto', () => {
     const dialog = await openFromMore(page)
     await dialog.getByRole('button', { name: 'Probar con un ejemplo' }).click()
     await expect(dialog.getByRole('heading', { name: 'Muebles encontrados' })).toBeVisible({ timeout: 30_000 })
-    await expect(dialog.getByRole('checkbox')).toHaveCount(8)
+    await expect(dialog.getByRole('checkbox')).toHaveCount(EXAMPLE_ANALYSIS.furniture.length)
+    // La miniatura de la foto de ejemplo acompaña a la lista, con su etiqueta, y se ve entera.
+    const thumb = dialog.getByRole('img', { name: /Foto de ejemplo/ })
+    await expect(thumb).toBeVisible()
+    await expect.poll(() => thumb.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0)
+    await expect(dialog.getByText(EXAMPLE_PHOTO.label, { exact: false })).toBeVisible()
+    await dialog.screenshot({ path: 'test-results/muebles-desde-foto/ejemplo-dialogo.png' })
     await dialog.getByRole('button', { name: /Agregar al proyecto/ }).click()
     await expect(dialog).toBeHidden({ timeout: 30_000 })
-    await expect.poll(() => items(page), { timeout: 30_000 }).toBe(before + 8)
+    await expect.poll(() => items(page), { timeout: 30_000 }).toBe(before + EXAMPLE_ANALYSIS.furniture.length)
     expect(called).toBe(false)
   })
 })

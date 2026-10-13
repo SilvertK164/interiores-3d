@@ -1,25 +1,31 @@
 import { type Page, expect, test } from '@playwright/test'
 import { MIN_CONFIDENCE } from '../src/lib/lab/layout-constants'
-import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
+import { EXAMPLE_ANALYSIS, SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
+import type { RoomAnalysis } from '../src/lib/lab/schema'
 import { counts, ready, templateCounts } from './support/editor'
 import { hook } from './support/hooks'
 import { PROJECT_URL } from './support/projects'
 import { ANALYZE_URL, analyzePhoto, answerWith, failWith, sentBy } from './support/analysis'
 
-// Las piezas del ejemplo con confianza suficiente: la planta (20 %) se descarta con aviso.
-const EXAMPLE_PIECES = SAMPLE_ANALYSIS.furniture.filter((piece) => piece.confidence >= MIN_CONFIDENCE).length
+// Las piezas de un plano con confianza suficiente (las demás se descartan con aviso).
+const pieceCount = (analysis: RoomAnalysis) => analysis.furniture.filter((piece) => piece.confidence >= MIN_CONFIDENCE).length
 
-/** La escena de «Escena desde una foto» con el análisis de ejemplo: un ambiente de 5 × 4,4 m con piso, cielo, cuatro muros, puerta, ventana y los muebles dentro. */
-async function expectExampleScene(page: Page) {
+/**
+ * La escena de «Escena desde una foto» con un plano: un ambiente del tamaño del plano con piso, cielo, cuatro muros, sus aberturas y los muebles dentro.
+ * La escena queda centrada en el origen: el ambiente va de -ancho/2 a ancho/2 en x y de -fondo/2 a fondo/2 en z; ningún mueble pisa un muro (la cara está a
+ * 0,1 m del borde) y solo la tele, sobre su mueble, no está en el piso (0,35 m).
+ */
+async function expectSceneOf(page: Page, analysis: RoomAnalysis) {
+  const pieces = pieceCount(analysis)
+  const doors = analysis.openings.filter((opening) => opening.type === 'door').length
+  const windows = analysis.openings.filter((opening) => opening.type === 'window').length
   await expect.poll(async () => (await counts(page)).zone, { timeout: 60_000 }).toBe(1)
-  expect(await counts(page)).toMatchObject({ zone: 1, slab: 1, ceiling: 1, wall: 4, door: 1, window: 1, item: EXAMPLE_PIECES })
-  // La escena queda centrada en el origen: el ambiente va de -2,5 a 2,5 en x y de -2,2 a 2,2 en z; ningún mueble pisa un muro (la cara está a 0,1 m del
-  // borde) y solo la tele, sobre su mueble, no está en el piso (0,35 m).
+  expect(await counts(page)).toMatchObject({ zone: 1, slab: 1, ceiling: 1, wall: 4, door: doors, window: windows, item: pieces })
   const items = (await hook(page, 'nodesOf', 'item')) as { asset: { id: string }; position: [number, number, number] }[]
-  expect(items).toHaveLength(EXAMPLE_PIECES)
+  expect(items).toHaveLength(pieces)
   for (const { asset, position } of items) {
-    expect(Math.abs(position[0]), asset.id).toBeLessThanOrEqual(2.5 - 0.1 + 0.01)
-    expect(Math.abs(position[2]), asset.id).toBeLessThanOrEqual(2.2 - 0.1 + 0.01)
+    expect(Math.abs(position[0]), asset.id).toBeLessThanOrEqual(analysis.room.width_m / 2 - 0.1 + 0.01)
+    expect(Math.abs(position[2]), asset.id).toBeLessThanOrEqual(analysis.room.depth_m / 2 - 0.1 + 0.01)
     expect(position[1], asset.id).toBe(asset.id === 'television' ? 0.35 : 0)
   }
 }
@@ -109,10 +115,10 @@ test.describe('escena desde una foto', () => {
     expect((await created).postDataJSON().name).toMatch(/^Desde una foto · \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/)
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
-    await expectExampleScene(page)
+    await expectSceneOf(page, SAMPLE_ANALYSIS)
   })
 
-  test('«Probar con un ejemplo» no llama a la API y abre un proyecto real en el editor, con el ambiente y los muebles del ejemplo', async ({ page }) => {
+  test('«Probar con un ejemplo» no llama a la API y abre un proyecto real en el editor, con el salón de 3,6 × 7,5 m y sus 14 muebles', async ({ page }) => {
     test.setTimeout(180_000)
     let calledApi = false
     await page.route(ANALYZE_URL, (route) => {
@@ -123,7 +129,7 @@ test.describe('escena desde una foto', () => {
     await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
-    await expectExampleScene(page)
+    await expectSceneOf(page, EXAMPLE_ANALYSIS)
     expect(calledApi).toBe(false)
   })
 

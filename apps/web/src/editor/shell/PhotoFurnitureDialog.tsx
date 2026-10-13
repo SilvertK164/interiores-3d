@@ -9,7 +9,7 @@ import { buildAnalysisCatalog } from '@/lib/lab/analysis-catalog'
 import { describeLabError } from '@/lib/lab/describe-error'
 import { parseKnownWidth } from '@/lib/lab/form-helpers'
 import { LabError } from '@/lib/lab/lab-error'
-import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
+import { EXAMPLE_ANALYSIS, EXAMPLE_PHOTO } from '@/lib/lab/sample-analysis'
 import type { CatalogItemLike } from './furniture-model'
 import { TEXT, canAdd, canAnalyze, checkedRows, detectedRows, initialState, photoReducer, selectionSummary } from './photo-furniture-model'
 import { CHECK_ROW } from './ui/PlanOptions'
@@ -66,10 +66,10 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
     else if (state.step === 'form') dialogRef.current?.querySelector<HTMLElement>('input[type="file"]')?.focus()
   }, [open, state.step])
 
-  /** Un análisis fijo (sin Gemini, sin cuota): sirve para probar o mostrar el flujo si el servicio no responde. */
+  /** Un análisis fijo con su foto (sin Gemini, sin cuota): sirve para probar o mostrar el flujo completo si el servicio no responde. */
   const tryExample = () => {
     if (busy.current) return
-    dispatch({ type: 'analyzed', ...detectedRows(SAMPLE_ANALYSIS, (id) => local.pieces.get(id)) })
+    dispatch({ type: 'analyzed', ...detectedRows(EXAMPLE_ANALYSIS, (id) => local.pieces.get(id)), example: true })
   }
 
   const analyze = async () => {
@@ -151,6 +151,13 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
 
         {results ? (
           <section aria-labelledby={`${ids}-found`} className="flex flex-col gap-3">
+            {state.example && (
+              <figure className="m-0 flex items-center gap-3">
+                {/* biome-ignore lint/performance/noImgElement: foto de ejemplo propia de 1600 px, ya reducida; aquí va en miniatura. */}
+                <img alt={EXAMPLE_PHOTO.alt} className="block h-auto w-32 shrink-0 rounded-[12px] shadow-[inset_0_0_0_1px_rgb(11_31_77/0.06)]" height={1070} src={EXAMPLE_PHOTO.src} width={1600} />
+                <figcaption className={HINT}>{EXAMPLE_PHOTO.label}: el análisis es de ejemplo, no se llamó al servicio.</figcaption>
+              </figure>
+            )}
             <div>
               <h3 className="text-[15px] font-semibold outline-none" id={`${ids}-found`} ref={heading} tabIndex={-1}>
                 {TEXT.found}

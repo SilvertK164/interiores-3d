@@ -13,7 +13,7 @@ import { LabError } from '@/lib/lab/lab-error'
 import { showEditorPathTool } from '@/lib/lab/lab-view'
 import { type CameraPose, photoSceneCamera } from '@/lib/lab/photo-camera'
 import { savePhotoCamera } from '@/lib/lab/photo-camera-handoff'
-import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
+import { EXAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
 import { savedName } from '@/lib/person-name'
 import { TEMPLATE_DEFINITIONS } from '@/lib/templates'
@@ -90,6 +90,7 @@ export default function EscenaDesdeFotoPage() {
   async function analyze(event: FormEvent) {
     event.preventDefault()
     if (lock.current) return
+    if (fromExample) return setNotice({ text: 'Ahora ves el ejemplo. Pulsa «Usar mi propia foto» para analizar la tuya.', place: 'form' })
     if (!file) return setNotice({ text: 'Elige primero la foto del ambiente.', place: 'form' })
     start('analizando')
     try {
@@ -153,9 +154,18 @@ export default function EscenaDesdeFotoPage() {
     } finally {
       release()
     }
-    setAnalysis(SAMPLE_ANALYSIS)
+    setAnalysis(EXAMPLE_ANALYSIS)
     setFromExample(true)
-    void openInEditor(modelAnalysis(SAMPLE_ANALYSIS), 'results')
+    void openInEditor(modelAnalysis(EXAMPLE_ANALYSIS), 'results')
+  }
+
+  /** Quita el ejemplo (su foto y su plano) para volver a pedir la foto de la persona. */
+  function leaveExample() {
+    setFromExample(false)
+    setAnalysis(null)
+    setModelWarnings([])
+    setNotice(null)
+    setPending(null)
   }
 
   async function retry() {
@@ -195,7 +205,9 @@ export default function EscenaDesdeFotoPage() {
             busy={busy}
             file={file}
             notice={notice}
+            fromExample={fromExample}
             onExample={() => void tryExample()}
+            onLeaveExample={leaveExample}
             onFile={setFile}
             onRetry={() => void retry()}
             onSubmit={analyze}

@@ -72,16 +72,18 @@ export type PhotoState = {
   error: string | null
   rows: PhotoRow[]
   warnings: string[]
+  /** La lista viene de «Probar con un ejemplo»: el diálogo muestra la foto de ejemplo junto a ella. */
+  example: boolean
 }
 
-export const initialState = (): PhotoState => ({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [] })
+export const initialState = (): PhotoState => ({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [], example: false })
 
 export type PhotoAction =
   | { type: 'open' }
   | { type: 'file'; file: File | null }
   | { type: 'width'; value: string }
   | { type: 'analyzing' }
-  | { type: 'analyzed'; rows: PhotoRow[]; warnings: string[] }
+  | { type: 'analyzed'; rows: PhotoRow[]; warnings: string[]; example?: boolean }
   /** Con `stay` el error se muestra sin salir de la lista (por ejemplo, al agregar). */
   | { type: 'failed'; message: string; stay?: boolean }
   | { type: 'toggle'; key: string }
@@ -125,13 +127,13 @@ export function photoReducer(state: PhotoState, action: PhotoAction): PhotoState
     case 'analyzing':
       return { ...state, step: 'analyzing', error: null }
     case 'analyzed':
-      return { ...state, step: 'results', error: null, rows: action.rows, warnings: action.warnings }
+      return { ...state, step: 'results', error: null, rows: action.rows, warnings: action.warnings, example: action.example ?? false }
     case 'failed':
       return action.stay ? { ...state, error: action.message } : { ...state, step: 'form', error: action.message }
     case 'toggle':
       return { ...state, rows: toggleRow(state.rows, action.key) }
     case 'back':
-      return { ...state, step: 'form', error: null, rows: [], warnings: [] }
+      return { ...state, step: 'form', error: null, rows: [], warnings: [], example: false }
   }
 }
 

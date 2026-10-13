@@ -96,7 +96,7 @@ describe('photoReducer', () => {
   })
 
   it('empieza en el formulario, sin foto y sin errores', () => {
-    expect(initialState()).toEqual({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [] })
+    expect(initialState()).toEqual({ step: 'form', file: null, widthText: '', error: null, rows: [], warnings: [], example: false })
   })
 
   it('al abrir se parte de cero', () => {
@@ -123,6 +123,16 @@ describe('photoReducer', () => {
     const state = photoReducer({ ...initialState(), step: 'analyzing', file: photo() }, { type: 'analyzed', rows, warnings: ['Aviso'] })
     expect(state).toMatchObject({ step: 'results', error: null, warnings: ['Aviso'] })
     expect(state.rows.every((r) => r.checked)).toBe(true)
+  })
+
+  it('el ejemplo se marca para mostrar su foto: un análisis de verdad no, y «cambiar la foto» la quita', () => {
+    const { rows } = detectedRows(analysisOf([detected()]), resolve)
+    expect(initialState().example).toBe(false)
+    expect(photoReducer(initialState(), { type: 'analyzed', rows, warnings: [] }).example).toBe(false)
+    const example = photoReducer(initialState(), { type: 'analyzed', rows, warnings: [], example: true })
+    expect(example).toMatchObject({ step: 'results', example: true })
+    expect(photoReducer(example, { type: 'back' }).example).toBe(false)
+    expect(photoReducer(example, { type: 'open' }).example).toBe(false)
   })
 
   it('si falla vuelve al formulario con el mensaje, sin tocar lo que escribió la persona', () => {

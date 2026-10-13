@@ -56,8 +56,8 @@ async function expect3dVisibleAndKeyTaken(page: Page) {
 const PHOTO_FOV = 60
 /** El salón de 3,2 × 7 m (HALL_ANALYSIS): cámara en el extremo sur, a 0,3 m del muro, mirando al norte con el objetivo a 4,5 m. */
 const HALL_POSE = { position: [0, 1.55, 3.2], target: [0, 0.75, -1.3] }
-/** El análisis de ejemplo (5 × 4,4 m): cámara a 0,3 m del muro sur, mirando al norte hasta el muro del fondo. */
-const SAMPLE_POSE = { position: [0, 1.55, 1.9], target: [0, 0.75, -2.2] }
+/** El análisis de ejemplo (3,6 × 7,5 m, `EXAMPLE_ANALYSIS`): cámara a 0,3 m del muro sur, mirando al norte con el objetivo a 4,5 m. */
+const EXAMPLE_POSE = { position: [0, 1.55, 3.45], target: [0, 0.75, -1.05] }
 /** La foto desde la esquina sureste (fuera del rectángulo por 0,4 m en los dos ejes): se corre a 0,3 m de los dos muros y mira en diagonal al noroeste. */
 const CORNER_POSE = { position: [2.2, 1.55, 1.7], target: [-1.379, 0.75, -1.027] }
 
@@ -128,8 +128,8 @@ test.describe('la cámara 3D abre en el punto de vista de la foto', () => {
     await page.getByRole('button', { name: 'Probar con un ejemplo' }).click()
     await page.waitForURL(PROJECT_URL, { timeout: 90_000 })
     await ready(page)
-    const pose = await expectPhotoPose(page, SAMPLE_POSE)
-    expectLooksFromNearWall(pose, 2.2)
+    const pose = await expectPhotoPose(page, EXAMPLE_POSE)
+    expectLooksFromNearWall(pose, 3.75)
     await expect3dVisibleAndKeyTaken(page)
     await page.waitForTimeout(6000)
     await page.mouse.move(1270, 400)
