@@ -8,6 +8,7 @@ import { ExportPlanDialog } from './ExportPlanDialog'
 import type { CatalogItemLike } from './furniture-model'
 import { installKeyTrap } from './key-trap'
 import { LeftPanel } from './LeftPanel'
+import { PhotoFurnitureDialog } from './PhotoFurnitureDialog'
 import { PropertiesPanel } from './PropertiesPanel'
 import { ShellDock } from './ShellDock'
 import { ShellTopBar } from './ShellTopBar'
@@ -23,7 +24,17 @@ function FrameViews() {
   return null
 }
 
-function ShellBody({ catalog, onExportPlan, projectName }: { catalog: readonly CatalogItemLike[]; onExportPlan: (opener: HTMLElement | null) => void; projectName: string }) {
+function ShellBody({
+  catalog,
+  onExportPlan,
+  onPhotoFurniture,
+  projectName,
+}: {
+  catalog: readonly CatalogItemLike[]
+  onExportPlan: (opener: HTMLElement | null) => void
+  onPhotoFurniture: (opener: HTMLElement | null) => void
+  projectName: string
+}) {
   const { mode, firstPerson } = useShell((s) => {
     const state = selectShellState(s)
     return { mode: state.mode, firstPerson: state.firstPerson }
@@ -34,7 +45,7 @@ function ShellBody({ catalog, onExportPlan, projectName }: { catalog: readonly C
       <LeftPanel catalog={catalog} />
       {mode === 'editar' ? (
         <>
-          <ShellDock onExportPlan={onExportPlan} />
+          <ShellDock onExportPlan={onExportPlan} onPhotoFurniture={onPhotoFurniture} />
           <ShellUndoRedo />
           <PropertiesPanel />
         </>
@@ -74,6 +85,12 @@ export function EditorShell({
     exportOpener.current = opener
     setExportOpen(true)
   }
+  const [photoOpen, setPhotoOpen] = useState(false)
+  const photoOpener = useRef<HTMLElement | null>(null)
+  const openPhoto = (opener: HTMLElement | null) => {
+    photoOpener.current = opener
+    setPhotoOpen(true)
+  }
   useEffect(() => {
     const stop = bridge.mountDefaults()
     // Las teclas de Pascal no llegan a sus atajos con el foco en un botón del shell, ni en Ver (donde Ctrl+Z ni siquiera
@@ -95,8 +112,9 @@ export function EditorShell({
       <div data-editor-shell className="editor-shell pointer-events-none absolute inset-0 z-40 overflow-hidden">
         <FrameViews />
         <ShellTopBar name={projectName} saveStatus={saveStatus} onBack={onBack} backBusy={backBusy} />
-        <ShellBody catalog={catalog} onExportPlan={openExport} projectName={projectName} />
+        <ShellBody catalog={catalog} onExportPlan={openExport} onPhotoFurniture={openPhoto} projectName={projectName} />
         <ExportPlanDialog author={author} onClose={() => setExportOpen(false)} open={exportOpen} opener={exportOpener} projectName={projectName} />
+        <PhotoFurnitureDialog catalog={catalog} onClose={() => setPhotoOpen(false)} open={photoOpen} opener={photoOpener} />
       </div>
     </BridgeProvider>
   )

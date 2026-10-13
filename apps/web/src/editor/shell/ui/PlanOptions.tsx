@@ -34,7 +34,8 @@ export type PlanOptionsProps = {
 const CHIP =
   'relative inline-flex min-h-11 cursor-pointer select-none items-center gap-2 rounded-full bg-white px-4 text-[15px] font-medium text-ink shadow-soft transition-colors duration-150 hover:bg-brand-wash motion-reduce:transition-none has-[:checked]:bg-ink has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand/45 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-45 has-[:disabled]:hover:bg-white'
 
-const ROW =
+/** Fila con casilla: píldora blanca con anillo de foco (también la usa «Muebles desde una foto»). */
+export const CHECK_ROW =
   'flex min-h-11 cursor-pointer items-center gap-3 rounded-[16px] bg-white px-4 text-[15px] text-ink shadow-soft has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60 has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand/45'
 
 function Group({ legend, children }: { legend: string; children: ReactNode }) {
@@ -169,7 +170,7 @@ export function PlanOptions(props: PlanOptionsProps) {
             const hint = level.empty ? TEXT.emptyLevelHint : last ? TEXT.levelsMin : null
             const hintId = `${id}-level-${level.id}`
             return (
-              <label className={cx(ROW, 'rounded-full px-3')} key={level.id}>
+              <label className={cx(CHECK_ROW, 'rounded-full px-3')} key={level.id}>
                 <input
                   aria-describedby={hint ? hintId : undefined}
                   checked={level.checked}
@@ -192,11 +193,11 @@ export function PlanOptions(props: PlanOptionsProps) {
       </Group>
 
       <div className="grid grid-cols-2 gap-2">
-        <label className={cx(ROW, 'justify-between rounded-full')} title={TEXT.titleBlockHint}>
+        <label className={cx(CHECK_ROW, 'justify-between rounded-full')} title={TEXT.titleBlockHint}>
           <span className="font-medium">{TEXT.titleBlock}</span>
           <input aria-checked={props.titleBlock} checked={props.titleBlock} className="size-5 shrink-0 accent-brand" disabled={busy} onChange={(event) => props.onTitleBlock(event.target.checked)} role="switch" type="checkbox" />
         </label>
-        <label className={cx(ROW, 'justify-between rounded-full')} title={TEXT.isometricHint}>
+        <label className={cx(CHECK_ROW, 'justify-between rounded-full')} title={TEXT.isometricHint}>
           <span className="font-medium">{TEXT.isometric}</span>
           <input aria-checked={props.isometric} checked={props.isometric} className="size-5 shrink-0 accent-brand" disabled={busy} onChange={(event) => props.onIsometric(event.target.checked)} role="switch" type="checkbox" />
         </label>

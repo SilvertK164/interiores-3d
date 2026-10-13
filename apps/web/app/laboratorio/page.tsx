@@ -10,7 +10,7 @@ import type { AnalysisCandidate } from '@/lib/lab/analysis-catalog'
 import { analysisToDefinition } from '@/lib/lab/analysis-to-definition'
 import { analyzeRoom } from '@/lib/lab/analyze-room'
 import { describeLabError } from '@/lib/lab/describe-error'
-import { labProjectName, normalizeServiceUrl, parseKnownWidth, readSavedServiceUrl, saveServiceUrl } from '@/lib/lab/form-helpers'
+import { DEFAULT_SERVICE_URL, labProjectName, normalizeServiceUrl, parseKnownWidth, readSavedServiceUrl, saveServiceUrl } from '@/lib/lab/form-helpers'
 import { LabError, LabNotImplementedError } from '@/lib/lab/lab-error'
 import { SAMPLE_ANALYSIS } from '@/lib/lab/sample-analysis'
 import type { RoomAnalysis } from '@/lib/lab/schema'
@@ -22,7 +22,6 @@ import { useSession } from '@/lib/use-session'
 import { PiecesTable } from './PiecesTable'
 import { WarningList } from './WarningList'
 
-const DEFAULT_URL = process.env.NEXT_PUBLIC_LAB_PHOTO_URL ?? 'http://localhost:8000'
 const PRIMARY = 'inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-60'
 const SECONDARY = 'inline-flex items-center gap-2 rounded-md bg-secondary px-4 py-2 disabled:opacity-60'
 const FIELD = 'rounded-md bg-secondary px-3 py-2'
@@ -43,7 +42,7 @@ export default function LaboratorioPage() {
   const { session, loading, hadSession } = useSession()
   const [file, setFile] = useState<File | null>(null)
   const [widthText, setWidthText] = useState('')
-  const [serviceUrl, setServiceUrl] = useState(DEFAULT_URL)
+  const [serviceUrl, setServiceUrl] = useState(DEFAULT_SERVICE_URL)
   const [analysis, setAnalysis] = useState<RoomAnalysis | null>(null)
   // Las piezas del catálogo que se le ofrecieron a TP3: con ellas se escriben los nombres de la tabla.
   const [candidates, setCandidates] = useState<AnalysisCandidate[]>([])

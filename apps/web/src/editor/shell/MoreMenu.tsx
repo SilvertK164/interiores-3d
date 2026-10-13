@@ -1,6 +1,6 @@
 'use client'
 
-import { FileDown, Keyboard, Trash2 } from 'lucide-react'
+import { FileDown, ImagePlus, Keyboard, Trash2 } from 'lucide-react'
 import { type KeyboardEvent, useEffect, useRef } from 'react'
 import { cx } from '@/lib/cx'
 import type { SnapMode } from './bridge/types'
@@ -21,8 +21,18 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-/** Panel del botón "Más": borrar, cuadrícula y ajustes de Pascal, atajos y Exportar plano. */
-export function MoreMenu({ onClose, onShortcuts, onExportPlan }: { onClose: () => void; onShortcuts: () => void; onExportPlan: () => void }) {
+/** Panel del botón "Más": borrar, cuadrícula y ajustes de Pascal, Muebles desde una foto, atajos y Exportar plano. */
+export function MoreMenu({
+  onClose,
+  onShortcuts,
+  onExportPlan,
+  onPhotoFurniture,
+}: {
+  onClose: () => void
+  onShortcuts: () => void
+  onExportPlan: () => void
+  onPhotoFurniture: () => void
+}) {
   const bridge = useBridge()
   const { mode, gridStep, snapWall, snapItem } = useShell((s) => ({
     mode: s.editor.mode,
@@ -69,6 +79,10 @@ export function MoreMenu({ onClose, onShortcuts, onExportPlan }: { onClose: () =
       <Section title="Ajuste de muebles">
         <ChipRow title="Ajuste de muebles" chips={ITEM_SNAP} active={snapItem} onPick={(v) => bridge.setSnap('item', v as SnapMode)} />
       </Section>
+      <button type="button" onClick={onPhotoFurniture} className={cx(ROW, 'text-ink hover:bg-ink/5')}>
+        <ImagePlus aria-hidden="true" className="size-5 shrink-0 text-ink-muted" strokeWidth={1.9} />
+        Muebles desde una foto
+      </button>
       <button type="button" onClick={onShortcuts} className={cx(ROW, 'text-ink hover:bg-ink/5')}>
         <Keyboard aria-hidden="true" className="size-5 shrink-0 text-ink-muted" strokeWidth={1.9} />
         Atajos de teclado

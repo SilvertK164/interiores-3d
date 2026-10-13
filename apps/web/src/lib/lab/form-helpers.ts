@@ -1,5 +1,8 @@
 import { LabError } from './lab-error'
 
+/** Dirección del servicio de TP3 con la que parten la página del laboratorio y «Muebles desde una foto» (se cambia con `NEXT_PUBLIC_LAB_PHOTO_URL`). */
+export const DEFAULT_SERVICE_URL = process.env.NEXT_PUBLIC_LAB_PHOTO_URL ?? 'http://localhost:8000'
+
 /**
  * Ancho conocido del ambiente tal como lo escribe la persona ("4", "4,5" o "4.5"). Vacío significa que no lo sabe (`null`).
  * El rango es el que acepta TP3: mayor que 0 y hasta 100 metros.

@@ -23,7 +23,10 @@ import { useBridge, useShell } from './use-bridge'
 import { useDismiss } from './use-dismiss'
 
 /** El dock del modo Editar. Lo que marca sale del estado REAL de Pascal; cada entrada arma la herramienta por el puente. */
-export function ShellDock({ onExportPlan }: { onExportPlan?: (opener: HTMLElement | null) => void } = {}) {
+export function ShellDock({
+  onExportPlan,
+  onPhotoFurniture,
+}: { onExportPlan?: (opener: HTMLElement | null) => void; onPhotoFurniture?: (opener: HTMLElement | null) => void } = {}) {
   const bridge = useBridge()
   const { mode, tool } = useShell((s) => ({ mode: s.editor.mode, tool: s.editor.tool }))
   const [openMenu, setOpenMenu] = useState<DockId | null>(null)
@@ -89,6 +92,11 @@ export function ShellDock({ onExportPlan }: { onExportPlan?: (opener: HTMLElemen
         onExportPlan={() => {
           // El botón Más es el que "abrió" el diálogo: el foco vuelve ahí al cerrarlo.
           onExportPlan?.(root.current?.querySelector<HTMLElement>('[data-dock="more"]') ?? null)
+          setOpenMenu(null)
+        }}
+        onPhotoFurniture={() => {
+          // Igual que Exportar plano: el foco vuelve al botón Más al cerrar el diálogo.
+          onPhotoFurniture?.(root.current?.querySelector<HTMLElement>('[data-dock="more"]') ?? null)
           setOpenMenu(null)
         }}
         onShortcuts={() => {
