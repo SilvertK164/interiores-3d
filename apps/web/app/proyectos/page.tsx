@@ -2,9 +2,11 @@
 
 import type { ProjectSummary } from '@interiores/contract'
 import { Clock, Folder, Search } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AppHeader } from '@/components/AppHeader'
 import { AppShell } from '@/components/AppShell'
+import { DeleteProjectDialog } from '@/components/DeleteProjectDialog'
+import { FlashNotice } from '@/components/FlashNotice'
 import { NewProjectDialog } from '@/components/NewProjectDialog'
 import { ProjectsSection } from '@/components/ProjectsSection'
 import { HeaderChipsSkeleton, ProjectsPageSkeleton } from '@/components/Skeleton'
@@ -12,6 +14,7 @@ import { TemplateGallery } from '@/components/TemplateGallery'
 import { ApiError } from '@/lib/api/client'
 import { friendlyMessage } from '@/lib/api/errors'
 import { api } from '@/lib/api/instance'
+import { PROJECT_DELETED_NOTICE, withoutProject } from '@/lib/delete-project'
 import { type NewProjectPreset, parseNewProjectParam } from '@/lib/new-project-preset'
 import { greetingName, savedName } from '@/lib/person-name'
 import { filterProjects, filterTemplates } from '@/lib/project-search'
@@ -31,6 +34,9 @@ export default function ProjectsPage() {
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [dialog, setDialog] = useState<{ open: boolean; preset: NewProjectPreset | null }>({ open: false, preset: null })
+  const [deleting, setDeleting] = useState<ProjectSummary | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const projectsTitle = useRef<HTMLHeadingElement>(null)
 
   const load = useCallback(() => {
     api.listProjects().then(
@@ -62,6 +68,15 @@ export default function ProjectsPage() {
     setDialog({ open: true, preset })
     window.history.replaceState(null, '', window.location.pathname)
   }, [ready])
+
+  const clearNotice = useCallback(() => setNotice(null), [])
+  const onDeleted = useCallback((project: ProjectSummary) => {
+    setProjects((list) => withoutProject(list, project.id))
+    setDeleting(null)
+    setNotice(PROJECT_DELETED_NOTICE)
+    // La tarjeta (y su botón) ya no existe: el foco pasa al título de la sección, no se pierde en el <body>.
+    requestAnimationFrame(() => projectsTitle.current?.focus())
+  }, [])
 
   const openDialog = (templateId: string | null = null) => setDialog({ open: true, preset: templateId ? { templateId } : null })
   const closeDialog = () => setDialog((d) => ({ ...d, open: false }))
@@ -127,10 +142,13 @@ export default function ProjectsPage() {
         </div>
 
         <section className={SECTION}>
-          <h2 className={SECTION_TITLE}>Tus proyectos</h2>
+          <h2 className={`${SECTION_TITLE} outline-none`} ref={projectsTitle} tabIndex={-1}>
+            Tus proyectos
+          </h2>
           <ProjectsSection
             error={error}
             now={now}
+            onDelete={setDeleting}
             onNew={() => openDialog()}
             projects={projects}
             query={query}
@@ -159,6 +177,8 @@ export default function ProjectsPage() {
       </div>
 
       <NewProjectDialog onClose={closeDialog} onPartial={load} open={dialog.open} preset={dialog.preset} />
+      <DeleteProjectDialog onClose={() => setDeleting(null)} onDeleted={onDeleted} project={deleting} />
+      <FlashNotice message={notice} onDone={clearNotice} />
     </AppShell>
   )
 }

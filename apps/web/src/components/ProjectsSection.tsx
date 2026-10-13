@@ -15,12 +15,14 @@ type Props = {
   error: string | null
   now: Date
   onNew: () => void
+  /** Se pidió eliminar este proyecto desde el menú «…» de su tarjeta. */
+  onDelete: (project: ProjectSummary) => void
 }
 
 const PANEL = 'glass grid min-h-0 place-items-center rounded-[28px] p-4 text-center'
 
 /** Fila "Tus proyectos": tarjetas con scroll horizontal interno, invitación si no hay ninguno, o aviso si falló la carga. */
-export function ProjectsSection({ projects, visible, query, error, now, onNew }: Props) {
+export function ProjectsSection({ projects, visible, query, error, now, onNew, onDelete }: Props) {
   if (error)
     return (
       <p className={`${PANEL} text-sm text-destructive`} role="alert">
@@ -68,7 +70,7 @@ export function ProjectsSection({ projects, visible, query, error, now, onNew }:
     <ul aria-label="Tus proyectos" className={PROJECT_LIST}>
       {visible.map((p) => (
         <li className={PROJECT_ITEM} key={p.id}>
-          <ProjectCard now={now} project={p} />
+          <ProjectCard now={now} onDelete={onDelete} project={p} />
         </li>
       ))}
       <li className="min-h-[120px] min-w-0 desk:min-h-0">
