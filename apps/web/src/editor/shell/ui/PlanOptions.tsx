@@ -3,7 +3,7 @@
 import { Palette, Printer, RectangleHorizontal, RectangleVertical } from 'lucide-react'
 import { type ReactNode, useId } from 'react'
 import { cx } from '@/lib/cx'
-import { TEXT, scaleText } from '@/lib/export/texts-es'
+import { TEXT, scaleEquivalence, scaleText } from '@/lib/export/texts-es'
 import type { Orientation, PaperSize, PlanMode, Scale } from '@/lib/export/types'
 import { Badge } from './primitives'
 
@@ -142,7 +142,11 @@ export function PlanOptions(props: PlanOptionsProps) {
             )
           })}
         </div>
-        {firstBlocked?.reason && <p className="ml-1.5 mt-1.5 text-[13px] text-sun-ink">{firstBlocked.reason}</p>}
+        {firstBlocked?.reason ? (
+          <p className="ml-1.5 mt-1.5 text-[13px] text-sun-ink">{firstBlocked.reason}</p>
+        ) : (
+          <p className="ml-1.5 mt-1.5 text-[13px] text-ink-muted">{scaleEquivalence(props.scale)}</p>
+        )}
       </Group>
 
       <Group legend={TEXT.mode}>

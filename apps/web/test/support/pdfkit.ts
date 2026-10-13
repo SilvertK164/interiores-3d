@@ -19,6 +19,8 @@ export interface PdfKitDoc {
   end(): void
   save(): PdfKitDoc
   restore(): PdfKitDoc
+  translate(x: number, y: number): PdfKitDoc
+  scale(x: number, y?: number): PdfKitDoc
   fillColor(color: string): PdfKitDoc
   strokeColor(color: string): PdfKitDoc
   lineWidth(width: number): PdfKitDoc

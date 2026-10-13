@@ -1,4 +1,6 @@
-import { inflateSync } from 'node:zlib'
+import { type PdfObject, asLatin1, pagesOf, parseObjects, refOf } from './pdf-objects'
+
+export { asLatin1 }
 
 /**
  * Lector mínimo de los PDF que arma `pdfkit` (texto en `TJ`, fuentes Type0 con su `ToUnicode` o estándar), sin agregar
@@ -7,34 +9,6 @@ import { inflateSync } from 'node:zlib'
  */
 export type PdfItem = { str: string; x: number; y: number; width: number; font: string; size: number }
 export type PdfPage = { width: number; height: number; items: PdfItem[]; content: string }
-type PdfObject = { dict: string; text: string | null }
-
-/** `latin1` conserva un byte por carácter: sirve para buscar texto en el binario sin perder nada. */
-export const asLatin1 = (bytes: Uint8Array): string => Buffer.from(bytes).toString('latin1')
-
-function parseObjects(raw: string): Map<number, PdfObject> {
-  const objects = new Map<number, PdfObject>()
-  for (const match of raw.matchAll(/(\d+) 0 obj\b([\s\S]*?)\bendobj/g)) {
-    const body = match[2] ?? ''
-    const start = body.indexOf('stream')
-    if (start < 0 || !/^\s*<</.test(body)) {
-      objects.set(Number(match[1]), { dict: body, text: null })
-      continue
-    }
-    const dict = body.slice(0, start)
-    let data = body.slice(start + 6).replace(/^\r?\n/, '')
-    data = data.slice(0, data.lastIndexOf('endstream')).replace(/\r?\n$/, '')
-    if (/\/FlateDecode/.test(dict)) data = inflateSync(Buffer.from(data, 'latin1')).toString('latin1')
-    objects.set(Number(match[1]), { dict, text: data })
-  }
-  return objects
-}
-
-const refOf = (dict: string, key: string): number | null => {
-  const found = new RegExp(String.raw`/${key}\s+(\d+) 0 R`).exec(dict)
-  return found ? Number(found[1]) : null
-}
-
 /** Traduce los códigos (CID) de una fuente Type0 con su `ToUnicode` (`bfchar` y `bfrange`). */
 function toUnicodeMap(cmap: string): Map<number, string> {
   const map = new Map<number, string>()
@@ -69,7 +43,7 @@ function fontFor(objects: Map<number, PdfObject>, id: number): Font {
     // Fuente estándar (WinAnsi ≈ Latin-1): un byte por carácter, sin anchos.
     return { decode: (hex) => ({ text: Buffer.from(hex, 'hex').toString('latin1'), widths: [] }) }
   }
-  const map = toUnicodeMap(objects.get(unicode)?.text ?? '')
+  const map = toUnicodeMap(objects.get(unicode)?.data() ?? '')
   const descendant = /\/DescendantFonts\s*\[\s*(\d+) 0 R/.exec(dict)
   const cid = descendant ? (objects.get(Number(descendant[1]))?.dict ?? '') : ''
   const widths = (/\/W\s*\[\s*0\s*\[([^\]]*)\]/.exec(cid)?.[1] ?? '').trim().split(/\s+/).filter(Boolean).map(Number)
@@ -125,15 +99,11 @@ function itemsOf(content: string, fonts: Map<string, Font>): PdfItem[] {
 }
 
 export async function readPdf(bytes: Uint8Array): Promise<PdfPage[]> {
-  const objects = parseObjects(asLatin1(bytes))
+  const objects = parseObjects(bytes)
   const pages: PdfPage[] = []
-  for (const { dict } of objects.values()) {
-    if (!/\/Type\s*\/Page\b(?!s)/.test(dict)) continue
+  for (const { dict, content, resources } of pagesOf(objects)) {
     const box = /\/MediaBox\s*\[\s*([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\s*\]/.exec(dict)
-    const contents = refOf(dict, 'Contents')
-    const resources = refOf(dict, 'Resources')
-    const content = contents ? (objects.get(contents)?.text ?? '') : ''
-    const fonts = fontsOf(objects, resources ? (objects.get(resources)?.dict ?? '') : dict)
+    const fonts = fontsOf(objects, resources)
     pages.push({
       width: Number(box?.[3] ?? 0) - Number(box?.[1] ?? 0),
       height: Number(box?.[4] ?? 0) - Number(box?.[2] ?? 0),

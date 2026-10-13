@@ -1,4 +1,5 @@
 import type { FitResult } from './fit'
+import { formatMeters } from './scale-bar'
 import { paperLabel } from './sheet'
 import type { Orientation, PaperSize, Scale } from './types'
 
@@ -62,6 +63,9 @@ export function fitSummary(result: FitResult): string {
 }
 
 export const scaleText = (scale: Scale): string => `1:${scale}`
+
+/** Lo que significa la escala elegida: "1 cm en el papel = 0,5 m real" (lámina 19). */
+export const scaleEquivalence = (scale: Scale): string => `1 cm en el papel = ${formatMeters(scale / 100)} real`
 
 /** El motivo por el que una escala está deshabilitada, con el mejor ajuste si lo hay. */
 export function scaleDisabledReason(scale: Scale, paper: PaperSize, result: FitResult, best: Scale | null): string {

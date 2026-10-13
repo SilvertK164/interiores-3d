@@ -74,6 +74,8 @@ Tokens planos, **sin degradados**. Viven en `apps/web/app/app-shell.css` (la int
 | `madori-logotipo.png` | Logotipo con fondo transparente, 1024 px de ancho. |
 | `madori-icono.png` | Icono (cuadrado Crema con la ventana Noche y el sol), 512 × 512 px, esquinas transparentes. |
 
+**Logotipo vectorial para el PDF** (2026-10-12): `apps/web/public/brand/madori-logotipo.svg` y `apps/web/src/lib/export/brand-paths.ts` son las letras de Madori en Fraunces 700 (SOFT 100, tamaño óptico 144) convertidas a contornos con `pnpm --filter @interiores/web brand:build <ruta de la fuente>` (pide `fontkit` 2.0.4 y un TTF de Fraunces: la variable de `@fontsource-variable/fraunces` 5.3.0 viene en woff2, que `fontkit` no varía; se pasó a TTF con `fonttools`), con la "o" reservada para la ventana (`WINDOW` de `brand.ts`) en una caja de 0,5 × 0,479 em medida contra la "o" real. En Papel va todo negro y el sol como círculo sin relleno; en Color, Noche y Sol. El PDF no incrusta Fraunces.
+
 ## Pendientes honestos
 
 - **Disponibilidad de dominio y marca: SIN comprobar [por probar].** No se buscó `madori.*` ni en registros de marcas; antes de publicar hay que hacerlo (y revisar que no choque con otra empresa de diseño o inmobiliaria).
