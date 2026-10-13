@@ -22,7 +22,7 @@ test('en blanco y negro la imagen se descarga sin color', async ({ page }) => {
   test.setTimeout(180_000)
   await openTemplate(page, 'loft')
   await modeButton(page, 'Ver').click()
-  await page.getByRole('radio', { name: 'Blanco y negro' }).click()
+  await page.locator('label', { hasText: 'Blanco y negro' }).click()
   const download = page.waitForEvent('download', { timeout: 60_000 })
   await page.getByRole('button', { name: 'Exportar imagen 3D' }).click()
   const file = await download

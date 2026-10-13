@@ -89,25 +89,23 @@ export function ExportButtons({
 } = {}) {
   return (
     <div className="absolute bottom-6 right-5 z-10 flex items-center gap-3">
-      <div role="radiogroup" aria-label="Estilo de la imagen 3D" className={cx(FLOAT, 'inline-flex h-12 items-center gap-1 rounded-full p-1')}>
+      <fieldset className={cx(FLOAT, 'm-0 inline-flex h-12 items-center gap-1 rounded-full border-0 p-1')}>
+        <legend className="sr-only">Colores de la imagen 3D</legend>
         {(
           [
             ['color', 'Color'],
             ['bn', 'Blanco y negro'],
           ] as const
         ).map(([value, label]) => (
-          <button
+          <label
             key={value}
-            type="button"
-            role="radio"
-            aria-checked={imageStyle === value}
-            onClick={() => onImageStyle?.(value)}
-            className={cx('focus-ring h-10 cursor-pointer rounded-full px-4 text-[14px] font-semibold', imageStyle === value ? 'bg-ink text-white' : 'text-ink hover:bg-white')}
+            className="relative inline-flex h-10 cursor-pointer items-center rounded-full px-4 text-[14px] font-semibold text-ink hover:bg-white has-[:checked]:bg-ink has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand/45"
           >
+            <input checked={imageStyle === value} className="sr-only" name="estilo-imagen-3d" onChange={() => onImageStyle?.(value)} type="radio" value={value} />
             {label}
-          </button>
+          </label>
         ))}
-      </div>
+      </fieldset>
       <button type="button" onClick={onExportImage} disabled={imageBusy} aria-busy={imageBusy || undefined} className={EXPORT_BUTTON}>
         <ImageDown aria-hidden="true" className="size-[18px]" strokeWidth={2} />
         {imageBusy ? 'Generando imagen…' : 'Exportar imagen 3D'}

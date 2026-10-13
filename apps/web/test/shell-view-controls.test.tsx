@@ -31,9 +31,9 @@ describe('controles de Vista 3D', () => {
 
   it('ofrece Exportar imagen 3D y Exportar plano, ambos activos y sin Compartir, Renderizar ni "Pronto"', () => {
     const markup = renderToStaticMarkup(<ExportButtons onExportPlan={noop} onExportImage={noop} />)
-    expect(textOf(markup)).toBe('ColorBlanco y negroExportar imagen 3DExportar plano')
+    expect(textOf(markup)).toBe('Colores de la imagen 3DColorBlanco y negroExportar imagen 3DExportar plano')
     expect(markup).not.toMatch(/<button[^>]*disabled=""/)
-    expect(markup).toContain('aria-label="Estilo de la imagen 3D"')
+    expect(markup).toContain('Colores de la imagen 3D')
     expect(markup).not.toContain('Pronto')
   })
 
