@@ -1,5 +1,5 @@
 import { type AnalysisCandidate, pieceLabel } from '@/lib/lab/analysis-catalog'
-import { confidenceLevel, detailLines, percent, rotationText, sizeText } from '@/lib/lab/lab-view'
+import { confidenceLevel, detailLines, percent, placementLines, positionLines } from '@/lib/lab/lab-view'
 import type { DetectedFurniture } from '@/lib/lab/schema'
 
 const TH = 'px-2.5 py-2.5 font-medium'
@@ -18,9 +18,10 @@ function ConfidenceBar({ value }: { value: number }) {
 }
 
 /**
- * Las piezas que detectó el análisis, tal cual las devuelve (proporciones del ambiente), sin interpretarlas. El nombre sale del
+ * Las piezas que detectó el análisis, tal cual las devuelve (en metros sobre el plano, antes de que el acomodador las corrija): dónde
+ * está el centro, hacia dónde mira («mira al sur»), contra qué muro está («contra el muro norte») y sobre qué se apoya. El nombre sale del
  * catálogo que se le envió (`candidates`); si devolviera un id que no está, se muestra tal cual y se aclara. Sin desplazamiento
- * horizontal: con poco ancho solo se ven la pieza y su confianza.
+ * horizontal: con poco ancho solo se ven la pieza y su confianza, y el detalle va debajo del nombre.
  */
 export function PiecesTable({ furniture, candidates }: { furniture: DetectedFurniture[]; candidates: readonly AnalysisCandidate[] }) {
   if (furniture.length === 0) {
@@ -43,10 +44,7 @@ export function PiecesTable({ furniture, candidates }: { furniture: DetectedFurn
               Posición del centro
             </th>
             <th className={DETAIL_TH} scope="col">
-              Tamaño estimado
-            </th>
-            <th className={DETAIL_TH} scope="col">
-              Giro (horario)
+              Ubicación
             </th>
           </tr>
         </thead>
@@ -57,7 +55,7 @@ export function PiecesTable({ furniture, candidates }: { furniture: DetectedFurn
                 {pieceLabel(piece.asset_id, candidates)}
                 {confidenceLevel(piece.confidence) === 'low' && <span className="mt-0.5 block text-xs font-normal text-sun-ink">Confianza baja</span>}
                 <span className="mt-0.5 block text-xs font-normal text-ink-muted @md:hidden">
-                  {detailLines(piece).map((line) => (
+                  {detailLines(piece, furniture, candidates).map((line) => (
                     <span className="block" key={line}>
                       {line}
                     </span>
@@ -71,11 +69,19 @@ export function PiecesTable({ furniture, candidates }: { furniture: DetectedFurn
                 </span>
               </td>
               <td className={DETAIL_TD}>
-                <span className="block">{percent(piece.x)} del ancho</span>
-                <span className="block">{percent(piece.y)} del fondo</span>
+                {positionLines(piece).map((line) => (
+                  <span className="block" key={line}>
+                    {line}
+                  </span>
+                ))}
               </td>
-              <td className={DETAIL_TD}>{sizeText(piece)}</td>
-              <td className={DETAIL_TD}>{rotationText(piece)}</td>
+              <td className={DETAIL_TD}>
+                {placementLines(piece, furniture, candidates).map((line) => (
+                  <span className="block" key={line}>
+                    {line}
+                  </span>
+                ))}
+              </td>
             </tr>
           ))}
         </tbody>

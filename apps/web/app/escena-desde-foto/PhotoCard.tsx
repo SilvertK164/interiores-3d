@@ -25,7 +25,7 @@ type Props = {
 
 const CARD = 'glass flex flex-col gap-4 rounded-[28px] p-5 sm:p-6'
 
-/** Primera tarjeta: la foto (con vista previa), el ancho conocido, el aviso de privacidad y los dos botones de análisis. */
+/** Primera tarjeta: la foto (con vista previa), el ancho conocido del muro del fondo, el aviso de privacidad y los dos botones de análisis. */
 export function PhotoCard({ file, onFile, widthText, onWidth, busy, notice, pending, onSubmit, onExample, onRetry }: Props) {
   const analyzing = busy === 'analizando'
   return (
@@ -46,7 +46,7 @@ export function PhotoCard({ file, onFile, widthText, onWidth, busy, notice, pend
           placeholder="4,5"
           value={widthText}
         />
-        <span className="text-[13px] font-normal text-ink-muted">Si lo sabes, ajustamos las medidas a ese ancho.</span>
+        <span className="text-[13px] font-normal text-ink-muted">Si lo sabes, mide el muro del fondo (el que ves de frente) de lado a lado: así las medidas salen más precisas.</span>
       </label>
 
       <p className="m-0 flex items-start gap-2 text-[13px] leading-snug text-ink-muted">

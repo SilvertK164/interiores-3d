@@ -3,7 +3,7 @@
 import { ArrowRight, Braces, Sofa } from 'lucide-react'
 import { Loader } from '@/components/Loader'
 import type { AnalysisCandidate } from '@/lib/lab/analysis-catalog'
-import { calibrationText, originText, pieceCountLabel } from '@/lib/lab/lab-view'
+import { cameraText, openingsText, originText, pieceCountLabel, roomText } from '@/lib/lab/lab-view'
 import type { RoomAnalysis } from '@/lib/lab/schema'
 import type { CreateFromTemplateResult } from '@/lib/templates/create-from-template'
 import { LabNotice, type Notice, PendingActions } from './LabNotice'
@@ -15,7 +15,7 @@ type Props = {
   analysis: RoomAnalysis | null
   candidates: readonly AnalysisCandidate[]
   fromExample: boolean
-  /** Lo que `analysisToDefinition` movió o dejó afuera al armar el ambiente (piezas fuera del ambiente, sin catálogo o de confianza baja). */
+  /** Lo que el acomodador y `analysisToDefinition` corrigieron o dejaron afuera al armar el ambiente (piezas fuera del ambiente, solapadas, sin catálogo o de confianza baja). */
   modelWarnings: string[]
   busy: Busy
   notice: Notice | null
@@ -26,7 +26,7 @@ type Props = {
 
 const CARD = 'glass flex min-w-0 flex-col gap-4 rounded-[28px] p-5 sm:p-6'
 
-/** Segunda tarjeta: lo que encontró el análisis (avisos y tabla de piezas) y «Abrir en el editor». Antes del análisis es una invitación. */
+/** Segunda tarjeta: lo que encontró el análisis (el ambiente en metros, desde dónde se tomó la foto, avisos y tabla de piezas) y «Abrir en el editor». Antes del análisis es una invitación. */
 export function ResultsCard({ analysis, candidates, fromExample, modelWarnings, busy, notice, pending, onOpen, onRetry }: Props) {
   return (
     <section aria-labelledby="resultado" className={CARD}>
@@ -35,9 +35,14 @@ export function ResultsCard({ analysis, candidates, fromExample, modelWarnings, 
       </h2>
       {analysis ? (
         <>
-          <p className="m-0 text-sm text-ink-muted">
-            {originText(fromExample)} {calibrationText(analysis.calibration)}
-          </p>
+          <div className="flex flex-col gap-1 text-sm">
+            <p className="m-0 text-ink-muted">{originText(fromExample)}</p>
+            <p className="m-0 font-medium" data-testid="room-summary">
+              {roomText(analysis.room)}
+            </p>
+            <p className="m-0 text-ink-muted">{cameraText(analysis.camera)}</p>
+            <p className="m-0 text-ink-muted">{openingsText(analysis.openings)}</p>
+          </div>
           <WarningList title="Avisos del análisis" warnings={analysis.warnings} />
           <WarningList title="Avisos del modelado" warnings={modelWarnings} />
           <div className="flex flex-wrap items-center gap-2">

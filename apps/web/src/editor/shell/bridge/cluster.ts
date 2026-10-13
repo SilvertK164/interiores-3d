@@ -11,10 +11,11 @@ type Pt = readonly [number, number]
 
 /**
  * Una pieza del conjunto tal como la arma `analysisToCluster`: el mueble del catálogo local (con su tamaño real), su centro `at =
- * [x, z]` en metros (+x a la derecha, +z hacia abajo) y su `rotY` de Pascal. Las posiciones son entre sí; el puente las lleva a la
- * planta.
+ * [x, z]` en metros (+x a la derecha, +z hacia abajo), su `rotY` de Pascal y `y`, la altura de su base sobre el piso (0 si no se da:
+ * una tele sobre su mueble lleva la altura del mueble). Las posiciones en el plano son entre sí; el puente las lleva a la planta. La
+ * altura no cambia al mover el conjunto: lo apoyado sigue sobre su soporte.
  */
-export type ClusterPiece = { asset: CatalogItemLike; at: Pt; rotY: number }
+export type ClusterPiece = { asset: CatalogItemLike; at: Pt; rotY: number; y?: number }
 
 /** Lo que `insertItems` crea: el mueble, su posición en la planta (x, y, z) y su giro. */
 export type ClusterItem = { asset: CatalogItemLike; position: [number, number, number]; rotY: number }
@@ -109,7 +110,7 @@ export function createClusterSlice(deps: CoreDeps & ClusterDeps, decisions: Pick
         const here = centerOfBox(box)
         const items = pieces.map((piece): ClusterItem => ({
           asset: piece.asset,
-          position: [mm(piece.at[0] + center[0] - here[0]), FLOOR_Y, mm(piece.at[1] + center[1] - here[1])],
+          position: [mm(piece.at[0] + center[0] - here[0]), mm(FLOOR_Y + (piece.y ?? 0)), mm(piece.at[1] + center[1] - here[1])],
           rotY: piece.rotY,
         }))
         const ids = deps.insertItems({ parentId: target.id, items })

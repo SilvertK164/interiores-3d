@@ -115,6 +115,26 @@ describe('bridge.cluster.insert: todo de una vez', () => {
     expect(item?.rotY).toBeCloseTo(-Math.PI / 2, 12)
   })
 
+  it('lo apoyado sobre otra pieza lleva su altura (y): una tele sobre su mueble queda a la altura del mueble, y no se mueve con el centro del conjunto', () => {
+    const fake = setup()
+    const stand = piece('tv-stand', [0, 0], [1.86, 0.35, 0.32])
+    const tv = { ...piece('television', [0, 0], [1.62, 1.07, 0.38]), y: 0.35 }
+    fake.bridge.cluster.insert([stand, tv])
+    const [first, second] = lastCall(fake).items
+    expect(first?.position[1]).toBe(0)
+    expect(second?.position[1]).toBe(0.35)
+    expect(second?.position[0]).toBe(first?.position[0])
+    expect(second?.position[2]).toBe(first?.position[2])
+  })
+
+  it('la altura se redondea al milímetro y una pieza sin altura queda en el piso', () => {
+    const fake = setup()
+    fake.bridge.cluster.insert([{ ...piece('cactus', [0, 0], [0.3, 0.4, 0.3]), y: 0.33999999999999997 }, piece('sofa', [2, 0], [2, 1, 1])])
+    const [high, floor] = lastCall(fake).items
+    expect(high?.position[1]).toBe(0.34)
+    expect(floor?.position[1]).toBe(0)
+  })
+
   it('con una planta elegida por parámetro, inserta ahí y deja esa planta como la activa', () => {
     const fake = setup()
     const ids = fake.bridge.cluster.insert([SOFA], 'level_b')

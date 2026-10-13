@@ -1,47 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { EDGE_M, solveLayout } from '../src/lib/lab/layout-solver'
 import { WALL_FACE_M } from '../src/lib/lab/layout-constants'
-import type { DetectedFurniture, RoomAnalysis, RoomOpening } from '../src/lib/lab/schema'
 import { ASSETS, dims, resolve } from './support/layout'
+import { RANDOM_PLAN_IDS, randomPlan } from './support/random-plan'
 
 // Barrido: cientos de planos al azar (con una semilla fija, así que siempre son los mismos) y lo que el acomodador promete en todos: no
 // falla, es determinista, nada del piso se sale del ambiente, lo apoyado queda a la altura de su soporte, las aberturas caben en su muro y
 // no se pisan, y si no avisó de un conflicto sin resolver, nada sólido se pisa ni tapa una puerta.
-
-const IDS = ['sofa', 'coffee-table', 'tv-stand', 'television', 'livingroom-chair', 'bookshelf', 'indoor-plant', 'floor-lamp', 'dining-table', 'dining-chair', 'dresser', 'closet', 'rectangular-carpet', 'cactus']
-const WALLS = ['n', 's', 'e', 'w'] as const
-
-/** Un generador congruencial lineal: los mismos números en cada corrida. */
-function lcg(seed: number) {
-  let state = seed
-  const next = () => {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0
-    return state / 2 ** 32
-  }
-  return { next, between: (a: number, b: number) => a + next() * (b - a), pick: <T>(list: readonly T[]) => list[Math.floor(next() * list.length)] as T }
-}
-
-function randomPlan(seed: number): RoomAnalysis {
-  const rnd = lcg(seed)
-  const room = { width_m: rnd.between(1.5, 9), depth_m: rnd.between(1.5, 9) }
-  const count = Math.floor(rnd.between(0, 13))
-  const furniture: DetectedFurniture[] = Array.from({ length: count }, (_, index) => ({
-    asset_id: rnd.pick(IDS),
-    x_m: rnd.between(-0.4, room.width_m + 0.4),
-    z_m: rnd.between(-0.4, room.depth_m + 0.4),
-    facing_deg: rnd.between(-360, 360),
-    against_wall: rnd.next() < 0.3 ? rnd.pick(WALLS) : null,
-    on_top_of: index > 0 && rnd.next() < 0.2 ? Math.floor(rnd.between(0, index)) : null,
-    confidence: rnd.between(0.1, 1),
-  }))
-  const openings: RoomOpening[] = Array.from({ length: Math.floor(rnd.between(0, 4)) }, () => ({
-    type: rnd.next() < 0.5 ? 'door' : 'window',
-    wall: rnd.pick(WALLS),
-    at_m: rnd.between(0, 9),
-    width_m: rnd.between(0.4, 3),
-  }))
-  return { room, camera: { x_m: room.width_m / 2, z_m: room.depth_m, look_at: { x_m: room.width_m / 2, z_m: 0 } }, openings, furniture, warnings: [] }
-}
 
 /** La huella axial o girada (con su caja envolvente) de una pieza ya acomodada. */
 function box(piece: { asset: { id: string }; x: number; z: number; facingDeg: number }): [number, number, number, number] {
@@ -173,6 +138,6 @@ describe('barrido de planos al azar', () => {
   })
 
   it('usa las piezas reales del catálogo (el barrido no se queda sin materiales)', () => {
-    for (const id of IDS) expect(ASSETS.has(id), id).toBe(true)
+    for (const id of RANDOM_PLAN_IDS) expect(ASSETS.has(id), id).toBe(true)
   })
 })

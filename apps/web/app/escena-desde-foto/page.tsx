@@ -133,15 +133,15 @@ export default function EscenaDesdeFotoPage() {
   }
 
   /**
-   * El ambiente de la foto: las piezas se resuelven contra el catálogo local, que se carga recién aquí (Pascal no se importa antes).
-   * El editor abre con la cámara 3D en el punto de vista de la foto (`photoSceneCamera`).
+   * El ambiente de la foto: las piezas se resuelven contra el catálogo local, que se carga recién aquí (Pascal no se importa antes). El plano
+   * ya trae el tamaño del ambiente, sus aberturas y los muebles en metros; el editor abre con la cámara 3D donde estaba quien sacó la foto
+   * (`photoSceneCamera`).
    */
   const modelAnalysis = (current: RoomAnalysis) => async (warn: (message: string) => void): Promise<Built> => {
     const { analysisCatalog } = await import('@/editor/lab-scene')
     const { pieces } = await analysisCatalog()
-    const knownWidthM = parseKnownWidth(widthText)
-    const definition = analysisToDefinition(current, (id) => pieces.get(id), { knownWidthM, warn })
-    return { definition, camera: photoSceneCamera(knownWidthM, definition) }
+    const definition = analysisToDefinition(current, (id) => pieces.get(id), { warn })
+    return { definition, camera: photoSceneCamera(current.camera, definition) }
   }
 
   async function tryExample() {

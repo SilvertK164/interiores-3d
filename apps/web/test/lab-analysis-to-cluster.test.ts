@@ -1,230 +1,130 @@
 import { describe, expect, it } from 'vitest'
-import {
-  DEFAULT_ROOM_WIDTH_M,
-  MIN_CONFIDENCE,
-  ROOM_DEPTH_RATIO,
-  analysisToCluster,
-  roomSize,
-} from '../src/lib/lab/analysis-to-cluster'
+import { analysisToCluster } from '../src/lib/lab/analysis-to-cluster'
+import { MIN_CONFIDENCE } from '../src/lib/lab/layout-constants'
 import { SAMPLE_ANALYSIS } from '../src/lib/lab/sample-analysis'
-import type { DetectedFurniture, RoomAnalysis } from '../src/lib/lab/schema'
-import { footprint } from '../src/lib/templates/geometry'
+import type { DetectedFurniture } from '../src/lib/lab/schema'
+import { dims, piece, planOf, resolve } from './support/layout'
 
-const piece = (over: Partial<DetectedFurniture> = {}): DetectedFurniture => ({
-  asset_id: 'sofa',
-  x: 0.5,
-  y: 0.5,
-  width: 0.3,
-  depth: 0.2,
-  rotation_deg: 0,
-  confidence: 0.9,
-  ...over,
-})
-const analysisOf = (...furniture: DetectedFurniture[]): RoomAnalysis => ({ furniture, warnings: [], calibration: { status: 'uncalibrated', width_m: null } })
+// «Muebles desde una foto»: del plano de Gemini (ya acomodado) a un conjunto de muebles del catálogo local con sus posiciones entre sí. Sin
+// el ambiente inventado de 4 m: las posiciones salen del plano en metros, relativas al centro del ambiente de la foto.
 
-// Las piezas locales de mentira: lo único que el conversor les pide es su id y su nombre.
-const LOCAL: Record<string, { id: string; name: string; dimensions: [number, number, number] }> = {
-  sofa: { id: 'sofa', name: 'Sofa', dimensions: [2.06, 0.74, 1.01] },
-  'dining-chair': { id: 'dining-chair', name: 'Dining chair', dimensions: [0.47, 0.87, 0.5] },
-  'coffee-table': { id: 'coffee-table', name: 'Coffee table', dimensions: [1.72, 0.3, 1.04] },
-}
-const resolve = (id: string) => LOCAL[id]
-const run = (analysis: RoomAnalysis, opts: { knownWidthM?: number | null } = {}) => {
+const room = { width_m: 3.2, depth_m: 7 }
+const run = (furniture: DetectedFurniture[], over: Parameters<typeof planOf>[1] = {}) => {
   const warnings: string[] = []
-  const pieces = analysisToCluster(analysis, resolve, { ...opts, warn: (m) => warnings.push(m) })
+  const pieces = analysisToCluster(planOf(furniture, { room, ...over }), resolve, { warn: (message) => warnings.push(message) })
   return { pieces, warnings }
 }
 
 describe('analysisToCluster: posiciones', () => {
-  it('el ambiente de la foto mide 4 m de ancho y un 75 % de fondo cuando no se sabe su ancho', () => {
-    expect(DEFAULT_ROOM_WIDTH_M).toBe(4)
-    expect(ROOM_DEPTH_RATIO).toBe(0.75)
-    const { pieces } = run(analysisOf(piece({ x: 0.75, y: 0.25 })))
-    // x = 0,75 → 0,25 × 4 m a la derecha del centro; y = 0,25 → 0,25 × 3 m hacia arriba (-z)
-    expect(pieces).toHaveLength(1)
-    expect(pieces[0]?.at).toEqual([1, -0.75])
-  })
-
-  it('con el ancho conocido, el ambiente mide ese ancho y el fondo sigue siendo el 75 %', () => {
-    const { pieces } = run(analysisOf(piece({ x: 1, y: 1 })), { knownWidthM: 6 })
-    expect(pieces[0]?.at).toEqual([3, 2.25])
-  })
-
-  it.each([
-    ['no se indica', undefined],
-    ['es null', null],
-    ['es 0', 0],
-    ['es negativo', -3],
-    ['no es un número', Number.NaN],
-    ['es infinito', Number.POSITIVE_INFINITY],
-  ])('si el ancho conocido %s, usa los 4 m', (_name, knownWidthM) => {
-    const { pieces } = run(analysisOf(piece({ x: 1, y: 0.5 })), { knownWidthM })
-    expect(pieces[0]?.at).toEqual([2, 0])
-  })
-
-  it('el centro de la foto queda en el centro (0, 0), sin un -0 suelto', () => {
-    const at = run(analysisOf(piece())).pieces[0]?.at as [number, number]
-    expect(Object.is(at[0], 0)).toBe(true)
-    expect(Object.is(at[1], 0)).toBe(true)
-  })
-
-  it('en los bordes de la foto, la pieza queda en los bordes del ambiente (x e y de 0 a 1)', () => {
-    const corners = run(
-      analysisOf(piece({ x: 0, y: 0 }), piece({ x: 1, y: 0 }), piece({ x: 0, y: 1 }), piece({ x: 1, y: 1 })),
-    ).pieces.map((p) => p.at)
-    expect(corners).toEqual([
-      [-2, -1.5],
-      [2, -1.5],
-      [-2, 1.5],
-      [2, 1.5],
+  it('cada pieza va en su centro (x_m, z_m) del plano en metros, relativo al centro del ambiente, con +x al este y +z al sur', () => {
+    const { pieces } = run([piece({ asset_id: 'sofa', x_m: 1.6, z_m: 4.9 }), piece({ asset_id: 'bookshelf', x_m: 0.7, z_m: 1 })])
+    expect(pieces.map((p) => p.at)).toEqual([
+      [0, 1.4], // el centro del ambiente es (1,6; 3,5)
+      [-0.9, -2.5],
     ])
   })
 
-  it('redondea al milímetro (sin ruido de coma flotante)', () => {
-    const at = run(analysisOf(piece({ x: 0.58, y: 0.82 }))).pieces[0]?.at
-    expect(at).toEqual([0.32, 0.96])
+  it('no depende de ningún ancho inventado: el mismo mueble en el mismo punto da lo mismo en un ambiente de otro tamaño, salvo por su centro', () => {
+    const at = (width_m: number, depth_m: number) => run([piece({ asset_id: 'cactus', x_m: 1.5, z_m: 2 })], { room: { width_m, depth_m } }).pieces[0]?.at
+    expect(at(3, 4)).toEqual([0, 0])
+    expect(at(5, 6)).toEqual([-1, -1])
   })
 
-  it('+x va a la derecha y +z hacia abajo: lo de arriba de la foto (y chico) queda en z negativo', () => {
-    const { pieces } = run(analysisOf(piece({ y: 0.1 }), piece({ y: 0.9 })))
-    expect((pieces[0]?.at[1] ?? 0) < 0).toBe(true)
-    expect((pieces[1]?.at[1] ?? 0) > 0).toBe(true)
+  it('redondea al milímetro (sin ruido de coma flotante) y no deja un -0', () => {
+    const pieces = run([piece({ asset_id: 'cactus', x_m: 1.6, z_m: 3.5 }), piece({ asset_id: 'cactus', x_m: 1.2345678, z_m: 3.7777777 })]).pieces
+    expect(pieces[0]?.at.some((n) => Object.is(n, -0))).toBe(false)
+    for (const p of pieces) for (const n of p.at) expect(Math.round(n * 1000) / 1000).toBe(n)
   })
-})
 
-describe('analysisToCluster: tamaño', () => {
-  it('el tamaño es siempre el real del catálogo: width y depth de Gemini no cambian nada y la pieza sale tal cual está en el catálogo', () => {
-    const small = run(analysisOf(piece({ width: 0.01, depth: 0.01 }))).pieces
-    const huge = run(analysisOf(piece({ width: 1, depth: 1 }))).pieces
-    expect(small).toEqual(huge)
-    expect(small[0]?.asset).toBe(LOCAL.sofa)
-    expect(small[0]).not.toHaveProperty('scale')
-    expect(small[0]).not.toHaveProperty('size')
+  it('usa las posiciones ya acomodadas: lo que se pasa del ambiente se mete adentro', () => {
+    const { pieces } = run([piece({ asset_id: 'bookshelf', x_m: 3.1, z_m: 3.5 })])
+    expect(pieces[0]?.at[0]).toBeCloseTo(3.2 - 0.15 - 0.465 - 1.6, 3)
   })
 })
 
-describe('analysisToCluster: giro', () => {
-  // La rotación de TP3 es horaria vista desde arriba; el rotY de Pascal (el de three.js) es antihorario: los signos son opuestos.
-  it.each([
-    [0, 0],
-    [90, -Math.PI / 2],
-    [-90, Math.PI / 2],
-    [45, -Math.PI / 4],
-    [180, -Math.PI],
-    [-180, Math.PI],
-  ])('un giro horario de %i° es un rotY de %f', (deg, rotY) => {
-    expect(run(analysisOf(piece({ rotation_deg: deg }))).pieces[0]?.rotY).toBeCloseTo(rotY, 12)
+describe('analysisToCluster: giro y altura', () => {
+  it('el giro horario del plano llega como el rotY de Pascal (antihorario: el signo opuesto), a escuadra', () => {
+    const rot = (facing_deg: number) => run([piece({ asset_id: 'floor-lamp', x_m: 1.6, z_m: 3.5, facing_deg })]).pieces[0]?.rotY ?? 99
+    expect(rot(0)).toBe(0)
+    expect(rot(90)).toBeCloseTo(-Math.PI / 2, 10)
+    expect(rot(180)).toBeCloseTo(Math.PI, 10)
+    expect(rot(270)).toBeCloseTo(Math.PI / 2, 10)
+    expect(Object.is(rot(0), -0)).toBe(false)
   })
 
-  it('los giros de más de media vuelta se reducen al giro equivalente más corto', () => {
-    expect(run(analysisOf(piece({ rotation_deg: 270 }))).pieces[0]?.rotY).toBeCloseTo(Math.PI / 2, 12)
-    expect(run(analysisOf(piece({ rotation_deg: -270 }))).pieces[0]?.rotY).toBeCloseTo(-Math.PI / 2, 12)
-    expect(run(analysisOf(piece({ rotation_deg: 360 }))).pieces[0]?.rotY).toBeCloseTo(0, 12)
-    expect(run(analysisOf(piece({ rotation_deg: -360 }))).pieces[0]?.rotY).toBeCloseTo(0, 12)
+  it('con el rotY de Pascal un giro horario de 90° lleva el frente de la pieza hacia el oeste (-x)', () => {
+    const rotY = run([piece({ asset_id: 'floor-lamp', x_m: 1.6, z_m: 3.5, facing_deg: 90 })]).pieces[0]?.rotY ?? 0
+    expect([Math.round(Math.sin(rotY)) + 0, Math.round(Math.cos(rotY)) + 0]).toEqual([-1, 0])
   })
 
-  it('el giro 0 no deja un -0', () => {
-    expect(Object.is(run(analysisOf(piece({ rotation_deg: 0 }))).pieces[0]?.rotY, 0)).toBe(true)
-    expect(Object.is(run(analysisOf(piece({ rotation_deg: 360 }))).pieces[0]?.rotY, 0)).toBe(true)
+  it('lo apoyado sobre otra pieza lleva la altura real de su soporte (y), y lo del piso, 0', () => {
+    const stand = piece({ asset_id: 'tv-stand', x_m: 1.6, z_m: 0.31, against_wall: 'n' })
+    const tv = piece({ asset_id: 'television', x_m: 1.6, z_m: 0.31, on_top_of: 0 })
+    const { pieces } = run([stand, tv])
+    expect(pieces.map((p) => p.y)).toEqual([0, 0.35])
+    expect(pieces[1]?.supportedBy).toBe(0)
+    expect(pieces[0]?.supportedBy).toBeNull()
+    expect(pieces[1]?.at).toEqual(pieces[0]?.at)
   })
 
-  it('con el rotY de Pascal, un giro horario de 90° lleva el lado derecho de la pieza hacia abajo en el plano (+z)', () => {
-    // `footprint` usa el mismo rotY que Pascal (x' = cos·x + sin·z, z' = -sin·x + cos·z): la esquina (+x, -z) de la pieza, que
-    // arriba a la derecha, tiene que terminar abajo a la derecha tras un giro horario (en el plano +x va a la derecha y +z hacia abajo).
-    const rotY = run(analysisOf(piece({ rotation_deg: 90 }))).pieces[0]?.rotY as number
-    const [, topRight] = footprint([0, 0], 2, 1, rotY)
-    expect(topRight?.[0]).toBeCloseTo(0.5, 6)
-    expect(topRight?.[1]).toBeCloseTo(1, 6)
-    // y un giro antihorario de 90° (-90 en TP3) la lleva hacia arriba
-    const back = run(analysisOf(piece({ rotation_deg: -90 }))).pieces[0]?.rotY as number
-    const [, other] = footprint([0, 0], 2, 1, back)
-    expect(other?.[0]).toBeCloseTo(-0.5, 6)
-    expect(other?.[1]).toBeCloseTo(-1, 6)
+  it('cada pieza trae el tamaño real del catálogo (el del conjunto sale siempre de ahí)', () => {
+    const { pieces } = run([piece({ asset_id: 'sofa', x_m: 1.6, z_m: 3.5 })])
+    expect((pieces[0]?.asset as unknown as { dimensions: number[] } | undefined)?.dimensions).toEqual(dims('sofa'))
   })
 })
 
 describe('analysisToCluster: lo que se descarta, siempre con aviso y sin inventar sustitutos', () => {
   it('descarta lo que tiene confianza menor que 0,3 y lo dice con el nombre en castellano', () => {
     expect(MIN_CONFIDENCE).toBe(0.3)
-    const { pieces, warnings } = run(analysisOf(piece({ asset_id: 'dining-chair', confidence: 0.29 })))
+    const { pieces, warnings } = run([piece({ asset_id: 'indoor-plant', x_m: 1.6, z_m: 3.5, confidence: 0.2 })])
     expect(pieces).toEqual([])
     expect(warnings).toHaveLength(1)
-    expect(warnings[0]).toContain('Silla de comedor')
-    expect(warnings[0]).toContain('29 %')
+    expect(warnings[0]).toMatch(/Planta de interior/)
+    expect(warnings[0]).toMatch(/20 %/)
   })
 
   it('con confianza de 0,3 justo se queda (el corte es estrictamente menor)', () => {
-    expect(run(analysisOf(piece({ confidence: 0.3 }))).pieces).toHaveLength(1)
-    expect(run(analysisOf(piece({ confidence: 0.3 }))).warnings).toEqual([])
+    expect(run([piece({ asset_id: 'cactus', x_m: 1.6, z_m: 3.5, confidence: 0.3 })]).pieces).toHaveLength(1)
   })
 
   it('un asset_id que el catálogo local no conoce se descarta con aviso (con el id tal cual) y no se reemplaza por otra pieza', () => {
-    const { pieces, warnings } = run(analysisOf(piece({ asset_id: 'lampara-rara' }), piece({ asset_id: 'sofa' })))
-    expect(pieces.map((p) => p.asset.id)).toEqual(['sofa'])
-    expect(warnings).toHaveLength(1)
-    expect(warnings[0]).toContain('lampara-rara')
-    expect(warnings[0]).toMatch(/catálogo/)
-  })
-
-  it('una lista vacía da un conjunto vacío y ningún aviso', () => {
-    expect(run(analysisOf())).toEqual({ pieces: [], warnings: [] })
-  })
-
-  it('si todo se descarta, el conjunto queda vacío y hay un aviso por cada pieza', () => {
-    const { pieces, warnings } = run(
-      analysisOf(piece({ asset_id: 'inventada' }), piece({ asset_id: 'sofa', confidence: 0.1 }), piece({ asset_id: 'otra-inventada', confidence: 0.05 })),
-    )
+    const { pieces, warnings } = run([piece({ asset_id: 'lampara-rara' })])
     expect(pieces).toEqual([])
-    expect(warnings).toHaveLength(3)
+    expect(warnings[0]).toMatch(/lampara-rara/)
   })
 
-  it('una pieza desconocida con confianza baja da un solo aviso (el del id desconocido)', () => {
-    expect(run(analysisOf(piece({ asset_id: 'inventada', confidence: 0.1 }))).warnings).toHaveLength(1)
+  it('una lista vacía da un conjunto vacío y ningún aviso; sin función de avisos no falla', () => {
+    expect(run([])).toEqual({ pieces: [], warnings: [] })
+    expect(() => analysisToCluster(planOf([piece({ asset_id: 'lampara-rara' })]), resolve)).not.toThrow()
   })
 
-  it('sin función de avisos no falla', () => {
-    expect(() => analysisToCluster(analysisOf(piece({ asset_id: 'inventada' })), resolve)).not.toThrow()
-    expect(analysisToCluster(analysisOf(piece({ asset_id: 'inventada' })), resolve, {})).toEqual([])
+  it('si lo que se descarta es el soporte, lo apoyado se descarta con él (no queda una tele flotando)', () => {
+    const { pieces, warnings } = run([piece({ asset_id: 'tv-stand', x_m: 1.6, z_m: 0.31, confidence: 0.1 }), piece({ asset_id: 'television', x_m: 1.6, z_m: 0.31, on_top_of: 0 })])
+    expect(pieces).toEqual([])
+    expect(warnings).toHaveLength(2)
   })
 })
 
 describe('analysisToCluster: varias piezas', () => {
   it('un mismo mueble repetido (cuatro sillas) da cuatro piezas, una por cada detección y en el mismo orden', () => {
-    const chairs = [0.2, 0.4, 0.6, 0.8].map((x) => piece({ asset_id: 'dining-chair', x }))
-    const { pieces, warnings } = run(analysisOf(...chairs))
-    expect(warnings).toEqual([])
+    const chairs = [0.5, 1.2, 1.9, 2.6].map((x) => piece({ asset_id: 'dining-chair', x_m: x, z_m: 3.5 }))
+    const { pieces } = run(chairs)
+    expect(pieces).toHaveLength(4)
+    expect(pieces.map((p) => p.source)).toEqual([0, 1, 2, 3])
     expect(pieces.map((p) => p.asset.id)).toEqual(['dining-chair', 'dining-chair', 'dining-chair', 'dining-chair'])
-    expect(pieces.map((p) => p.at[0])).toEqual([-1.2, -0.4, 0.4, 1.2])
   })
 
-  it('mezcla lo que sirve y lo que no: conserva el orden de lo que se queda', () => {
-    const { pieces, warnings } = run(
-      analysisOf(piece({ asset_id: 'coffee-table' }), piece({ asset_id: 'inventada' }), piece({ asset_id: 'sofa', confidence: 0.2 }), piece({ asset_id: 'dining-chair' })),
-    )
-    expect(pieces.map((p) => p.asset.id)).toEqual(['coffee-table', 'dining-chair'])
-    expect(warnings).toHaveLength(2)
+  it('mezcla lo que sirve y lo que no: conserva el orden de lo que se queda, con su posición en el plano (source)', () => {
+    const { pieces } = run([piece({ asset_id: 'lampara-rara' }), piece({ asset_id: 'cactus', x_m: 1.6, z_m: 3.5 }), piece({ asset_id: 'sofa', confidence: 0.05 }), piece({ asset_id: 'floor-lamp', x_m: 0.5, z_m: 1 })])
+    expect(pieces.map((p) => [p.source, p.asset.id])).toEqual([[1, 'cactus'], [3, 'floor-lamp']])
   })
 
-  it('el análisis de ejemplo da una pieza menos que las que trae: la planta de confianza baja se descarta con aviso', () => {
-    const everything = Object.fromEntries(SAMPLE_ANALYSIS.furniture.map((f) => [f.asset_id, { id: f.asset_id, name: f.asset_id }]))
+  it('el plano de ejemplo da ocho piezas: la planta de confianza baja se descarta con aviso', () => {
     const warnings: string[] = []
-    const pieces = analysisToCluster(SAMPLE_ANALYSIS, (id) => everything[id], { warn: (m) => warnings.push(m) })
-    expect(pieces).toHaveLength(SAMPLE_ANALYSIS.furniture.length - 1)
+    const pieces = analysisToCluster(SAMPLE_ANALYSIS, resolve, { warn: (message) => warnings.push(message) })
+    expect(pieces).toHaveLength(8)
     expect(pieces.map((p) => p.asset.id)).not.toContain('indoor-plant')
-    expect(warnings).toHaveLength(1)
-  })
-})
-
-describe('roomSize: la medida del ambiente de la foto se decide en un solo lugar', () => {
-  it('sin ancho conocido, 4 m de ancho y el 75 % de fondo', () => {
-    expect(roomSize()).toEqual({ width: 4, depth: 3 })
-  })
-
-  it('con el ancho conocido, ese ancho y el 75 % de fondo', () => {
-    expect(roomSize(6)).toEqual({ width: 6, depth: 4.5 })
-  })
-
-  it.each([null, 0, -3, Number.NaN, Number.POSITIVE_INFINITY])('un ancho inválido (%s) cae a los 4 m', (knownWidthM) => {
-    expect(roomSize(knownWidthM)).toEqual({ width: 4, depth: 3 })
+    expect(warnings.some((m) => /Planta de interior/.test(m))).toBe(true)
+    expect(pieces.find((p) => p.asset.id === 'television')?.y).toBe(0.35)
   })
 })

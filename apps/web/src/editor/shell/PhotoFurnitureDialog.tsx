@@ -74,7 +74,7 @@ export function PhotoFurnitureDialog({ open, catalog, opener, onClose }: Props) 
       const knownWidthM = parseKnownWidth(state.widthText)
       dispatch({ type: 'analyzing' })
       const analysis = await api.analyzeRoom(state.file, { knownWidthM, catalog: local.candidates })
-      if (mine === run.current) dispatch({ type: 'analyzed', ...detectedRows(analysis, (id) => local.pieces.get(id), knownWidthM) })
+      if (mine === run.current) dispatch({ type: 'analyzed', ...detectedRows(analysis, (id) => local.pieces.get(id)) })
     } catch (error) {
       if (!(error instanceof LabError)) console.error('[muebles desde una foto]', error)
       if (mine === run.current) dispatch({ type: 'failed', message: describeLabError(error) })

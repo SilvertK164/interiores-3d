@@ -13,45 +13,58 @@ import {
 import type { DetectedFurniture, RoomAnalysis } from '../src/lib/lab/schema'
 
 const photo = () => new File([new Uint8Array([137, 80, 78, 71])], 'sala.png', { type: 'image/png' })
+// Un plano de 4 × 3 m: los muebles van en metros desde la esquina noroeste.
 const detected = (over: Partial<DetectedFurniture> = {}): DetectedFurniture => ({
   asset_id: 'sofa',
-  x: 0.5,
-  y: 0.5,
-  width: 0.3,
-  depth: 0.2,
-  rotation_deg: 0,
+  x_m: 2,
+  z_m: 1.5,
+  facing_deg: 0,
+  against_wall: null,
+  on_top_of: null,
   confidence: 0.9,
   ...over,
 })
 const analysisOf = (furniture: DetectedFurniture[], warnings: string[] = []): RoomAnalysis => ({
+  room: { width_m: 4, depth_m: 3 },
+  camera: { x_m: 2, z_m: 2.8, look_at: { x_m: 2, z_m: 0 } },
+  openings: [],
   furniture,
   warnings,
-  calibration: { status: 'uncalibrated', width_m: null },
 })
-const LOCAL: Record<string, { id: string; name: string }> = {
-  sofa: { id: 'sofa', name: 'Sofa' },
-  'dining-chair': { id: 'dining-chair', name: 'Dining chair' },
+const LOCAL: Record<string, { id: string; name: string; dimensions: [number, number, number] }> = {
+  sofa: { id: 'sofa', name: 'Sofa', dimensions: [2, 1, 1] },
+  'dining-chair': { id: 'dining-chair', name: 'Dining chair', dimensions: [0.5, 0.9, 0.5] },
+  'tv-stand': { id: 'tv-stand', name: 'TV stand', dimensions: [1.8, 0.35, 0.3] },
+  television: { id: 'television', name: 'Television', dimensions: [1.6, 1, 0.4] },
 }
 const resolve = (id: string) => LOCAL[id]
 describe('detectedRows (lo que el diálogo lista tras analizar)', () => {
-  it('una fila por pieza, todas marcadas, con el nombre en castellano, la confianza y el lugar que le toca', () => {
-    const { rows, warnings } = detectedRows(analysisOf([detected({ x: 1, y: 1, confidence: 0.92 }), detected({ asset_id: 'dining-chair', confidence: 0.5 })]), resolve, null)
+  it('una fila por pieza, todas marcadas, con el nombre en castellano, la confianza y el lugar que le toca (en metros, relativo al centro del ambiente)', () => {
+    const { rows, warnings } = detectedRows(analysisOf([detected({ x_m: 2.5, z_m: 1.5, confidence: 0.92 }), detected({ asset_id: 'dining-chair', x_m: 1, z_m: 2, confidence: 0.5 })]), resolve)
     expect(warnings).toEqual([])
     expect(rows.map((r) => [r.name, r.confidence, r.checked])).toEqual([
       ['Sofá', 0.92, true],
       ['Silla de comedor', 0.5, true],
     ])
-    expect(rows[0]?.piece.at).toEqual([2, 1.5])
+    expect(rows[0]?.piece.at).toEqual([0.5, 0]) // el centro del ambiente es (2; 1,5)
+    expect(rows[1]?.piece.at).toEqual([-1, 0.5])
     expect(rows[0]?.piece.asset).toBe(LOCAL.sofa)
   })
 
-  it('usa el ancho conocido para ubicar las piezas', () => {
-    const { rows } = detectedRows(analysisOf([detected({ x: 1, y: 0.5 })]), resolve, 6)
-    expect(rows[0]?.piece.at).toEqual([3, 0])
+  it('las medidas del ambiente son las del plano: no hay ningún ancho que suponer', () => {
+    const wider = { ...analysisOf([detected({ x_m: 3, z_m: 1.5 })]), room: { width_m: 6, depth_m: 3 } }
+    expect(detectedRows(wider, resolve).rows[0]?.piece.at).toEqual([0, 0])
+  })
+
+  it('lo apoyado sobre otra pieza lleva su altura y recuerda cuál es su soporte', () => {
+    const { rows } = detectedRows(analysisOf([detected({ asset_id: 'tv-stand', x_m: 2, z_m: 0.3, against_wall: 'n' }), detected({ asset_id: 'television', x_m: 2, z_m: 0.3, on_top_of: 0 })]), resolve)
+    expect(rows.map((r) => r.piece.y)).toEqual([0, 0.35])
+    expect(rows[0]?.supportKey).toBeNull()
+    expect(rows[1]?.supportKey).toBe(rows[0]?.key)
   })
 
   it('las piezas repetidas son filas distintas, cada una con su clave', () => {
-    const { rows } = detectedRows(analysisOf([detected({ asset_id: 'dining-chair', x: 0.2 }), detected({ asset_id: 'dining-chair', x: 0.8 })]), resolve, null)
+    const { rows } = detectedRows(analysisOf([detected({ asset_id: 'dining-chair', x_m: 0.8 }), detected({ asset_id: 'dining-chair', x_m: 3.2 })]), resolve)
     expect(rows).toHaveLength(2)
     expect(new Set(rows.map((r) => r.key)).size).toBe(2)
   })
@@ -60,7 +73,6 @@ describe('detectedRows (lo que el diálogo lista tras analizar)', () => {
     const { rows, warnings } = detectedRows(
       analysisOf([detected({ asset_id: 'inventada' }), detected({ confidence: 0.1 }), detected({ asset_id: 'dining-chair' })], ['La silla está tapada.']),
       resolve,
-      null,
     )
     expect(rows.map((r) => r.piece.asset.id)).toEqual(['dining-chair'])
     expect(warnings).toHaveLength(3)
@@ -70,12 +82,12 @@ describe('detectedRows (lo que el diálogo lista tras analizar)', () => {
   })
 
   it('sin muebles: ninguna fila, pero los avisos del servicio se conservan', () => {
-    expect(detectedRows(analysisOf([], ['No se ve ningún mueble.']), resolve, null)).toEqual({ rows: [], warnings: ['No se ve ningún mueble.'] })
+    expect(detectedRows(analysisOf([], ['No se ve ningún mueble.']), resolve)).toEqual({ rows: [], warnings: ['No se ve ningún mueble.'] })
   })
 })
 
 describe('photoReducer', () => {
-  const analyzed = (rows = detectedRows(analysisOf([detected(), detected({ asset_id: 'dining-chair' })]), resolve, null).rows): PhotoState => ({
+  const analyzed = (rows = detectedRows(analysisOf([detected({ x_m: 1 }), detected({ asset_id: 'dining-chair', x_m: 3 })]), resolve).rows): PhotoState => ({
     ...initialState(),
     file: photo(),
     step: 'results',
@@ -107,7 +119,7 @@ describe('photoReducer', () => {
   })
 
   it('al terminar muestra las filas (todas marcadas) y los avisos', () => {
-    const { rows } = detectedRows(analysisOf([detected()]), resolve, null)
+    const { rows } = detectedRows(analysisOf([detected()]), resolve)
     const state = photoReducer({ ...initialState(), step: 'analyzing', file: photo() }, { type: 'analyzed', rows, warnings: ['Aviso'] })
     expect(state).toMatchObject({ step: 'results', error: null, warnings: ['Aviso'] })
     expect(state.rows.every((r) => r.checked)).toBe(true)
@@ -128,6 +140,19 @@ describe('photoReducer', () => {
     expect(checkedRows(off)).toEqual([second])
     const on = photoReducer(off, { type: 'toggle', key: first?.key as string })
     expect(on.rows.every((r) => r.checked)).toBe(true)
+  })
+
+  it('desmarcar un soporte desmarca lo que está apoyado sobre él, y marcar lo apoyado marca su soporte (no queda una tele flotando)', () => {
+    const { rows } = detectedRows(analysisOf([detected({ asset_id: 'tv-stand', x_m: 2, z_m: 0.3, against_wall: 'n' }), detected({ asset_id: 'television', x_m: 2, z_m: 0.3, on_top_of: 0 }), detected({ x_m: 2, z_m: 2 })]), resolve)
+    const [stand, tv, sofa] = rows
+    const state: PhotoState = { ...initialState(), file: photo(), step: 'results', rows }
+    const standOff = photoReducer(state, { type: 'toggle', key: stand?.key as string })
+    expect(standOff.rows.map((r) => r.checked)).toEqual([false, false, true])
+    const tvOn = photoReducer(standOff, { type: 'toggle', key: tv?.key as string })
+    expect(tvOn.rows.map((r) => r.checked)).toEqual([true, true, true])
+    const tvOff = photoReducer(state, { type: 'toggle', key: tv?.key as string })
+    expect(tvOff.rows.map((r) => r.checked)).toEqual([true, false, true])
+    expect(photoReducer(state, { type: 'toggle', key: sofa?.key as string }).rows.map((r) => r.checked)).toEqual([true, true, false])
   })
 
   it('«cambiar la foto» vuelve al formulario y se queda con lo escrito, sin las filas', () => {
@@ -154,7 +179,7 @@ describe('qué se puede hacer', () => {
   })
 
   it('agregar pide estar en la lista y tener al menos una pieza marcada', () => {
-    const { rows } = detectedRows(analysisOf([detected(), detected()]), resolve, null)
+    const { rows } = detectedRows(analysisOf([detected({ x_m: 1 }), detected({ x_m: 3 })]), resolve)
     expect(canAdd({ ...base, step: 'results', rows })).toBe(true)
     expect(canAdd({ ...base, step: 'results', rows: rows.map((r) => ({ ...r, checked: false })) })).toBe(false)
     expect(canAdd({ ...base, step: 'results', rows: [] })).toBe(false)
@@ -162,7 +187,7 @@ describe('qué se puede hacer', () => {
   })
 
   it('el resumen cuenta las piezas elegidas, en singular o plural', () => {
-    const { rows } = detectedRows(analysisOf([detected(), detected(), detected()]), resolve, null)
+    const { rows } = detectedRows(analysisOf([detected({ x_m: 1 }), detected({ asset_id: 'dining-chair', x_m: 2 }), detected({ x_m: 3, z_m: 0.8 })]), resolve)
     const state = { ...base, step: 'results' as const, rows: rows.map((r, i) => ({ ...r, checked: i < 2 })) }
     expect(selectionSummary(state)).toBe('2 de 3 muebles elegidos')
     expect(selectionSummary({ ...state, rows: rows.slice(0, 1) })).toBe('1 de 1 mueble elegido')
