@@ -6,8 +6,7 @@ Una guía de convivencia entre Silvert y Victoria, no un reglamento: se ajusta e
 
 | Persona | Suele ocuparse de |
 |---|---|
-| Silvert | La infraestructura (base de datos, API y despliegue) y el editor |
-| Victoria | El laboratorio (`lab/`): el espacio de Victoria para explorar el modelado a partir de fotos |
+| Silvert y Victoria | Todo el proyecto, entre los dos: cada cambio lo hace uno y lo revisa el otro |
 
 Los dos revisan los PR del otro, así cada cambio lo mira alguien que no lo escribió.
 
