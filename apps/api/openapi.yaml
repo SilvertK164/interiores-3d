@@ -143,6 +143,40 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '428':
           $ref: '#/components/responses/PreconditionRequired'
+  /v1/analyze-room:
+    post:
+      operationId: analyzeRoom
+      summary: Propone qué muebles del catálogo hay en la foto de un ambiente
+      description: >-
+        Recibe la foto en base64 (JSON, sin multipart) y las piezas del catálogo entre las que puede elegir. La API las
+        envía a un modelo de visión (Gemini) y devuelve, por cada mueble reconocido, el id de UNA de esas piezas con su
+        posición como proporción del ambiente. Cada persona puede pedir hasta 10 análisis por hora: los pedidos
+        inválidos no cuentan; los que llegan al modelo sí, aunque el modelo falle. La foto no se guarda ni se registra.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRoomBody'
+      responses:
+        '200':
+          description: Muebles propuestos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomAnalysis'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '413':
+          $ref: '#/components/responses/ImageTooLarge'
+        '422':
+          $ref: '#/components/responses/AnalysisInvalid'
+        '429':
+          $ref: '#/components/responses/AnalysisLimit'
+        '502':
+          $ref: '#/components/responses/AnalysisFailed'
+        '503':
+          $ref: '#/components/responses/AnalysisUnavailable'
 components:
   securitySchemes:
     bearerAuth:
@@ -199,6 +233,40 @@ components:
             $ref: '#/components/schemas/ErrorBody'
     PreconditionRequired:
       description: Falta el encabezado If-Match
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    ImageTooLarge:
+      description: La foto supera los 3 MB una vez decodificada (code imagen_demasiado_grande)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    AnalysisInvalid:
+      description: >-
+        El pedido no cumple el contrato (code datos_invalidos), la foto no se puede leer o no coincide con el formato
+        indicado (code imagen_ilegible) o el catálogo no sirve (code catalogo_invalido)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    AnalysisLimit:
+      description: La persona ya pidió 10 análisis por hora (code limite_de_analisis)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    AnalysisFailed:
+      description: >-
+        El proveedor de visión falló, tardó más de 25 segundos o devolvió una respuesta que no sirve, por ejemplo un id
+        fuera del catálogo enviado (code analisis_fallido)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    AnalysisUnavailable:
+      description: El análisis no está configurado en este servidor, porque falta GEMINI_API_KEY (code analisis_no_disponible)
       content:
         application/json:
           schema:
@@ -332,4 +400,85 @@ components:
                 - limite_de_proyectos
                 - falta_if_match
                 - error_interno
+                - analisis_no_disponible
+                - analisis_fallido
+                - catalogo_invalido
+                - imagen_ilegible
+                - imagen_demasiado_grande
+                - limite_de_analisis
             message: { type: string }
+    AnalyzeRoomBody:
+      type: object
+      required: [image, mime, catalog]
+      properties:
+        image:
+          type: string
+          contentEncoding: base64
+          minLength: 1
+          maxLength: 4194304
+          description: La foto en base64 (sin el prefijo data:), de hasta 3 MB una vez decodificada
+        mime:
+          type: string
+          enum: [image/jpeg, image/png, image/webp]
+          description: El formato real de la foto; debe coincidir con los primeros bytes del archivo
+        knownWidthM:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 100
+          description: Ancho conocido del ambiente, en metros
+        catalog:
+          type: array
+          minItems: 1
+          maxItems: 100
+          description: Las piezas entre las que puede elegir el modelo; hasta 64 KB de JSON y con ids únicos
+          items:
+            $ref: '#/components/schemas/CatalogOption'
+    CatalogOption:
+      type: object
+      additionalProperties: false
+      description: Lo único que el servicio sabe de cada pieza (sin rutas ni medidas)
+      required: [id, name, category]
+      properties:
+        id: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$' }
+        name: { type: string, minLength: 1, maxLength: 120 }
+        category: { type: string, minLength: 1, maxLength: 60 }
+        tags:
+          type: array
+          maxItems: 10
+          items: { type: string, minLength: 1, maxLength: 40 }
+    DetectedFurniture:
+      type: object
+      description: >-
+        Un mueble reconocido. x e y son su centro y width y depth su tamaño, todos como proporción del ancho y del fondo
+        del ambiente (la esquina superior izquierda es 0,0); rotation_deg gira en sentido horario visto desde arriba.
+      required: [asset_id, x, y, width, depth, rotation_deg, confidence]
+      properties:
+        asset_id: { type: string, minLength: 1, maxLength: 100, description: El id de una de las piezas del catálogo enviado }
+        x: { type: number, minimum: 0, maximum: 1 }
+        y: { type: number, minimum: 0, maximum: 1 }
+        width: { type: number, exclusiveMinimum: 0, maximum: 1 }
+        depth: { type: number, exclusiveMinimum: 0, maximum: 1 }
+        rotation_deg: { type: number, minimum: -360, maximum: 360 }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+    Calibration:
+      type: object
+      required: [status, width_m]
+      properties:
+        status: { type: string, enum: [uncalibrated, user_provided] }
+        width_m:
+          oneOf:
+            - type: number
+            - type: 'null'
+    RoomAnalysis:
+      type: object
+      required: [furniture, warnings, calibration]
+      properties:
+        furniture:
+          type: array
+          items:
+            $ref: '#/components/schemas/DetectedFurniture'
+        warnings:
+          type: array
+          items: { type: string }
+        calibration:
+          $ref: '#/components/schemas/Calibration'

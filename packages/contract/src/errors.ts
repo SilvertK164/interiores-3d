@@ -14,5 +14,11 @@ export const ERROR_CODES = {
   projectLimit: 'limite_de_proyectos',
   preconditionRequired: 'falta_if_match',
   internal: 'error_interno',
+  analysisUnavailable: 'analisis_no_disponible',
+  analysisFailed: 'analisis_fallido',
+  invalidCatalog: 'catalogo_invalido',
+  unreadableImage: 'imagen_ilegible',
+  imageTooLarge: 'imagen_demasiado_grande',
+  analysisLimit: 'limite_de_analisis',
 } as const
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]

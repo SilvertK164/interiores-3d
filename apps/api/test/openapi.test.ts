@@ -1,12 +1,20 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import {
+  ANALYSES_PER_HOUR,
+  ANALYZE_CATALOG_MAX_ITEMS,
+  ANALYZE_IMAGE_MAX_BASE64_CHARS,
+  AnalyzeRoomBodySchema,
+  CalibrationSchema,
+  CatalogOptionSchema,
   CreateProjectBodySchema,
+  DetectedFurnitureSchema,
   ERROR_CODES,
   ErrorBodySchema,
   ProjectCreatedSchema,
   ProjectDetailSchema,
   ProjectSummarySchema,
+  RoomAnalysisSchema,
   SceneEnvelopeSchema,
   SceneSavedSchema,
   TemplateIdSchema,
@@ -36,6 +44,7 @@ describe('openapi.yaml', () => {
     expect(codes('/v1/projects/{id}', 'patch')).toEqual(['200', '401', '404', '422'])
     expect(codes('/v1/projects/{id}', 'delete')).toEqual(['204', '401', '404'])
     expect(codes('/v1/projects/{id}/scene', 'put')).toEqual(['200', '401', '404', '409', '413', '422', '428'])
+    expect(codes('/v1/analyze-room', 'post')).toEqual(['200', '401', '413', '422', '429', '502', '503'])
     expect(spec.paths['/health'].get.security).toEqual([])
   })
 
@@ -48,6 +57,11 @@ describe('openapi.yaml', () => {
     ['SceneEnvelope', SceneEnvelopeSchema],
     ['SceneSaved', SceneSavedSchema],
     ['ErrorBody', ErrorBodySchema],
+    ['AnalyzeRoomBody', AnalyzeRoomBodySchema],
+    ['CatalogOption', CatalogOptionSchema],
+    ['RoomAnalysis', RoomAnalysisSchema],
+    ['DetectedFurniture', DetectedFurnitureSchema],
+    ['Calibration', CalibrationSchema],
   ]
 
   it.each(pairs)('%s coincide con su esquema zod (propiedades y obligatorias)', (name, schema) => {
@@ -79,5 +93,25 @@ describe('openapi.yaml', () => {
     }
     expect(schemas.CreateProjectBody.properties.templateId).toEqual({ $ref: '#/components/schemas/TemplateId' })
     expect(schemas.CreateProjectBody.required).toEqual(['name'])
+  })
+
+  it('POST /v1/analyze-room exige sesión (usa la seguridad global) y documenta los límites del contrato', () => {
+    const post = spec.paths['/v1/analyze-room'].post
+    expect(post.security).toBeUndefined()
+    expect(spec.security).toEqual([{ bearerAuth: [] }])
+    const body = spec.components.schemas.AnalyzeRoomBody
+    expect(body.properties.image.maxLength).toBe(ANALYZE_IMAGE_MAX_BASE64_CHARS)
+    expect(body.properties.mime.enum).toEqual(['image/jpeg', 'image/png', 'image/webp'])
+    expect(body.properties.catalog.maxItems).toBe(ANALYZE_CATALOG_MAX_ITEMS)
+    expect(body.properties.knownWidthM).toMatchObject({ exclusiveMinimum: 0, maximum: 100 })
+    expect(spec.components.schemas.CatalogOption.additionalProperties).toBe(false)
+  })
+
+  it('las respuestas del análisis explican cada falla en castellano', () => {
+    const { responses } = spec.components
+    expect(responses.ImageTooLarge.description).toMatch(/3 MB/)
+    expect(responses.AnalysisLimit.description).toMatch(new RegExp(`${ANALYSES_PER_HOUR} análisis por hora`))
+    expect(responses.AnalysisFailed.description).toMatch(/proveedor/i)
+    expect(responses.AnalysisUnavailable.description).toMatch(/GEMINI_API_KEY/)
   })
 })

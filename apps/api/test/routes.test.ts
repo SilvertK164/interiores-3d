@@ -41,6 +41,7 @@ describe('autenticación', () => {
     ['PATCH', '/v1/projects/0b0e8d9c-6a40-4d6e-9a3c-1f2f6a0f1b11'],
     ['DELETE', '/v1/projects/0b0e8d9c-6a40-4d6e-9a3c-1f2f6a0f1b11'],
     ['PUT', '/v1/projects/0b0e8d9c-6a40-4d6e-9a3c-1f2f6a0f1b11/scene'],
+    ['POST', '/v1/analyze-room'],
   ]
 
   it.each(routes)('%s %s sin token responde 401 con el cuerpo de error en castellano', async (method, url) => {

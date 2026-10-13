@@ -3,6 +3,7 @@ import { ERROR_CODES, SCENE_MAX_BYTES } from '@interiores/contract'
 import Fastify, { type FastifyServerOptions } from 'fastify'
 import { type AuthUser, type AuthVerifier, bearerToken } from './auth.js'
 import { AppError, errorBody, errors } from './errors.js'
+import { analyzeRoomRoutes } from './routes/analyze-room.js'
 import { healthRoutes } from './routes/health.js'
 import { projectRoutes } from './routes/projects.js'
 import { sceneRoutes } from './routes/scene.js'
@@ -11,6 +12,10 @@ import type { ProjectStore } from './store.js'
 declare module 'fastify' {
   interface FastifyRequest {
     user: AuthUser
+  }
+  interface FastifyContextConfig {
+    /** `image`: si el cuerpo pasa el tope de la ruta, el error habla de la foto y no de la escena. */
+    oversize?: 'image'
   }
 }
 
@@ -51,7 +56,7 @@ export function buildApp(deps: Deps, options: BuildOptions = {}) {
     if (err instanceof AppError) return reply.status(err.status).send(errorBody(err.code, err.message))
     const code = (err as { code?: string }).code
     if (code === 'FST_ERR_CTP_BODY_TOO_LARGE') {
-      const e = errors.tooLarge()
+      const e = req.routeOptions.config?.oversize === 'image' ? errors.imageTooLarge() : errors.tooLarge()
       return reply.status(e.status).send(errorBody(e.code, e.message))
     }
     const status = (err as { statusCode?: number }).statusCode
@@ -80,6 +85,7 @@ export function buildApp(deps: Deps, options: BuildOptions = {}) {
       })
       v1.register(projectRoutes(deps.store))
       v1.register(sceneRoutes(deps.store))
+      v1.register(analyzeRoomRoutes)
     },
     { prefix: '/v1' },
   )
